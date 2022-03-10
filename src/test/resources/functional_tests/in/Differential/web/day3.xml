@@ -1,0 +1,3328 @@
+<Campagne idPeriode="X00" idSource="VQS" millesime="2021">
+    <Traitement>
+        <Type>ExtractionReponses</Type>
+    </Traitement>
+    <Questionnaires>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS6402286</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">6  SSZ KP TKK RL RUCGE 4E CJKCN  27688 RCNPH</Valeur>
+                    <Valeur type="nouvelle">6  SSZ KP TKK RL RUCGE 4E CJKCN  27688 RCNPH</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">YFRBU FHNVW</Valeur>
+                    <Valeur type="nouvelle">YFRBU FHNVW</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">2</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">879</Valeur>
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">route de mimet</Valeur>
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">Chambre 1311</Valeur>
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">13120</Valeur>
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">Gardanne</Valeur>
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Mxmzi</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Eojoé</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1998-10-30</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">l'habitant du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS7067637</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">060  MCZ VW CAMNRCFM AVMQF ZOEWKOT   17065 PQOOX</Valeur>
+                    <Valeur type="nouvelle">060  MCZ VW CAMNRCFM AVMQF ZOEWKOT   17065 PQOOX</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">BHQCO YETGP</Valeur>
+                    <Valeur type="nouvelle">BHQCO YETGP</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Ofjjé</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">PIUPJ</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2005-05-02</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">4</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les 3 habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS4758324</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">65  CJN DO D ZYWH   53818 RODVK</Valeur>
+                    <Valeur type="nouvelle">65  CJN DO D ZYWH   53818 RODVK</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">GQUJE RZIYCG</Valeur>
+                    <Valeur type="nouvelle">GQUJE RZIYCG</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Ufsye</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Tmxdpk</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1911-10-20</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">l'habitant du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">wx lzjqn g'jbnszquzs gmxu atzaf à yk IQV bcéqan mz abbcdkr à ip rsrc in 61 Ztrr 2292</Valeur>
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS4401017</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">6  UHL KXSZ TCHDST   88587 AUXPW</Valeur>
+                    <Valeur type="nouvelle">6  UHL KXSZ TCHDST   88587 AUXPW</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">HVTH NTLHMT</Valeur>
+                    <Valeur type="nouvelle">HVTH NTLHMT</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Qgwqmo</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Burpst</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1974-11-09</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Idzqjxmn</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Yppoyw</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1903-04-09</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Yfvh</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Ndntqz</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1943-11-12</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les 3 habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS7664354</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">7  BJD MCJTHP   35220 ITAGZ</Valeur>
+                    <Valeur type="nouvelle">7  BJD MCJTHP   35220 ITAGZ</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">OKKUIMDA KIOWJK</Valeur>
+                    <Valeur type="nouvelle">OKKUIMDA KIOWJK</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Inbmlobt</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Tvfjim</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1997-05-10</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Awrtoqc</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Mkytm</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1946-12-31</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Dbmwo</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Rpgffx Xepes</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1956-04-29</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les 3 habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS2930486</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">511  RBY VO GI USMPCFUFZN OIKF 9 LYYJDSERNJJ 915  32707 QSXBQ</Valeur>
+                    <Valeur type="nouvelle">511  RBY VO GI USMPCFUFZN OIKF 9 LYYJDSERNJJ 915  32707 QSXBQ</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">QEWVWL JZ AMPFU</Valeur>
+                    <Valeur type="nouvelle">QEWVWL JZ AMPFU</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">4</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Milej</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">bcyz</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2018-11-20</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Kfxuiykb</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Cn wlzsn</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1923-12-30</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Rexlk</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Ht rixwp</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1996-11-20</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-4" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Fltxws</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Jp niamj</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2000-10-24</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-4" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">4</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les 4 habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS5085259</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">59  VX CS MKFWBGVTGKXS   56579 DCZDY</Valeur>
+                    <Valeur type="nouvelle">59  VX CS MKFWBGVTGKXS   56579 DCZDY</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">SLUGURYTQ QRAFFQ</Valeur>
+                    <Valeur type="nouvelle">SLUGURYTQ QRAFFQ</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">Knsxçjnid OFLDLW</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1950-05-11</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS6083207</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">8  GA NUWSWF   31597 YNAPI</Valeur>
+                    <Valeur type="nouvelle">8  GA NUWSWF   31597 YNAPI</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">WNRLQT VRQKRWZ IGNYRBCV</Valeur>
+                    <Valeur type="nouvelle">WNRLQT VRQKRWZ IGNYRBCV</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">zgbeeo</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">rdcsjox yofrbeah</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1902-10-21</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">wtmqlwqa</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">wczithdl</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1984-04-23</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">oyna</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">udbujykq</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1909-09-11</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-2" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                    <Groupe idGroupe="BOUCLEINDIV-3" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">3</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">les 3 habitants du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+        <Questionnaire idModele="v1">
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>VQS2231003</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Ue_QuiRepond1">
+                    <Valeur type="ancienne">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                    <Valeur type="nouvelle">Toutes les personnes vivant plus de la moitié de l’année avec vous. Les personnes vivant à mi-temps avec vous répondent uniquement si elles ont dormi à votre domicile la veille du jour où vous répondez à l’enquête.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond2">
+                    <Valeur type="ancienne">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                    <Valeur type="nouvelle">Si vous vivez dans une gendarmerie, un foyer ou un autre type de collectivité, vous seul(e) devez répondre.</Valeur>
+                </Variable>
+                <Variable idVariable="Ue_QuiRepond3">
+                    <Valeur type="ancienne">Une personne du foyer peut répondre pour les autres.</Valeur>
+                    <Valeur type="nouvelle">Une personne du foyer peut répondre pour les autres.</Valeur>
+                </Variable>
+                <Variable idVariable="ADRESSE">
+                    <Valeur type="ancienne">67  HJ OQ YOCEIBBA   05787 TGSCM</Valeur>
+                    <Valeur type="nouvelle">67  HJ OQ YOCEIBBA   05787 TGSCM</Valeur>
+                </Variable>
+                <Variable idVariable="LIBCONTACT">
+                    <Valeur type="ancienne">EXEJNS YCPDU</Valeur>
+                    <Valeur type="nouvelle">EXEJNS YCPDU</Valeur>
+                </Variable>
+                <Variable idVariable="OKADRESS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="RESIDM">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOI">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NVOIC">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NLIB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMP">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCODPOS">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NCOMMU">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+                <Variable idVariable="NHAB">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Groupe idGroupe="BOUCLEINDIV">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="prenom">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">womafy</Valeur>
+                        </Variable>
+                        <Variable idVariable="NOM">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">qrnxf</Valeur>
+                        </Variable>
+                        <Variable idVariable="SEXE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="DTNAIS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1929-11-20</Valeur>
+                        </Variable>
+                        <Variable idVariable="prenomok">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Groupe idGroupe="BOUCLEINDIV_2">
+                    <Groupe idGroupe="BOUCLEINDIV-1" typeGroupe="BOUCLEINDIV">
+                        <Variable idVariable="ETAT_SANT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAL_CHRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="LIMITAT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="VUE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">3</Valeur>
+                        </Variable>
+                        <Variable idVariable="AUDITIF">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MARCHE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="BRAS">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="MAIN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="CONCENTRA">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="DECISION">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="SORTIES">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="COMPRENDRE">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="PSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HPSY">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDPRO">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">2</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AMENALOG">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="AIDTECH">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="HANDICAP">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RECONNAI">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="APPRENT">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_A">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_B">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_C">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="AIDREG_D">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                        <Variable idVariable="RELATION1">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION2">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION3">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RELATION4">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle" />
+                        </Variable>
+                        <Variable idVariable="RESIDANCIEN">
+                            <Valeur type="ancienne" />
+                            <Valeur type="nouvelle">1</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+                <Variable idVariable="nbprenomok">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">1</Valeur>
+                </Variable>
+                <Variable idVariable="LIBINSTRUCT">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle">l'habitant du logement</Valeur>
+                </Variable>
+                <Variable idVariable="COMMENT_QE">
+                    <Valeur type="ancienne" />
+                    <Valeur type="nouvelle" />
+                </Variable>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+    </Questionnaires>
+</Campagne>

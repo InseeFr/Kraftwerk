@@ -1,0 +1,96 @@
+package fr.insee.kraftwerk.dataprocessing;
+
+import fr.insee.kraftwerk.metadata.UcqVariable;
+import fr.insee.kraftwerk.metadata.UcqVariable.UcqModality;
+import fr.insee.kraftwerk.metadata.VariablesMap;
+import fr.insee.kraftwerk.vtl.VtlBindings;
+import fr.insee.kraftwerk.vtl.VtlScript;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+/**
+ * Implementation of the UnimodalDataProcessing class for data from digitized paper.
+ */
+@Slf4j
+public class PaperDataProcessing extends UnimodalDataProcessing {
+
+    public PaperDataProcessing(VtlBindings vtlBindings) {
+        super(vtlBindings);
+    }
+
+    @Override
+    public String getStepName() {
+        return "Paper";
+    }
+
+    /**
+     * In data that comes from digitized paper, UCQ (unique choice questions) are split into indicator variables.
+     * In data which come from collection tools like Coleman or Sabiane a UCQ corresponds to a single variable.
+     * For instance, a variable GENDER becomes GENDER_1 and GENDER_2 in paper data file.
+     * This method return VTL instructions to transform split UCQ into a single variable.
+     *
+     * If several indicators of a same variable are ticked, the value is the last modality ticked.
+     * If none is ticked, the value of the result variable will be empty ("").
+     *
+     * @param bindingName The name of the dataset in the bindings.
+     * @param objects      a VariablesMap object is expected here.
+     * @return VTL instructions
+     */
+    @Override
+    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+
+        // Rich variables map
+        VariablesMap variablesMap = (VariablesMap) objects[0];
+
+        // Get UCQ variables
+        List<UcqVariable> ucqVariables = variablesMap.getUcqVariables();
+
+        // Write the VTL instructions
+        VtlScript vtlScript = new VtlScript();
+
+        for (UcqVariable ucqVariable : ucqVariables) {
+
+            // Init the vtl instruction for the UCQ variable
+            StringBuilder vtlInstruction = new StringBuilder(
+                    String.format("%s := %s [calc ", bindingName, bindingName)
+            );
+
+            // Get UCQ variable name
+            String variableVtlName = variablesMap.getFullyQualifiedName(ucqVariable.getName());
+
+            // Get UCQ modalities
+            List<UcqModality> ucqModalities = ucqVariable.getModalities();
+            int modalitiesCount = ucqModalities.size();
+
+            // First modality and first line of the VTL instruction
+            UcqModality firstModality = ucqModalities.get(0);
+            String firstModalityVtlName = variablesMap.getFullyQualifiedName(firstModality.getVariableName());
+            vtlInstruction.append(String.format("%s := if %s = \"1\" then \"%s\" else (\n",
+                    variableVtlName, firstModalityVtlName, firstModality.getValue()));
+
+            // Middle lines of the VTL instruction
+            for (int k = 1; k < modalitiesCount - 1; k++) {
+                UcqModality modality = ucqModalities.get(k);
+                String modalityVtlName = variablesMap.getFullyQualifiedName(modality.getVariableName());
+                vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else (\n",
+                        modalityVtlName, modality.getValue()));
+            }
+
+            // Last line of the VTL instruction
+            UcqModality lastModality = ucqModalities.get(modalitiesCount - 1);
+            String latsModalityVtlName = variablesMap.getFullyQualifiedName(lastModality.getVariableName());
+            vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else \"\" ",
+                    latsModalityVtlName, lastModality.getValue()));
+
+            // (add closing parenthesis and ';')
+            vtlInstruction.append(")".repeat(modalitiesCount - 1));
+            vtlInstruction.append("];");
+
+            vtlScript.add(vtlInstruction.toString());
+        }
+
+        return vtlScript;
+    }
+
+}

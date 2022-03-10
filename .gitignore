@@ -1,0 +1,32 @@
+# Default Kraftwerk data location
+local_files/in/*
+!local_files/in/.gitkeep
+local_files/out/*
+!local_files/out/.gitkeep
+
+# Config
+src/main/resources/application-*.properties
+!src/main/resources/application-local.properties
+
+# Compiled files
+target/
+doc/
+src/bin/
+
+# Eclipse files
+.metadata
+.classpath
+.project
+.settings
+RemoteSystemsTempFiles
+.factorypath
+
+# IntelliJ Files
+.idea
+*.iml
+
+# Test generated files
+src/test/resources/functional_tests/out/*
+!src/test/resources/functional_tests/out/.gitkeep
+src/test/resources/unit_tests/out/*
+!src/test/resources/unit_tests/out/.gitkeep

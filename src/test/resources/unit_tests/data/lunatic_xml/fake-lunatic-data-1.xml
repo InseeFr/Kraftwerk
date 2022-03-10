@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+    <Id>TEST01</Id>
+    <Label>Fake campaign with one level of group</Label>
+    <SurveyUnits>
+        <SurveyUnit>
+            <Id>T0000001</Id>
+            <QuestionnaireModelId>TEST01</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <ADDRESS>
+                        <COLLECTED type="string">742 Evergreen Terrace</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </ADDRESS>
+                    <HOUSEHOLD_INCOME>
+                        <COLLECTED type="number">20000</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </HOUSEHOLD_INCOME>
+					<FIRST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Homer</COLLECTED>
+							<COLLECTED type="string">Marge</COLLECTED>
+							<COLLECTED type="string">Bart</COLLECTED>
+							<COLLECTED type="string">Lisa</COLLECTED>
+							<COLLECTED type="string">Maggie</COLLECTED>
+							<COLLECTED type="string">Maggie</COLLECTED>
+							<COLLECTED type="string">Santa's Little Helper</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</FIRST_NAME>
+					<LAST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Simpson</COLLECTED>
+							<COLLECTED type="string">Simpson</COLLECTED>
+							<COLLECTED type="string">Simpson</COLLECTED>
+							<COLLECTED type="string">Simpson</COLLECTED>
+							<COLLECTED type="string">Simpson</COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</LAST_NAME>
+					<GENDER>
+						<COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+							<COLLECTED type="string">F</COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+							<COLLECTED type="string">F</COLLECTED>
+							<COLLECTED type="string">F</COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</GENDER>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+        <SurveyUnit>
+            <Id>T0000091</Id>
+            <QuestionnaireModelId>TEST01</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <ADDRESS>
+                        <COLLECTED type="null" />
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </ADDRESS>
+                    <HOUSEHOLD_INCOME>
+                        <COLLECTED type="null" />
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </HOUSEHOLD_INCOME>
+					<FIRST_NAME>
+						<COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</FIRST_NAME>
+					<LAST_NAME>
+						<COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</LAST_NAME>
+					<GENDER>
+						<COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</GENDER>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+        <SurveyUnit>
+            <Id>T0000002</Id>
+            <QuestionnaireModelId>TEST01</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <ADDRESS>
+                        <COLLECTED type="string">740 Evergreen Terrace</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </ADDRESS>
+                    <HOUSEHOLD_INCOME>
+                        <COLLECTED type="number">30000</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </HOUSEHOLD_INCOME>
+					<FIRST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Ned</COLLECTED>
+							<COLLECTED type="string">Rod</COLLECTED>
+							<COLLECTED type="string">Todd</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</FIRST_NAME>
+					<LAST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Flanders</COLLECTED>
+							<COLLECTED type="string">Flanders</COLLECTED>
+							<COLLECTED type="string">Flanders</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</LAST_NAME>
+					<GENDER>
+						<COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</GENDER>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+		<SurveyUnit>
+            <Id>T0000003</Id>
+            <QuestionnaireModelId>TEST01</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <ADDRESS>
+                        <COLLECTED type="string">Kwik-E-Mart</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </ADDRESS>
+                    <HOUSEHOLD_INCOME>
+                        <COLLECTED type="number">20000</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </HOUSEHOLD_INCOME>
+					<FIRST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Apu</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</FIRST_NAME>
+					<LAST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Nahasapeemapetilon</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</LAST_NAME>
+					<GENDER>
+						<COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</GENDER>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+		<SurveyUnit>
+            <Id>T0000004</Id>
+            <QuestionnaireModelId>TEST01</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <ADDRESS>
+                        <COLLECTED type="string">1000 Mammon Street</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </ADDRESS>
+                    <HOUSEHOLD_INCOME>
+                        <COLLECTED type="number">1000000000</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </HOUSEHOLD_INCOME>
+					<FIRST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Charles Montgomery</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</FIRST_NAME>
+					<LAST_NAME>
+						<COLLECTED>
+							<COLLECTED type="string">Burns</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</LAST_NAME>
+					<GENDER>
+						<COLLECTED>
+							<COLLECTED type="string">M</COLLECTED>
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</GENDER>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+    </SurveyUnits>
+</Campaign>

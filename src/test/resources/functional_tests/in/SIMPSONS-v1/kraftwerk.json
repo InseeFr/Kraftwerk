@@ -1,0 +1,34 @@
+{
+  
+  "campaign": "SIMPSONS-v1",
+  
+  "survey_data": [
+    {
+      "data_mode": "CAWI",
+	  "data_file": "xforms/simpsons-v1-xforms-20201217-160729.xml",
+	  "DDI_file": "ddi-simpsons-v1.xml",
+	  "data_format": "XFORMS",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": ""
+  	}, 
+    {
+      "data_mode": "PAPI",
+	  "data_file": "paper/simpsons-papier.txt",
+	  "DDI_file": "https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Simpsons/V1/ddi-simpsons-v1.xml",
+	  "data_format": "PAPER",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}
