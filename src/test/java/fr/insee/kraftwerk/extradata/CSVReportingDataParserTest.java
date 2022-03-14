@@ -4,13 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.Constants;
@@ -18,7 +11,6 @@ import fr.insee.kraftwerk.TestConstants;
 import fr.insee.kraftwerk.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.extradata.reportingdata.CSVReportingDataParser;
-import fr.insee.kraftwerk.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.rawdata.SurveyRawDataTest;
 

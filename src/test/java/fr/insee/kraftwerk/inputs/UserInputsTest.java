@@ -1,13 +1,11 @@
 package fr.insee.kraftwerk.inputs;
 
 import fr.insee.kraftwerk.TestConstants;
-import fr.insee.kraftwerk.parsers.DataFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Paths;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 

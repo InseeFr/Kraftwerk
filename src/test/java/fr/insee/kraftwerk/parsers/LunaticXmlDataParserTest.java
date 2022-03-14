@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.parsers;
 
 import fr.insee.kraftwerk.TestConstants;
-import fr.insee.kraftwerk.metadata.DDIReader;
 import fr.insee.kraftwerk.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.rawdata.GroupData;
 import fr.insee.kraftwerk.rawdata.QuestionnaireData;

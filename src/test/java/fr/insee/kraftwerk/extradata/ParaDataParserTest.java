@@ -12,7 +12,6 @@ import fr.insee.kraftwerk.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.extradata.paradata.ParaDataUE;
 import fr.insee.kraftwerk.metadata.DDIReader;
-import fr.insee.kraftwerk.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.rawdata.SurveyRawDataTest;
 
