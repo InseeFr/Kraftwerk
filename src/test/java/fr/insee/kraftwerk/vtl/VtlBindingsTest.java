@@ -85,7 +85,7 @@ public class VtlBindingsTest {
 				"https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Simpsons/V1/ddi-simpsons-v1.xml"));
 
 		paperData.setDataMode("PAPER");
-		paperData.setDataFilePath(Constants.getResourceAbsolutePath(TestConstants.TEST_FUNCTIONAL_INPUT_DIRECTORY + "/SIMPSONS-v1/paper/simpsons-papier.txt"));
+		paperData.setDataFilePath(Constants.getResourceAbsolutePath(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY + "/SIMPSONS-v1/paper/simpsons-papier.txt"));
 		PaperDataParser parser = new PaperDataParser();
 		parser.parseSurveyData(paperData);
 		vtlBindings.convertToVtlDataset(paperData, "TEST");

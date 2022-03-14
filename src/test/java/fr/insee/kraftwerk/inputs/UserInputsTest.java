@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserInputsTest {
 
-	private static final String inputSamplesDirectory = TestConstants.TEST_UNIT_INPUT_DIRECTORY +  "/user_inputs";
+	private static final String inputSamplesDirectory = TestConstants.UNIT_TESTS_DIRECTORY +  "/user_inputs";
 
 	@ParameterizedTest
 	@ValueSource(strings = {

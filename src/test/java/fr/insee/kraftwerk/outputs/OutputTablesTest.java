@@ -35,7 +35,7 @@ public class OutputTablesTest {
 		assertDoesNotThrow(() -> {
 			//
 			testUserInputs = new UserInputs(
-					TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/user_inputs/inputs_valid_several_modes.json",
+					TestConstants.UNIT_TESTS_DIRECTORY + "/user_inputs/inputs_valid_several_modes.json",
 					Paths.get("/whatever/in"));
 			//
 			VtlBindings vtlBindings = new VtlBindings();
@@ -48,7 +48,7 @@ public class OutputTablesTest {
 			vtlBindings.getBindings().put("FROM_USER", fooDataset);
 			//
 			outputTables = new OutputTables(
-					Paths.get(TestConstants.TEST_UNIT_OUTPUT_DIRECTORY),
+					Paths.get(TestConstants.UNIT_TESTS_DUMP),
 					vtlBindings, testUserInputs);
 		});
 	}

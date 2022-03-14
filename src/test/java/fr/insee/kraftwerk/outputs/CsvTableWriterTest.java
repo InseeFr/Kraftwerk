@@ -36,7 +36,7 @@ public class CsvTableWriterTest {
 	@Test
 	public void writeCsvFromDataset() throws IOException, CsvException {
 		// Clean the existing file
-		String outTestFilePath = TestConstants.TEST_UNIT_OUTPUT_DIRECTORY + "/test.csv";
+		String outTestFilePath = TestConstants.UNIT_TESTS_DUMP + "/test.csv";
 		File outTestFile = new File(outTestFilePath);
 		if (outTestFile.exists()) {
 			outTestFile.delete();

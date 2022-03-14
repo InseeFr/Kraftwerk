@@ -28,7 +28,7 @@ public class ParaDataParserTest {
 		SurveyRawData srdTest = SurveyRawDataTest.createFakeCawiSurveyRawData();
 
 		srdTest.setVariablesMap(DDIReader.getVariablesFromDDI("https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Logement/LOG2021T01/S1logement13juil_ddi.xml"));
-		paraData.setFilepath(Constants.getResourceAbsolutePath(TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/paradata/LOG2021T01"));
+		paraData.setFilepath(Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01"));
 		paraDataParser.parseParadata(paraData, srdTest);
 		// Test we get the raw data correctly
 		assertEquals("init-session", paraData.getListParadataUE().get(1).getEvents().get(0).getIdParadataObject());
@@ -48,7 +48,7 @@ public class ParaDataParserTest {
 	@Test
 	public void createOrchestratorsAndSessionsTest() {
 		ParaDataUE paraDataUE = new ParaDataUE();
-		paraDataUE.setFilepath(Constants.getResourceAbsolutePath(TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/paradata/LOG2021T01/paradata.complete.LOG2021T01.S00000001.Example.json"));
+		paraDataUE.setFilepath(Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01/paradata.complete.LOG2021T01.S00000001.Example.json"));
 		paraDataUE.setIdentifier("S00000001");
 
 		SurveyRawData srdTest = SurveyRawDataTest.createFakeCawiSurveyRawData();

@@ -30,7 +30,7 @@ public class CSVReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Constants.getResourceAbsolutePath(TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/reportingdata/reportingdata.csv"));
+				Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
 		csvReportingDataParser.parseReportingData(reportingData, data);
 
 		// Check the reporting data is well captured

@@ -12,7 +12,7 @@ public class KraftwerkTest {
 
     @Test
     public void listDirectories() {
-        File[] directories = new File(TestConstants.TEST_FUNCTIONAL_INPUT_DIRECTORY).listFiles(File::isDirectory);
+        File[] directories = new File(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY).listFiles(File::isDirectory);
         assertNotNull(directories);
         assertTrue(directories.length > 0);
         assertTrue(Arrays.stream(directories).sequential()

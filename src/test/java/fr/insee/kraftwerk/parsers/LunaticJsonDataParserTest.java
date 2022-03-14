@@ -20,7 +20,7 @@ public class LunaticJsonDataParserTest {
 		lunaticData.setVariablesMap(DDIReader.getVariablesFromDDI(
 				"https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Simpsons/V2/ddi-simpsons-v2.xml"));
 
-		lunaticData.setDataFilePath(Constants.getResourceAbsolutePath(TestConstants.TEST_FUNCTIONAL_INPUT_DIRECTORY + "/SIMPSONS-v2/simpsons-v2-sample.json"));
+		lunaticData.setDataFilePath(Constants.getResourceAbsolutePath(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY + "/SIMPSONS-v2/simpsons-v2-sample.json"));
 		LunaticJsonDataParser parser = new LunaticJsonDataParser();
 		parser.parseSurveyData(lunaticData);
 		

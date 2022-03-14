@@ -22,7 +22,7 @@ public class XMLReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Constants.getResourceAbsolutePath(TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/reportingdata/reportingdata.xml"));
+				Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
 		xMLReportingDataParser.parseReportingData(reportingData, data);
 
 		// Check the reporting data is well captured

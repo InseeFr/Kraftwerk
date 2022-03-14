@@ -215,8 +215,8 @@ public class TrevasTests {
 	public void testUnionKraftwerk() throws ScriptException {
 
 		UserInputs userInputs = new UserInputs(
-				TestConstants.TEST_FUNCTIONAL_INPUT_DIRECTORY + "/VQS-2021-x00/kraftwerk-union.json",
-				Paths.get(TestConstants.TEST_FUNCTIONAL_INPUT_DIRECTORY + "/VQS-2021-x00"));
+				TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY + "/VQS-2021-x00/kraftwerk-union.json",
+				Paths.get(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY + "/VQS-2021-x00"));
 
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 

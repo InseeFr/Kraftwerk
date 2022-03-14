@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LunaticXmlDataParserTest {
 
-	private final String dataSamplesFolder = TestConstants.TEST_UNIT_INPUT_DIRECTORY + "/data";
+	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
 
 	@Test
 	public void parseLunaticXml_rootOnly() {
