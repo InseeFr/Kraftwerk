@@ -28,7 +28,7 @@ import java.util.Map;
  *
  */
 @Slf4j
-public class Launcher {
+public class Launcher { 
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 
