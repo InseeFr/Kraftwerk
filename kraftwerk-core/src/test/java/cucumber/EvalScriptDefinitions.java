@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import javax.script.Bindings;
 
-import fr.insee.kraftwerk.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

@@ -5,11 +5,11 @@ import static org.junit.Assert.assertTrue;
 
 import javax.script.Bindings;
 
-import fr.insee.kraftwerk.Constants;
-import fr.insee.kraftwerk.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.vtl.VtlBindings;
-import fr.insee.kraftwerk.vtl.VtlJsonDatasetWriter;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

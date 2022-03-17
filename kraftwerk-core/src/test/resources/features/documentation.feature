@@ -1,8 +1,8 @@
-Feature: Est-ce qu'une fonctionnalité de mon application fonctionne ?
-  Je détaille dans "Feature" ce que je veux faire en principe
-  Je veux savoir si cette fonctionnalité spécifique fonctionne
+Feature: Est-ce qu'une fonctionnalitï¿½ de mon application fonctionne ?
+  Je dï¿½taille dans "Feature" ce que je veux faire en principe
+  Je veux savoir si cette fonctionnalitï¿½ spï¿½cifique fonctionne
 
-  Scenario Outline: Je décide de simuler un cas d'utilisation de cette fonctionnalité spécifique, qui consiste à ajouter 1 à un nombre
+  Scenario Outline: Je dï¿½cide de simuler un cas d'utilisation de cette fonctionnalitï¿½ spï¿½cifique, qui consiste ï¿½ ajouter 1 ï¿½ un nombre
     Given I have a number, let's say <myFirstNumber>
     When I try to increment that number
     Then I see if the function did increment my number, it should answer <myExpectedNumber>
