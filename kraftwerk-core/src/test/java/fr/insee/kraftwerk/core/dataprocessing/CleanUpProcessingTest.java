@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
