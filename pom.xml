@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<log4j2.version>2.16.0</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
+		<project.version>1.0.0</project.version>
 	</properties>
 	
 	<modules>
@@ -112,19 +113,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<testFailureIgnore>true</testFailureIgnore>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
