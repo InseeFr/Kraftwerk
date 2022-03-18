@@ -9,6 +9,6 @@
     http://www.springframework.org/schema/context/spring-context.xsd">
     
     <context:annotation-config />
-    <context:component-scan base-package="fr.insee.kraftwerk.*" />
+    <context:component-scan base-package="fr.insee.kraftwerk.batch.*" />
     
 </beans>
