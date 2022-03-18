@@ -70,6 +70,14 @@
 						</exclude>
 					</excludes>
 				</configuration>
+				<executions>
+                    <execution>
+                        <id>repackage</id>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
 			</plugin>
 		</plugins>
 	</build>
