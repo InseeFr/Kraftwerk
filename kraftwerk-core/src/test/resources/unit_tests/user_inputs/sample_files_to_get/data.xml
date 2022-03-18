@@ -1,0 +1,7 @@
+<Campagne idPeriode="X00" idSource="TEST" millesime="9999">
+    <Traitement>
+        <Type>ExtractionReponses</Type>
+    </Traitement>
+    <Questionnaires>
+    </Questionnaires>
+</Campagne>

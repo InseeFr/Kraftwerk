@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.insee.kraftwerk</groupId>
+		<artifactId>kraftwerk</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<artifactId>kraftwerk-core</artifactId>
+	<packaging>jar</packaging>
+	<name>kraftwerk-core</name>
+
+	<dependencies>
+
+		<!-- Logging API -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<!-- XML libraries -->
+		<!-- XML-XSLT with Saxon -->
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>10.3</version>
+		</dependency>
+		<!-- XML oriented test dependency -->
+		<!-- https://www.xmlunit.org/ -->
+		<dependency>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-assertj3</artifactId>
+			<version>2.9.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- XOM -->
+		<!-- http://www.xom.nu/ -->
+		<dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.3.4</version>
+		</dependency>
+		<!-- TODO: maybe replace XOM (see: https://www.baeldung.com/java-xml-libraries) -->
+
+		<!-- JSON libraries -->
+		<!-- json-simple -->
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<!-- jackson -->
+		<!-- (imported with Trevas) -->
+
+		<!-- CSV -->
+		<!-- OpenCSV -->
+		<!-- https://www.geeksforgeeks.org/writing-a-csv-file-in-java-using-opencsv/ -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.5.2</version>
+		</dependency>
+
+		<!-- VTL 2 with Trevas -->
+		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-engine -->
+		<dependency>
+			<groupId>fr.insee.trevas</groupId>
+			<artifactId>vtl-engine</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-jackson -->
+		<dependency>
+			<groupId>fr.insee.trevas</groupId>
+			<artifactId>vtl-jackson</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
