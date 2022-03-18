@@ -1,0 +1,34 @@
+{
+  
+  "campaign": "VQS-2021-x00",
+  
+  "survey_data": [
+    {
+      "data_mode": "WEB",
+	  "data_file": "web/vqs-2021-x00_anonymized_sample.xml",
+	  "DDI_file": "web/vqs-2021-x00-xforms-ddi.xml",
+	  "data_format": "XFORMS",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": "web/WEB.vtl"
+  	},
+	{
+      "data_mode": "PAPER",
+	  "data_file": "papier/VQS_paper_anonymized_sample_edit.txt",
+	  "DDI_file": "papier/vqs-2021-x00-fo-ddi_edit.xml",
+	  "data_format": "PAPER",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": "papier/PAPER.vtl"
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "reconciliation.vtl",
+  
+  "transformation_specifications": "transformation.vtl",
+  
+  "information_levels_specifications": "information_levels.vtl"
+
+}

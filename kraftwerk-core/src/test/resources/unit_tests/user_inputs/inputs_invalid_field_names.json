@@ -1,0 +1,25 @@
+{
+  
+  "campaign": "TEST",
+  
+  "survey_data": [
+    {
+      "data_mode": "CAPI",
+	  "foo1": "data.xml",
+	  "foo2": "ddi.xml",
+	  "data_format": "XFORMS",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}

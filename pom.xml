@@ -3,10 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<packaging>jar</packaging>
+	
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
 	<version>1.0.0</version>
+	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 
 	<parent>
@@ -21,15 +22,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<log4j2.version>2.16.0</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
+		<project.version>1.0.0</project.version>
 	</properties>
+	
+	<modules>
+	    <module>kraftwerk-core</module>
+		<module>kraftwerk-batch</module>
+	</modules>
 
 	<dependencies>
 
 		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-batch</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -93,7 +96,7 @@
 		<!-- Logback -->
 		<!-- (imported with Spring) -->
 
-		<!-- Lombok to write less code -->
+		<!-- Lombok to write less boilerplate code -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -101,118 +104,15 @@
 			<!-- version from parent pom -->
 		</dependency>
 
-		<!-- XML libraries -->
-		<!-- XML-XSLT with Saxon -->
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>Saxon-HE</artifactId>
-			<version>10.3</version>
-		</dependency>
-		<!-- XML oriented test dependency -->
-		<!-- https://www.xmlunit.org/ -->
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-assertj3</artifactId>
-			<version>2.9.0</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- XOM -->
-		<!-- http://www.xom.nu/ -->
-		<dependency>
-			<groupId>xom</groupId>
-			<artifactId>xom</artifactId>
-			<version>1.3.4</version>
-		</dependency>
-		<!-- TODO: maybe replace XOM (see: https://www.baeldung.com/java-xml-libraries) -->
-
-		<!-- JSON libraries -->
-		<!-- json-simple -->
-		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<!-- jackson -->
-		<!-- (imported with Trevas) -->
-
-		<!-- CSV -->
-		<!-- OpenCSV -->
-		<!-- https://www.geeksforgeeks.org/writing-a-csv-file-in-java-using-opencsv/ -->
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>5.5.2</version>
-		</dependency>
-
-		<!-- VTL 2 with Trevas -->
-		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-engine -->
-		<dependency>
-			<groupId>fr.insee.trevas</groupId>
-			<artifactId>vtl-engine</artifactId>
-			<version>0.3.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-jackson -->
-		<dependency>
-			<groupId>fr.insee.trevas</groupId>
-			<artifactId>vtl-jackson</artifactId>
-			<version>0.3.0</version>
-		</dependency>
-
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>local</id>
-		</profile>
-		<profile>
-			<id>dv</id>
-			<properties>
-				<env>dv</env>
-			</properties>
-		</profile>
-		<profile>
-			<id>qf</id>
-			<properties>
-				<env>qf</env>
-			</properties>
-		</profile>
-		<profile>
-			<id>prod</id>
-			<properties>
-				<env>prod</env>
-			</properties>
-		</profile>
-	</profiles>
-
 	<build>
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<excludes>
-					<exclude>env/**/*.*</exclude>
-				</excludes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<testFailureIgnore>true</testFailureIgnore>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
