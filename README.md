@@ -6,7 +6,9 @@ Kraftwerk is a Java Spring Batch application designed to validate and process da
 It heavily relies on metadata described using the [DDI](http://ddialliance.org) standard.
 The batch automated processes can be enriched with specification written in [VTL](https://sdmx.org/?page_id=5096), thanks to [Trevas](https://github.com/InseeFr/Trevas) implementation.
 
-User and developer documentation can be found in the [wiki](https://gitlab.insee.fr/sic/service-agregation-echange-de-donnees/kraftwerk/-/wikis/home).
+Developer documentation can be found in the [wiki](https://github.com/InseeFr/Kraftwerk/wiki).
+
+User documentation and batch functionnal tests are still in an [inhouse project](https://gitlab.insee.fr/sic/service-agregation-echange-de-donnees/kraftwerk/-/wikis/home).
 
 ## Requirements
 
