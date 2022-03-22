@@ -166,15 +166,13 @@ public class OutputFiles {
 			}
 				// We then put the old file in the archive file
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			    // get the last modified date and format it to the defined format
+				String nameNewFile = inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString();
+				
+				nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) + "-" + sdf.format(timestamp) + nameNewFile.substring(nameNewFile.lastIndexOf("."));
 			    try {
-			    	File originFile = new File(Constants.getInputPath(inputFolder, modeInputs.getDataFile()));
-			    	File endFile = new File(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString());
-			    	System.out.println(originFile.getAbsolutePath());
-			    	System.out.println(endFile.getAbsolutePath());
-			    	//boolean renameTo = originFile.renameTo(endFile);
-			    	//System.out.println(renameTo);
-			    	Files.move(Paths.get(originFile.getAbsolutePath()), Paths.get(endFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+			    	Files.move(Paths.get(Constants.getInputPath(inputFolder, modeInputs.getDataFile())), Paths.get(nameNewFile), StandardCopyOption.REPLACE_EXISTING);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
