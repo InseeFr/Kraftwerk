@@ -19,10 +19,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class OutputTablesTest {
+public class OutputFilesTest {
 
 	private static UserInputs testUserInputs;
-	private static OutputTables outputTables;
+	private static OutputFiles outputFiles;
 
 	Dataset fooDataset = new InMemoryDataset(
 			List.of(),
@@ -47,7 +47,7 @@ public class OutputTablesTest {
 			vtlBindings.getBindings().put("LOOP", fooDataset);
 			vtlBindings.getBindings().put("FROM_USER", fooDataset);
 			//
-			outputTables = new OutputTables(
+			outputFiles = new OutputFiles(
 					Paths.get(TestConstants.UNIT_TESTS_DUMP),
 					vtlBindings, testUserInputs);
 		});
@@ -57,7 +57,7 @@ public class OutputTablesTest {
 	@Order(2)
 	public void testGetDatasetOutputNames() {
 		//
-		Set<String> outputDatasetNames = outputTables.getOutputDatasetNames();
+		Set<String> outputDatasetNames = outputFiles.getOutputDatasetNames();
 
 		//
 		for (String mode : testUserInputs.getModes()) {
