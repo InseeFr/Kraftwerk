@@ -72,6 +72,7 @@ public class TextFileReader {
             content.append(line);
         }
         fileReader.close();
+        br.close();
         return content.toString();
     }
 }

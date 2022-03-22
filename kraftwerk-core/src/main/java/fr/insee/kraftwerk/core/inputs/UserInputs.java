@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserInputs {
 
 	private final String userInputFile;
+	
+	@Getter
 	private final Path inputDirectory;
 
 	@Getter
@@ -54,7 +56,7 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = getText(fileNode, "data_mode");
-				String dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
+				String dataFile = getText(fileNode, "data_file");
 				String DDIFilePath = getText(fileNode, "DDI_file");
 				String DDIFile = "";
 				if (DDIFilePath.contains("http")) {
