@@ -64,7 +64,7 @@ public class Launcher {
 				parser.parseSurveyData(data);
 
 				/* Step 2.2 : Get paradata for the survey */
-				String paraDataFolder = modeInputs.getParadataFolder();
+				String paraDataFolder = Constants.getInputPath(inDirectory, modeInputs.getParadataFolder());
 				if (paraDataFolder != null) {
 					ParadataParser paraDataParser = new ParadataParser();
 					Paradata paraData = new Paradata(paraDataFolder);
@@ -72,7 +72,7 @@ public class Launcher {
 				}
 
 				/* Step 2.3 : Get reportingData for the survey */
-				String reportingDataFile = modeInputs.getReportingDataFile();
+				String reportingDataFile = Constants.getInputPath(inDirectory, modeInputs.getReportingDataFile());
 				if (reportingDataFile != null) {
 					ReportingData reportingData = new ReportingData(reportingDataFile);
 					if (reportingDataFile.contains(".xml")) {
@@ -133,6 +133,9 @@ public class Launcher {
 
 			/* Step 4.3 : move kraftwerk.json to a secondary folder */
 			outputFiles.renameInputFile(inDirectory);
+			
+			/* Step 4.4 : move differential data to a secondary folder */
+			outputFiles.moveInputFile(userInputs);
 
 			log.info("Kraftwerk batch ended.");
 
