@@ -98,7 +98,8 @@ public class OutputFiles {
 			File outputFile = outputFolder.resolve(outputFileName(datasetName)).toFile();
 			if (outputFile.exists()) {
 				CsvTableWriter.updateCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder + "/" + outputFileName(datasetName), outputFolder.getFileName() + "_" + datasetName, outputFolder);
+						outputFolder + "/" + outputFileName(datasetName),
+						outputFolder.getFileName() + "_" + datasetName, outputFolder);
 			} else {
 				CsvTableWriter.writeCsvTable(vtlBindings.getDataset(datasetName),
 						outputFolder + "/" + outputFileName(datasetName));
@@ -155,32 +156,81 @@ public class OutputFiles {
 	public void moveInputFile(UserInputs userInputs) {
 		Path inputFolder = userInputs.getInputDirectory();
 		Map<String, ModeInputs> modeInputsMap = userInputs.getModeInputsMap();
+		// First we create an archive directory in case it doesn't exist
+		if (!Files.exists(inputFolder.resolve("Archive"))) {
+			new File(inputFolder.resolve("Archive").toString()).mkdir();
+		}
 		for (String mode : modeInputsMap.keySet()) {
 			ModeInputs modeInputs = userInputs.getModeInputs(mode);
-		// First we create an archive directory in case it doesn't exist
-			if (!Files.exists(inputFolder.resolve("Archive"))){
-				new File(inputFolder.resolve("Archive").toString()).mkdir();
+			if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent())) {
+				new File(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent().toString())
+						.mkdirs();
 			}
-			if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent())){
-				new File(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent().toString()).mkdirs();
+			// We then put the old file in the archive file
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			// get the last modified date and format it to the defined format
+			String nameNewFile = inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString();
+
+			nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) /*+ "-" + sdf.format(timestamp)*/
+					+ nameNewFile.substring(nameNewFile.lastIndexOf("."));
+			try {
+				Files.move(Paths.get(Constants.getInputPath(inputFolder, modeInputs.getDataFile())),
+						Paths.get(nameNewFile), StandardCopyOption.REPLACE_EXISTING);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-				// We then put the old file in the archive file
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			    // get the last modified date and format it to the defined format
-				String nameNewFile = inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString();
-				
-				nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) + "-" + sdf.format(timestamp) + nameNewFile.substring(nameNewFile.lastIndexOf("."));
-			    try {
-			    	Files.move(Paths.get(Constants.getInputPath(inputFolder, modeInputs.getDataFile())), Paths.get(nameNewFile), StandardCopyOption.REPLACE_EXISTING);
+
+			// If paradata, we move the paradata
+			if (!modeInputs.getParadataFolder().contentEquals("") && !modeInputs.getParadataFolder().contentEquals("null") && !modeInputs.getParadataFolder().equals(null)) {
+				try {
+					moveDirectory(
+							new File(Constants.getInputPath(inputFolder, modeInputs.getParadataFolder()).toString()),
+							new File(
+									inputFolder.resolve("Archive").resolve(modeInputs.getParadataFolder()).toString()));
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
-			 
+			// If reportingdata, we move the paradata
+			if (!modeInputs.getReportingDataFile().equals(null) && !modeInputs.getReportingDataFile().equals("")) {
+				if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent())) {
+					new File(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent().toString())
+							.mkdirs();
+				}
+				try {
+					moveDirectory(
+							new File(
+									Constants.getInputPath(inputFolder, modeInputs.getReportingDataFile()).toString()),
+							new File(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).toString()));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+
+		}
+
 	}
 
-
+	private static void moveDirectory(File sourceFile, File destFile) {
+		if (sourceFile.isDirectory()) {
+			File[] files = sourceFile.listFiles();
+			assert files != null;
+			for (File file : files)
+				moveDirectory(file, new File(destFile, file.getName()));
+			if (!sourceFile.delete())
+				throw new RuntimeException();
+		} else {
+			if (!destFile.getParentFile().exists())
+				if (!destFile.getParentFile().mkdirs())
+					throw new RuntimeException();
+			if (!sourceFile.renameTo(destFile))
+				throw new RuntimeException();
+		}
+	}
 }
