@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -19,10 +20,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class OutputTablesTest {
+public class OutputFilesTest {
 
 	private static UserInputs testUserInputs;
-	private static OutputTables outputTables;
+	private static OutputFiles outputFiles;
 
 	Dataset fooDataset = new InMemoryDataset(
 			List.of(),
@@ -47,7 +48,7 @@ public class OutputTablesTest {
 			vtlBindings.getBindings().put("LOOP", fooDataset);
 			vtlBindings.getBindings().put("FROM_USER", fooDataset);
 			//
-			outputTables = new OutputTables(
+			outputFiles = new OutputFiles(
 					Paths.get(TestConstants.UNIT_TESTS_DUMP),
 					vtlBindings, testUserInputs);
 		});
@@ -57,7 +58,7 @@ public class OutputTablesTest {
 	@Order(2)
 	public void testGetDatasetOutputNames() {
 		//
-		Set<String> outputDatasetNames = outputTables.getOutputDatasetNames();
+		Set<String> outputDatasetNames = outputFiles.getOutputDatasetNames();
 
 		//
 		for (String mode : testUserInputs.getModes()) {
@@ -65,5 +66,20 @@ public class OutputTablesTest {
 		}
 		assertFalse(outputDatasetNames.contains(testUserInputs.getMultimodeDatasetName()));
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
+	}
+
+	@Test
+	@Order(3)
+	public void moveFiles() {
+		//
+		testUserInputs = new UserInputs(
+				TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/move_files.json",
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files"));
+		outputFiles.moveInputFile(testUserInputs);
+		
+	assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/papier").exists());
+	assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/web").exists());
+	assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/paradata/L0000010.json").exists());
+	assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/suivi/reportingdata.xml").exists());
 	}
 }

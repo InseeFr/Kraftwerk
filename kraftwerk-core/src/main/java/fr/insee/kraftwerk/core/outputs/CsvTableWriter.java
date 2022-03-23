@@ -58,7 +58,6 @@ public class CsvTableWriter {
 	 * @param filePath Path to the file to be written.
 	 */
 	public static void updateCsvTable(Dataset dataset, String filePath, String datasetName, Path outputFolder) {
-		moveFile(dataset, filePath, datasetName, outputFolder);
 		File file = new File(filePath);
 		setCSVWriter(filePath);
 		try {
@@ -127,26 +126,6 @@ public class CsvTableWriter {
 		}
 
 	}
-
-	private static void moveFile(Dataset dataset, String filePath, String datasetName, Path outputFolder) {
-		// First we create an archive directory in case it doesn't exist
-				if (!Files.exists(outputFolder.resolve("Archive"))){
-					new File(outputFolder.resolve("Archive").toString()).mkdir();
-				}
-				// We then put the old file in the archive file
-				File file = new File(filePath);
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			    // get the last modified date and format it to the defined format
-			    Path copied = Paths.get(outputFolder.resolve("Archive").toString() + "/" + datasetName + "-" + sdf.format(file.lastModified()) + ".csv");
-			    try {
-					Files.copy(Paths.get(filePath), copied, StandardCopyOption.REPLACE_EXISTING);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			 
-	}
-
 	/**
 	 * Write a CSV file from a Trevas dataset.
 	 * 

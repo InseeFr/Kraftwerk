@@ -1,8 +1,11 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Dataset;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,16 +13,19 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Class to manage the writing of output tables.
  */
 @Slf4j
-public class OutputTables {
+public class OutputFiles {
 
 	/** Final absolute path to the batch output folder */
 	@Getter
@@ -38,7 +44,7 @@ public class OutputTables {
 	 * @param userInputs   Used to get the campaign name and to filter intermediate
 	 *                     datasets that we don't want to output.
 	 */
-	public OutputTables(Path outDirectory, VtlBindings vtlBindings, UserInputs userInputs) {
+	public OutputFiles(Path outDirectory, VtlBindings vtlBindings, UserInputs userInputs) {
 		//
 		this.vtlBindings = vtlBindings;
 		//
@@ -92,7 +98,8 @@ public class OutputTables {
 			File outputFile = outputFolder.resolve(outputFileName(datasetName)).toFile();
 			if (outputFile.exists()) {
 				CsvTableWriter.updateCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder + "/" + outputFileName(datasetName), outputFolder.getFileName() + "_" + datasetName, outputFolder);
+						outputFolder + "/" + outputFileName(datasetName),
+						outputFolder.getFileName() + "_" + datasetName, outputFolder);
 			} else {
 				CsvTableWriter.writeCsvTable(vtlBindings.getDataset(datasetName),
 						outputFolder + "/" + outputFileName(datasetName));
@@ -146,4 +153,84 @@ public class OutputTables {
 		file.renameTo(file2);
 	}
 
+	public void moveInputFile(UserInputs userInputs) {
+		Path inputFolder = userInputs.getInputDirectory();
+		Map<String, ModeInputs> modeInputsMap = userInputs.getModeInputsMap();
+		// First we create an archive directory in case it doesn't exist
+		if (!Files.exists(inputFolder.resolve("Archive"))) {
+			new File(inputFolder.resolve("Archive").toString()).mkdir();
+		}
+		for (String mode : modeInputsMap.keySet()) {
+			ModeInputs modeInputs = userInputs.getModeInputs(mode);
+			if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent())) {
+				new File(inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).getParent().toString())
+						.mkdirs();
+			}
+			// We then put the old file in the archive file
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			// get the last modified date and format it to the defined format
+			String nameNewFile = inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString();
+
+			nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) /*+ "-" + sdf.format(timestamp)*/
+					+ nameNewFile.substring(nameNewFile.lastIndexOf("."));
+			try {
+				Files.move(Paths.get(Constants.getInputPath(inputFolder, modeInputs.getDataFile())),
+						Paths.get(nameNewFile), StandardCopyOption.REPLACE_EXISTING);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// If paradata, we move the paradata
+			if (!modeInputs.getParadataFolder().contentEquals("") && !modeInputs.getParadataFolder().contentEquals("null") && !modeInputs.getParadataFolder().equals(null)) {
+				try {
+					moveDirectory(
+							new File(Constants.getInputPath(inputFolder, modeInputs.getParadataFolder()).toString()),
+							new File(
+									inputFolder.resolve("Archive").resolve(modeInputs.getParadataFolder()).toString()));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+			// If reportingdata, we move the paradata
+			if (!modeInputs.getReportingDataFile().equals(null) && !modeInputs.getReportingDataFile().equals("")) {
+				if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent())) {
+					new File(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent().toString())
+							.mkdirs();
+				}
+				try {
+					moveDirectory(
+							new File(
+									Constants.getInputPath(inputFolder, modeInputs.getReportingDataFile()).toString()),
+							new File(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).toString()));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+
+		}
+
+	}
+
+	private static void moveDirectory(File sourceFile, File destFile) {
+		if (sourceFile.isDirectory()) {
+			File[] files = sourceFile.listFiles();
+			assert files != null;
+			for (File file : files)
+				moveDirectory(file, new File(destFile, file.getName()));
+			if (!sourceFile.delete())
+				throw new RuntimeException();
+		} else {
+			if (!destFile.getParentFile().exists())
+				if (!destFile.getParentFile().mkdirs())
+					throw new RuntimeException();
+			if (!sourceFile.renameTo(destFile))
+				throw new RuntimeException();
+		}
+	}
 }

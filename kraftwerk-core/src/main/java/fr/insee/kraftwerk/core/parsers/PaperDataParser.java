@@ -35,6 +35,8 @@ public class PaperDataParser implements DataParser {
 
 	/** Reader */
 	private CSVReader csvReader;
+	/** Reader */
+	private FileReader filereader;
 
 	public void parseSurveyData(SurveyRawData data) {
 
@@ -116,7 +118,8 @@ public class PaperDataParser implements DataParser {
 				}
 				data.addQuestionnaire(questionnaireData);
 			}
-
+			filereader.close();
+			csvReader.close();
 		}
 		catch(CsvValidationException e) {
 			log.error(String.format("Following CSV file is malformed: %s", filePath), e);
@@ -149,7 +152,7 @@ public class PaperDataParser implements DataParser {
 		try {
 			// Create an object of file reader
 			// class with CSV file as a parameter.
-			FileReader filereader = new FileReader(filePath);
+			filereader = new FileReader(filePath);
 			// create csvReader object passing
 			// file reader as a parameter
 			csvReader = new CSVReader(filereader);

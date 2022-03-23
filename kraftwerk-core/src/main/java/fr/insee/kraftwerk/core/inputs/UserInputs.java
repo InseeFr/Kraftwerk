@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserInputs {
 
 	private final String userInputFile;
+	
+	@Getter
 	private final Path inputDirectory;
 
 	@Getter
@@ -54,7 +56,7 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = getText(fileNode, "data_mode");
-				String dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
+				String dataFile = getText(fileNode, "data_file");
 				String DDIFilePath = getText(fileNode, "DDI_file");
 				String DDIFile = "";
 				if (DDIFilePath.contains("http")) {
@@ -63,9 +65,8 @@ public class UserInputs {
 					DDIFile = Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file"));
 				}
 				String dataFormat = getText(fileNode, "data_format");
-				String paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
-				String reportingDataFile = Constants.getInputPath(inputDirectory,
-						getText(fileNode, "reporting_data_file"));
+				String paradataFolder = getText(fileNode, "paradata_folder");
+				String reportingDataFile = getText(fileNode, "reporting_data_file");
 				String vtlFile = Constants.getInputPath(inputDirectory, getText(fileNode, "mode_specifications"));
 				//
 				ModeInputs modeInputs = new ModeInputs();
@@ -100,11 +101,12 @@ public class UserInputs {
 			if (!(text.equals("") || text.equals("null"))) {
 				return text;
 			} else {
+				System.out.println("quoi");
 				if (mandatoryFields.contains(field)) {
 					throw new MissingMandatoryFieldException(String
 							.format("Empty or null value in mandatory field \"%s\" in the input file given", field));
 				} else {
-					return null;
+					return "";
 				}
 			}
 		} else {
@@ -113,7 +115,7 @@ public class UserInputs {
 						String.format("Mandatory field \"%s\" missing in the input file given", field));
 			} else {
 				log.info(String.format("Optional field \"%s\" missing in the input file given", field));
-				return null;
+				return "";
 			}
 		}
 	}

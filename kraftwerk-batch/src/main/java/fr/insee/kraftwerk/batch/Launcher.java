@@ -11,7 +11,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.OutputTables;
+import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -59,12 +59,12 @@ public class Launcher {
 				metadataVariables.put(dataMode, data.getVariablesMap());
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
-				data.setDataFilePath(modeInputs.getDataFile());
+				data.setDataFilePath(Constants.getInputPath(inDirectory, modeInputs.getDataFile()));
 				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat());
 				parser.parseSurveyData(data);
 
 				/* Step 2.2 : Get paradata for the survey */
-				String paraDataFolder = modeInputs.getParadataFolder();
+				String paraDataFolder = Constants.getInputPath(inDirectory, modeInputs.getParadataFolder());
 				if (paraDataFolder != null) {
 					ParadataParser paraDataParser = new ParadataParser();
 					Paradata paraData = new Paradata(paraDataFolder);
@@ -72,7 +72,7 @@ public class Launcher {
 				}
 
 				/* Step 2.3 : Get reportingData for the survey */
-				String reportingDataFile = modeInputs.getReportingDataFile();
+				String reportingDataFile = Constants.getInputPath(inDirectory, modeInputs.getReportingDataFile());
 				if (reportingDataFile != null) {
 					ReportingData reportingData = new ReportingData(reportingDataFile);
 					if (reportingDataFile.contains(".xml")) {
@@ -125,14 +125,17 @@ public class Launcher {
 			/* Step 4 : Write output files */
 
 			/* Step 4.1 : write csv output tables */
-			OutputTables outputTables = new OutputTables(outDirectory, vtlBindings, userInputs);
-			outputTables.writeOutputCsvTables();
+			OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
+			outputFiles.writeOutputCsvTables();
 
 			/* Step 4.2 : write scripts to import csv tables in several languages */
-			outputTables.writeImportScripts();
+			outputFiles.writeImportScripts();
 
 			/* Step 4.3 : move kraftwerk.json to a secondary folder */
-			outputTables.renameInputFile(inDirectory);
+			outputFiles.renameInputFile(inDirectory);
+			
+			/* Step 4.4 : move differential data to a secondary folder */
+			outputFiles.moveInputFile(userInputs);
 
 			log.info("Kraftwerk batch ended.");
 
