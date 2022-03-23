@@ -172,7 +172,7 @@ public class OutputFiles {
 			// get the last modified date and format it to the defined format
 			String nameNewFile = inputFolder.resolve("Archive").resolve(modeInputs.getDataFile()).toString();
 
-			nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) /*+ "-" + sdf.format(timestamp)*/
+			nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) + "-" + sdf.format(timestamp)
 					+ nameNewFile.substring(nameNewFile.lastIndexOf("."));
 			try {
 				Files.move(Paths.get(Constants.getInputPath(inputFolder, modeInputs.getDataFile())),
