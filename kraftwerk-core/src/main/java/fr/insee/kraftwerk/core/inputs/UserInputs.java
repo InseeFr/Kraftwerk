@@ -101,7 +101,6 @@ public class UserInputs {
 			if (!(text.equals("") || text.equals("null"))) {
 				return text;
 			} else {
-				System.out.println("quoi");
 				if (mandatoryFields.contains(field)) {
 					throw new MissingMandatoryFieldException(String
 							.format("Empty or null value in mandatory field \"%s\" in the input file given", field));
