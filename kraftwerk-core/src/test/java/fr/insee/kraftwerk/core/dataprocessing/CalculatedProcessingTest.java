@@ -9,13 +9,11 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-
 import static fr.insee.vtl.model.Dataset.Role;
 import static org.junit.jupiter.api.Assertions.*;
 
