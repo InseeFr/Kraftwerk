@@ -62,6 +62,7 @@ public class UserInputs {
 				} else {
 					DDIFile = Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file"));
 				}
+				String lunaticFile = getText(fileNode, "lunatic_file");
 				String dataFormat = getText(fileNode, "data_format");
 				String paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
 				String reportingDataFile = Constants.getInputPath(inputDirectory,
@@ -71,6 +72,7 @@ public class UserInputs {
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataFile);
 				modeInputs.setDDIFile(DDIFile);
+				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
 				modeInputs.setParadataFolder(paradataFolder);
 				modeInputs.setReportingDataFile(reportingDataFile);

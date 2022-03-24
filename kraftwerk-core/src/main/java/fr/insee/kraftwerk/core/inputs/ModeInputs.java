@@ -11,6 +11,7 @@ public class ModeInputs {
 
     @Getter @Setter protected String dataFile;
     @Getter @Setter protected String DDIFile;
+    @Getter @Setter protected String LunaticFile;
     @Getter         protected DataFormat dataFormat;
     @Getter @Setter protected String dataMode;
     @Getter @Setter protected String modeVtlFile;
