@@ -1,8 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
@@ -20,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CalculatedProcessingTest {
 
     private static CalculatedVariables fooCalculated;
+    private static VariablesMap fooVariables;
     private static VtlBindings vtlBindings;
 
     static final String LUNATIC_SAMPLES = TestConstants.UNIT_TESTS_DIRECTORY + "/lunatic";
@@ -35,6 +35,12 @@ public class CalculatedProcessingTest {
         fooCalculated.putVariable(
                 new CalculatedVariable("FOO3", "1"));
         //
+        fooVariables = new VariablesMap();
+        fooVariables.putVariable(new Variable("FOO", fooVariables.getRootGroup(), VariableType.STRING));
+        fooVariables.putVariable(new Variable("FOO1", fooVariables.getRootGroup(), VariableType.STRING));
+        fooVariables.putVariable(new Variable("FOO2", fooVariables.getRootGroup(), VariableType.STRING));
+        fooVariables.putVariable(new Variable("FOO3", fooVariables.getRootGroup(), VariableType.STRING));
+        //
         vtlBindings = new VtlBindings();
     }
 
@@ -42,11 +48,13 @@ public class CalculatedProcessingTest {
     public void testIfCalculatedAreCorrectlyResolved() {
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        VtlScript vtlScript = processing.generateVtlInstructions("TEST", fooCalculated);
+        VtlScript vtlScript = processing.generateVtlInstructions("TEST", fooCalculated, fooVariables);
 
         //
         assertTrue(vtlScript.get(0).contains("FOO3"));
+        assertFalse(vtlScript.get(0).contains("FOO2"));
         assertTrue(vtlScript.get(1).contains("FOO2"));
+        assertFalse(vtlScript.get(1).contains("FOO1"));
         assertTrue(vtlScript.get(2).contains("FOO1"));
     }
 
@@ -66,7 +74,7 @@ public class CalculatedProcessingTest {
         vtlBindings.getBindings().put("TEST", fooDataset);
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        processing.applyAutomatedVtlInstructions("TEST", fooCalculated);
+        processing.applyAutomatedVtlInstructions("TEST", fooCalculated, fooVariables);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
@@ -83,7 +91,7 @@ public class CalculatedProcessingTest {
     }
 
     @Test
-    public void processCalculatedOnLogX21Tel() {
+    public void processCalculatedOnLogX21Web() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 LUNATIC_SAMPLES + "/log2021x21_tel.json");

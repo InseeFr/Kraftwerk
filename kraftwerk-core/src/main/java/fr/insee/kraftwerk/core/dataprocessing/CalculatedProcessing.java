@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
@@ -26,22 +27,26 @@ public class CalculatedProcessing extends DataProcessing {
     /**
      * Return the VTL instruction for each calculated variable registered in the CalculatedVariables object given.
      * @param bindingName The name of the concerned dataset.
-     * @param objects A CalculatedVariables instance is expected here.
+     * @param objects  Objects expected here are:
+     *                - a CalculatedVariables instance,
+     *                - the corresponding VariablesMap object (used to get fully qualified name).
      * @return a VtlScript with one instruction for each "calculated" variable.
      */
     @Override
     protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
 
         CalculatedVariables calculatedVariables = (CalculatedVariables) objects[0];
+        VariablesMap variablesMap = (VariablesMap) objects[1];
 
         List<String> orderedCalculatedNames = resolveCalculated(calculatedVariables);
 
         VtlScript vtlScript = new VtlScript();
 
         for (String calculatedName : orderedCalculatedNames) {
+            String fullyQualifiedName = variablesMap.getFullyQualifiedName(calculatedName);
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
             vtlScript.add(String.format("%s := %s [calc %s := %s];",
-                    bindingName, bindingName, calculatedName, vtlExpression));
+                    bindingName, bindingName, fullyQualifiedName, vtlExpression));
         }
 
         return vtlScript;
@@ -51,7 +56,7 @@ public class CalculatedProcessing extends DataProcessing {
      * can be performed. */
     private List<String> resolveCalculated(CalculatedVariables calculatedVariables) {
         // Init result
-        List<String> res = new ArrayList<>();
+        List<String> resolved = new ArrayList<>();
 
         // Create a shallow copy of the calculated variables map
         CalculatedVariables unresolved = shallowCopy(calculatedVariables);
@@ -62,7 +67,7 @@ public class CalculatedProcessing extends DataProcessing {
             for (String calculatedName : unresolved.keySet()) {
                 if (isResolved(unresolved, calculatedName)) {
                     unresolved.remove(calculatedName);
-                    res.add(calculatedName);
+                    resolved.add(calculatedName);
                 }
             }
             counter++;
@@ -74,7 +79,7 @@ public class CalculatedProcessing extends DataProcessing {
             log.warn(unresolved.keySet().toString());
         }
 
-        return res;
+        return resolved;
     }
 
     /** Return a shallow copy of the given CalculatedVariables object.

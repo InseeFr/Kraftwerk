@@ -98,7 +98,7 @@ public class Launcher {
 					CalculatedVariables calculatedVariables = LunaticReader
 							.getCalculatedFromLunatic(modeInputs.getLunaticFile());
 					DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
-					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables);
+					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
 				} else {
 					log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
 					if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
