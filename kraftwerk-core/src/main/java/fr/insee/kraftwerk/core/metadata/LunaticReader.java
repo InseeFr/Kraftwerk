@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+
 @Slf4j
 public class LunaticReader {
 
@@ -24,6 +26,10 @@ public class LunaticReader {
 
             // Fill the object
             // TODO
+            // (example)
+            CalculatedVariable calculatedVariable = new CalculatedVariable("name", "vtl expression");
+            calculatedVariable.addDependantVariable("dependant variable 1 name");
+            calculatedVariable.addDependantVariable("dependant variable 2 name");
 
             //
             return calculatedVariables;
