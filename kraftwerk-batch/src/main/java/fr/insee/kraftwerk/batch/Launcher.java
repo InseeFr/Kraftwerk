@@ -9,9 +9,12 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
+import fr.insee.kraftwerk.core.metadata.LunaticReader;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputTables;
+import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -86,11 +89,27 @@ public class Launcher {
 					}
 				}
 
-				/* Step 2.4 : Convert data object to a VTL Dataset */
+				/* Step 2.4a : Convert data object to a VTL Dataset */
 				data.setDataMode(dataMode);
 				vtlBindings.convertToVtlDataset(data, dataMode);
 
-				/* Step 2.5 : Apply mode-specific VTL transformations */
+				/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
+				if (modeInputs.getLunaticFile() != null) {
+					CalculatedVariables calculatedVariables = LunaticReader
+							.getCalculatedFromLunatic(modeInputs.getLunaticFile());
+					DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
+					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables);
+				} else {
+					log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
+					if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
+							|| modeInputs.getDataFormat() == DataFormat.LUNATIC_JSON) {
+						log.warn(String.format(
+								"Calculated variables for lunatic data of mode \"%s\" will not be evaluated.",
+								dataMode));
+					}
+				}
+
+				/* Step 2.5b : Apply mode-specific VTL transformations */
 				UnimodalDataProcessing dataProcessing = DataProcessingManager
 						.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
 				dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
