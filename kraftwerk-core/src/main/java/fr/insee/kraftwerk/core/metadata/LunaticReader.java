@@ -18,20 +18,25 @@ public class LunaticReader {
      */
     public static CalculatedVariables getCalculatedFromLunatic(String lunaticFile) {
         try {
-            // Read the lunatic questionnaire json file
             JsonNode rootNode = JsonFileReader.read(lunaticFile);
 
-            // Init the result object
             CalculatedVariables calculatedVariables = new CalculatedVariables();
 
-            // Fill the object
-            // TODO
-            // (example)
-            CalculatedVariable calculatedVariable = new CalculatedVariable("name", "vtl expression");
-            calculatedVariable.addDependantVariable("dependant variable 1 name");
-            calculatedVariable.addDependantVariable("dependant variable 2 name");
+            JsonNode variablesNode = rootNode.get("variables");
+            variablesNode.forEach(variableNode -> {
+                if (variableNode.get("variableType").asText().equals("CALCULATED")) {
+                    CalculatedVariable calculatedVariable = new CalculatedVariable(
+                            variableNode.get("name").asText(),
+                            variableNode.get("expression").asText());
+                    JsonNode dependantVariablesNode = variableNode.get("bindingDependencies");
+                    if (dependantVariablesNode != null) {
+                        dependantVariablesNode.forEach(name ->
+                                calculatedVariable.addDependantVariable(name.asText()));
+                    }
+                    calculatedVariables.putVariable(calculatedVariable);
+                }
+            });
 
-            //
             return calculatedVariables;
 
         } catch (IOException e) {
@@ -39,4 +44,5 @@ public class LunaticReader {
             return null;
         }
     }
+
 }
