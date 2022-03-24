@@ -27,6 +27,13 @@ public class LunaticReaderTest {
         assertEquals(
                 List.of("FUTURANNIVERSAIRE", "AGEMILLESIME", "DATENAIS"),
                 calculatedVariables.getDependantVariables("AGE"));
+        //
+        assertTrue(calculatedVariables.containsKey("ANNEENQ"));
+        assertEquals(
+                "cast(current_date(),string,\"YYYY\")",
+                calculatedVariables.getVtlExpression("ANNEENQ"));
+        assertTrue(calculatedVariables.getDependantVariables("ANNEENQ").isEmpty());
 
     }
+
 }
