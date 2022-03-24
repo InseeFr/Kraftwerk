@@ -92,6 +92,8 @@ public class OutputFilesTest {
 				System.out.println(Constants.getResourceAbsolutePath(nameNewFile));
 				boolean test = new File(Constants.getResourceAbsolutePath(nameNewFile)).createNewFile();
 				System.out.println(test);
+				System.out.println(modeInputs.getParadataFolder().equals(""));
+				System.out.println(modeInputs.getParadataFolder().contentEquals("null"));
 				// Now the paradata
 				if (!modeInputs.getParadataFolder().contentEquals("")) {
 					Files.createDirectories(Paths.get(inputFolder + "/paradata"));

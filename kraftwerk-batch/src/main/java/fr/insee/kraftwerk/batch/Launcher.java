@@ -59,12 +59,12 @@ public class Launcher {
 				metadataVariables.put(dataMode, data.getVariablesMap());
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
-				data.setDataFilePath(Constants.getInputPath(inDirectory, modeInputs.getDataFile()));
+				data.setDataFilePath(modeInputs.getDataFile());
 				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat());
 				parser.parseSurveyData(data);
 
 				/* Step 2.2 : Get paradata for the survey */
-				String paraDataFolder = Constants.getInputPath(inDirectory, modeInputs.getParadataFolder());
+				String paraDataFolder = modeInputs.getParadataFolder();
 				if (paraDataFolder != null) {
 					ParadataParser paraDataParser = new ParadataParser();
 					Paradata paraData = new Paradata(paraDataFolder);
@@ -72,7 +72,7 @@ public class Launcher {
 				}
 
 				/* Step 2.3 : Get reportingData for the survey */
-				String reportingDataFile = Constants.getInputPath(inDirectory, modeInputs.getReportingDataFile());
+				String reportingDataFile = modeInputs.getReportingDataFile();
 				if (reportingDataFile != null) {
 					ReportingData reportingData = new ReportingData(reportingDataFile);
 					if (reportingDataFile.contains(".xml")) {

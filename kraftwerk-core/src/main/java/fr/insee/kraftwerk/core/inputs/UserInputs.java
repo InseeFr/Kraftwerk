@@ -56,7 +56,7 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = getText(fileNode, "data_mode");
-				String dataFile = getText(fileNode, "data_file");
+				String dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
 				String DDIFilePath = getText(fileNode, "DDI_file");
 				String DDIFile = "";
 				if (DDIFilePath.contains("http")) {
@@ -65,8 +65,8 @@ public class UserInputs {
 					DDIFile = Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file"));
 				}
 				String dataFormat = getText(fileNode, "data_format");
-				String paradataFolder = getText(fileNode, "paradata_folder");
-				String reportingDataFile = getText(fileNode, "reporting_data_file");
+				String paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
+				String reportingDataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "reporting_data_file"));
 				String vtlFile = Constants.getInputPath(inputDirectory, getText(fileNode, "mode_specifications"));
 				//
 				ModeInputs modeInputs = new ModeInputs();
@@ -105,7 +105,7 @@ public class UserInputs {
 					throw new MissingMandatoryFieldException(String
 							.format("Empty or null value in mandatory field \"%s\" in the input file given", field));
 				} else {
-					return "";
+					return null;
 				}
 			}
 		} else {
@@ -114,7 +114,7 @@ public class UserInputs {
 						String.format("Mandatory field \"%s\" missing in the input file given", field));
 			} else {
 				log.info(String.format("Optional field \"%s\" missing in the input file given", field));
-				return "";
+				return null;
 			}
 		}
 	}

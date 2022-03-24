@@ -49,6 +49,7 @@ public class LunaticXmlDataParser implements DataParser {
 	public void parseSurveyData(SurveyRawData data) {
 
 		String filePath = data.getDataFilePath();
+		System.out.println(filePath);
 		readXmlFile(filePath);
 		Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
 				.getChildElements("SurveyUnit");

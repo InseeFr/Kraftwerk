@@ -52,14 +52,18 @@ public abstract class DataProcessing {
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
         log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
                 automatedInstructions));
-        vtlBindings.evalVtlScript(automatedInstructions);
+        if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
+            vtlBindings.evalVtlScript(automatedInstructions);
+        }
     }
 
     protected void applyUserVtlInstructions(String userVtlInstructionsPath){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
         log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
                 vtlScript));
-        vtlBindings.evalVtlScript(vtlScript);
+        if (!(vtlScript.isEmpty() || vtlScript.toString().contentEquals(""))) {
+            vtlBindings.evalVtlScript(vtlScript);
+        }
     }
 
 }
