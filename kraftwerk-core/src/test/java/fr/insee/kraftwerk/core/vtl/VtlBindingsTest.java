@@ -102,7 +102,9 @@ public class VtlBindingsTest {
 	@Test
 	public void evalEmptyVtlString() {
 		vtlBindings.evalVtlScript((String) null);
+		vtlBindings.evalVtlScript((VtlScript) null);
 		vtlBindings.evalVtlScript("");
+		vtlBindings.evalVtlScript(new VtlScript());
 	}
 
 	@Test
