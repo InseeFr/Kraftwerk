@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
@@ -30,9 +31,9 @@ public class LunaticXmlDataParser implements DataParser {
 	 *
 	 * @param filePath Path to the XML file.
 	 */
-	public void readXmlFile(String filePath) {
+	public void readXmlFile(Path filePath) {
 		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath);
+		document = xmlFileReader.readXmlFile(filePath.toString());
 		if (document != null) {
 			log.info("Successfully parsed Lunatic answers file: " + filePath);
 		} else {
@@ -48,8 +49,7 @@ public class LunaticXmlDataParser implements DataParser {
 	@Override
 	public void parseSurveyData(SurveyRawData data) {
 
-		String filePath = data.getDataFilePath();
-		System.out.println(filePath);
+		Path filePath = data.getDataFilePath();
 		readXmlFile(filePath);
 		Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
 				.getChildElements("SurveyUnit");

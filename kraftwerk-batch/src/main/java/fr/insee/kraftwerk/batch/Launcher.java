@@ -55,7 +55,7 @@ public class Launcher {
 				SurveyRawData data = new SurveyRawData();
 
 				/* Step 2.0 : Read the DDI file to get survey variables */
-				data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIFile()));
+				data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
 				metadataVariables.put(dataMode, data.getVariablesMap());
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
@@ -64,7 +64,7 @@ public class Launcher {
 				parser.parseSurveyData(data);
 
 				/* Step 2.2 : Get paradata for the survey */
-				String paraDataFolder = modeInputs.getParadataFolder();
+				Path paraDataFolder = modeInputs.getParadataFolder();
 				if (paraDataFolder != null) {
 					ParadataParser paraDataParser = new ParadataParser();
 					Paradata paraData = new Paradata(paraDataFolder);
@@ -72,14 +72,14 @@ public class Launcher {
 				}
 
 				/* Step 2.3 : Get reportingData for the survey */
-				String reportingDataFile = modeInputs.getReportingDataFile();
+				Path reportingDataFile = modeInputs.getReportingDataFile();
 				if (reportingDataFile != null) {
 					ReportingData reportingData = new ReportingData(reportingDataFile);
-					if (reportingDataFile.contains(".xml")) {
+					if (reportingDataFile.toString().contains(".xml")) {
 						XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 						xMLReportingDataParser.parseReportingData(reportingData, data);
 					} else {
-						if (reportingDataFile.contains(".csv")) {
+						if (reportingDataFile.toString().contains(".csv")) {
 							CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
 							cSVReportingDataParser.parseReportingData(reportingData, data);
 						}
@@ -106,7 +106,7 @@ public class Launcher {
 			/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 			DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 			reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlReconciliationFile()));
+					Constants.getInputPath(inDirectory, userInputs.getVtlReconciliationFile().toString()));
 
 			/* Step 3.1.b : clean up processing */
 			CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
@@ -115,12 +115,12 @@ public class Launcher {
 			/* Step 3.2 : treatments on the multimodal dataset */
 			DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
 			multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlTransformationsFile()));
+					Constants.getInputPath(inDirectory, userInputs.getVtlTransformationsFile().toString()));
 
 			/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 			DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 			informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlInformationLevelsFile()));
+					Constants.getInputPath(inDirectory, userInputs.getVtlInformationLevelsFile().toString()));
 
 			/* Step 4 : Write output files */
 

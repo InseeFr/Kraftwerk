@@ -2,6 +2,8 @@ package fr.insee.kraftwerk.core.extradata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.file.Paths;
+
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,7 @@ public class XMLReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
 		xMLReportingDataParser.parseReportingData(reportingData, data);
 
 		// Check the reporting data is well captured

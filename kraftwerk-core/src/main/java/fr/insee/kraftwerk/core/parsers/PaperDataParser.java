@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.parsers;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class PaperDataParser implements DataParser {
 
 	public void parseSurveyData(SurveyRawData data) {
 
-		String filePath = data.getDataFilePath();
+		Path filePath = data.getDataFilePath();
 		readFile(filePath);
 
 		try {
@@ -148,11 +149,11 @@ public class PaperDataParser implements DataParser {
 	 *
 	 * @param filePath Path to the CSV file.
 	 */
-	private void readFile(String filePath) {
+	private void readFile(Path filePath) {
 		try {
 			// Create an object of file reader
 			// class with CSV file as a parameter.
-			filereader = new FileReader(filePath);
+			filereader = new FileReader(filePath.toString());
 			// create csvReader object passing
 			// file reader as a parameter
 			csvReader = new CSVReader(filereader);

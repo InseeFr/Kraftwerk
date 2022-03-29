@@ -87,13 +87,13 @@ public final class Constants {
 	/** Update path with the root.
 	 *
 	 * @param inputDirectory the directory where all files are stored
-	 * @param userPath the path to the file or the folder
+	 * @param path the path to the file or the folder
 	 *
 	 * @return the file or null when not found.
 	 * */
-	public static String getInputPath(Path inputDirectory, String userPath) {
-		if (userPath != null) {
-			return inputDirectory.resolve(userPath).toString();
+	public static Path getInputPath(Path inputDirectory, String path) {
+		if (path != null) {
+			return Paths.get(inputDirectory.resolve(path).toString());
 		} else {
 			return null;
 		}
@@ -127,8 +127,8 @@ public final class Constants {
 	/** Parse JSON from fileName
 	 * @param filename
 	 */
-	public static Object readJsonSimple(String filename) throws Exception {
-		FileReader reader = new FileReader(filename);
+	public static Object readJsonSimple(Path filename) throws Exception {
+		FileReader reader = new FileReader(filename.toString());
 		JSONParser jsonParser = new JSONParser();
 		return jsonParser.parse(reader);
 	}
@@ -162,6 +162,25 @@ public final class Constants {
 			return new URL(filePath);
 		} else {
 			return new File(filePath).toURI().toURL();
+		}
+	}
+
+
+	/** Convert a string path to an URL object.
+	 *
+	 * @param filePath
+	 * Can be a URL or a local absolute path.
+	 *
+	 * @return
+	 * A java.net.URL object.
+	 *
+	 * @throws MalformedURLException if the path given is incorrect.
+	 * */
+	public static URL convertToUrl(Path filePath) throws MalformedURLException {
+		if(filePath.startsWith("http")) {
+			return new URL(filePath.toString());
+		} else {
+			return new File(filePath.toString()).toURI().toURL();
 		}
 	}
 		

@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,9 +72,10 @@ public class OutputFilesTest {
 	@Test
 	@Order(3)
 	public void moveFiles() {
+		String campaignName = "move_files";
 		//
-		testUserInputs = new UserInputs(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/move_files.json",
-				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files"));
+		testUserInputs = new UserInputs(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/move_files.json",
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName));
 		Path inputFolder = testUserInputs.getInputDirectory();
 
 		Map<String, ModeInputs> modeInputsMap = testUserInputs.getModeInputsMap();
@@ -86,23 +84,19 @@ public class OutputFilesTest {
 			// We create the mode files
 			ModeInputs modeInputs = testUserInputs.getModeInputs(mode);
 
-			String nameNewFile = inputFolder.resolve(modeInputs.getDataFile()).toString();
+			String nameNewFile = modeInputs.getDataFile().toString();
 			try {
-				System.out.println(nameNewFile);
-				System.out.println(Constants.getResourceAbsolutePath(nameNewFile));
-				boolean test = new File(Constants.getResourceAbsolutePath(nameNewFile)).createNewFile();
-				System.out.println(test);
-				System.out.println(modeInputs.getParadataFolder().equals(""));
-				System.out.println(modeInputs.getParadataFolder().contentEquals("null"));
+				new File(nameNewFile).createNewFile();
 				// Now the paradata
-				if (!modeInputs.getParadataFolder().contentEquals("")) {
+				if (modeInputs.getParadataFolder() != null && !modeInputs.getParadataFolder().toString().contentEquals("")) {
 					Files.createDirectories(Paths.get(inputFolder + "/paradata"));
 					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000003.json")).createNewFile();
 					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000004.json")).createNewFile();
 					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000009.json")).createNewFile();
 					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000010.json")).createNewFile();
 				}
-				if (!modeInputs.getReportingDataFile().contentEquals("")) {
+				if (modeInputs.getReportingDataFile() != null && !modeInputs.getReportingDataFile().toString().contentEquals("")) {
+					Files.createDirectories(Paths.get(inputFolder + "/suivi"));
 					new File(Constants.getResourceAbsolutePath(inputFolder + "/suivi/reportingdata.xml")).createNewFile();
 				}
 			} catch (IOException e) {
@@ -112,14 +106,16 @@ public class OutputFilesTest {
 		}
 
 		outputFiles.moveInputFile(testUserInputs);
-		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/papier").exists());
-		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/web").exists());
+		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/papier").exists());
+		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/web").exists());
 		assertTrue(
-				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/paradata/L0000010.json").exists());
+				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/paradata/L0000010.json").exists());
 		assertTrue(
-				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive/suivi/reportingdata.xml").exists());
-		
-		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/move_files/Archive"));
+				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/suivi/reportingdata.xml").exists());
+
+		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive"));
+		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/paradata"));
+		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/suivi"));
 	}
 	
 	

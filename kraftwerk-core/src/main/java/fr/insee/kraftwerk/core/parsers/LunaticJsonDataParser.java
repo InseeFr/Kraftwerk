@@ -1,6 +1,9 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.Constants;
+
+import java.nio.file.Path;
+
 import org.json.simple.JSONObject;
 
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
@@ -15,7 +18,7 @@ public class LunaticJsonDataParser implements DataParser {
 		log.warn("Lunatic data parser being implemented!");
 
 		//
-		String filePath = surveyRawData.getDataFilePath();
+		Path filePath = surveyRawData.getDataFilePath();
 
 		//
 		JSONObject jsonObject = null;

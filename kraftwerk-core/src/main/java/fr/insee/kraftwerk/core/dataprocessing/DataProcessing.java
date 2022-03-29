@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -25,7 +27,7 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public void applyVtlTransformations(String bindingName, String userVtlInstructionsPath, Object... objects){
+    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects){
         // First step
         applyAutomatedVtlInstructions(bindingName, objects);
         // Second step
@@ -57,7 +59,7 @@ public abstract class DataProcessing {
         }
     }
 
-    protected void applyUserVtlInstructions(String userVtlInstructionsPath){
+    protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
         log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
                 vtlScript));

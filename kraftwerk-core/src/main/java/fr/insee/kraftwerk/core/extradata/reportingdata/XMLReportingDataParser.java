@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
 	public void parseReportingData(ReportingData reportingData, SurveyRawData data) {
 
-		String filePath = reportingData.getFilepath();
+		Path filePath = reportingData.getFilepath();
 		readFile(filePath);
 
 		Element root = document.getRootElement();
@@ -50,17 +52,15 @@ public class XMLReportingDataParser extends ReportingDataParser {
 		document = null;
 	}
 
-	
-
 	/**
 	 * Parse the XML file from the given path. The parsed object is set in the
 	 * private attribute document.
 	 *
 	 * @param filePath Path to the XML file.
 	 */
-	private void readFile(String filePath) {
+	private void readFile(Path filePath) {
 		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath);
+		document = xmlFileReader.readXmlFile(filePath.toString());
 		if (document != null) {
 			log.info("Successfully parsed Coleman answers file: " + filePath);
 		} else {

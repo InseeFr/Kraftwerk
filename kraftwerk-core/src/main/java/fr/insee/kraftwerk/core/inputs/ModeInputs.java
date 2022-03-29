@@ -1,5 +1,8 @@
 package fr.insee.kraftwerk.core.inputs;
 
+import java.net.URL;
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,13 +12,13 @@ import lombok.Setter;
  */
 public class ModeInputs {
 
-    @Getter @Setter protected String dataFile;
-    @Getter @Setter protected String DDIFile;
+    @Getter @Setter protected Path dataFile;
+    @Getter @Setter protected URL DDIURL;
     @Getter         protected DataFormat dataFormat;
     @Getter @Setter protected String dataMode;
-    @Getter @Setter protected String modeVtlFile;
-    @Getter @Setter protected String paradataFolder;
-    @Getter @Setter protected String reportingDataFile;
+    @Getter @Setter protected Path modeVtlFile;
+    @Getter @Setter protected Path paradataFolder;
+    @Getter @Setter protected Path reportingDataFile;
 
     /**
      * Allow to specify the data format using a string argument.

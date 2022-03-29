@@ -1,6 +1,9 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
+
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -31,7 +34,7 @@ public class XformsDataParser implements DataParser {
 	 */
 	public void parseSurveyData(SurveyRawData data) {
 
-		String filePath = data.getDataFilePath();
+		Path filePath = data.getDataFilePath();
 		readFile(filePath);
 
 		Element root = document.getRootElement();
@@ -120,9 +123,9 @@ public class XformsDataParser implements DataParser {
 	 *
 	 * @param filePath Path to the XML file.
 	 */
-	private void readFile(String filePath) {
+	private void readFile(Path filePath) {
 		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath);
+		document = xmlFileReader.readXmlFile(filePath.toString());
 		if (document != null) {
 			log.info("Successfully parsed Coleman answers file: " + filePath);
 		} else {

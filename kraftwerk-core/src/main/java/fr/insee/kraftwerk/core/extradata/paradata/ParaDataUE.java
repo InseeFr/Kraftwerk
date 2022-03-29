@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class ParaDataUE {
 
-	private String filepath;
+	private Path filepath;
 
 	private String identifier;
 	
@@ -35,11 +36,11 @@ public class ParaDataUE {
 		this.orchestrators = new ArrayList<Orchestrator>();
 	}
 
-	public String getFilepath() {
+	public Path getFilepath() {
 		return filepath;
 	}
 
-	public void setFilepath(String filepath) {
+	public void setFilepath(Path filepath) {
 		this.filepath = filepath;
 	}
 

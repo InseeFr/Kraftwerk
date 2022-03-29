@@ -12,31 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 
 @Slf4j
 public class DDIReader {
 
-
-	/**
-	 * This method apply the XSLT_STRUCTURED_VARIABLES transformation to the DDI,
-	 * then reads the output xml to return the variables.
-	 * The XML file generated is written at path given.
-	 *
-	 * @param DDIPath 				: Path to the DDI file.
-	 * @param outputVariablesPath 	: Path to the variables XML file that will be created.
-	 *
-	 * @return The variables found in the DDI.
-	 */
-	public static VariablesMap getVariablesFromDDI(String DDIPath, String outputVariablesPath) {
-		try {
-			URL DDIUrl = Constants.convertToUrl(DDIPath);
-			transformDDI(DDIUrl, outputVariablesPath);
-			return getVariablesFromTransformed(outputVariablesPath);
-		} catch (MalformedURLException e) {
-			log.error(String.format("Error when converting file path '%s' to an URL.", DDIPath), e);
-			return null;
-		}
-	}
 
 	/**
 	 * This method apply the XSLT_STRUCTURED_VARIABLES transformation to the DDI,
@@ -48,12 +28,9 @@ public class DDIReader {
 	 *
 	 * @return The variables found in the DDI.
 	 */
-	public static VariablesMap getVariablesFromDDI(String DDIPath){
+	public static VariablesMap getVariablesFromDDI(URL DDIUrl){
 
 		try {
-			//
-			URL DDIUrl = Constants.convertToUrl(DDIPath);
-
 			// Path of the output 'variables.xml' temp file
 			File variablesFile = File.createTempFile("variables",".xml");
 			variablesFile.deleteOnExit();
@@ -65,7 +42,7 @@ public class DDIReader {
 		}
 
 		catch (MalformedURLException e) {
-			log.error(String.format("Error when converting file path '%s' to an URL.", DDIPath), e);
+			log.error(String.format("Error when converting file path '%s' to an URL.", DDIUrl), e);
 			return null;
 		}
 		catch (IOException e) {

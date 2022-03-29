@@ -28,11 +28,11 @@ public class ParadataParser {
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) {
 
 		log.info("Para data parser being implemented!");
-		String filePath = paradata.getFilepath();
-		if (!filePath.contentEquals("")) {
+		Path filePath = paradata.getFilepath();
+		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
-			try (Stream<Path> walk = Files.walk(Paths.get(filePath))) {
+			try (Stream<Path> walk = Files.walk(filePath)) {
 				List<String> listFilePaths = walk.filter(Files::isRegularFile).map(x -> x.toString())
 						.collect(Collectors.toList());
 				// Parse each ParaDataUE
@@ -40,7 +40,7 @@ public class ParadataParser {
 
 				for (String fileParaDataPath : listFilePaths) {
 					ParaDataUE paraDataUE = new ParaDataUE();
-					paraDataUE.setFilepath(fileParaDataPath);
+					paraDataUE.setFilepath(Paths.get(fileParaDataPath));
 					parseParadataUE(paraDataUE, surveyRawData);
 					paraDataUE.sortEvents();
 					paraDataUE.createOrchestratorsAndSessions();
@@ -63,7 +63,7 @@ public class ParadataParser {
 
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) {
 		// To convert to a entire folder instead of a single file
-		String filePath = paradataUE.getFilepath();
+		Path filePath = paradataUE.getFilepath();
 
 		JSONObject jsonObject = null;
 		try {
