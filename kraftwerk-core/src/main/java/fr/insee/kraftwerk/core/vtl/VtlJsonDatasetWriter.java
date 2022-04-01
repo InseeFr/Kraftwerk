@@ -181,18 +181,20 @@ public class VtlJsonDatasetWriter {
 	}
 
 	public static String convertToVtlType(VariableType variableType) {
-		// temp code: "STRING" type if variableType is null;
+		//
 		if (variableType == null) {
-			log.debug("null variable type given to convertToVtlType method, this should not happen!");
+			log.debug("null variable type given to convertToVtlType method, this should NEVER happen!");
 			return "STRING";
 		}
 		//
 		String vtlType = null;
 		switch (variableType) {
 		case STRING:
-		case BOOLEAN:
-		case DATE:
+		case DATE: // TODO: (note) date type not yet supported by Trevas
 			vtlType = "STRING";
+			break;
+		case BOOLEAN:
+			vtlType = "BOOLEAN";
 			break;
 		case INTEGER:
 			vtlType = "INTEGER";
