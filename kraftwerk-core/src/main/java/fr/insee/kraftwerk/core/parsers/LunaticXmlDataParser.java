@@ -21,7 +21,9 @@ public class LunaticXmlDataParser implements DataParser {
 
 	private Document document;
 
-	/** Words used to filter VTL expressions in "calculated" elements. */
+	/** Words used to filter VTL expressions in "calculated" elements.
+	 * Deprecated since we don't read calculated values in the parser anymore. */
+	@Deprecated
 	private static final String[] forbiddenWords = {"cast", "isnull", "if "};
 
 	/**
@@ -42,8 +44,6 @@ public class LunaticXmlDataParser implements DataParser {
 
 	/**
 	 * Parse a Lunatic xml data file.
-	 * "FILTER_RESULT" variables are added to the variables map.
-	 * VTL expressions in the calculated elements are ignored.
 	 */
 	@Override
 	public void parseSurveyData(SurveyRawData data) {
@@ -65,7 +65,7 @@ public class LunaticXmlDataParser implements DataParser {
 			questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+			//readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); TODO: remove this line
 
 			data.addQuestionnaire(questionnaireData);
 		}
@@ -114,6 +114,7 @@ public class LunaticXmlDataParser implements DataParser {
 	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
+	@Deprecated
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
 											 VariablesMap variables) {
 
@@ -188,7 +189,11 @@ public class LunaticXmlDataParser implements DataParser {
 
 	/**
 	 * Check if the given value is a VTL expression using the 'forbiddenWords' attribute.
+	 * Deprecated since we don't read calculated values in the parser anymore.
+	 * @see fr.insee.kraftwerk.core.metadata.LunaticReader
+	 * @see fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing
 	 */
+	@Deprecated
 	private static boolean isNotVtlExpression(String value) {
 		return !(stringContainsItemFromList(value, forbiddenWords));
 	}
