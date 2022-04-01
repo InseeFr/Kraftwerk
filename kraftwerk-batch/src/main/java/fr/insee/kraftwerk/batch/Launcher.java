@@ -109,7 +109,10 @@ public class Launcher {
 					}
 				}
 
-				/* Step 2.5b : Apply mode-specific VTL transformations */
+				/* Step 2.4c : Prefix variable names with their belonging group names */
+				new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, data.getVariablesMap());
+
+				/* Step 2.5 : Apply mode-specific VTL transformations */
 				UnimodalDataProcessing dataProcessing = DataProcessingManager
 						.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
 				dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
