@@ -44,10 +44,12 @@ public class CalculatedProcessing extends DataProcessing {
         VtlScript vtlScript = new VtlScript();
 
         for (String calculatedName : orderedCalculatedNames) {
-            String fullyQualifiedName = variablesMap.getFullyQualifiedName(calculatedName);
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
-            vtlScript.add(String.format("%s := %s [calc %s := %s];",
-                    bindingName, bindingName, fullyQualifiedName, vtlExpression));
+            if (vtlExpression != null && !vtlExpression.equals("")) {
+                vtlScript.add(String.format("%s := %s [calc %s := %s];",
+                        bindingName, bindingName, calculatedName, vtlExpression));
+            }
+
         }
 
         return vtlScript;
