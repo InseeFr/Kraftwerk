@@ -155,6 +155,14 @@ public class VtlBindings {
             } catch (ScriptException e) {
                 log.warn("The following VTL instruction given is invalid and has been skipped:\n" + vtlScript);
                 log.warn(e.getMessage());
+            } catch (NumberFormatException e) { // NOTE: issue sent to Trevas
+                log.warn("NumberFormatException cause by following VTL instruction:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("Corresponding variable could not be calculated.");
+            } catch (NullPointerException e) { // NOTE: issue sent to Trevas
+                log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.debug(e.getMessage());
+                log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
