@@ -16,7 +16,7 @@ public class Variable {
 	protected VariableType type;
 
 	public Variable(String name, Group group, VariableType type) {
-		this.name = name.toUpperCase();
+		this.name = name;
 		this.group = group;
 		this.type = type;
 	}

@@ -88,7 +88,7 @@ public class LunaticXmlDataParser implements DataParser {
 		for (Element variableNode : collectedVariablesNodes) {
 
 			// Variable name
-			String variableName = variableNode.getLocalName().toUpperCase();
+			String variableName = variableNode.getLocalName();
 
 			// Root variables
 			if (variableNode.getFirstChildElement("COLLECTED").getAttribute("type") != null) {
@@ -130,7 +130,7 @@ public class LunaticXmlDataParser implements DataParser {
 			for (Element variableNode : calculatedVariablesNodes) {
 
 				// Variable name
-				String variableName = variableNode.getLocalName().toUpperCase();
+				String variableName = variableNode.getLocalName();
 
 				// Root variables
 				if (variableNode.getAttribute("type") != null) {
