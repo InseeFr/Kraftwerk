@@ -109,7 +109,8 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : variablesMap.getVariableNames()) {
 			Variable variable = variablesMap.getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
-			jsonVtlVariable.put("name", variablesMap.getFullyQualifiedName(variableName));
+			//jsonVtlVariable.put("name", variablesMap.getFullyQualifiedName(variableName));
+			jsonVtlVariable.put("name", variableName); // recent change (see GroupProcessing class)
 			jsonVtlVariable.put("type", convertToVtlType(variable.getType()));
 			jsonVtlVariable.put("role", "MEASURE");
 			dataStructure.add(jsonVtlVariable);
