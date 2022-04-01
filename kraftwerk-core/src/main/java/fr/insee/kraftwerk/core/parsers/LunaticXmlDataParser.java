@@ -67,11 +67,11 @@ public class LunaticXmlDataParser implements DataParser {
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 			data.addQuestionnaire(questionnaireData);
 		}
 	}
-
 
 	/**
 	 * Read data in the COLLECTED elements.
@@ -91,8 +91,10 @@ public class LunaticXmlDataParser implements DataParser {
 			// Variable name
 			String variableName = variableNode.getLocalName().toUpperCase();
 
-			// Root variables
-			if (variableNode.getFirstChildElement("COLLECTED").getAttribute("type") != null) {
+			// Root variables // TODO: "_MISSING" variables management
+			Element collectedNode = variableNode.getFirstChildElement("COLLECTED");
+			if (collectedNode.getAttribute("type") != null &&
+					! collectedNode.getAttribute("type").getValue().equals("null")) {
 				String value = variableNode.getFirstChildElement("COLLECTED").getValue();
 				answers.putValue(variableName, value);
 			}
@@ -100,11 +102,41 @@ public class LunaticXmlDataParser implements DataParser {
 			// Group variables // TODO : recursion etc.
 			else {
 				Elements valueNodes = variableNode.getFirstChildElement("COLLECTED").getChildElements();
-				String groupName = variables.getVariable(variableName).getGroupName();
-				GroupData groupData = answers.getSubGroup(groupName);
-				for (int j = 0; j < valueNodes.size(); j++) {
-					String value = valueNodes.get(j).getValue();
-					groupData.putValue(value, variableName, j);
+				if(variables.hasVariable(variableName)) { // TODO: "_MISSING" variables management
+					String groupName = variables.getVariable(variableName).getGroupName();
+					GroupData groupData = answers.getSubGroup(groupName);
+					for (int j = 0; j < valueNodes.size(); j++) {
+						Element valueNode = valueNodes.get(j);
+						if(! valueNode.getAttribute("type").getValue().equals("null")) {
+							String value = valueNodes.get(j).getValue();
+							groupData.putValue(value, variableName, j);
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * Read data in the EXTERNAL elements.
+	 * "External" variables are always in the root group.
+	 */
+	private void readExternal(Element questionnaireNode, QuestionnaireData questionnaireData,
+							   VariablesMap variables) {
+
+		Element externalNode = questionnaireNode.getFirstChildElement("Data")
+				.getFirstChildElement("EXTERNAL");
+
+		if (externalNode != null) {
+
+			Elements externalVariableNodes = externalNode.getChildElements();
+
+			for (Element externalVariableNode : externalVariableNodes) {
+				if(! externalVariableNode.getAttribute("type").getValue().equals("null")) {
+					String variableName = externalVariableNode.getLocalName();
+					String value = externalVariableNode.getValue();
+					questionnaireData.putValue(value, variableName);
 				}
 			}
 		}
@@ -134,7 +166,7 @@ public class LunaticXmlDataParser implements DataParser {
 				String variableName = variableNode.getLocalName().toUpperCase();
 
 				// Root variables
-				if (variableNode.getAttribute("type") != null) {
+				if (!variableNode.getAttribute("type").getValue().equals("null")) {
 					//
 					if (variableName.startsWith("FILTER_RESULT_")) {
 						variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN));
