@@ -155,7 +155,9 @@ public class VariablesMap {
     public boolean hasMcq(String questionName) {
         return variables.values().stream()
                 .filter(variable -> variable instanceof McqVariable)
-                .anyMatch(mcqVariable -> ((McqVariable) mcqVariable).getMqcName().equals(questionName));
+                .anyMatch(mcqVariable -> // (FILTER_RESULT variables are upper case)
+                        ((McqVariable) mcqVariable).getMqcName().equals(questionName)
+                                || ((McqVariable) mcqVariable).getMqcName().toUpperCase().equals(questionName));
     }
     public Group getMcqGroup(String questionName) {
         return variables.values().stream()
