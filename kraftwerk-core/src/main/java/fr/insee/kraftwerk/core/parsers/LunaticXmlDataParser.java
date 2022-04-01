@@ -195,14 +195,7 @@ public class LunaticXmlDataParser implements DataParser {
 	 */
 	@Deprecated
 	private static boolean isNotVtlExpression(String value) {
-		return !(stringContainsItemFromList(value, forbiddenWords));
-	}
-
-	/**
-	 * Check if the string given contains any of the words listed in second parameter.
-	 */
-	public static boolean stringContainsItemFromList(String string, String[] items) {
-	    return Arrays.stream(items).anyMatch(string::contains);
+		return Arrays.stream(forbiddenWords).noneMatch(value::contains);
 	}
 	
 }
