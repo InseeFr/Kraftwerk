@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -64,9 +65,10 @@ public class CalculatedProcessing extends DataProcessing {
         // Resolve
         int counter = 0;
         while (!unresolved.isEmpty() && counter < MAXIMAL_RESOLVING_ITERATIONS) {
-            for (String calculatedName : unresolved.keySet()) {
+            for (Iterator<String> iterator = unresolved.keySet().iterator(); iterator.hasNext();) {
+                String calculatedName = iterator.next();
                 if (isResolved(unresolved, calculatedName)) {
-                    unresolved.remove(calculatedName);
+                    iterator.remove(); // ( => unresolved.remove(calculatedName); )
                     resolved.add(calculatedName);
                 }
             }
