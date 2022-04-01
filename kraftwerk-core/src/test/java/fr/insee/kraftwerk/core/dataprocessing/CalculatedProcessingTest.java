@@ -1,7 +1,9 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
@@ -21,8 +23,6 @@ public class CalculatedProcessingTest {
     private static CalculatedVariables fooCalculated;
     private static VariablesMap fooVariables;
     private static VtlBindings vtlBindings;
-
-    static final String LUNATIC_SAMPLES = TestConstants.UNIT_TESTS_DIRECTORY + "/lunatic";
 
     @BeforeAll
     static void setFooCalculated() {
@@ -90,13 +90,4 @@ public class CalculatedProcessingTest {
         assertEquals(2L, outDataset.getDataPoints().get(0).get("FOO1"));
     }
 
-    @Test
-    public void processCalculatedOnLogX21Web() {
-        //
-        CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                LUNATIC_SAMPLES + "/log2021x21_tel.json");
-
-        //
-        // TODO: maybe move this toward integration / functional tests (need data + DDI to be tested)
-    }
 }
