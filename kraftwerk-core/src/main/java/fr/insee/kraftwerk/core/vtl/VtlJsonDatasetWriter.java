@@ -130,7 +130,8 @@ public class VtlJsonDatasetWriter {
 			GroupInstance rootInstance = questionnaireData.getAnswers();
 
 			String[] rowValues = new String[columnsMapping.size()];
-			Arrays.fill(rowValues, "");
+			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
+			// (previous implementation was: fill with empty strings ("")
 
 			// Root level identifier
 			rowValues[0] = questionnaireData.getIdentifier();
