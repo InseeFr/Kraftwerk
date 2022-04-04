@@ -113,17 +113,18 @@ public class DDIReader {
 			Elements variableElements = groupElement.getChildElements("Variable");
 			for (int j=0; j<variableElements.size(); j++) {
 				Element variableElement = variableElements.get(j);
-				// Variable name and type
+				// Variable name, type and size
 				String variableName = variableElement.getFirstChildElement("Name").getValue();
 				VariableType variableType = VariableType.valueOf(
 						variableElement.getFirstChildElement("Format").getValue());
+				int variableLength = Integer.parseInt(variableElement.getFirstChildElement("Size").getValue());
 				//
 				Element valuesElement = variableElement.getFirstChildElement("Values");
 				//
 				Element mcqElement = variableElement.getFirstChildElement("MCQ");
 				//
 				if (valuesElement != null) {
-					UcqVariable variable = new UcqVariable(variableName, group, variableType);
+					UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
 					Elements valueElements = valuesElement.getChildElements("Value");
 					for (int k=0; k<valueElements.size(); k++) {
 						Element valueElement = valueElements.get(k);
@@ -131,12 +132,12 @@ public class DDIReader {
 					}
 					variablesMap.putVariable(variable);
 				} else if (mcqElement != null) {
-					McqVariable variable = new McqVariable(variableName, group, variableType);
+					McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
 					variable.setMqcName(mcqElement.getValue());
 					variable.setText(variableElement.getFirstChildElement("Label").getValue());
 					variablesMap.putVariable(variable);
 				} else {
-					Variable variable = new Variable(variableName, group, variableType);
+					Variable variable = new Variable(variableName, group, variableType, variableLength);
 					variablesMap.putVariable(variable);
 				}
 			}

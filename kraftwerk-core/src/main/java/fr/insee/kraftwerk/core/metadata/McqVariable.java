@@ -26,6 +26,14 @@ public class McqVariable extends Variable {
         }
     }
 
+    public McqVariable(String name, Group group, VariableType type, int variableLength) {
+        super(name, group, type, variableLength);
+        if (type != VariableType.BOOLEAN) {
+            log.warn(String.format("%s type given when creating MCQ \"%s\"", type, name));
+            log.warn("Type of a MCQ variable should be BOOLEAN.");
+        }
+    }
+
     /** Builder. Variable type is BOOLEAN. */
     @Builder
     public McqVariable(String name, Group group, String mcqName, String text) {

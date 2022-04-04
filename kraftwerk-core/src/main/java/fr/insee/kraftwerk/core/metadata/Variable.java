@@ -15,10 +15,20 @@ public class Variable {
 	/** Variable type from the enum class (STRING, INTEGER, DATE, ...) */
 	protected VariableType type;
 
+	/** Variable length. */
+	protected int length;
+
 	public Variable(String name, Group group, VariableType type) {
 		this.name = name.toUpperCase();
 		this.group = group;
 		this.type = type;
+	}
+
+	public Variable(String name, Group group, VariableType type, int length) {
+		this.name = name.toUpperCase();
+		this.group = group;
+		this.type = type;
+		this.length = length;
 	}
 
 	public String getName() {
@@ -32,6 +42,9 @@ public class Variable {
 	}
 	public VariableType getType() {
 		return type;
+	}
+	public int getLength() {
+		return length;
 	}
 
 }
