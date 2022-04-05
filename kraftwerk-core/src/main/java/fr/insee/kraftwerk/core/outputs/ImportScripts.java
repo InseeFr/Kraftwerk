@@ -53,7 +53,19 @@ public class ImportScripts {
 			// TODO: find a R solution to properly import variables types
 			// NOTE: fread from data.table guesses types pretty well, no it's not a big
 			// issue
+			script.append("colClasses = c( ");
 
+			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
+			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+			for (String variableName : listVariables.keySet()) {
+				VariableType variableType = listVariables.get(variableName).getType();
+				if (!variableType.equals(VariableType.STRING) && !variableType.equals(VariableType.INTEGER) && !variableType.equals(VariableType.NUMBER)) {
+					
+				script.append(String.format("'%s'='%s',", variableName, getDataTableType(variableType)));
+				}
+			}
+			script.deleteCharAt(script.length() - 1);
+			script.append("), \n");
 			// quote parameter
 			if (Constants.CSV_OUTPUTS_QUOTE_CHAR == '"') { // TODO: condition always true, but not later if we let the
 															// user choose
@@ -66,6 +78,7 @@ public class ImportScripts {
 		}
 
 		return script.toString();
+
 	}
 
 	public String scriptPython_pandas() {
@@ -84,16 +97,17 @@ public class ImportScripts {
 			String tableName = tableScriptInfo.getTableName();
 			// filename reference to the file
 			script.append(String.format("filename %s \"&path\\%s\" ENCODING=\"UTF-8\" ;\n",
-					 tableName.substring(0, Math.min(tableName.length(), 6)), tableScriptInfo.getCsvFileName()));
+					tableName.substring(0, Math.min(tableName.length(), 6)), tableScriptInfo.getCsvFileName()));
 
 			// PROC IMPORT
 			// careful about special characters, which can't be imported in SAS
-			script.append(String.format("PROC IMPORT datafile=%s \n", tableName.substring(0, Math.min(tableName.length(), 6))));
+			script.append(String.format("PROC IMPORT datafile=%s \n",
+					tableName.substring(0, Math.min(tableName.length(), 6))));
 			script.append(String.format("out=work.%s  dbms=dlm replace; \n", tableName));
 			script.append(String.format("FORMAT "));
 			// Special treatment to display the length of the variables
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(metadataVariables);
+			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
 			int count = 0;
 			for (String variableName : listVariables.keySet()) {
 				Variable variable = listVariables.get(variableName);
@@ -108,7 +122,8 @@ public class ImportScripts {
 							|| variable.getType().equals(VariableType.NUMBER)) {
 						script.append(String.format("%s %s. ", variableName, length));
 					}
-					// SAS doesn't allow more than 6000 characters for each line, we do a break every once in a while
+					// SAS doesn't allow more than 6000 characters for each line, we do a break
+					// every once in a while
 					if (count < 40) {
 						count++;
 					} else {
@@ -135,7 +150,6 @@ public class ImportScripts {
 	 * @param variableType a VariableType from the Kraftwerk enum class
 	 * @return eiter: character, integer, numeric, Date, logical
 	 */
-	@Deprecated
 	private String getDataTableType(VariableType variableType) {
 		switch (variableType) {
 		case STRING:
