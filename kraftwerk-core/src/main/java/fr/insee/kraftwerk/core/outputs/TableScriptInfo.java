@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.outputs;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -29,24 +30,32 @@ public class TableScriptInfo {
 	@Getter
 	Map<String, VariablesMap> metadataVariables;
 
-	public Map<String, Variable> getAllLength(Map<String, VariablesMap> metadataVariables) {
+	public Map<String, Variable> getAllLength(DataStructure dataStructure, Map<String, VariablesMap> metadataVariables) {
+		System.out.println(tableName);
+		System.out.println("tableName");
+		System.out.println(dataStructure.keySet());
 		Map<String, Variable> result = new LinkedHashMap<String, Variable>();
 
+		for (String variableName : dataStructure.keySet()) {
+
 		for (String datasetName : metadataVariables.keySet()) {
-			for (String variableName : metadataVariables.get(datasetName).getVariableNames()) {
-				int newLength = metadataVariables.get(datasetName).getVariable(variableName).getLength();
-				if (result.containsKey(variableName)) {
-					int existingLength = result.get(variableName).getLength();
-					if (existingLength < newLength ) {
-						
-						//name, Group group, VariableType type, int length
+			
+				if (metadataVariables.get(datasetName).hasVariable(variableName) && !variableName.contains(Constants.FILTER_RESULT_PREFIX)) {
+
+					int newLength = metadataVariables.get(datasetName).getVariable(variableName).getLength();
+					if (result.containsKey(variableName)) {
+						int existingLength = result.get(variableName).getLength();
+						if (existingLength < newLength) {
+
+							// name, Group group, VariableType type, int length
+						}
+						result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
+								result.get(variableName).getType(), newLength));
+					} else {
+						Variable variable = metadataVariables.get(datasetName).getVariable(variableName);
+						result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
+								variable.getLength()));
 					}
-					result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
-							result.get(variableName).getType(), newLength));
-				} else {
-					Variable variable = metadataVariables.get(datasetName).getVariable(variableName);
-					result.put(variableName, new Variable(variableName, variable.getGroup(),
-							variable.getType(), variable.getLength()));
 				}
 			}
 		}
