@@ -62,7 +62,6 @@
                 <xsl:if test="l:VariableRepresentation/r:DateTimeRepresentation">23</xsl:if>
                 <xsl:if test="l:VariableRepresentation/r:CodeRepresentation">255</xsl:if>
                 <xsl:if test="l:VariableRepresentation/r:DateTimeRepresentationReference">23</xsl:if>
-                
             </Size>
             
             <!-- MCQ variables -->
