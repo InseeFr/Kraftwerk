@@ -31,13 +31,12 @@ public class TableScriptInfo {
 	Map<String, VariablesMap> metadataVariables;
 
 	public Map<String, Variable> getAllLength(DataStructure dataStructure, Map<String, VariablesMap> metadataVariables) {
-		System.out.println(tableName);
-		System.out.println("tableName");
-		System.out.println(dataStructure.keySet());
 		Map<String, Variable> result = new LinkedHashMap<String, Variable>();
 
+		// We loop with all variables in the current dataset we want to export
 		for (String variableName : dataStructure.keySet()) {
 
+			// We try to find it from the first datasets containing together all variables (except VTL and Kraftwerk-created ones)
 		for (String datasetName : metadataVariables.keySet()) {
 			
 				if (metadataVariables.get(datasetName).hasVariable(variableName) && !variableName.contains(Constants.FILTER_RESULT_PREFIX)) {
