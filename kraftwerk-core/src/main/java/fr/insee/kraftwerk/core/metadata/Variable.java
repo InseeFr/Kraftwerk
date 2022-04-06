@@ -16,7 +16,7 @@ public class Variable {
 	protected VariableType type;
 
 	/** Variable length. */
-	protected int length;
+	protected String length;
 
 	public Variable(String name, Group group, VariableType type) {
 		this.name = name.toUpperCase();
@@ -24,7 +24,7 @@ public class Variable {
 		this.type = type;
 	}
 
-	public Variable(String name, Group group, VariableType type, int length) {
+	public Variable(String name, Group group, VariableType type, String length) {
 		this.name = name.toUpperCase();
 		this.group = group;
 		this.type = type;
@@ -43,7 +43,7 @@ public class Variable {
 	public VariableType getType() {
 		return type;
 	}
-	public int getLength() {
+	public String getLength() {
 		return length;
 	}
 

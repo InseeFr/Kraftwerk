@@ -117,7 +117,7 @@ public class DDIReader {
 				String variableName = variableElement.getFirstChildElement("Name").getValue();
 				VariableType variableType = VariableType.valueOf(
 						variableElement.getFirstChildElement("Format").getValue());
-				int variableLength = Integer.parseInt(variableElement.getFirstChildElement("Size").getValue());
+				String variableLength = variableElement.getFirstChildElement("Size").getValue();
 				//
 				Element valuesElement = variableElement.getFirstChildElement("Values");
 				//

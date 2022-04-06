@@ -138,7 +138,7 @@ public class LunaticXmlDataParser implements DataParser {
 				if (variableNode.getAttribute("type") != null) {
 					//
 					if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-						variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, 5));
+						variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
 					}
 					//
 					String value = variableNode.getValue();
@@ -157,11 +157,11 @@ public class LunaticXmlDataParser implements DataParser {
 						if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
 							Group group = variables.getVariable(correspondingVariableName).getGroup();
 							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, 1));
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else if (variables.hasMcq(correspondingVariableName)) { // otherwise it should be from a MCQ
 							Group group = variables.getMcqGroup(correspondingVariableName);
 							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, 1));
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else {
 							Group group = variables.getGroup(variables.getGroupNames().get(0));
 							groupName = group.getName(); //TODO : make the log appear only one time per variable (not at each questionnaire occurrence).

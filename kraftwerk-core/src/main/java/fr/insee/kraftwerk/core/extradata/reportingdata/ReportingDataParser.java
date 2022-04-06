@@ -12,7 +12,7 @@ public abstract class ReportingDataParser {
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData) {
 		for (int k = 1; k <= max(reportingData); k++) {
 			Variable variableListStates = new Variable(
-					Constants.STATE_SUFFIX_NAME + "_" + k, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, 50);
+					Constants.STATE_SUFFIX_NAME + "_" + k, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListStates);
 
 			for (int i = 0; i < reportingData.getListReportingDataUE().size(); i++) {
@@ -31,7 +31,7 @@ public abstract class ReportingDataParser {
 			}
 		}
 		Variable variableLastState = new Variable(
-				Constants.LAST_STATE_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, 50);
+				Constants.LAST_STATE_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
 		surveyRawData.getVariablesMap().putVariable(variableLastState);
 
 		for (int i = 0; i < reportingData.getListReportingDataUE().size(); i++) {

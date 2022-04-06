@@ -107,8 +107,8 @@ public class ImportScripts {
 			int count = 0;
 			for (String variableName : listVariables.keySet()) {
 				Variable variable = listVariables.get(variableName);
-				int length = variable.getLength();
-				if (length != 0) {
+				String length = variable.getLength();
+				if (length.contentEquals("0")) {
 					if (variable.getType().equals(VariableType.BOOLEAN)
 							|| variable.getType().equals(VariableType.STRING)
 							|| variable.getType().equals(VariableType.DATE)) {
