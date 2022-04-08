@@ -34,6 +34,7 @@ public class Variable {
 	public String getName() {
 		return name;
 	}
+	
 	public String getGroupName() {
 		return group.getName();
 	}
