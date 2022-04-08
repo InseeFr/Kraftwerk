@@ -56,7 +56,7 @@ public class TextFileReader {
      */
     public static String readFromPath(Path filePath){
         try {
-            FileReader fileReader = new FileReader(new File(filePath.toString()));
+            FileReader fileReader = new FileReader(filePath.toFile());
             return readTextContent(fileReader);
         }
         catch (IOException e) {
