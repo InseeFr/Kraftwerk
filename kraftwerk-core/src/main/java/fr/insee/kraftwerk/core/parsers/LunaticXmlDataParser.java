@@ -166,7 +166,8 @@ public class LunaticXmlDataParser implements DataParser {
 				String variableName = variableNode.getLocalName().toUpperCase();
 
 				// Root variables
-				if (!variableNode.getAttribute("type").getValue().equals("null")) {
+				if (variableNode.getAttribute("type") != null &&
+						!variableNode.getAttribute("type").getValue().equals("null")) {
 					//
 					if (variableName.startsWith("FILTER_RESULT_")) {
 						variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN));
