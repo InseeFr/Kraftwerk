@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,7 @@ public class OutputFilesTest {
 
 	@Test
 	@Order(3)
+	@Disabled
 	public void moveFiles() {
 		String campaignName = "move_files";
 		//
