@@ -40,8 +40,8 @@ public class LunaticXmlDataParserTest {
 		//
 		QuestionnaireData q2 = data.getQuestionnaires().get(1);
 		assertEquals("T0000091", q2.getIdentifier());
-		assertEquals("", q2.getValue("ADDRESS"));
-		assertEquals("", q2.getValue("HOUSEHOLD_INCOME"));
+		assertNull(q2.getValue("ADDRESS"));
+		assertNull(q2.getValue("HOUSEHOLD_INCOME"));
 		//
 		QuestionnaireData q5 = data.getQuestionnaires().get(4);
 		assertEquals("T0000004", q5.getIdentifier());
@@ -66,17 +66,17 @@ public class LunaticXmlDataParserTest {
 	}
 
 	public void checkLevelOneContent(SurveyRawData data) {
-		//
+		// Simpson's family
 		GroupData individuals1 = data.getQuestionnaires().get(0).getAnswers().getSubGroup("INDIVIDUALS_LOOP");
 		assertEquals("Homer", individuals1.getValue("FIRST_NAME", 0));
 		assertEquals("Marge", individuals1.getValue("FIRST_NAME", 1));
 		assertEquals("Santa's Little Helper", individuals1.getValue("FIRST_NAME", 6));
-		//
+		// Empty questionnaire
 		GroupData individuals2 = data.getQuestionnaires().get(1).getAnswers().getSubGroup("INDIVIDUALS_LOOP");
 		for (String variableName : List.of("FIRST_NAME", "LAST_NAME", "GENDER")) {
-			assertEquals("", individuals2.getValue(variableName, 0));
+			assertNull(individuals2.getValue(variableName, 0));
 		}
-		//
+		// Flanders' family
 		GroupData individuals3 = data.getQuestionnaires().get(2).getAnswers().getSubGroup("INDIVIDUALS_LOOP");
 		for (int i=0; i<3; i++) {
 			assertEquals("Flanders", individuals3.getValue("LAST_NAME", i));
