@@ -28,7 +28,7 @@ public class UcqVariable extends Variable {
 		}
 	}
 
-	public UcqVariable(String name, Group group, VariableType type, int variableLength) {
+	public UcqVariable(String name, Group group, VariableType type, String variableLength) {
         super(name, group, type, variableLength);
         if (type != VariableType.STRING) {
             log.warn(String.format("%s type given when creating UCQ \"%s\"", type, name));

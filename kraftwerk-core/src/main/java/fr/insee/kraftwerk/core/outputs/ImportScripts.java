@@ -46,13 +46,8 @@ public class ImportScripts {
 			script.append("header=TRUE, \n");
 
 			// colClasses parameter
-			// DataStructure dataStructure = tableScriptInfo.getDataStructure();
-			// ...
-			// NOTE: disabled since the instruction is too long if the dataset has many
-			// variables
-			// TODO: find a R solution to properly import variables types
-			// NOTE: fread from data.table guesses types pretty well, no it's not a big
-			// issue
+			// NOTE: we don't specify variables in String or Number format since the instruction is too long if the dataset has many
+			// variables, and R seems to get them correctly anyway
 			script.append("colClasses = c( ");
 
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
@@ -66,6 +61,7 @@ public class ImportScripts {
 			}
 			script.deleteCharAt(script.length() - 1);
 			script.append("), \n");
+			
 			// quote parameter
 			if (Constants.CSV_OUTPUTS_QUOTE_CHAR == '"') { // TODO: condition always true, but not later if we let the
 															// user choose
@@ -111,8 +107,8 @@ public class ImportScripts {
 			int count = 0;
 			for (String variableName : listVariables.keySet()) {
 				Variable variable = listVariables.get(variableName);
-				int length = variable.getLength();
-				if (length != 0) {
+				String length = variable.getLength();
+				if (length.contentEquals("0")) {
 					if (variable.getType().equals(VariableType.BOOLEAN)
 							|| variable.getType().equals(VariableType.STRING)
 							|| variable.getType().equals(VariableType.DATE)) {

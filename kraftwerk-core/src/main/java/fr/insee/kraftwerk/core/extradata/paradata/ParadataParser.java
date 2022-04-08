@@ -164,9 +164,9 @@ public class ParadataParser {
 	 */
 	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
-		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING);
-		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER);
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER);
+		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "30");
+		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "20");
+		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "3");
 		try {
 			surveyRawData.getVariablesMap().putVariable(variableDuree);
 			surveyRawData.getVariablesMap().putVariable(variableDureeBrute);
@@ -174,7 +174,7 @@ public class ParadataParser {
 			for (String variableName : paradataVariables) {
 				if (variableName.contentEquals("PRENOM")) {
 					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName, surveyRawData.getVariablesMap().getRootGroup(),
-							VariableType.STRING);
+							VariableType.STRING, "3");
 					surveyRawData.getVariablesMap().putVariable(variable);
 				}
 			}
