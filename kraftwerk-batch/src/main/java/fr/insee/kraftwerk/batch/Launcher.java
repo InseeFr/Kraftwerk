@@ -35,9 +35,13 @@ public class Launcher {
 
 	public Boolean main(@NonNull Path inDirectory) {
 
-		log.info("Kraftwerk launched on directory " + inDirectory);
-
 		if (verifyInDirectory(inDirectory)) {
+
+			String campaignName = readCampaignName(inDirectory);
+
+			log.info("===============================================================================================");
+			log.info("Kraftwerk batch started for campaign: " + campaignName);
+			log.info("===============================================================================================");
 
 			Path outDirectory = transformToOut(inDirectory);
 
@@ -137,7 +141,9 @@ public class Launcher {
 			/* Step 4.4 : move differential data to a secondary folder */
 			outputFiles.moveInputFile(userInputs);
 
-			log.info("Kraftwerk batch ended.");
+			log.info("===============================================================================================");
+			log.info("Kraftwerk batch terminated for campaign: " + campaignName);
+			log.info("===============================================================================================\n");
 
 		}
 
