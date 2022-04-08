@@ -106,7 +106,7 @@ public class Launcher {
 			/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 			DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 			reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlReconciliationFile().toString()));
+					userInputs.getVtlReconciliationFile());
 
 			/* Step 3.1.b : clean up processing */
 			CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
@@ -115,12 +115,12 @@ public class Launcher {
 			/* Step 3.2 : treatments on the multimodal dataset */
 			DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
 			multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlTransformationsFile().toString()));
+					userInputs.getVtlTransformationsFile());
 
 			/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 			DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 			informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlInformationLevelsFile().toString()));
+					userInputs.getVtlInformationLevelsFile());
 
 			/* Step 4 : Write output files */
 
