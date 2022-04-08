@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.outputs;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
@@ -109,13 +110,13 @@ public class OutputFiles {
 		}
 	}
 
-	public void writeImportScripts() {
+	public void writeImportScripts(Map<String, VariablesMap> metadataVariables) {
 		//
 		ImportScripts importScripts = new ImportScripts();
 		//
 		for (String datasetName : datasetToCreate) {
 			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
-					vtlBindings.getDataset(datasetName).getDataStructure());
+					vtlBindings.getDataset(datasetName).getDataStructure(), metadataVariables);
 			importScripts.registerTable(tableScriptInfo);
 		}
 		//

@@ -50,6 +50,7 @@ public final class Constants {
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
 	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
+	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 
 
 	
