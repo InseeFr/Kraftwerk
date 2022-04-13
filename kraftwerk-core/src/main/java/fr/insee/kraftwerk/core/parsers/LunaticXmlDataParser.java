@@ -91,17 +91,20 @@ public class LunaticXmlDataParser implements DataParser {
 			// Variable name
 			String variableName = variableNode.getLocalName().toUpperCase();
 
-			// Root variables // TODO: "_MISSING" variables management
+			//
 			Element collectedNode = variableNode.getFirstChildElement("COLLECTED");
-			if (collectedNode.getAttribute("type") != null &&
-					! collectedNode.getAttribute("type").getValue().equals("null")) {
-				String value = variableNode.getFirstChildElement("COLLECTED").getValue();
-				answers.putValue(variableName, value);
+
+			// Root variables // TODO: "_MISSING" variables management
+			if (collectedNode.getAttribute("type") != null) {
+				if(! collectedNode.getAttribute("type").getValue().equals("null")) {
+					String value = variableNode.getFirstChildElement("COLLECTED").getValue();
+					answers.putValue(variableName, value);
+				}
 			}
 
 			// Group variables // TODO : recursion etc.
 			else {
-				Elements valueNodes = variableNode.getFirstChildElement("COLLECTED").getChildElements();
+				Elements valueNodes = collectedNode.getChildElements();
 				if(variables.hasVariable(variableName)) { // TODO: "_MISSING" variables management
 					String groupName = variables.getVariable(variableName).getGroupName();
 					GroupData groupData = answers.getSubGroup(groupName);
@@ -166,16 +169,17 @@ public class LunaticXmlDataParser implements DataParser {
 				String variableName = variableNode.getLocalName().toUpperCase();
 
 				// Root variables
-				if (variableNode.getAttribute("type") != null &&
-						!variableNode.getAttribute("type").getValue().equals("null")) {
-					//
-					if (variableName.startsWith("FILTER_RESULT_")) {
-						variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN));
-					}
-					//
-					String value = variableNode.getValue();
-					if(isNotVtlExpression(value)) {
-						answers.putValue(variableName, value);
+				if (variableNode.getAttribute("type") != null) {
+					if (!variableNode.getAttribute("type").getValue().equals("null")) {
+						//
+						if (variableName.startsWith("FILTER_RESULT_")) {
+							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN));
+						}
+						//
+						String value = variableNode.getValue();
+						if(isNotVtlExpression(value)) {
+							answers.putValue(variableName, value);
+						}
 					}
 				}
 
