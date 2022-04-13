@@ -24,7 +24,7 @@ public class DDIReader {
 	 * The XML file generated is written in the system temporary folder with the name 'variables.xml',
 	 * and is deleted when the virtual machine terminates.
 	 *
-	 * @param DDIPath 	: Path to the DDI file.
+	 * @param DDIUrl 	: Path to the DDI file.
 	 *
 	 * @return The variables found in the DDI.
 	 */
