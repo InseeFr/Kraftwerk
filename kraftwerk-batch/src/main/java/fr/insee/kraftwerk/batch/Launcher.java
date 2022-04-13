@@ -133,7 +133,7 @@ public class Launcher {
 			outputFiles.writeOutputCsvTables();
 
 			/* Step 4.2 : write scripts to import csv tables in several languages */
-			outputFiles.writeImportScripts();
+			outputFiles.writeImportScripts(metadataVariables);
 
 			/* Step 4.3 : move kraftwerk.json to a secondary folder */
 			outputFiles.renameInputFile(inDirectory);

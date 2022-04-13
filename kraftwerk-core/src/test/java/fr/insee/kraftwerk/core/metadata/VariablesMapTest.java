@@ -147,13 +147,13 @@ public class VariablesMapTest {
         variablesMap.putGroup(carsGroup);
 
         // Variables
-        variablesMap.putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING));
-        variablesMap.putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING));
-        variablesMap.putVariable(new Variable("AGE", rootGroup, VariableType.INTEGER));
-        variablesMap.putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING));
+        variablesMap.putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING, "20"));
+        variablesMap.putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING, "50"));
+        variablesMap.putVariable(new Variable("AGE", rootGroup, VariableType.INTEGER, "50"));
+        variablesMap.putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING, "50"));
 
         // unique choice question variable
-        UcqVariable ucq = new UcqVariable("SEXE", rootGroup, VariableType.STRING);
+        UcqVariable ucq = new UcqVariable("SEXE", rootGroup, VariableType.STRING, "50");
         ucq.addModality("1", "Male");
         ucq.addModality("2", "Female");
         Variable paperUcq1 = new PaperUcq("SEXE_1", ucq, "1");
@@ -175,10 +175,10 @@ public class VariablesMapTest {
         variablesMap.putGroup(carsGroup);
 
         // Variables
-        variablesMap.putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING));
-        variablesMap.putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING));
-        variablesMap.putVariable(new Variable("ADDRESS", rootGroup, VariableType.STRING));
-        variablesMap.putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING));
+        variablesMap.putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING, "50"));
+        variablesMap.putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING, "20"));
+        variablesMap.putVariable(new Variable("ADDRESS", rootGroup, VariableType.STRING, "50"));
+        variablesMap.putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING, "500"));
 
         return variablesMap;
     }

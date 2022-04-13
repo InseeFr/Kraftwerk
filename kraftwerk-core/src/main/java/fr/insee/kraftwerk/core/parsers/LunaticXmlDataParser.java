@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -173,7 +174,7 @@ public class LunaticXmlDataParser implements DataParser {
 					if (!variableNode.getAttribute("type").getValue().equals("null")) {
 						//
 						if (variableName.startsWith("FILTER_RESULT_")) {
-							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN));
+							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
 						}
 						//
 						String value = variableNode.getValue();
@@ -188,16 +189,16 @@ public class LunaticXmlDataParser implements DataParser {
 					Elements valueNodes = variableNode.getChildElements();
 					//
 					String groupName;
-					if (variableName.startsWith("FILTER_RESULT_")) {
-						String correspondingVariableName = variableName.replace("FILTER_RESULT_", "");
+					if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
+						String correspondingVariableName = variableName.replace(Constants.FILTER_RESULT_PREFIX, "");
 						if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
 							Group group = variables.getVariable(correspondingVariableName).getGroup();
 							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN));
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else if (variables.hasMcq(correspondingVariableName)) { // otherwise it should be from a MCQ
 							Group group = variables.getMcqGroup(correspondingVariableName);
 							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN));
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else {
 							Group group = variables.getGroup(variables.getGroupNames().get(0));
 							groupName = group.getName(); //TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
