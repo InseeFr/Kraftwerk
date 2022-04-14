@@ -32,17 +32,26 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class PaperDataParser implements DataParser {
+public class PaperDataParser extends DataParser {
 
 	/** Reader */
 	private CSVReader csvReader;
 	/** Reader */
 	private FileReader filereader;
 
-	public void parseSurveyData(SurveyRawData data) {
+	/**
+	 * Parser constructor.
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
+	 *             The variables must have been previously set.
+	 */
+	public PaperDataParser(SurveyRawData data) {
+		super(data);
+	}
 
-		Path filePath = data.getDataFilePath();
-		readFile(filePath);
+	@Override
+	void parseDataFile(Path filePath) {
+
+		readCsvFile(filePath);
 
 		try {
 

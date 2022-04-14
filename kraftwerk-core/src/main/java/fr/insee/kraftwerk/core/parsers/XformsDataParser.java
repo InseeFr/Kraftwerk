@@ -18,9 +18,16 @@ import nu.xom.Elements;
  *
  */
 @Slf4j
-public class XformsDataParser implements DataParser {
+public class XformsDataParser extends DataParser {
 
-	private Document document;
+	/**
+	 * Parser constructor.
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
+	 *             The variables must have been previously set.
+	 */
+	public XformsDataParser(SurveyRawData data) {
+		super(data);
+	}
 
 	/**
 	 * Read a Coleman survey data XML file and fills the SurveyRawData object given.
@@ -29,13 +36,12 @@ public class XformsDataParser implements DataParser {
 	 * values with the attribute type="nouvelle". Values with attribute
 	 * type="ancienne" are ignored. Variables which are not in the DDI are ignored.
 	 *
-	 * @param data The SurveyRawData object to be filled, the variables must have
-	 *             already been set.
+	 * @param filePath Path to a Xforms data file.
 	 */
-	public void parseSurveyData(SurveyRawData data) {
+	@Override
+	void parseDataFile(Path filePath) {
 
-		Path filePath = data.getDataFilePath();
-		readFile(filePath);
+		Document document = readXmlFile(filePath);
 
 		Element root = document.getRootElement();
 
@@ -111,25 +117,6 @@ public class XformsDataParser implements DataParser {
 			}
 
 			data.addQuestionnaire(questionnaireData);
-		}
-
-		// Free memory
-		document = null;
-	}
-
-	/**
-	 * Parse the XML file from the given path. The parsed object is set in the
-	 * private attribute document.
-	 *
-	 * @param filePath Path to the XML file.
-	 */
-	private void readFile(Path filePath) {
-		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath.toString());
-		if (document != null) {
-			log.info("Successfully parsed Coleman answers file: " + filePath);
-		} else {
-			log.warn("Failed to parse Coleman answers file: " + filePath);
 		}
 	}
 
