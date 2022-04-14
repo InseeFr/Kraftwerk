@@ -141,6 +141,13 @@ public class LunaticXmlDataParser implements DataParser {
 					String variableName = externalVariableNode.getLocalName();
 					String value = externalVariableNode.getValue();
 					questionnaireData.putValue(value, variableName);
+					if (! variables.hasVariable(variableName)) {
+						variables.putVariable(
+								new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+						log.warn(String.format(
+								"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
+								variableName));
+					}
 				}
 			}
 		}
