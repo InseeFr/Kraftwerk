@@ -64,8 +64,8 @@ public class Launcher {
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
 				data.setDataFilePath(modeInputs.getDataFile());
-				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat());
-				parser.parseSurveyData(data);
+				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+				parser.parseSurveyData(modeInputs.getDataFile());
 
 				/* Step 2.2 : Get paradata for the survey */
 				Path paraDataFolder = modeInputs.getParadataFolder();
