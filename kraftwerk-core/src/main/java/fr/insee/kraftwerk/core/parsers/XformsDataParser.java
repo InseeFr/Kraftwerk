@@ -33,6 +33,17 @@ public class XformsDataParser extends DataParser {
 	 * @param filePath Path to the XML file.
 	 * @return The parsed document.
 	 */
+	private Document readXmlFile(Path filePath) {
+		XmlFileReader xmlFileReader = new XmlFileReader();
+		Document document = xmlFileReader.readXmlFile(filePath);
+		if (document != null) {
+			log.info("Successfully parsed Xforms answers file: " + filePath);
+		} else {
+			log.warn("Failed to parse Xforms answers file: " + filePath);
+		}
+		return document;
+	}
+
 	/**
 	 * Read a Xforms survey data file and fills the SurveyRawData object.
 	 * The method only reads values with the attribute type="nouvelle". Values with attribute
