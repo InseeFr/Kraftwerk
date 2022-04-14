@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -21,9 +22,9 @@ public class LunaticXmlDataParserTest {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_rootOnly());
-		data.setDataFilePath(Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml"));
-		LunaticXmlDataParser parser = new LunaticXmlDataParser();
-		parser.parseSurveyData(data);
+		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml");
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		parser.parseSurveyData(dataPath);
 
 		//
 		assertEquals(5, data.getQuestionnairesCount());
@@ -54,9 +55,9 @@ public class LunaticXmlDataParserTest {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_oneLevel());
-		data.setDataFilePath(Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml"));
-		LunaticXmlDataParser parser = new LunaticXmlDataParser();
-		parser.parseSurveyData(data);
+		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml");
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		parser.parseSurveyData(dataPath);
 
 		//
 		assertEquals(5, data.getQuestionnairesCount());
