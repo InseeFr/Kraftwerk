@@ -28,16 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Implementation of DataParser to read data collected in paper format.
  * Variables which are not in the DDI are ignored.
- *
  */
 
 @Slf4j
 public class PaperDataParser extends DataParser {
 
-	/** Reader */
-	private CSVReader csvReader;
-	/** Reader */
+	/** File reader */
 	private FileReader filereader;
+	/** Csv reader */
+	private CSVReader csvReader;
 
 	/**
 	 * Parser constructor.
@@ -46,6 +45,38 @@ public class PaperDataParser extends DataParser {
 	 */
 	public PaperDataParser(SurveyRawData data) {
 		super(data);
+	}
+
+	/**
+	 * Instantiate a CSVReader.
+	 * @param filePath Path to the CSV file.
+	 */
+	private void readCsvFile(Path filePath) {
+		try {
+			// Create an object of file reader
+			// class with CSV file as a parameter.
+			filereader = new FileReader(filePath.toString());
+			// create csvReader object passing
+			// file reader as a parameter
+			csvReader = new CSVReader(filereader);
+
+			// create csvParser object with
+			// custom separator semicolon
+			CSVParser parser = new CSVParserBuilder()
+					.withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR)
+					.build();
+
+			// create csvReader object with parameter
+			// file reader and parser
+			csvReader = new CSVReaderBuilder(filereader)
+					//.withSkipLines(1) // (uncomment to ignore header)
+					.withCSVParser(parser)
+					.build();
+
+		}
+		catch(FileNotFoundException e) {
+			log.error(String.format("Unable to find the file %s", filePath), e);
+		}
 	}
 
 	@Override
@@ -104,10 +135,9 @@ public class PaperDataParser extends DataParser {
 				String rowIdentifier = nextRecord[0];
 				String[] rowIdentifiers = rowIdentifier.split("_");
 				questionnaireData.setIdentifier(rowIdentifiers[0]);
-				String subGroupId = "";
 
 				if (rowIdentifiers.length > 1) {
-					subGroupId = rowIdentifiers[1];
+					String subGroupId = rowIdentifiers[1];
 
 					// Read variables values
 					for (int j : csvVariablesMap.keySet()) {
@@ -151,39 +181,6 @@ public class PaperDataParser extends DataParser {
 	private String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
 		return decomposition[decomposition.length - 1];
-	}
-
-	/**
-	 * Instantiate a CSVReader
-	 *
-	 * @param filePath Path to the CSV file.
-	 */
-	private void readFile(Path filePath) {
-		try {
-			// Create an object of file reader
-			// class with CSV file as a parameter.
-			filereader = new FileReader(filePath.toString());
-			// create csvReader object passing
-			// file reader as a parameter
-			csvReader = new CSVReader(filereader);
-
-			// create csvParser object with
-			// custom separator semi-colon
-			CSVParser parser = new CSVParserBuilder()
-					.withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR)
-					.build();
-
-			// create csvReader object with parameter
-			// file reader and parser
-			csvReader = new CSVReaderBuilder(filereader)
-					//.withSkipLines(1) // (uncomment to ignore header)
-					.withCSVParser(parser)
-					.build();
-
-		}
-		catch(FileNotFoundException e) {
-			log.error(String.format("Unable to find the file %s", filePath), e);
-		}
 	}
 
 	/**
