@@ -1,6 +1,9 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -16,6 +19,28 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
+
+	@Test
+	public void parseLunaticDataFolder() {
+		//
+		SurveyRawData data = new SurveyRawData("TEST");
+		VariablesMap variablesMap = new VariablesMap();
+		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
+		data.setVariablesMap(variablesMap);
+		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-multiple-files");
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		parser.parseSurveyData(dataPath);
+
+		//
+		assertEquals(4, data.getQuestionnairesCount());
+		//
+		for (QuestionnaireData questionnaireData : data.getQuestionnaires()) {
+			String fooValue = questionnaireData.getValue("FOO");
+			if (fooValue != null) {
+				assertEquals("foo", fooValue);
+			}
+		}
+	}
 
 	@Test
 	public void parseLunaticXml_rootOnly() {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+    <Id>TEST-MULTIPLE</Id>
+    <Label>Fake campaign with several data files</Label>
+    <SurveyUnits/>
+</Campaign>
