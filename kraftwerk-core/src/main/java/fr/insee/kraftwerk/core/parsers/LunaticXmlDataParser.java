@@ -195,7 +195,7 @@ public class LunaticXmlDataParser implements DataParser {
 							Group group = variables.getVariable(correspondingVariableName).getGroup();
 							groupName = group.getName();
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else if (variables.hasMcq(correspondingVariableName)) { // otherwise it should be from a MCQ
+						} else if (variables.hasMcq(correspondingVariableName)) { // otherwise, it should be from a MCQ
 							Group group = variables.getMcqGroup(correspondingVariableName);
 							groupName = group.getName();
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
