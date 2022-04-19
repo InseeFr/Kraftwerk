@@ -144,7 +144,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 			for (Element externalVariableNode : externalVariableNodes) {
 				if(! externalVariableNode.getAttribute("type").getValue().equals("null")) {
-					String variableName = externalVariableNode.getLocalName();
+					String variableName = externalVariableNode.getLocalName().toUpperCase();
 					String value = externalVariableNode.getValue();
 					questionnaireData.putValue(value, variableName);
 					if (! variables.hasVariable(variableName)) {
