@@ -139,7 +139,7 @@ public class Launcher {
 			outputFiles.renameInputFile(inDirectory);
 			
 			/* Step 4.4 : move differential data to a secondary folder */
-			outputFiles.moveInputFile(userInputs);
+			outputFiles.moveInputFiles(userInputs);
 
 			log.info("===============================================================================================");
 			log.info("Kraftwerk batch terminated for campaign: " + campaignName);

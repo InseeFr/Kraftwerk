@@ -107,7 +107,7 @@ public class OutputFilesTest {
 			}
 		}
 
-		outputFiles.moveInputFile(testUserInputs);
+		outputFiles.moveInputFiles(testUserInputs);
 		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/papier").exists());
 		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/web").exists());
 		assertTrue(
