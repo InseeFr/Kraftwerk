@@ -12,13 +12,20 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LunaticJsonDataParser implements DataParser {
+public class LunaticJsonDataParser extends DataParser {
 
-	public void parseSurveyData(SurveyRawData surveyRawData) {
+	/**
+	 * Parser constructor.
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
+	 *             The variables must have been previously set.
+	 */
+	public LunaticJsonDataParser(SurveyRawData data) {
+		super(data);
+	}
+
+	@Override
+	void parseDataFile(Path filePath) {
 		log.warn("Lunatic data parser being implemented!");
-
-		//
-		Path filePath = surveyRawData.getDataFilePath();
 
 		//
 		JSONObject jsonObject = null;
@@ -29,7 +36,7 @@ public class LunaticJsonDataParser implements DataParser {
 			e.printStackTrace();
 		}
 		//JSONObject stateData = (JSONObject) jsonObject.get("stateData");
-		JSONObject data = (JSONObject) jsonObject.get("data");
+		JSONObject jsonData = (JSONObject) jsonObject.get("data");
 		String identifier = (String) jsonObject.get("id");
 
 		QuestionnaireData questionnaireData = new QuestionnaireData();
@@ -44,20 +51,20 @@ public class LunaticJsonDataParser implements DataParser {
 		// TODO
 
 		// Now we get each variable collected during the survey
-		JSONObject collected_variables = (JSONObject) data.get("COLLECTED");
+		JSONObject collected_variables = (JSONObject) jsonData.get("COLLECTED");
 
 		for (Object variable : collected_variables.keySet()) {
-			String variableLabel = (String) variable;
-			JSONObject variable_data = (JSONObject) collected_variables.get(variableLabel);
-			if (surveyRawData.getVariablesMap().getVariables().containsKey(variableLabel)) {
+			String variableName = (String) variable;
+			JSONObject variable_data = (JSONObject) collected_variables.get(variableName);
+			if (data.getVariablesMap().hasVariable(variableName)) {
 				String value = "";
 				if (variable_data.get("COLLECTED") != null){
 					value = (String) variable_data.get("COLLECTED").toString();
 				} 
-				answers.putValue(variableLabel, value);
+				answers.putValue(variableName, value);
 			} else {
 				//TODO fix log, lots of useless lines
-				log.warn(String.format("WARNING: Variable %s not expected!", variableLabel));
+				log.warn(String.format("WARNING: Variable %s not expected!", variableName));
 			}
 			
 		}
@@ -66,7 +73,7 @@ public class LunaticJsonDataParser implements DataParser {
 		// TODO
 		
 		//
-		surveyRawData.addQuestionnaire(questionnaireData);
+		data.addQuestionnaire(questionnaireData);
 	}
 
 }

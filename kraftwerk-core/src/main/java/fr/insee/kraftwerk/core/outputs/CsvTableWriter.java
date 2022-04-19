@@ -1,40 +1,29 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
 import com.opencsv.CSVWriter;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.DataPoint;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.*;
+
 /**
  * To write in memory data into CSV files.
- *
  */
 @Slf4j
 public class CsvTableWriter {
 
 	static CSVWriter writer;
 
-	static void setCSVWriter(String filePath) {
+	static void setCSVWriter(Path filePath) {
 		try {
-			File file = new File(filePath);
+			File file = filePath.toFile();
 			FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
 			writer = new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.CSV_OUTPUTS_QUOTE_CHAR,
 					CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
@@ -43,7 +32,7 @@ public class CsvTableWriter {
 		}
 	}
 
-	static void closeWriter(String filePath) {
+	static void closeWriter(Path filePath) {
 		try {
 			writer.close();
 		} catch (IOException e) {
@@ -57,8 +46,8 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void updateCsvTable(Dataset dataset, String filePath, String datasetName, Path outputFolder) {
-		File file = new File(filePath);
+	public static void updateCsvTable(Dataset dataset, Path filePath) {
+		File file = filePath.toFile();
 		setCSVWriter(filePath);
 		try {
 			Scanner scanner = new Scanner(file);
@@ -114,14 +103,14 @@ public class CsvTableWriter {
 						String value = getDataPointValue(dataPoint, variableName);
 						csvRow[csvColumn] = value;
 					}
-					
+
 					writer.writeNext(csvRow);
 				}
 
 			}
 			writer.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			log.error(String.format("IOException occurred when trying to update CSV table: %s", filePath));
 			e.printStackTrace();
 		}
 
@@ -132,7 +121,7 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void writeCsvTable(Dataset dataset, String filePath) {
+	public static void writeCsvTable(Dataset dataset, Path filePath) {
 		// File connection
 		setCSVWriter(filePath);
 
