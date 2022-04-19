@@ -7,7 +7,7 @@ import java.util.List;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 
 /**
- * Object class to temporary store the data from an survey answer file.
+ * Object class to temporary store the data from a survey answer file.
  *
  */
 public class SurveyRawData {
