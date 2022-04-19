@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -36,11 +39,8 @@ public class CsvTableWriterTest {
 	@Test
 	public void writeCsvFromDataset() throws IOException, CsvException {
 		// Clean the existing file
-		String outTestFilePath = TestConstants.UNIT_TESTS_DUMP + "/test.csv";
-		File outTestFile = new File(outTestFilePath);
-		if (outTestFile.exists()) {
-			outTestFile.delete();
-		}
+		Path outTestFilePath = Paths.get(TestConstants.UNIT_TESTS_DUMP, "test.csv");
+		Files.deleteIfExists(outTestFilePath);
 		
 		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath);
 		//

@@ -105,7 +105,7 @@ public class OutputFiles {
 						outputFolder.getFileName() + "_" + datasetName, outputFolder);
 			} else {
 				CsvTableWriter.writeCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder + "/" + outputFileName(datasetName));
+						outputFolder.resolve(outputFileName(datasetName)));
 			}
 		}
 	}
@@ -119,11 +119,11 @@ public class OutputFiles {
 					vtlBindings.getDataset(datasetName).getDataStructure(), metadataVariables);
 			importScripts.registerTable(tableScriptInfo);
 		}
-		//
-		TextFileWriter.writeFile(outputFolder + "/import_base.R", importScripts.scriptR_base());
-		TextFileWriter.writeFile(outputFolder + "/import_with_data_table.R", importScripts.scriptR_dataTable());
-		TextFileWriter.writeFile(outputFolder + "/import_with_pandas.py", importScripts.scriptPython_pandas());
-		TextFileWriter.writeFile(outputFolder + "/import.sas", importScripts.scriptSAS());
+		// NOTE: commented unimplemented scripts
+		//TextFileWriter.writeFile(outputFolder.resolve("import_base.R"), importScripts.scriptR_base());
+		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"), importScripts.scriptR_dataTable());
+		//TextFileWriter.writeFile(outputFolder.resolve("import_with_pandas.py"), importScripts.scriptPython_pandas());
+		TextFileWriter.writeFile(outputFolder.resolve("import.sas"), importScripts.scriptSAS());
 	}
 
 	/**
