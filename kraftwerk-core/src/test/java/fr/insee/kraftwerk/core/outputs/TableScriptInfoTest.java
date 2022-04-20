@@ -8,10 +8,10 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.Structured.DataStructure;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import fr.insee.vtl.model.Structured.DataStructure;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -27,8 +27,12 @@ public class TableScriptInfoTest {
 
 	TableScriptInfo tableScriptInfo;
 
-	Map<String, VariablesMap> metadataVariables = new LinkedHashMap<String, VariablesMap>();
+	Map<String, VariablesMap> metadataVariables;
 
+	@BeforeEach
+	public void initMetadataVariablesMap() {
+		metadataVariables = new LinkedHashMap<>();
+	}
 
 	private void instantiateMap() {
 		metadataVariables.put("CAWI", VariablesMapTest.createFakeVariablesMap());
@@ -56,6 +60,26 @@ public class TableScriptInfoTest {
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
 		assertEquals("50", listVariables.get("AGE").getLength());
 		assertEquals("500", listVariables.get("CARS_LOOP.CAR_COLOR").getLength());
+	}
+
+	@Test
+	public void testGetAllLengthWithNumberType() {
+		//
+		VariablesMap testVariablesMap1 = new VariablesMap();
+		testVariablesMap1.putVariable(new Variable("FOO", testVariablesMap1.getRootGroup(), VariableType.NUMBER, "4.1"));
+		metadataVariables.put("TEST1", testVariablesMap1);
+		VariablesMap testVariablesMap2 = new VariablesMap();
+		testVariablesMap2.putVariable(new Variable("FOO", testVariablesMap2.getRootGroup(), VariableType.NUMBER, "4"));
+		metadataVariables.put("TEST2", testVariablesMap2);
+		//
+		DataStructure testDataStructure = new DataStructure(List.of(
+				new Structured.Component("ID", String.class, Dataset.Role.IDENTIFIER),
+				new Structured.Component("FOO", Double.class, Dataset.Role.MEASURE)
+		));
+		//
+		TableScriptInfo testTableScriptInfo = new TableScriptInfo(
+				"TEST", "test.csv", testDataStructure, metadataVariables);
+		assertDoesNotThrow(() -> testTableScriptInfo.getAllLength(testDataStructure, metadataVariables));
 	}
 
 	@Test
