@@ -53,15 +53,11 @@ public class VariablesMap {
     public Set<String> getVariableNames() {
         return variables.keySet();
     }
-
     /** Return the fully qualified names of all variables in the map. */
     public Set<String> getFullyQualifiedNames() {
-    	Set<String> result = new HashSet<String>();
-    	for (String variableName : variables.keySet()) {
-    		result.add(getFullyQualifiedName(variableName));
-    	}
-        return result;
+        return variables.keySet().stream().map(this::getFullyQualifiedName).collect(Collectors.toSet());
     }
+
     /** Return the number of all variables registered in the map. */
     public int getVariablesCount() {
         return variables.size();
