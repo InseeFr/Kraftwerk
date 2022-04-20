@@ -50,9 +50,9 @@ public class TableScriptInfo {
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						String newLengthString = variable.getLength();
 						if (result.containsKey(variableName)) {
-							if (!newLengthString.contains(".")) {
+							String existingLengthString = result.get(variableName).getLength();
+							if (!newLengthString.contains(".") && !existingLengthString.contains(".")) {
 								// Existing variable, and not a float (if float exists, we do nothing)
-								String existingLengthString = result.get(variableName).getLength();
 								int newLength = Integer.parseInt(newLengthString);
 								if (Integer.parseInt(existingLengthString) < newLength) {
 									// name, Group group, VariableType type, int length
