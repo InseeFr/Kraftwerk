@@ -40,7 +40,7 @@ public class TableScriptInfoTest {
 	Map<String, VariablesMap> metadataVariables = new LinkedHashMap<String, VariablesMap>();
 
 
-	private void instanciateMap() {
+	private void instantiateMap() {
 		metadataVariables.put("CAWI", VariablesMapTest.createFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		srdWeb.setVariablesMap(VariablesMapTest.createFakeVariablesMap());
@@ -60,7 +60,7 @@ public class TableScriptInfoTest {
 	
 	@Test
 	public void getAllLengthTest() {
-		instanciateMap();
+		instantiateMap();
 		Map<String, Variable> listVariables = tableScriptInfo.getAllLength(dataStructure, metadataVariables);
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
