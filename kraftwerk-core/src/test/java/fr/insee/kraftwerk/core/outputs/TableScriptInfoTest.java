@@ -58,4 +58,17 @@ public class TableScriptInfoTest {
 		assertEquals("500", listVariables.get("CARS_LOOP.CAR_COLOR").getLength());
 	}
 
+	@Test
+	private void numberTypeInDatasets() {
+		Dataset ds = new InMemoryDataset(
+				List.of(List.of(1L)),
+				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
+		);
+		vtlBindings.getBindings().put("test", ds);
+		vtlBindings.evalVtlScript("test := test [calc foo := 4.1];");
+		Dataset outDs = vtlBindings.getDataset("test");
+		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
+		// => "NUMBER" type in Trevas datasets is java "Double" type
+	}
+
 }
