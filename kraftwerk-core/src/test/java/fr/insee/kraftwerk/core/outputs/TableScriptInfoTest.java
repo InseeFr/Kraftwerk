@@ -1,33 +1,23 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.Structured.DataStructure;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import fr.insee.vtl.model.Structured.DataStructure;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TableScriptInfoTest {
 	
@@ -37,10 +27,14 @@ public class TableScriptInfoTest {
 
 	TableScriptInfo tableScriptInfo;
 
-	Map<String, VariablesMap> metadataVariables = new LinkedHashMap<String, VariablesMap>();
+	Map<String, VariablesMap> metadataVariables;
 
+	@BeforeEach
+	public void initMetadataVariablesMap() {
+		metadataVariables = new LinkedHashMap<>();
+	}
 
-	private void instanciateMap() {
+	private void instantiateMap() {
 		metadataVariables.put("CAWI", VariablesMapTest.createFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		srdWeb.setVariablesMap(VariablesMapTest.createFakeVariablesMap());
@@ -60,12 +54,45 @@ public class TableScriptInfoTest {
 	
 	@Test
 	public void getAllLengthTest() {
-		instanciateMap();
+		instantiateMap();
 		Map<String, Variable> listVariables = tableScriptInfo.getAllLength(dataStructure, metadataVariables);
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
 		assertEquals("50", listVariables.get("AGE").getLength());
 		assertEquals("500", listVariables.get("CARS_LOOP.CAR_COLOR").getLength());
+	}
+
+	@Test
+	public void testGetAllLengthWithNumberType() {
+		//
+		VariablesMap testVariablesMap1 = new VariablesMap();
+		testVariablesMap1.putVariable(new Variable("FOO", testVariablesMap1.getRootGroup(), VariableType.NUMBER, "4.1"));
+		metadataVariables.put("TEST1", testVariablesMap1);
+		VariablesMap testVariablesMap2 = new VariablesMap();
+		testVariablesMap2.putVariable(new Variable("FOO", testVariablesMap2.getRootGroup(), VariableType.NUMBER, "4"));
+		metadataVariables.put("TEST2", testVariablesMap2);
+		//
+		DataStructure testDataStructure = new DataStructure(List.of(
+				new Structured.Component("ID", String.class, Dataset.Role.IDENTIFIER),
+				new Structured.Component("FOO", Double.class, Dataset.Role.MEASURE)
+		));
+		//
+		TableScriptInfo testTableScriptInfo = new TableScriptInfo(
+				"TEST", "test.csv", testDataStructure, metadataVariables);
+		assertDoesNotThrow(() -> testTableScriptInfo.getAllLength(testDataStructure, metadataVariables));
+	}
+
+	@Test
+	private void numberTypeInDatasets() {
+		Dataset ds = new InMemoryDataset(
+				List.of(List.of(1L)),
+				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
+		);
+		vtlBindings.getBindings().put("test", ds);
+		vtlBindings.evalVtlScript("test := test [calc foo := 4.1];");
+		Dataset outDs = vtlBindings.getDataset("test");
+		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
+		// => "NUMBER" type in Trevas datasets is java "Double" type
 	}
 
 }

@@ -64,8 +64,8 @@ public class Launcher {
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
 				data.setDataFilePath(modeInputs.getDataFile());
-				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat());
-				parser.parseSurveyData(data);
+				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+				parser.parseSurveyData(modeInputs.getDataFile());
 
 				/* Step 2.2 : Get paradata for the survey */
 				Path paraDataFolder = modeInputs.getParadataFolder();
@@ -139,7 +139,7 @@ public class Launcher {
 			outputFiles.renameInputFile(inDirectory);
 			
 			/* Step 4.4 : move differential data to a secondary folder */
-			outputFiles.moveInputFile(userInputs);
+			outputFiles.moveInputFiles(userInputs);
 
 			log.info("===============================================================================================");
 			log.info("Kraftwerk batch terminated for campaign: " + campaignName);

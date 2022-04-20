@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+    <Id>TEST-MULTIPLE</Id>
+    <Label>Fake campaign with several data files</Label>
+    <SurveyUnits>
+        <SurveyUnit>
+            <Id>T0000021</Id>
+            <QuestionnaireModelId>TEST-MULTIPLE</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <FOO>
+                        <COLLECTED type="string">foo</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </FOO>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+		<SurveyUnit>
+            <Id>T0000022</Id>
+            <QuestionnaireModelId>TEST-MULTIPLE</QuestionnaireModelId>
+            <Data>
+                <COLLECTED>
+                    <FOO>
+                        <COLLECTED type="string">foo</COLLECTED>
+                        <EDITED type="null" />
+                        <INPUTED type="null" />
+                        <FORCED type="null" />
+                        <PREVIOUS type="null" />
+                    </FOO>
+                </COLLECTED>
+            </Data>
+        </SurveyUnit>
+    </SurveyUnits>
+</Campaign>

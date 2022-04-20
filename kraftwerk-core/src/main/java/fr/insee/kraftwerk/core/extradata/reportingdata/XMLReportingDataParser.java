@@ -60,7 +60,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
 	 */
 	private void readFile(Path filePath) {
 		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath.toString());
+		document = xmlFileReader.readXmlFile(filePath);
 		if (document != null) {
 			log.info("Successfully parsed Coleman answers file: " + filePath);
 		} else {

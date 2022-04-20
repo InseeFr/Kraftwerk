@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,16 +18,16 @@ public class DataParserManager {
 	 * @return
 	 * One of the concrete parsers.
 	 */
-	public static DataParser getParser(DataFormat dataFormat) {
+	public static DataParser getParser(DataFormat dataFormat, SurveyRawData data) {
 		switch (dataFormat) {
 			case XFORMS:
-				return new XformsDataParser();
+				return new XformsDataParser(data);
 			case PAPER:
-				return new PaperDataParser();
+				return new PaperDataParser(data);
 			case LUNATIC_XML:
-				return new LunaticXmlDataParser();
+				return new LunaticXmlDataParser(data);
 			case LUNATIC_JSON:
-				return new LunaticJsonDataParser();
+				return new LunaticJsonDataParser(data);
 			default:
 				log.debug(String.format("Unknown data format: %s", dataFormat));
 				throw new IllegalArgumentException(String.format("Unknown data format: %s", dataFormat));

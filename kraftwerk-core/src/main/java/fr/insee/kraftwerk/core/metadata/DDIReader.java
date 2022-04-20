@@ -33,7 +33,7 @@ public class DDIReader {
 			// Path of the output 'variables.xml' temp file
 			File variablesFile = File.createTempFile("variables", ".xml");
 			variablesFile.deleteOnExit();
-			String variablesTempFilePath = variablesFile.getAbsolutePath();
+			Path variablesTempFilePath = variablesFile.toPath();
 
 			//
 			transformDDI(DDIUrl, variablesTempFilePath);
@@ -55,7 +55,7 @@ public class DDIReader {
 	 * @param variablesFilePath Path of the transformed xml file.
 	 * @return The variables described in the file.
 	 */
-	public static VariablesMap getVariablesFromTransformed(String variablesFilePath) {
+	public static VariablesMap getVariablesFromTransformed(Path variablesFilePath) {
 		return readVariables(variablesFilePath);
 	}
 
@@ -65,7 +65,7 @@ public class DDIReader {
 	 * @param DDIUrl            : URL of the DDI file.
 	 * @param variablesFilePath : Path of the 'variables.xml' file to be generated.
 	 */
-	private static void transformDDI(URL DDIUrl, String variablesFilePath) {
+	private static void transformDDI(URL DDIUrl, Path variablesFilePath) {
 		SaxonTransformer saxonTransformer = new SaxonTransformer();
 		saxonTransformer.xslTransform(DDIUrl, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
 	}
@@ -77,7 +77,7 @@ public class DDIReader {
 	 * @param variablesFilePath Path to the transformed xml file.
 	 * @return The variables described in the file.
 	 */
-	private static VariablesMap readVariables(String variablesFilePath) {
+	private static VariablesMap readVariables(Path variablesFilePath) {
 		VariablesMap variablesMap = new VariablesMap();
 
 		// Parse
