@@ -1,17 +1,11 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -20,11 +14,7 @@ import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
