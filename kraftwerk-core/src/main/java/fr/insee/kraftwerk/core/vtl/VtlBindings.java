@@ -155,11 +155,15 @@ public class VtlBindings {
             } catch (ScriptException e) {
                 log.warn("The following VTL instruction given is invalid and has been skipped:\n" + vtlScript);
                 log.warn(e.getMessage());
-            } catch (NumberFormatException e) { // NOTE: issue sent to Trevas
-                log.warn("NumberFormatException cause by following VTL instruction:\n" + vtlScript);
+            } catch (NumberFormatException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
+                log.warn("NumberFormatException caused by following VTL instruction:\n" + vtlScript);
                 log.warn(e.getMessage());
                 log.warn("Corresponding variable could not be calculated.");
-            } catch (NullPointerException e) { // NOTE: issue sent to Trevas
+            } catch (UnsupportedOperationException e) { // TODO: send issue to Trevas
+                log.warn("UnsupportedOperationException caused by following VTL instruction:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("Corresponding variable could not be calculated.");
+            } catch (NullPointerException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
                 log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.debug(e.getMessage());
                 log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
