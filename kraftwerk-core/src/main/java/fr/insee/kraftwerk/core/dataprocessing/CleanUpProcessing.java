@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class CleanUpProcessing extends DataProcessing {
      * @param objects The batch metadata object instance is expected here.
      */
     @Override
-    public void applyVtlTransformations(String bindingName, String userVtlInstructionsPath, Object... objects) {
+    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects) {
         // Get the metadata object
         metadataVariables = (Map<String, VariablesMap>) objects[0]; // TODO: better management of metadata object
         // Remove paper UCQ variables

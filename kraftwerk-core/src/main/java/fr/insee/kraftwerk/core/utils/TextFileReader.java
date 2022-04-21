@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,9 +54,9 @@ public class TextFileReader {
      * @return
      * The content of the file in a string.
      */
-    public static String readFromPath(String filePath){
+    public static String readFromPath(Path filePath){
         try {
-            FileReader fileReader = new FileReader(new File(filePath));
+            FileReader fileReader = new FileReader(filePath.toFile());
             return readTextContent(fileReader);
         }
         catch (IOException e) {
@@ -72,6 +73,7 @@ public class TextFileReader {
             content.append(line);
         }
         fileReader.close();
+        br.close();
         return content.toString();
     }
 }

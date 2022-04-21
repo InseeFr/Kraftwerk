@@ -1,7 +1,9 @@
 package fr.insee.kraftwerk.core.inputs;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserInputs {
 
 	private final String userInputFile;
+
+	@Getter
 	private final Path inputDirectory;
 
 	@Getter
@@ -26,11 +30,11 @@ public class UserInputs {
 	@Getter
 	private String multimodeDatasetName;
 	@Getter
-	private String vtlReconciliationFile;
+	private Path vtlReconciliationFile;
 	@Getter
-	private String vtlTransformationsFile;
+	private Path vtlTransformationsFile;
 	@Getter
-	private String vtlInformationLevelsFile;
+	private Path vtlInformationLevelsFile;
 
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
 			"data_format", "multimode_dataset_name");
@@ -54,24 +58,23 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = getText(fileNode, "data_mode");
-				String dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
+				Path dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
 				String DDIFilePath = getText(fileNode, "DDI_file");
-				String DDIFile = "";
+				URL DDIURL;
 				if (DDIFilePath.contains("http")) {
-					DDIFile = DDIFilePath;
+					DDIURL = Constants.convertToUrl(DDIFilePath);
 				} else {
-					DDIFile = Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file"));
+					DDIURL = Constants.convertToUrl(Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file")));
 				}
 				String lunaticFile = getText(fileNode, "lunatic_file");
 				String dataFormat = getText(fileNode, "data_format");
-				String paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
-				String reportingDataFile = Constants.getInputPath(inputDirectory,
-						getText(fileNode, "reporting_data_file"));
-				String vtlFile = Constants.getInputPath(inputDirectory, getText(fileNode, "mode_specifications"));
+				Path paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
+				Path reportingDataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "reporting_data_file"));
+				Path vtlFile = Constants.getInputPath(inputDirectory, getText(fileNode, "mode_specifications"));
 				//
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataFile);
-				modeInputs.setDDIFile(DDIFile);
+				modeInputs.setDDIURL(DDIURL);
 				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
 				modeInputs.setParadataFolder(paradataFolder);
@@ -81,9 +84,9 @@ public class UserInputs {
 			}
 			//
 			multimodeDatasetName = getText(userInputs, "multimode_dataset_name");
-			vtlReconciliationFile = getText(userInputs, "reconciliation_specifications");
-			vtlTransformationsFile = getText(userInputs, "transformation_specifications");
-			vtlInformationLevelsFile = getText(userInputs, "information_levels_specifications");
+			vtlReconciliationFile = Constants.getInputPath(inputDirectory, getText(userInputs, "reconciliation_specifications"));
+			vtlTransformationsFile = Constants.getInputPath(inputDirectory, getText(userInputs, "transformation_specifications"));
+			vtlInformationLevelsFile = Constants.getInputPath(inputDirectory, getText(userInputs, "information_levels_specifications"));
 
 		} catch (IOException e) { // TODO: split read file and json parsing to throw IllegalArgumentException if
 									// the json file is malformed

@@ -18,8 +18,4 @@ Feature: Do we apply a VTL instruction correctly?
     | OUTPUT := COLEMAN [calc newIdUE := IdUE];        | OUTPUT       | 10              |
     | OUTPUT := COLEMAN [rename LAST_NAME to Label_1B];| OUTPUT       | 9               |
     | COLEMAN := COLEMAN [drop LAST_NAME];             | COLEMAN      | 8               |           
-            
-    
-    
-    
     

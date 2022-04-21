@@ -1,6 +1,9 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
+
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -11,28 +14,47 @@ import nu.xom.Element;
 import nu.xom.Elements;
 
 /**
- * Implementation of DataParser to read data from Coleman.
- *
+ * Implementation of DataParser to read Xforms data files.
  */
 @Slf4j
-public class XformsDataParser implements DataParser {
-
-	private Document document;
+public class XformsDataParser extends DataParser {
 
 	/**
-	 * Read a Coleman survey data XML file and fills the SurveyRawData object given.
-	 * The XML file is before hand flattened using the XSLT_FLATTEN_COLEMAN_FILE.
-	 * The flattened file is written in the output folder. The method only reads
-	 * values with the attribute type="nouvelle". Values with attribute
+	 * Parser constructor.
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
+	 *             The variables must have been previously set.
+	 */
+	public XformsDataParser(SurveyRawData data) {
+		super(data);
+	}
+
+	/**
+	 * Parse the XML file from the given path.
+	 * @param filePath Path to the XML file.
+	 * @return The parsed document.
+	 */
+	private Document readXmlFile(Path filePath) {
+		XmlFileReader xmlFileReader = new XmlFileReader();
+		Document document = xmlFileReader.readXmlFile(filePath);
+		if (document != null) {
+			log.info("Successfully parsed Xforms answers file: " + filePath);
+		} else {
+			log.warn("Failed to parse Xforms answers file: " + filePath);
+		}
+		return document;
+	}
+
+	/**
+	 * Read a Xforms survey data file and fills the SurveyRawData object.
+	 * The method only reads values with the attribute type="nouvelle". Values with attribute
 	 * type="ancienne" are ignored. Variables which are not in the DDI are ignored.
 	 *
-	 * @param data The SurveyRawData object to be filled, the variables must have
-	 *             already been set.
+	 * @param filePath Path to a Xforms data file.
 	 */
-	public void parseSurveyData(SurveyRawData data) {
+	@Override
+	void parseDataFile(Path filePath) {
 
-		String filePath = data.getDataFilePath();
-		readFile(filePath);
+		Document document = readXmlFile(filePath);
 
 		Element root = document.getRootElement();
 
@@ -61,7 +83,7 @@ public class XformsDataParser implements DataParser {
 			for (int j = 0; j < variableNodeList.size(); j++) {
 				Element variableNode = variableNodeList.get(j);
 				String variableName = variableNode.getAttributeValue("idVariable");
-				if (data.getVariablesMap().getVariables().containsKey(variableName)) {
+				if (data.getVariablesMap().hasVariable(variableName)) {
 					String value = getNodeValue(variableNode);
 					answers.putValue(variableName, value);
 				} else {
@@ -91,7 +113,7 @@ public class XformsDataParser implements DataParser {
 					Elements groupVariableNodeList = groupInstanceNode.getChildElements("Variable");
 					for (Element variableNode : groupVariableNodeList) {
 						String variableName = variableNode.getAttributeValue("idVariable");
-						if (data.getVariablesMap().getVariables().containsKey(variableName)) {
+						if (data.getVariablesMap().hasVariable(variableName)) {
 							String value = getNodeValue(variableNode);
 							groupInstance.putValue(variableName, value);
 						} else {
@@ -108,25 +130,6 @@ public class XformsDataParser implements DataParser {
 			}
 
 			data.addQuestionnaire(questionnaireData);
-		}
-
-		// Free memory
-		document = null;
-	}
-
-	/**
-	 * Parse the XML file from the given path. The parsed object is set in the
-	 * private attribute document.
-	 *
-	 * @param filePath Path to the XML file.
-	 */
-	private void readFile(String filePath) {
-		XmlFileReader xmlFileReader = new XmlFileReader();
-		document = xmlFileReader.readXmlFile(filePath);
-		if (document != null) {
-			log.info("Successfully parsed Coleman answers file: " + filePath);
-		} else {
-			log.warn("Failed to parse Coleman answers file: " + filePath);
 		}
 	}
 

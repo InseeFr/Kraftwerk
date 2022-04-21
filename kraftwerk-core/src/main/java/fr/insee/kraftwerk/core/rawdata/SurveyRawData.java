@@ -1,19 +1,20 @@
 package fr.insee.kraftwerk.core.rawdata;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 
 /**
- * Object class to temporary store the data from an survey answer file.
+ * Object class to temporary store the data from a survey answer file.
  *
  */
 public class SurveyRawData {
 
 	private String dataMode;
-	private String dataFilePath;
-	private String paraDataFolder;
+	private Path dataFilePath;
+	private Path paraDataFolder;
 	private VariablesMap variablesMap;
 	private final List<QuestionnaireData> questionnaires = new ArrayList<>();
 
@@ -29,17 +30,17 @@ public class SurveyRawData {
 		this.dataMode = dataMode;
 	}
 
-	public String getDataFilePath() {
+	public Path getDataFilePath() {
 		return dataFilePath;
 	}
-	public void setDataFilePath(String dataFilePath) {
-		this.dataFilePath = dataFilePath;
+	public void setDataFilePath(Path path) {
+		this.dataFilePath = path;
 	}
 
-	public String getParaDataFolder() {
+	public Path getParaDataFolder() {
 		return paraDataFolder;
 	}
-	public void setParaDataFolder(String paraDataFolder) {
+	public void setParaDataFolder(Path paraDataFolder) {
 		this.paraDataFolder = paraDataFolder;
 	}
 

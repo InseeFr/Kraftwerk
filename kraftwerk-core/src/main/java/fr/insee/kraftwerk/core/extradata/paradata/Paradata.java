@@ -1,10 +1,11 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class Paradata {
 
-	private String filepath;
+	private Path filepath;
 	
 	public List<ParaDataUE> listParadataUE;
 
@@ -12,16 +13,16 @@ public class Paradata {
 		super();
 	}
 
-	public Paradata(String filepath) {
+	public Paradata(Path filepath) {
 		super();
 		this.filepath = filepath;
 	}
 
-	public String getFilepath() {
+	public Path getFilepath() {
 		return filepath;
 	}
 
-	public void setFilepath(String filepath) {
+	public void setFilepath(Path filepath) {
 		this.filepath = filepath;
 	}
 

@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.parsers;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,19 +28,61 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Implementation of DataParser to read data collected in paper format.
  * Variables which are not in the DDI are ignored.
- *
  */
 
 @Slf4j
-public class PaperDataParser implements DataParser {
+public class PaperDataParser extends DataParser {
 
-	/** Reader */
+	/** File reader */
+	private FileReader filereader;
+	/** Csv reader */
 	private CSVReader csvReader;
 
-	public void parseSurveyData(SurveyRawData data) {
+	/**
+	 * Parser constructor.
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
+	 *             The variables must have been previously set.
+	 */
+	public PaperDataParser(SurveyRawData data) {
+		super(data);
+	}
 
-		String filePath = data.getDataFilePath();
-		readFile(filePath);
+	/**
+	 * Instantiate a CSVReader.
+	 * @param filePath Path to the CSV file.
+	 */
+	private void readCsvFile(Path filePath) {
+		try {
+			// Create an object of file reader
+			// class with CSV file as a parameter.
+			filereader = new FileReader(filePath.toString());
+			// create csvReader object passing
+			// file reader as a parameter
+			csvReader = new CSVReader(filereader);
+
+			// create csvParser object with
+			// custom separator semicolon
+			CSVParser parser = new CSVParserBuilder()
+					.withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR)
+					.build();
+
+			// create csvReader object with parameter
+			// file reader and parser
+			csvReader = new CSVReaderBuilder(filereader)
+					//.withSkipLines(1) // (uncomment to ignore header)
+					.withCSVParser(parser)
+					.build();
+
+		}
+		catch(FileNotFoundException e) {
+			log.error(String.format("Unable to find the file %s", filePath), e);
+		}
+	}
+
+	@Override
+	void parseDataFile(Path filePath) {
+
+		readCsvFile(filePath);
 
 		try {
 
@@ -92,10 +135,9 @@ public class PaperDataParser implements DataParser {
 				String rowIdentifier = nextRecord[0];
 				String[] rowIdentifiers = rowIdentifier.split("_");
 				questionnaireData.setIdentifier(rowIdentifiers[0]);
-				String subGroupId = "";
 
 				if (rowIdentifiers.length > 1) {
-					subGroupId = rowIdentifiers[1];
+					String subGroupId = rowIdentifiers[1];
 
 					// Read variables values
 					for (int j : csvVariablesMap.keySet()) {
@@ -116,7 +158,8 @@ public class PaperDataParser implements DataParser {
 				}
 				data.addQuestionnaire(questionnaireData);
 			}
-
+			filereader.close();
+			csvReader.close();
 		}
 		catch(CsvValidationException e) {
 			log.error(String.format("Following CSV file is malformed: %s", filePath), e);
@@ -138,39 +181,6 @@ public class PaperDataParser implements DataParser {
 	private String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
 		return decomposition[decomposition.length - 1];
-	}
-
-	/**
-	 * Instantiate a CSVReader
-	 *
-	 * @param filePath Path to the CSV file.
-	 */
-	private void readFile(String filePath) {
-		try {
-			// Create an object of file reader
-			// class with CSV file as a parameter.
-			FileReader filereader = new FileReader(filePath);
-			// create csvReader object passing
-			// file reader as a parameter
-			csvReader = new CSVReader(filereader);
-
-			// create csvParser object with
-			// custom separator semi-colon
-			CSVParser parser = new CSVParserBuilder()
-					.withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR)
-					.build();
-
-			// create csvReader object with parameter
-			// file reader and parser
-			csvReader = new CSVReaderBuilder(filereader)
-					//.withSkipLines(1) // (uncomment to ignore header)
-					.withCSVParser(parser)
-					.build();
-
-		}
-		catch(FileNotFoundException e) {
-			log.error(String.format("Unable to find the file %s", filePath), e);
-		}
 	}
 
 	/**

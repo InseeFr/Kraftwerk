@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.file.Paths;
+
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,7 @@ public class CSVReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
 		csvReportingDataParser.parseReportingData(reportingData, data);
 
 		// Check the reporting data is well captured

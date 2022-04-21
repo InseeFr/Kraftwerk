@@ -1,12 +1,13 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReportingData {
 
 
-	private String filepath;
+	private Path filepath;
 	
 	public List<ReportingDataUE> listReportingDataUE;
 
@@ -15,17 +16,17 @@ public class ReportingData {
 		this.listReportingDataUE = new ArrayList<ReportingDataUE>();
 	}
 
-	public ReportingData(String filepath) {
+	public ReportingData(Path filepath) {
 		super();
 		this.filepath = filepath;
 		this.listReportingDataUE = new ArrayList<ReportingDataUE>();
 	}
 
-	public String getFilepath() {
+	public Path getFilepath() {
 		return filepath;
 	}
 	
-	public void setFilepath(String filepath) {
+	public void setFilepath(Path filepath) {
 		this.filepath = filepath;
 	}
 	

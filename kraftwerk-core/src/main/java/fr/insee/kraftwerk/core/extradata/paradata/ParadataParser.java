@@ -28,11 +28,11 @@ public class ParadataParser {
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) {
 
 		log.info("Para data parser being implemented!");
-		String filePath = paradata.getFilepath();
-		if (!filePath.contentEquals("")) {
+		Path filePath = paradata.getFilepath();
+		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
-			try (Stream<Path> walk = Files.walk(Paths.get(filePath))) {
+			try (Stream<Path> walk = Files.walk(filePath)) {
 				List<String> listFilePaths = walk.filter(Files::isRegularFile).map(x -> x.toString())
 						.collect(Collectors.toList());
 				// Parse each ParaDataUE
@@ -40,7 +40,7 @@ public class ParadataParser {
 
 				for (String fileParaDataPath : listFilePaths) {
 					ParaDataUE paraDataUE = new ParaDataUE();
-					paraDataUE.setFilepath(fileParaDataPath);
+					paraDataUE.setFilepath(Paths.get(fileParaDataPath));
 					parseParadataUE(paraDataUE, surveyRawData);
 					paraDataUE.sortEvents();
 					paraDataUE.createOrchestratorsAndSessions();
@@ -63,7 +63,7 @@ public class ParadataParser {
 
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) {
 		// To convert to a entire folder instead of a single file
-		String filePath = paradataUE.getFilepath();
+		Path filePath = paradataUE.getFilepath();
 
 		JSONObject jsonObject = null;
 		try {
@@ -164,9 +164,9 @@ public class ParadataParser {
 	 */
 	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
-		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING);
-		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER);
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER);
+		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "30");
+		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "20");
+		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "3");
 		try {
 			surveyRawData.getVariablesMap().putVariable(variableDuree);
 			surveyRawData.getVariablesMap().putVariable(variableDureeBrute);
@@ -174,7 +174,7 @@ public class ParadataParser {
 			for (String variableName : paradataVariables) {
 				if (variableName.contentEquals("PRENOM")) {
 					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName, surveyRawData.getVariablesMap().getRootGroup(),
-							VariableType.STRING);
+							VariableType.STRING, "3");
 					surveyRawData.getVariablesMap().putVariable(variable);
 				}
 			}

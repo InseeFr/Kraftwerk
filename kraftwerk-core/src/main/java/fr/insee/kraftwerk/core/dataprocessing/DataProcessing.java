@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -25,7 +27,7 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public void applyVtlTransformations(String bindingName, String userVtlInstructionsPath, Object... objects){
+    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects){
         // First step
         applyAutomatedVtlInstructions(bindingName, objects);
         // Second step
@@ -52,14 +54,18 @@ public abstract class DataProcessing {
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
         log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
                 automatedInstructions));
-        vtlBindings.evalVtlScript(automatedInstructions);
+        if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
+            vtlBindings.evalVtlScript(automatedInstructions);
+        }
     }
 
-    protected void applyUserVtlInstructions(String userVtlInstructionsPath){
+    protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
         log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
                 vtlScript));
-        vtlBindings.evalVtlScript(vtlScript);
+        if (!(vtlScript.isEmpty() || vtlScript.toString().contentEquals(""))) {
+            vtlBindings.evalVtlScript(vtlScript);
+        }
     }
 
 }

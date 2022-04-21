@@ -13,7 +13,7 @@ import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.metadata.LunaticReader;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.OutputTables;
+import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
@@ -38,9 +38,13 @@ public class Launcher {
 
 	public Boolean main(@NonNull Path inDirectory) {
 
-		log.info("Kraftwerk launched on directory " + inDirectory);
-
 		if (verifyInDirectory(inDirectory)) {
+
+			String campaignName = readCampaignName(inDirectory);
+
+			log.info("===============================================================================================");
+			log.info("Kraftwerk batch started for campaign: " + campaignName);
+			log.info("===============================================================================================");
 
 			Path outDirectory = transformToOut(inDirectory);
 
@@ -58,16 +62,16 @@ public class Launcher {
 				SurveyRawData data = new SurveyRawData();
 
 				/* Step 2.0 : Read the DDI file to get survey variables */
-				data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIFile()));
+				data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
 				metadataVariables.put(dataMode, data.getVariablesMap());
 
 				/* Step 2.1 : Fill the data object with the survey answers file */
 				data.setDataFilePath(modeInputs.getDataFile());
-				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat());
-				parser.parseSurveyData(data);
+				DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+				parser.parseSurveyData(modeInputs.getDataFile());
 
 				/* Step 2.2 : Get paradata for the survey */
-				String paraDataFolder = modeInputs.getParadataFolder();
+				Path paraDataFolder = modeInputs.getParadataFolder();
 				if (paraDataFolder != null) {
 					ParadataParser paraDataParser = new ParadataParser();
 					Paradata paraData = new Paradata(paraDataFolder);
@@ -75,14 +79,14 @@ public class Launcher {
 				}
 
 				/* Step 2.3 : Get reportingData for the survey */
-				String reportingDataFile = modeInputs.getReportingDataFile();
+				Path reportingDataFile = modeInputs.getReportingDataFile();
 				if (reportingDataFile != null) {
 					ReportingData reportingData = new ReportingData(reportingDataFile);
-					if (reportingDataFile.contains(".xml")) {
+					if (reportingDataFile.toString().contains(".xml")) {
 						XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 						xMLReportingDataParser.parseReportingData(reportingData, data);
 					} else {
-						if (reportingDataFile.contains(".csv")) {
+						if (reportingDataFile.toString().contains(".csv")) {
 							CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
 							cSVReportingDataParser.parseReportingData(reportingData, data);
 						}
@@ -128,7 +132,7 @@ public class Launcher {
 			/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 			DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 			reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlReconciliationFile()));
+					userInputs.getVtlReconciliationFile());
 
 			/* Step 3.1.b : clean up processing */
 			CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
@@ -137,26 +141,31 @@ public class Launcher {
 			/* Step 3.2 : treatments on the multimodal dataset */
 			DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
 			multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlTransformationsFile()));
+					userInputs.getVtlTransformationsFile());
 
 			/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 			DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 			informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-					Constants.getInputPath(inDirectory, userInputs.getVtlInformationLevelsFile()));
+					userInputs.getVtlInformationLevelsFile());
 
 			/* Step 4 : Write output files */
 
 			/* Step 4.1 : write csv output tables */
-			OutputTables outputTables = new OutputTables(outDirectory, vtlBindings, userInputs);
-			outputTables.writeOutputCsvTables();
+			OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
+			outputFiles.writeOutputCsvTables();
 
 			/* Step 4.2 : write scripts to import csv tables in several languages */
-			outputTables.writeImportScripts();
+			outputFiles.writeImportScripts(metadataVariables);
 
 			/* Step 4.3 : move kraftwerk.json to a secondary folder */
-			outputTables.renameInputFile(inDirectory);
+			outputFiles.renameInputFile(inDirectory);
 
-			log.info("Kraftwerk batch ended.");
+			/* Step 4.4 : move differential data to a secondary folder */
+			outputFiles.moveInputFiles(userInputs);
+
+			log.info("===============================================================================================");
+			log.info("Kraftwerk batch terminated for campaign: " + campaignName);
+			log.info("===============================================================================================\n");
 
 		}
 

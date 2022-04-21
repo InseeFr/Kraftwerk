@@ -6,17 +6,18 @@ import fr.insee.kraftwerk.core.Constants;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 /** Encapsulate org.opencsv features that we use in Kraftwerk. */
 public class CsvUtils {
 
-    public static CSVReader getReader(String filePath) throws IOException {
+    public static CSVReader getReader(Path filePath) throws IOException {
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
                 //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
                 //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
                 .build();
-        return new CSVReaderBuilder(new FileReader(filePath, StandardCharsets.UTF_8))
+        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
                 //.withSkipLines(1) // (uncomment to ignore header)
                 .withCSVParser(parser)
                 .build();

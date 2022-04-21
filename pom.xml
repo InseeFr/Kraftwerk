@@ -6,7 +6,7 @@
 	
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.3</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 
@@ -21,8 +21,8 @@
 		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<log4j2.version>2.16.0</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
-		<project.version>1.0.0</project.version>
+		<log4j2.version>2.17.2</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
+		<project.version>1.0.3</project.version>
 	</properties>
 	
 	<modules>

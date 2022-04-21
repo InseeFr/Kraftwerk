@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +26,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 	private CSVReader csvReader;
 
 	public void parseReportingData(ReportingData reportingData, SurveyRawData data) {
-		String filePath = reportingData.getFilepath();
+		Path filePath = reportingData.getFilepath();
 
 		readFile(filePath);
 
@@ -102,11 +103,11 @@ public class CSVReportingDataParser extends ReportingDataParser {
 	 *
 	 * @param filePath Path to the CSV file.
 	 */
-	private void readFile(String filePath) {
+	private void readFile(Path filePath) {
 		try {
 			// Create an object of file reader
 			// class with CSV file as a parameter.
-			FileReader filereader = new FileReader(filePath);
+			FileReader filereader = new FileReader(filePath.toString());
 			// create csvReader object passing
 			// file reader as a parameter
 			csvReader = new CSVReader(filereader);

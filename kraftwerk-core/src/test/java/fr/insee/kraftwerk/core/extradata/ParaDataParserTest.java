@@ -2,6 +2,9 @@ package fr.insee.kraftwerk.core.extradata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
 
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Disabled;
@@ -26,8 +29,14 @@ public class ParaDataParserTest {
 		Paradata paraData = new Paradata();
 		SurveyRawData srdTest = SurveyRawDataTest.createFakeCawiSurveyRawData();
 
-		srdTest.setVariablesMap(DDIReader.getVariablesFromDDI("https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Logement/LOG2021T01/S1logement13juil_ddi.xml"));
-		paraData.setFilepath(Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01"));
+		try {
+			srdTest.setVariablesMap(DDIReader.getVariablesFromDDI(
+					new URL("https://gitlab.insee.fr/enquetes-menages/integration-metallica/-/raw/master/Logement/LOG2021T01/S1logement13juil_ddi.xml")));
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		paraData.setFilepath(Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01"));
 		paraDataParser.parseParadata(paraData, srdTest);
 		// Test we get the raw data correctly
 		assertEquals("init-session", paraData.getListParadataUE().get(1).getEvents().get(0).getIdParadataObject());
@@ -47,7 +56,7 @@ public class ParaDataParserTest {
 	@Test
 	public void createOrchestratorsAndSessionsTest() {
 		ParaDataUE paraDataUE = new ParaDataUE();
-		paraDataUE.setFilepath(Constants.getResourceAbsolutePath(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01/paradata.complete.LOG2021T01.S00000001.Example.json"));
+		paraDataUE.setFilepath(Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01/paradata.complete.LOG2021T01.S00000001.Example.json"));
 		paraDataUE.setIdentifier("S00000001");
 
 		SurveyRawData srdTest = SurveyRawDataTest.createFakeCawiSurveyRawData();

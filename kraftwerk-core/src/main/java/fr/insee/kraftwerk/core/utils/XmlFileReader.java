@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.xom.Builder;
@@ -11,16 +12,16 @@ import nu.xom.ValidityException;
 
 /**
  * Class providing method to parse an XML document using the nu.xom library.
- * TODO: replace it with DOM
+ * TODO: (if it seems necessary) replace XOM by something else.
  */
 @Slf4j
 public class XmlFileReader {
 
     private boolean xsdValidation = false;
 
-    public Document readXmlFile(String filePath) {
+    public Document readXmlFile(Path filePath) {
         try {
-            File file = new File(filePath);
+            File file = filePath.toFile();
             Builder parser = new Builder(xsdValidation);
             return parser.build(file);
         } catch (ValidityException ex) {
@@ -41,7 +42,7 @@ public class XmlFileReader {
         }
     }
 
-    public Document readXmlFile(String filePath, boolean xsdValidation) {
+    public Document readXmlFile(Path filePath, boolean xsdValidation) {
         this.xsdValidation = xsdValidation;
         return readXmlFile(filePath);
     }

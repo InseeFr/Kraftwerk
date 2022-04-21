@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DDIReaderTest {
+public class VariableTest {
 
 	static final String DDI_FOLDER = TestConstants.UNIT_TESTS_DIRECTORY + "/ddi";
 
