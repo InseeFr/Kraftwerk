@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.vtl;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
@@ -81,9 +80,8 @@ public class VtlJsonDatasetWriterTest {
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get("INDIVIDUALS_LOOP").getRole());
 		for(String variableName : variablesMap.getVariables().keySet()) {
-			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
-			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
-			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
+			assertTrue(ds.getDataStructure().containsKey(variableName));
+			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(variableName).getRole());
 		}
 		//
 		assertEquals(4, ds.getDataPoints().size());
@@ -97,7 +95,7 @@ public class VtlJsonDatasetWriterTest {
 		Set<String> dsFirstNames = new HashSet<>();
 		ds.getDataPoints().forEach(
 				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get(variablesMap.getFullyQualifiedName("FIRST_NAME")) )
+						(String) dataPoint.get("FIRST_NAME") )
 		);
 		assertEquals(expectedFirstNames, dsFirstNames);
 	}
@@ -143,7 +141,7 @@ public class VtlJsonDatasetWriterTest {
 		Set<String> dsFirstNames = new HashSet<>();
 		ds.getDataPoints().forEach(
 				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get(variables.getFullyQualifiedName("FIRST_NAME")) )
+						(String) dataPoint.get("FIRST_NAME") )
 		);
 		assertEquals(expectedFirstNames, dsFirstNames);
 	}

@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -44,7 +45,12 @@ public class TableScriptInfoTest {
 		SurveyRawData srdPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
 		srdPaper.setVariablesMap(VariablesMapTest.createAnotherFakeVariablesMap());
 		vtlBindings.convertToVtlDataset(srdPaper, "PAPI");
-		
+
+		// add group prefixes
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
+		groupProcessing.applyVtlTransformations("CAWI", null, srdWeb.getVariablesMap());
+		groupProcessing.applyVtlTransformations("PAPI", null, srdPaper.getVariablesMap());
+
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
 		System.out.println(dataStructure.keySet());
