@@ -214,18 +214,17 @@ public class VtlJsonDatasetWriter {
 		return vtlType;
 	}
 
-	/** Return "true" or "false" if boolean value can be converted. */
-	private String convertBooleanValue(String value) {
+	/** Compatible boolean values for "true */
+	private static final Set<String> trueValues = Set.of("true", "1");
+	/** Compatible boolean values for "false" */
+	private static final Set<String> falseValues = Set.of("false", "0");
+
+	/** Method to convert compatible boolean values to "true" or "false". */
+	private static String convertBooleanValue(String value) {
 		if (value != null) {
-			if (value.equals("1")) {
-				return "true";
-			}
-			else if (value.equals("0")) {
-				return "false";
-			}
-			else {
-				return null;
-			}
+			if (trueValues.contains(value)) return "true";
+			else if (falseValues.contains(value)) return "false";
+			else return null;
 		} else {
 			return null;
 		}
