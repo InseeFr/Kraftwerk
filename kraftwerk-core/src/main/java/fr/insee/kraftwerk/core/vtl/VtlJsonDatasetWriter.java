@@ -139,7 +139,11 @@ public class VtlJsonDatasetWriter {
 			// Root variables values
 			for (String variableName : rootInstance.getVariableNames()) {
 				if (columnsMapping.get(variableName) != null) {
-					rowValues[columnsMapping.get(variableName)] = rootInstance.getValue(variableName);
+					String value = rootInstance.getValue(variableName);
+					if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
+						value = convertBooleanValue(value);
+					}
+					rowValues[columnsMapping.get(variableName)] = value;
 				} else {
 					log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
 				}
@@ -164,6 +168,9 @@ public class VtlJsonDatasetWriter {
 						for (String variableName : groupInstance.getVariableNames()) {
 							if (columnsMapping.get(variableName) != null) {
 								String value = groupInstance.getValue(variableName);
+								if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
+									value = convertBooleanValue(value);
+								}
 								groupRowValues[columnsMapping.get(variableName)] = value;
 							} else {
 								log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
@@ -205,6 +212,23 @@ public class VtlJsonDatasetWriter {
 			break;
 		}
 		return vtlType;
+	}
+
+	/** Return "true" or "false" if boolean value can be converted. */
+	private String convertBooleanValue(String value) {
+		if (value != null) {
+			if (value.equals("1")) {
+				return "true";
+			}
+			else if (value.equals("0")) {
+				return "false";
+			}
+			else {
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 
 }
