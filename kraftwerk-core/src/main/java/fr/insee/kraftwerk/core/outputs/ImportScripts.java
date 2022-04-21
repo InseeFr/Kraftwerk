@@ -46,22 +46,25 @@ public class ImportScripts {
 			script.append("header=TRUE, \n");
 
 			// colClasses parameter
-			// NOTE: we don't specify variables in String or Number format since the instruction is too long if the dataset has many
+			// NOTE: we don't specify variables in String or Number format since the
+			// instruction is too long if the dataset has many
 			// variables, and R seems to get them correctly anyway
 			script.append("colClasses = c( ");
 
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
+					metadataVariables);
 			for (String variableName : listVariables.keySet()) {
 				VariableType variableType = listVariables.get(variableName).getType();
-				if (!variableType.equals(VariableType.STRING) && !variableType.equals(VariableType.INTEGER) && !variableType.equals(VariableType.NUMBER)) {
-					
-				script.append(String.format("'%s'='%s',", variableName, getDataTableType(variableType)));
+				if (!variableType.equals(VariableType.STRING) && !variableType.equals(VariableType.INTEGER)
+						&& !variableType.equals(VariableType.NUMBER)) {
+
+					script.append(String.format("'%s'='%s',", variableName, getDataTableType(variableType)));
 				}
 			}
 			script.deleteCharAt(script.length() - 1);
 			script.append("), \n");
-			
+
 			// quote parameter
 			if (Constants.CSV_OUTPUTS_QUOTE_CHAR == '"') { // TODO: condition always true, but not later if we let the
 															// user choose
@@ -103,20 +106,25 @@ public class ImportScripts {
 			script.append(String.format("FORMAT "));
 			// Special treatment to display the length of the variables
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
+					metadataVariables);
 			int count = 0;
 			for (String variableName : listVariables.keySet()) {
 				Variable variable = listVariables.get(variableName);
 				String length = variable.getLength();
-				if (length.contentEquals("0")) {
+				if (!length.contentEquals("0")) {
+					// We write the format instructions if we have inrofmations on the length of the variables
 					if (variable.getType().equals(VariableType.BOOLEAN)
 							|| variable.getType().equals(VariableType.STRING)
 							|| variable.getType().equals(VariableType.DATE)) {
-
 						script.append(String.format("%s $%s. ", variableName, length));
 					} else if (variable.getType().equals(VariableType.INTEGER)
 							|| variable.getType().equals(VariableType.NUMBER)) {
-						script.append(String.format("%s %s. ", variableName, length));
+						if (length.contains(".")) {
+							script.append(String.format("%s %s ", variableName, length));
+						} else {
+							script.append(String.format("%s %s. ", variableName, length));
+						}
 					}
 					// SAS doesn't allow more than 6000 characters for each line, we do a break
 					// every once in a while
