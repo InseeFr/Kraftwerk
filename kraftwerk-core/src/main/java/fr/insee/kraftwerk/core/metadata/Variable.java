@@ -25,7 +25,7 @@ public class Variable {
 	}
 
 	public Variable(String name, Group group, VariableType type, String length) {
-		this.name = name.toUpperCase();
+		this.name = name;
 		this.group = group;
 		this.type = type;
 		this.length = length;
