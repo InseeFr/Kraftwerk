@@ -41,7 +41,7 @@ public class VtlJsonDatasetWriterTest {
 		//
 		assertEquals(3, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
-		for(String variableName : variablesMap.getVariables().keySet()) {
+		for(String variableName : variablesMap.getVariableNames()) {
 			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
 			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
 			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
@@ -79,7 +79,7 @@ public class VtlJsonDatasetWriterTest {
 		assertEquals(7, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get("INDIVIDUALS_LOOP").getRole());
-		for(String variableName : variablesMap.getVariables().keySet()) {
+		for(String variableName : variablesMap.getVariableNames()) {
 			assertTrue(ds.getDataStructure().containsKey(variableName));
 			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(variableName).getRole());
 		}
