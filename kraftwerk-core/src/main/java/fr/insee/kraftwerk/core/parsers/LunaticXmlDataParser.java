@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.util.Arrays;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.utils.XmlFileReader;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -78,7 +76,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); TODO: remove this line
+			//readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); // TODO: remove this line
 
 			data.addQuestionnaire(questionnaireData);
 		}
@@ -150,6 +148,13 @@ public class LunaticXmlDataParser extends DataParser {
 					String variableName = externalVariableNode.getLocalName();
 					String value = externalVariableNode.getValue();
 					questionnaireData.putValue(value, variableName);
+					if (! variables.hasVariable(variableName)) {
+						variables.putVariable(
+								new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+						log.warn(String.format(
+								"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
+								variableName));
+					}
 				}
 			}
 		}
