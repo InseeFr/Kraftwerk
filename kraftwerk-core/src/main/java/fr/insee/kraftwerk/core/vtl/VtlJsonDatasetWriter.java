@@ -149,7 +149,9 @@ public class VtlJsonDatasetWriter {
 				}
 			}
 
-			// TODO: ça sera la condition d'arrêt quand on implémentera la récursion
+			// TODO: only works with at most one level of subgroups. Implement recursion or
+
+			// If no subgroups, write line right away
 			if (! rootInstance.hasSubGroups()) {
 				JSONArray array = new JSONArray();
 				array.addAll(Arrays.asList(rowValues));
@@ -157,6 +159,8 @@ public class VtlJsonDatasetWriter {
 			}
 
 			else {
+				boolean emptySubGroups = true;
+
 				for (String groupName : rootInstance.getSubGroupNames()) {
 					GroupData groupData = rootInstance.getSubGroup(groupName);
 
@@ -180,7 +184,15 @@ public class VtlJsonDatasetWriter {
 						JSONArray array = new JSONArray();
 						array.addAll(Arrays.asList(groupRowValues));
 						dataPoints.add(array);
+						emptySubGroups = false;
 					}
+				}
+
+				// If all subgroups are empty, write a single line
+				if (emptySubGroups) {
+					JSONArray array = new JSONArray();
+					array.addAll(Arrays.asList(rowValues));
+					dataPoints.add(array);
 				}
 			}
 		}
