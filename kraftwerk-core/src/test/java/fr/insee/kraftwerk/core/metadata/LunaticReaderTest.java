@@ -3,19 +3,20 @@ package fr.insee.kraftwerk.core.metadata;
 import fr.insee.kraftwerk.core.TestConstants;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LunaticReaderTest {
 
-    static final String LUNATIC_SAMPLES = TestConstants.UNIT_TESTS_DIRECTORY + "/lunatic";
+    static final Path lunaticSamplesPath = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "lunatic");
 
     @Test
     public void readLogX21TelLunaticFile() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                LUNATIC_SAMPLES + "/log2021x21_tel.json");
+                lunaticSamplesPath.resolve("log2021x21_tel.json"));
 
         //
         assertNotNull(calculatedVariables);

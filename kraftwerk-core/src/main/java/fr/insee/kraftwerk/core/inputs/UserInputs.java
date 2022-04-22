@@ -56,10 +56,10 @@ public class UserInputs {
 			JsonNode filesNode = userInputs.get("survey_data");
 			for (JsonNode fileNode : filesNode) {
 				//
-				String lunaticFile = getText(fileNode, "lunatic_file");
 				String dataMode = readField(fileNode, "data_mode");
 				Path dataFile = convertToPath(readField(fileNode, "data_file"));
 				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
+				Path lunaticFile = convertToPath(readField(fileNode, "lunatic_file"));
 				String dataFormat = readField(fileNode, "data_format");
 				Path paradataFolder = convertToPath(readField(fileNode, "paradata_folder"));
 				Path reportingDataFile = convertToPath(readField(fileNode, "reporting_data_file"));

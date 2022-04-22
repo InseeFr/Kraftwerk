@@ -15,9 +15,9 @@ public class JsonFileReader {
      *
      *  @return A jackson.databind.JsonNode.
      */
-    public static JsonNode read(String filePath) throws IOException {
+    public static JsonNode read(Path filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readTree(new File(filePath));
+        return mapper.readTree(filePath.toFile());
     }
 
 }

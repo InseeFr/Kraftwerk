@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 
@@ -16,7 +17,7 @@ public class LunaticReader {
      * @param lunaticFile Path to a lunatic questionnaire file.
      * @return A CalculatedVariables map.
      */
-    public static CalculatedVariables getCalculatedFromLunatic(String lunaticFile) {
+    public static CalculatedVariables getCalculatedFromLunatic(Path lunaticFile) {
         try {
             JsonNode rootNode = JsonFileReader.read(lunaticFile);
 
