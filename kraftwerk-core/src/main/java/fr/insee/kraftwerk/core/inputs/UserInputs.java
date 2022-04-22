@@ -1,9 +1,9 @@
 package fr.insee.kraftwerk.core.inputs;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +12,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -57,24 +56,18 @@ public class UserInputs {
 			JsonNode filesNode = userInputs.get("survey_data");
 			for (JsonNode fileNode : filesNode) {
 				//
-				String dataMode = getText(fileNode, "data_mode");
-				Path dataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "data_file"));
-				String DDIFilePath = getText(fileNode, "DDI_file");
-				URL DDIURL;
-				if (DDIFilePath.contains("http")) {
-					DDIURL = Constants.convertToUrl(DDIFilePath);
-				} else {
-					DDIURL = Constants.convertToUrl(Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file")));
-				}
 				String lunaticFile = getText(fileNode, "lunatic_file");
-				String dataFormat = getText(fileNode, "data_format");
-				Path paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
-				Path reportingDataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "reporting_data_file"));
-				Path vtlFile = Constants.getInputPath(inputDirectory, getText(fileNode, "mode_specifications"));
+				String dataMode = readField(fileNode, "data_mode");
+				Path dataFile = convertToPath(readField(fileNode, "data_file"));
+				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
+				String dataFormat = readField(fileNode, "data_format");
+				Path paradataFolder = convertToPath(readField(fileNode, "paradata_folder"));
+				Path reportingDataFile = convertToPath(readField(fileNode, "reporting_data_file"));
+				Path vtlFile = convertToPath(readField(fileNode, "mode_specifications"));
 				//
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataFile);
-				modeInputs.setDDIURL(DDIURL);
+				modeInputs.setDDIURL(ddiFile);
 				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
 				modeInputs.setParadataFolder(paradataFolder);
@@ -83,10 +76,10 @@ public class UserInputs {
 				modeInputsMap.put(dataMode, modeInputs);
 			}
 			//
-			multimodeDatasetName = getText(userInputs, "multimode_dataset_name");
-			vtlReconciliationFile = Constants.getInputPath(inputDirectory, getText(userInputs, "reconciliation_specifications"));
-			vtlTransformationsFile = Constants.getInputPath(inputDirectory, getText(userInputs, "transformation_specifications"));
-			vtlInformationLevelsFile = Constants.getInputPath(inputDirectory, getText(userInputs, "information_levels_specifications"));
+			multimodeDatasetName = readField(userInputs, "multimode_dataset_name");
+			vtlReconciliationFile = convertToPath(readField(userInputs, "reconciliation_specifications"));
+			vtlTransformationsFile = convertToPath(readField(userInputs, "transformation_specifications"));
+			vtlInformationLevelsFile = convertToPath(readField(userInputs, "information_levels_specifications"));
 
 		} catch (IOException e) { // TODO: split read file and json parsing to throw IllegalArgumentException if
 									// the json file is malformed
@@ -98,7 +91,7 @@ public class UserInputs {
 		return new ArrayList<>(modeInputsMap.keySet());
 	}
 
-	private String getText(JsonNode node, String field) throws MissingMandatoryFieldException {
+	private String readField(JsonNode node, String field) throws MissingMandatoryFieldException {
 		JsonNode value = node.get(field);
 		if (value != null) {
 			String text = value.asText();
@@ -122,4 +115,31 @@ public class UserInputs {
 			}
 		}
 	}
+
+	private Path convertToPath(String userField) {
+		if (userField != null) {
+			return inputDirectory.resolve(userField);
+		} else {
+			return null;
+		}
+
+	}
+
+	private URL convertToUrl(String userField) {
+		if (userField == null) {
+			log.debug("null value out of method that reads DDI field (should not happen).");
+			return null;
+		}
+		try {
+			if (userField.startsWith("http")) {
+				return new URL(userField);
+			} else {
+				return inputDirectory.resolve(userField).toFile().toURI().toURL();
+			}
+		} catch (MalformedURLException e) {
+			log.error("Unable to convert URL from user input: " + userField);
+			return null;
+		}
+	}
+
 }
