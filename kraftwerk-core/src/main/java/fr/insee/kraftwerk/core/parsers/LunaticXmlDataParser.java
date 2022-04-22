@@ -21,7 +21,9 @@ import java.util.Arrays;
 @Slf4j
 public class LunaticXmlDataParser extends DataParser {
 
-	/** Words used to filter VTL expressions in "calculated" elements. */
+	/** Words used to filter VTL expressions in "calculated" elements.
+	 * Deprecated since we don't read calculated values in the parser anymore. */
+	@Deprecated
 	private static final String[] forbiddenWords = {"cast", "isnull", "if "};
 
 	/**
@@ -51,8 +53,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Parse a Lunatic xml data file.
-	 * "FILTER_RESULT" variables are added to the variables map.
-	 * VTL expressions in the calculated elements are ignored.
+	 * Only "COLLECTED" and "EXTERNAL" variables are read.
 	 * @param filePath Path to a Lunatic xml data file.
 	 */
 	@Override
@@ -74,8 +75,8 @@ public class LunaticXmlDataParser extends DataParser {
 			questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+			//readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); // TODO: remove this line
 
 			data.addQuestionnaire(questionnaireData);
 		}
@@ -97,7 +98,7 @@ public class LunaticXmlDataParser extends DataParser {
 		for (Element variableNode : collectedVariablesNodes) {
 
 			// Variable name
-			String variableName = variableNode.getLocalName().toUpperCase();
+			String variableName = variableNode.getLocalName();
 
 			//
 			Element collectedNode = variableNode.getFirstChildElement("COLLECTED");
@@ -144,7 +145,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 			for (Element externalVariableNode : externalVariableNodes) {
 				if(! externalVariableNode.getAttribute("type").getValue().equals("null")) {
-					String variableName = externalVariableNode.getLocalName().toUpperCase();
+					String variableName = externalVariableNode.getLocalName();
 					String value = externalVariableNode.getValue();
 					questionnaireData.putValue(value, variableName);
 					if (! variables.hasVariable(variableName)) {
@@ -164,6 +165,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
+	@Deprecated
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
 											 VariablesMap variables) {
 
@@ -180,7 +182,7 @@ public class LunaticXmlDataParser extends DataParser {
 			for (Element variableNode : calculatedVariablesNodes) {
 
 				// Variable name
-				String variableName = variableNode.getLocalName().toUpperCase();
+				String variableName = variableNode.getLocalName();
 
 				// Root variables
 				if (variableNode.getAttribute("type") != null) {
@@ -240,16 +242,13 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Check if the given value is a VTL expression using the 'forbiddenWords' attribute.
+	 * Deprecated since we don't read calculated values in the parser anymore.
+	 * @see fr.insee.kraftwerk.core.metadata.LunaticReader
+	 * @see fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing
 	 */
+	@Deprecated
 	private static boolean isNotVtlExpression(String value) {
-		return !(stringContainsItemFromList(value, forbiddenWords));
-	}
-
-	/**
-	 * Check if the string given contains any of the words listed in second parameter.
-	 */
-	public static boolean stringContainsItemFromList(String string, String[] items) {
-	    return Arrays.stream(items).anyMatch(string::contains);
+		return Arrays.stream(forbiddenWords).noneMatch(value::contains);
 	}
 	
 }

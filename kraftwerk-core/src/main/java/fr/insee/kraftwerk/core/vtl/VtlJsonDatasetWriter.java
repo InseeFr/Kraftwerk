@@ -109,7 +109,8 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : variablesMap.getVariableNames()) {
 			Variable variable = variablesMap.getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
-			jsonVtlVariable.put("name", variablesMap.getFullyQualifiedName(variableName));
+			//jsonVtlVariable.put("name", variablesMap.getFullyQualifiedName(variableName));
+			jsonVtlVariable.put("name", variableName); // recent change (see GroupProcessing class)
 			jsonVtlVariable.put("type", convertToVtlType(variable.getType()));
 			jsonVtlVariable.put("role", "MEASURE");
 			dataStructure.add(jsonVtlVariable);
@@ -129,7 +130,8 @@ public class VtlJsonDatasetWriter {
 			GroupInstance rootInstance = questionnaireData.getAnswers();
 
 			String[] rowValues = new String[columnsMapping.size()];
-			Arrays.fill(rowValues, "");
+			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
+			// (previous implementation was: fill with empty strings ("")
 
 			// Root level identifier
 			rowValues[0] = questionnaireData.getIdentifier();
@@ -137,13 +139,19 @@ public class VtlJsonDatasetWriter {
 			// Root variables values
 			for (String variableName : rootInstance.getVariableNames()) {
 				if (columnsMapping.get(variableName) != null) {
-					rowValues[columnsMapping.get(variableName)] = rootInstance.getValue(variableName);
+					String value = rootInstance.getValue(variableName);
+					if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
+						value = convertBooleanValue(value);
+					}
+					rowValues[columnsMapping.get(variableName)] = value;
 				} else {
 					log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
 				}
 			}
 
-			// TODO: ça sera la condition d'arrêt quand on implémentera la récursion
+			// TODO: only works with at most one level of subgroups. Implement recursion or
+
+			// If no subgroups, write line right away
 			if (! rootInstance.hasSubGroups()) {
 				JSONArray array = new JSONArray();
 				array.addAll(Arrays.asList(rowValues));
@@ -151,6 +159,8 @@ public class VtlJsonDatasetWriter {
 			}
 
 			else {
+				boolean emptySubGroups = true;
+
 				for (String groupName : rootInstance.getSubGroupNames()) {
 					GroupData groupData = rootInstance.getSubGroup(groupName);
 
@@ -162,6 +172,9 @@ public class VtlJsonDatasetWriter {
 						for (String variableName : groupInstance.getVariableNames()) {
 							if (columnsMapping.get(variableName) != null) {
 								String value = groupInstance.getValue(variableName);
+								if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
+									value = convertBooleanValue(value);
+								}
 								groupRowValues[columnsMapping.get(variableName)] = value;
 							} else {
 								log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
@@ -171,7 +184,15 @@ public class VtlJsonDatasetWriter {
 						JSONArray array = new JSONArray();
 						array.addAll(Arrays.asList(groupRowValues));
 						dataPoints.add(array);
+						emptySubGroups = false;
 					}
+				}
+
+				// If all subgroups are empty, write a single line
+				if (emptySubGroups) {
+					JSONArray array = new JSONArray();
+					array.addAll(Arrays.asList(rowValues));
+					dataPoints.add(array);
 				}
 			}
 		}
@@ -180,18 +201,20 @@ public class VtlJsonDatasetWriter {
 	}
 
 	public static String convertToVtlType(VariableType variableType) {
-		// temp code: "STRING" type if variableType is null;
+		//
 		if (variableType == null) {
-			log.debug("null variable type given to convertToVtlType method, this should not happen!");
+			log.debug("null variable type given to convertToVtlType method, this should NEVER happen!");
 			return "STRING";
 		}
 		//
 		String vtlType = null;
 		switch (variableType) {
 		case STRING:
-		case BOOLEAN:
-		case DATE:
+		case DATE: // TODO: (note) date type not yet supported by Trevas
 			vtlType = "STRING";
+			break;
+		case BOOLEAN:
+			vtlType = "BOOLEAN";
 			break;
 		case INTEGER:
 			vtlType = "INTEGER";
@@ -201,6 +224,22 @@ public class VtlJsonDatasetWriter {
 			break;
 		}
 		return vtlType;
+	}
+
+	/** Compatible boolean values for "true */
+	private static final Set<String> trueValues = Set.of("true", "1");
+	/** Compatible boolean values for "false" */
+	private static final Set<String> falseValues = Set.of("false", "0");
+
+	/** Method to convert compatible boolean values to "true" or "false". */
+	private static String convertBooleanValue(String value) {
+		if (value != null) {
+			if (trueValues.contains(value)) return "true";
+			else if (falseValues.contains(value)) return "false";
+			else return null;
+		} else {
+			return null;
+		}
 	}
 
 }

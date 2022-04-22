@@ -24,6 +24,14 @@ public class GroupData {
         return groupName;
     }
 
+    /**
+     * Method to test if a group data object is empty or not.
+     * @return True if there is at least one instance in the group data object.
+     */
+    public boolean hasInstances() {
+        return !groupInstances.isEmpty();
+    }
+
     /** Return the instance corresponding to the given id.
      * The instance is created if it doesn't already exist. */
     public GroupInstance getInstance(String groupId){

@@ -82,7 +82,7 @@ public class XformsDataParser extends DataParser {
 					.getChildElements("Variable");
 			for (int j = 0; j < variableNodeList.size(); j++) {
 				Element variableNode = variableNodeList.get(j);
-				String variableName = variableNode.getAttributeValue("idVariable").toUpperCase();
+				String variableName = variableNode.getAttributeValue("idVariable");
 				if (data.getVariablesMap().hasVariable(variableName)) {
 					String value = getNodeValue(variableNode);
 					answers.putValue(variableName, value);
@@ -112,7 +112,7 @@ public class XformsDataParser extends DataParser {
 					GroupInstance groupInstance = groupData.getInstance(groupInstanceId);
 					Elements groupVariableNodeList = groupInstanceNode.getChildElements("Variable");
 					for (Element variableNode : groupVariableNodeList) {
-						String variableName = variableNode.getAttributeValue("idVariable").toUpperCase();
+						String variableName = variableNode.getAttributeValue("idVariable");
 						if (data.getVariablesMap().hasVariable(variableName)) {
 							String value = getNodeValue(variableNode);
 							groupInstance.putValue(variableName, value);

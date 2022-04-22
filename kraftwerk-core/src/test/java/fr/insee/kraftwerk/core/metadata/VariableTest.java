@@ -100,7 +100,7 @@ public class VariableTest {
 	@Test
 	public void readVqsWebVariables() throws MalformedURLException {
 
-		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
+		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
 				"RESIDM", "NHAB");
 
@@ -118,7 +118,7 @@ public class VariableTest {
 		}
 		//
 		assertEquals(Constants.ROOT_GROUP_NAME, vqsVariables.getVariable("ADRESSE").getGroup().getName());
-		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("PRENOM").getGroup().getName());
+		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("prenom").getGroup().getName());
 		// UCQ
 		assertTrue(vqsVariables.getVariable("ETAT_SANT") instanceof UcqVariable);
 		UcqVariable etatSant = (UcqVariable) vqsVariables.getVariable("ETAT_SANT");

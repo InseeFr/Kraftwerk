@@ -19,13 +19,13 @@ public class Variable {
 	protected String length;
 
 	public Variable(String name, Group group, VariableType type) {
-		this.name = name.toUpperCase();
+		this.name = name;
 		this.group = group;
 		this.type = type;
 	}
 
 	public Variable(String name, Group group, VariableType type, String length) {
-		this.name = name.toUpperCase();
+		this.name = name;
 		this.group = group;
 		this.type = type;
 		this.length = length;

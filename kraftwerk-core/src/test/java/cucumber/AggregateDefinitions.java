@@ -7,7 +7,9 @@ import javax.script.Bindings;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.en.Given;
@@ -22,12 +24,19 @@ public class AggregateDefinitions {
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset) throws Exception {
-		vtlBindings.convertToVtlDataset(SurveyRawDataTest.createFakeCawiSurveyRawData(), firstDataset);
-		vtlBindings.convertToVtlDataset(SurveyRawDataTest.createFakePapiSurveyRawData(), secondDataset);
+		// create datasets
+		SurveyRawData fakeCawiData = SurveyRawDataTest.createFakeCawiSurveyRawData();
+		SurveyRawData fakePapiData = SurveyRawDataTest.createFakePapiSurveyRawData();
+		vtlBindings.convertToVtlDataset(fakeCawiData, firstDataset);
+		vtlBindings.convertToVtlDataset(fakePapiData, secondDataset);
+		// add group prefixes
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
+		groupProcessing.applyVtlTransformations(firstDataset, null, fakeCawiData.getVariablesMap());
+		groupProcessing.applyVtlTransformations(secondDataset, null, fakePapiData.getVariablesMap());
 
+		//
 		assertTrue(vtlBindings.getBindings().containsKey(firstDataset));
 		assertTrue(vtlBindings.getBindings().containsKey(secondDataset));
-
 	}
 
 	@When("I try to aggregate the bindings")

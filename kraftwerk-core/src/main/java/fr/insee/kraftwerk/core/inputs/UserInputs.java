@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserInputs {
 
 	private final String userInputFile;
-	
+
 	@Getter
 	private final Path inputDirectory;
 
@@ -66,6 +66,7 @@ public class UserInputs {
 				} else {
 					DDIURL = Constants.convertToUrl(Constants.getInputPath(inputDirectory, getText(fileNode, "DDI_file")));
 				}
+				String lunaticFile = getText(fileNode, "lunatic_file");
 				String dataFormat = getText(fileNode, "data_format");
 				Path paradataFolder = Constants.getInputPath(inputDirectory, getText(fileNode, "paradata_folder"));
 				Path reportingDataFile = Constants.getInputPath(inputDirectory, getText(fileNode, "reporting_data_file"));
@@ -74,6 +75,7 @@ public class UserInputs {
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataFile);
 				modeInputs.setDDIURL(DDIURL);
+				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
 				modeInputs.setParadataFolder(paradataFolder);
 				modeInputs.setReportingDataFile(reportingDataFile);

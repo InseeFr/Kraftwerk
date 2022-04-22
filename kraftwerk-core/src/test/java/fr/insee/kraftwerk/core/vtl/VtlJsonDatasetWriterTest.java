@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.vtl;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -42,7 +40,7 @@ public class VtlJsonDatasetWriterTest {
 		//
 		assertEquals(3, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
-		for(String variableName : variablesMap.getVariables().keySet()) {
+		for(String variableName : variablesMap.getVariableNames()) {
 			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
 			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
 			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
@@ -80,10 +78,9 @@ public class VtlJsonDatasetWriterTest {
 		assertEquals(7, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get("INDIVIDUALS_LOOP").getRole());
-		for(String variableName : variablesMap.getVariables().keySet()) {
-			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
-			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
-			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
+		for(String variableName : variablesMap.getVariableNames()) {
+			assertTrue(ds.getDataStructure().containsKey(variableName));
+			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(variableName).getRole());
 		}
 		//
 		assertEquals(4, ds.getDataPoints().size());
@@ -97,7 +94,7 @@ public class VtlJsonDatasetWriterTest {
 		Set<String> dsFirstNames = new HashSet<>();
 		ds.getDataPoints().forEach(
 				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get(variablesMap.getFullyQualifiedName("FIRST_NAME")) )
+						(String) dataPoint.get("FIRST_NAME") )
 		);
 		assertEquals(expectedFirstNames, dsFirstNames);
 	}
@@ -143,9 +140,65 @@ public class VtlJsonDatasetWriterTest {
 		Set<String> dsFirstNames = new HashSet<>();
 		ds.getDataPoints().forEach(
 				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get(variables.getFullyQualifiedName("FIRST_NAME")) )
+						(String) dataPoint.get("FIRST_NAME") )
 		);
 		assertEquals(expectedFirstNames, dsFirstNames);
+	}
+
+	@Test
+	public void convertSurveyRawDataWithEmptyGroup() {
+		//
+		SurveyRawData srd = new SurveyRawData();
+		//
+		VariablesMap variablesMap = new VariablesMap();
+		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
+		variablesMap.putGroup(new Group("DEPTH1", variablesMap.getRootGroup().getName()));
+		variablesMap.putVariable(new Variable("FOO1", variablesMap.getGroup("DEPTH1"), VariableType.STRING));
+		srd.setVariablesMap(variablesMap);
+		//
+		QuestionnaireData questionnaire = new QuestionnaireData();
+		questionnaire.putValue("foo", "FOO");
+		questionnaire.getAnswers().getSubGroup("DEPTH1"); // this call adds a GroupInstance in the data object
+		srd.addQuestionnaire(questionnaire);
+
+		//
+		vtlBindings.convertToVtlDataset(srd, "test");
+		Dataset dataset = vtlBindings.getDataset("test");
+
+		//
+		assertEquals(1, dataset.getDataPoints().size());
+	}
+
+	@Test
+	public void convertSurveyRawDataWithTwoParallelGroups() {
+		//
+		SurveyRawData srd = new SurveyRawData();
+		//
+		VariablesMap variablesMap = new VariablesMap();
+		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
+		variablesMap.putGroup(new Group("GROUP_A", variablesMap.getRootGroup().getName()));
+		variablesMap.putGroup(new Group("GROUP_B", variablesMap.getRootGroup().getName()));
+		variablesMap.putVariable(new Variable("FOO_A", variablesMap.getGroup("GROUP_A"), VariableType.STRING));
+		variablesMap.putVariable(new Variable("FOO_B", variablesMap.getGroup("GROUP_B"), VariableType.STRING));
+		srd.setVariablesMap(variablesMap);
+		//
+		QuestionnaireData completeQuestionnaire = new QuestionnaireData();
+		completeQuestionnaire.putValue("foo", "FOO");
+		completeQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 0));
+		completeQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 1));
+		completeQuestionnaire.putValue("foo_b", "FOO_B", Pair.of("GROUP_B", 0));
+		srd.addQuestionnaire(completeQuestionnaire);
+		//
+		QuestionnaireData oneGroupQuestionnaire = new QuestionnaireData();
+		oneGroupQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 0));
+		srd.addQuestionnaire(oneGroupQuestionnaire);
+
+		//
+		vtlBindings.convertToVtlDataset(srd, "test");
+		Dataset dataset = vtlBindings.getDataset("test");
+
+		//
+		assertEquals(4, dataset.getDataPoints().size());
 	}
 
 }
