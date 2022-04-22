@@ -178,11 +178,7 @@ public final class Constants {
 	 * @throws MalformedURLException if the path given is incorrect.
 	 * */
 	public static URL convertToUrl(Path filePath) throws MalformedURLException {
-		if(filePath.startsWith("http")) {
-			return new URL(filePath.toString());
-		} else {
-			return new File(filePath.toString()).toURI().toURL();
-		}
+		return filePath.toFile().toURI().toURL();
 	}
 		
 }
