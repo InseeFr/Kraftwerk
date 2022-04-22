@@ -81,8 +81,7 @@ public class UserInputs {
 			vtlTransformationsFile = convertToPath(readField(userInputs, "transformation_specifications"));
 			vtlInformationLevelsFile = convertToPath(readField(userInputs, "information_levels_specifications"));
 
-		} catch (IOException e) { // TODO: split read file and json parsing to throw IllegalArgumentException if
-									// the json file is malformed
+		} catch (IOException e) { // TODO: split file reading and json parsing to throw IllegalArgumentException if the json file is malformed
 			log.error("Unable to read user input file: " + userInputFile, e);
 		}
 	}
