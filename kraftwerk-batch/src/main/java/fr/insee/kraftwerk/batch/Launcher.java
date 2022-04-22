@@ -50,7 +50,7 @@ public class Launcher {
 
 			/* Step 1 : Init */
 
-			UserInputs userInputs = new UserInputs(inDirectory + "/" + Constants.USER_INPUT_FILE, inDirectory);
+			UserInputs userInputs = new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
 
 			VtlBindings vtlBindings = new VtlBindings();
 

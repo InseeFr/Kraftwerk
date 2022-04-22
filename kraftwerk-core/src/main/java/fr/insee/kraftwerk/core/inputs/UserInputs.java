@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserInputs {
 
-	private final String userInputFile;
+	private final Path userInputFile;
 
 	@Getter
 	private final Path inputDirectory;
@@ -38,7 +38,7 @@ public class UserInputs {
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
 			"data_format", "multimode_dataset_name");
 
-	public UserInputs(String userConfigFile, Path inputDirectory) {
+	public UserInputs(Path userConfigFile, Path inputDirectory) {
 		this.userInputFile = userConfigFile;
 		this.inputDirectory = inputDirectory;
 		readUserInputs();
