@@ -34,8 +34,10 @@ public class GroupProcessing extends DataProcessing{
         VariablesMap variablesMap = (VariablesMap) objects[0];
 
         for (String variableName : variablesMap.getVariableNames()) {
-            vtlScript.add(String.format("%s := %s [rename %s to %s];",
-                    bindingName, bindingName, variableName, variablesMap.getFullyQualifiedName(variableName)));
+            if (variablesMap.getVariable(variableName).getGroup() != variablesMap.getRootGroup()) {
+                vtlScript.add(String.format("%s := %s [rename %s to %s];",
+                        bindingName, bindingName, variableName, variablesMap.getFullyQualifiedName(variableName)));
+            }
         }
 
         return vtlScript;
