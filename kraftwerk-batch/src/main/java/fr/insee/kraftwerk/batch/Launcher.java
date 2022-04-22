@@ -99,8 +99,8 @@ public class Launcher {
 
 				/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 				if (modeInputs.getLunaticFile() != null) {
-					CalculatedVariables calculatedVariables = LunaticReader
-							.getCalculatedFromLunatic(modeInputs.getLunaticFile());
+					CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
+							modeInputs.getLunaticFile());
 					DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
 					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
 				} else {
