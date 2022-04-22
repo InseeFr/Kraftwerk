@@ -8,7 +8,7 @@ The batch automated processes can be enriched with specification written in [VTL
 
 Developer documentation can be found in the [wiki](https://github.com/InseeFr/Kraftwerk/wiki).
 
-User documentation and batch functionnal tests are still in an [inhouse project](https://gitlab.insee.fr/sic/service-agregation-echange-de-donnees/kraftwerk).
+User documentation and batch functional tests are still in an [inhouse project](https://gitlab.insee.fr/sic/service-agregation-echange-de-donnees/kraftwerk).
 
 ## Requirements
 
