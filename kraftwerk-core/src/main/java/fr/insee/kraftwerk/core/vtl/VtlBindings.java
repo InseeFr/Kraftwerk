@@ -167,7 +167,7 @@ public class VtlBindings {
                 log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.debug(e.getMessage());
                 log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
-            } catch (Error e) {
+            } catch (Error e) { // TODO: send issue to Trevas
                 log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.error(e.getMessage());
                 log.error("Probable cause: Syntax error.");
