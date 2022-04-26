@@ -200,6 +200,7 @@ public class VtlBindings {
         }
     }
 
+    // TODO: these methods might be used in some data processing classes
     public static List<String> getComponentNamesWithRole(Dataset dataset, Dataset.Role role) {
         if (dataset != null) {
             return dataset.getDataStructure().values().stream()
