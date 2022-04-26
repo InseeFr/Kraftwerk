@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -24,6 +25,7 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -167,6 +169,14 @@ public class VtlBindings {
                 log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.debug(e.getMessage());
                 log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
+            } catch (Error e) { // TODO: send issue to Trevas
+                log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.error(e.getMessage());
+                log.error("Probable cause: Syntax error.");
+            } catch (Exception e) {
+                log.warn("Exception thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("UNKNOWN EXCEPTION PLEASE REPORT IT!");
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
@@ -188,6 +198,42 @@ public class VtlBindings {
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");
         }
+    }
+
+    // TODO: these methods might be used in some data processing classes
+    public static List<String> getComponentNamesWithRole(Dataset dataset, Dataset.Role role) {
+        if (dataset != null) {
+            return dataset.getDataStructure().values().stream()
+                    .filter(component -> component.getRole() == role)
+                    .map(Structured.Component::getName)
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+
+    }
+    public static List<String> getDatasetIdentifierNames(Dataset dataset) {
+        return getComponentNamesWithRole(dataset, Dataset.Role.IDENTIFIER);
+    }
+    public static List<String> getDatasetMeasureNames(Dataset dataset) {
+        return getComponentNamesWithRole(dataset, Dataset.Role.MEASURE);
+    }
+
+    /**
+     * Return identifier names in the dataset registered in the bindings under the given name.
+     * @param datasetName Name of a dataset stored in the bindings.
+     * @return List of the identifier names in the dataset, or null if there is no dataset under the given name.
+     */
+    public List<String> getDatasetIdentifierNames(String datasetName) {
+        return getDatasetIdentifierNames(this.getDataset(datasetName));
+    }
+    /**
+     * Return measure names in the dataset registered in the bindings under the given name.
+     * @param datasetName Name of a dataset stored in the bindings.
+     * @return List of the measure names in the dataset, or null if there is no dataset under the given name.
+     */
+    public List<String> getDatasetMeasureNames(String datasetName) {
+        return getDatasetMeasureNames(this.getDataset(datasetName));
     }
 
     /**

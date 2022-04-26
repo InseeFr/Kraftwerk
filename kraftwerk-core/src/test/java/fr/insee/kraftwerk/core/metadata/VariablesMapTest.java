@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +83,14 @@ public class VariablesMapTest {
         assertFalse(variablesMap.hasVariable("HOUSEHOLD_INCOME"));
         assertTrue(variablesMap.hasVariable("FIRST_NAME"));
         assertFalse(variablesMap.hasVariable("CAR_COLOR"));
+    }
+
+    @Test
+    public void getIdentifierNamesTest() {
+        assertEquals(
+                List.of(Constants.ROOT_IDENTIFIER_NAME, "INDIVIDUALS_LOOP", "CARS_LOOP"),
+                variablesMap.getIdentifierNames()
+        );
     }
 
     @Test
