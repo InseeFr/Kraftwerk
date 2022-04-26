@@ -171,6 +171,10 @@ public class VtlBindings {
                 log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.error(e.getMessage());
                 log.error("Probable cause: Syntax error.");
+            } catch (Exception e) {
+                log.warn("Exception thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("UNKNOWN EXCEPTION PLEASE REPORT IT!");
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
