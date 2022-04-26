@@ -65,7 +65,7 @@ public class TableScriptInfoTest {
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
 		assertEquals("50", listVariables.get("AGE").getLength());
-		assertEquals("500", listVariables.get("CARS_LOOP.CAR_COLOR").getLength());
+		assertEquals("500", listVariables.get("CAR_COLOR").getLength());
 	}
 
 	@Test

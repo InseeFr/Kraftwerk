@@ -35,19 +35,18 @@ public class TableScriptInfo {
 	public Map<String, Variable> getAllLength(DataStructure dataStructure,
 			Map<String, VariablesMap> metadataVariables) {
 		Map<String, Variable> result = new LinkedHashMap<String, Variable>();
-
 		// datastructure : noms complets
 		// metadata : suffixe du nom
-
 		// We loop with all variables in the current dataset we want to export
 		for (String variableName : dataStructure.keySet()) {
 			// We try to find it from the first datasets containing together all variables
 			// (except VTL and Kraftwerk-created ones)
 			for (String datasetName : metadataVariables.keySet()) {
 				VariablesMap variablesMap = metadataVariables.get(datasetName);
-				if (variablesMap.getFullyQualifiedNames().contains(variableName)) {
+				if (variablesMap.getFullyQualifiedNames().contains(variableName) || variablesMap.getVariableNames().contains(variableName)) {
 					if (!variableName.contains(Constants.FILTER_RESULT_PREFIX)) {
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
+						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getLength();
