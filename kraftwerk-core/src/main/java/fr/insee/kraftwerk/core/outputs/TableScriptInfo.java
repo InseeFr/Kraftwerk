@@ -56,7 +56,6 @@ public class TableScriptInfo {
 
 				if (variablesMap.getFullyQualifiedNames().contains(variableName)
 						|| variablesMap.getVariableNames().contains(variableName)) {
-						System.out.println(variableName);
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
@@ -84,8 +83,10 @@ public class TableScriptInfo {
 					}
 
 				} else {
-					result.put(variableName, new Variable(variableName,
-							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "32"));
+					if (!result.containsKey(variableName)) {
+						result.put(variableName, new Variable(variableName,
+								variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));	
+					}
 				}
 			}
 		}

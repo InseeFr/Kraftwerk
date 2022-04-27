@@ -53,9 +53,7 @@ public class TableScriptInfoTest {
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
-		System.out.println(dataStructure.keySet());
-		System.out.println(metadataVariables.get("CAWI").getVariableNames());
-		System.out.println(metadataVariables.get("CAWI").getFullyQualifiedNames());
+		
 	}
 	
 	@Test
