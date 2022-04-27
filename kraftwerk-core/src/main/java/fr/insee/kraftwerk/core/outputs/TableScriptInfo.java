@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -59,10 +57,11 @@ public class TableScriptInfo {
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
+						// We already got the variable, so we check to see if the lengthes are different -> take the maximum one then
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getLength();
 							if (!newLengthString.contains(".") && !existingLengthString.contains(".")) {
-								// Existing variable, and not a float (if float exists, we do nothing)
+								// Variable already put in result, and not a float (if float exists, we do nothing)
 								int newLength = Integer.parseInt(newLengthString);
 								if (Integer.parseInt(existingLengthString) < newLength) {
 									// name, Group group, VariableType type, int length
@@ -72,11 +71,12 @@ public class TableScriptInfo {
 								}
 							}
 						} else {
+							// Filter results are boolean, value "true" or "false"
 							if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
 								result.put(variableName, new Variable(variableName,
 										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "5"));
 							} else {
-							// new Variable, we keep it immediatly
+							// new Variable, we keep it like that
 							result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
 									variable.getLength()));
 						}
