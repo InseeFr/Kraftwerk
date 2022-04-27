@@ -122,18 +122,7 @@ public class Launcher {
 				UnimodalDataProcessing dataProcessing = DataProcessingManager
 						.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
 				dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
-				
-				/* Step 2.6 : Save variablesMap of the dataset */
-				for (String groupName : data.getVariablesMap().getGroupNames()) {
-					if (groupName.contentEquals(Constants.ROOT_GROUP_NAME)) {
-						Variable idRoot = new Variable(Constants.ROOT_IDENTIFIER_NAME, data.getVariablesMap().getGroup(groupName), VariableType.STRING, "32");
-						data.getVariablesMap().putVariable(idRoot);
-					} else {		
-					Variable idGroup = new Variable(groupName,  data.getVariablesMap().getGroup(groupName), VariableType.STRING, "32");	
-					data.getVariablesMap().putVariable(idGroup);
-					}
-				}
-				metadataVariables.put(dataMode, data.getVariablesMap());
+
 			}
 
 			/* Step 3 : multimodal VTL data processing */
