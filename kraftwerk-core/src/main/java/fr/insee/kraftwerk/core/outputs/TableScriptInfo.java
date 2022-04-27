@@ -1,15 +1,14 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataStructure;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,10 +40,23 @@ public class TableScriptInfo {
 		for (String variableName : dataStructure.keySet()) {
 			// We try to find it from the first datasets containing together all variables
 			// (except VTL and Kraftwerk-created ones)
+
 			for (String datasetName : metadataVariables.keySet()) {
 				VariablesMap variablesMap = metadataVariables.get(datasetName);
-				if (variablesMap.getFullyQualifiedNames().contains(variableName) || variablesMap.getVariableNames().contains(variableName)) {
-					if (!variableName.contains(Constants.FILTER_RESULT_PREFIX)) {
+
+				// We treat the identifiers
+
+				if (variablesMap.getIdentifierNames().contains(variableName)) {
+					Variable idGroupVariable = new Variable(variableName, variablesMap.getGroup(variableName),
+							VariableType.STRING, "32");
+					if (!result.containsKey(variableName)) {
+						result.put(variableName, idGroupVariable);
+					}
+				}
+
+				if (variablesMap.getFullyQualifiedNames().contains(variableName)
+						|| variablesMap.getVariableNames().contains(variableName)) {
+						System.out.println(variableName);
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
@@ -61,11 +73,19 @@ public class TableScriptInfo {
 								}
 							}
 						} else {
+							if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+								result.put(variableName, new Variable(variableName,
+										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "5"));
+							} else {
 							// new Variable, we keep it immediatly
 							result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
 									variable.getLength()));
 						}
 					}
+
+				} else {
+					result.put(variableName, new Variable(variableName,
+							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "32"));
 				}
 			}
 		}

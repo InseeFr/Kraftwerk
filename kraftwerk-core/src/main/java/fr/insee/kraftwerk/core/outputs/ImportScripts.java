@@ -100,7 +100,7 @@ public class ImportScripts {
 
 			// PROC IMPORT
 			// careful about special characters, which can't be imported in SAS
-			script.append("data WORK.DSN_TEMP; \n");
+			script.append(String.format("data %s; \n", tableName));
 			script.append("%let _EFIERR_ = 0; /* set the ERROR detection macro variable */ \n");
 			script.append(String.format("infile %s delimiter=\"%s\" MISSOVER DSD lrecl=13106 firstobs=2;\n",
 					tableName.substring(0, Math.min(tableName.length(), 6)), Constants.CSV_OUTPUTS_SEPARATOR));
@@ -109,7 +109,6 @@ public class ImportScripts {
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
 			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
 					metadataVariables);
-
 			script.append(scriptSASPart1(listVariables));
 
 			/*
@@ -266,19 +265,15 @@ public class ImportScripts {
 			Variable variable = listVariables.get(variableName);
 			String length = variable.getLength();
 
-			if (!length.contentEquals("0")) {
-				// We write the format instructions if we have informations on the length of the
-				// variables
-				if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
-						|| variable.getType().equals(VariableType.DATE)) {
-					script.append(String.format("%s $ \n", variableName, length));
-				} else if (variable.getType().equals(VariableType.INTEGER)
-						|| variable.getType().equals(VariableType.NUMBER)) {
+			// We write the format instructions if we have informations on the length of the
+			// variables
+			if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
+					|| variable.getType().equals(VariableType.DATE)) {
+				script.append(String.format("%s $ \n", variableName, length));
+			} else if (variable.getType().equals(VariableType.INTEGER)
+					|| variable.getType().equals(VariableType.NUMBER)) {
 
-					script.append(String.format("%s \n", variableName, length));
-
-				}
-			} else {
+				script.append(String.format("%s \n", variableName, length));
 
 			}
 		}
