@@ -60,8 +60,9 @@ public class VariablesMap {
         return variables.size();
     }
 
-    /** Use other methods instead. */
-    @Deprecated
+    /** Get the map containing variable objects.
+     * Keys: variable names
+     * Values: variable objects */
     public Map<String, Variable> getVariables(){
         return variables;
     }

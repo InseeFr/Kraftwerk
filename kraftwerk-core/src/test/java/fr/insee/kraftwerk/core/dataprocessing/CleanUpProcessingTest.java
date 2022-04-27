@@ -98,9 +98,12 @@ public class CleanUpProcessingTest {
         CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
         cleanUpProcessing.applyVtlTransformations("MULTIMODE", null, metadataVariables);
 
-        // Are paper indicator variables removed ?
+        // Are paper indicator variables removed in VTL multimode dataset ?
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_2"));
+        // Are these also removed in VariablesMap object ?
+        assertFalse(papiVariables.hasVariable("GENDER_1"));
+        assertFalse(papiVariables.hasVariable("GENDER_2"));
         // Are unimodal datasets removed ?
         assertEquals(Set.of("MULTIMODE"), vtlBindings.getBindings().keySet());
     }
