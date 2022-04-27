@@ -52,8 +52,8 @@ public abstract class DataProcessing {
 
     protected void applyAutomatedVtlInstructions(String bindingName, Object... objects){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
-       // log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
-        //        automatedInstructions));
+        log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
+                automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
             vtlBindings.evalVtlScript(automatedInstructions);
         }
