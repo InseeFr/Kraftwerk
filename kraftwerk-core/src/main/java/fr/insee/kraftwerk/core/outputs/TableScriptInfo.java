@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -51,13 +52,14 @@ public class TableScriptInfo {
 						result.put(variableName, idGroupVariable);
 					}
 				}
-
 				if (variablesMap.getFullyQualifiedNames().contains(variableName)
 						|| variablesMap.getVariableNames().contains(variableName)) {
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
 						// We already got the variable, so we check to see if the lengthes are different -> take the maximum one then
+					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+					} else {
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getLength();
 							if (!newLengthString.contains(".") && !existingLengthString.contains(".")) {
@@ -79,16 +81,19 @@ public class TableScriptInfo {
 							// new Variable, we keep it like that
 							result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
 									variable.getLength()));
-						}
-					}
+							}
 
+						}
+
+					}
 				} else {
 					if (!result.containsKey(variableName)) {
 						result.put(variableName, new Variable(variableName,
-								variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));	
+								variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
 					}
 				}
 			}
+
 		}
 		return result;
 	}
