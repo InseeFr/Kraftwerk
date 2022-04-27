@@ -125,8 +125,8 @@ public class ParadataParser {
 					paradataUE.addParadataSessions(paradataSession);
 
 				} else {
-					log.warn("Unexpected paradata for SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
-							+ collected_event.get(timestamp));
+					//log.warn("Unexpected paradata for SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
+					//		+ collected_event.get(timestamp));
 				}
 				events.add(event);
 			}
