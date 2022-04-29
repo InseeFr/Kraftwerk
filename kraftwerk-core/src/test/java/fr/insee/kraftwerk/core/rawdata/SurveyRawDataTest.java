@@ -56,7 +56,7 @@ public class SurveyRawDataTest {
 		SurveyRawData data = new SurveyRawData("CAWI");
 
 		// Give it a data structure
-		VariablesMap variablesMap = VariablesMapTest.createFakeVariablesMap();
+		VariablesMap variablesMap = VariablesMapTest.createCompleteFakeVariablesMap();
 		data.setVariablesMap(variablesMap);
 
 		// Homer Simpsons, aged 40, has a purple and a red car.
@@ -91,7 +91,7 @@ public class SurveyRawDataTest {
 		SurveyRawData data = new SurveyRawData("CAPI");
 
 		// Give it a data structure
-		VariablesMap variablesMap = VariablesMapTest.createFakeVariablesMap();
+		VariablesMap variablesMap = VariablesMapTest.createCompleteFakeVariablesMap();
 		data.setVariablesMap(variablesMap);
 
 		// Homer Simpsons, aged 40, has a purple and a red car.

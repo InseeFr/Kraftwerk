@@ -36,9 +36,9 @@ public class TableScriptInfoTest {
 	}
 
 	private void instantiateMap() {
-		metadataVariables.put("CAWI", VariablesMapTest.createFakeVariablesMap());
+		metadataVariables.put("CAWI", VariablesMapTest.createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		srdWeb.setVariablesMap(VariablesMapTest.createFakeVariablesMap());
+		srdWeb.setVariablesMap(VariablesMapTest.createCompleteFakeVariablesMap());
 		vtlBindings.convertToVtlDataset(srdWeb, "CAWI");
 		
 		metadataVariables.put("PAPI", VariablesMapTest.createAnotherFakeVariablesMap());

@@ -118,15 +118,16 @@ public class VariablesMapTest {
         //
         Group group = variablesMap.getGroup("INDIVIDUALS_LOOP");
         variablesMap.putVariable(McqVariable.builder()
-                .name("RELATIONSHIP_A").group(group).mcqName("RELATIONSHIP").text("Spouse").build());
+                .name("RELATIONSHIP_A").group(group).questionItemName("RELATIONSHIP").text("Spouse").build());
         variablesMap.putVariable(McqVariable.builder()
-                .name("RELATIONSHIP_B").group(group).mcqName("RELATIONSHIP").text("Child").build());
+                .name("RELATIONSHIP_B").group(group).questionItemName("RELATIONSHIP").text("Child").build());
         variablesMap.putVariable(McqVariable.builder()
-                .name("RELATIONSHIP_C").group(group).mcqName("RELATIONSHIP").text("Parent").build());
+                .name("RELATIONSHIP_C").group(group).questionItemName("RELATIONSHIP").text("Parent").build());
         variablesMap.putVariable(McqVariable.builder()
-                .name("RELATIONSHIP_D").group(group).mcqName("RELATIONSHIP").text("Other").build());
+                .name("RELATIONSHIP_D").group(group).questionItemName("RELATIONSHIP").text("Other").build());
         //
         assertTrue(variablesMap.hasMcq("RELATIONSHIP"));
+        assertSame("RELATIONSHIP", variablesMap.getVariable("RELATIONSHIP_A").getQuestionItemName());
         assertFalse(variablesMap.hasMcq("ADDRESS"));
         assertFalse(variablesMap.hasMcq("FIRST_NAME"));
         assertFalse(variablesMap.hasMcq("CAR_COLOR"));
@@ -138,6 +139,35 @@ public class VariablesMapTest {
         assertNull(variablesMap.getMcqGroup("CAR_COLOR"));
         assertNull(variablesMap.getMcqGroup("UNKNOWN_QUESTION"));
     }
+    
+    @Test
+    public void testGetVariablesNames() {
+    	variablesMap = createCompleteFakeVariablesMap();
+    	// KSE et KGA à trouver, une par liste
+    	List<String> ucqMcqVariablesNames = variablesMap.getUcqVariablesNames();
+    	List<String> mcqVariablesNames = variablesMap.getMcqVariablesNames();
+    	Set<String> variablesNames = variablesMap.getVariableNames();
+    	// Check ucq
+        assertTrue(ucqMcqVariablesNames.contains("VEHICLE_OWNER"));
+        assertFalse(ucqMcqVariablesNames.contains("CAR_OWNER"));
+    	// Check mcq
+        assertFalse(mcqVariablesNames.contains("VEHICLE_OWNER"));
+        assertTrue(mcqVariablesNames.contains("RELATIONSHIP"));
+        assertFalse(mcqVariablesNames.contains("RELATIONSHIP_A"));
+    	// Check mcq
+        assertFalse(variablesNames.contains("VEHICLE_OWNER"));
+        assertTrue(variablesNames.contains("CAR_OWNER"));
+        assertTrue(variablesNames.contains("MOTO_OWNER"));
+
+        assertTrue(variablesMap.hasMcq("RELATIONSHIP"));
+        assertTrue(variablesMap.hasUcq("CAR_OWNER"));
+        assertTrue(variablesMap.hasUcqMcq("CAR_OWNER"));
+        assertFalse(variablesMap.hasUcqMcq("VEHICLE_OWNER"));
+        assertFalse(variablesMap.hasMcq("ADDRESS"));
+        assertFalse(variablesMap.hasMcq("FIRST_NAME"));
+        assertFalse(variablesMap.hasMcq("CAR_COLOR"));
+        assertFalse(variablesMap.hasMcq("UNKNOWN_QUESTION"));
+    }
 
     /* Variables map objects to test multimode management */
 
@@ -146,7 +176,7 @@ public class VariablesMapTest {
      * - FIRST_NAME, LAST_NAME, AGE at the root
      * - CAR_COLOR in a group named CARS_LOOP
      */
-    public static VariablesMap createFakeVariablesMap(){
+    public static VariablesMap createCompleteFakeVariablesMap(){
 
         VariablesMap variablesMap = new VariablesMap();
 
@@ -171,6 +201,28 @@ public class VariablesMapTest {
         variablesMap.putVariable(paperUcq1);
         variablesMap.putVariable(paperUcq2);
 
+        // unique choice question variable related to multiple choices question
+        UcqVariable ucqMcq1 = new UcqVariable("CAR_OWNER", rootGroup, VariableType.STRING, "50");
+        ucqMcq1.setQuestionItemName("VEHICLE_OWNER");
+        ucqMcq1.addModality("1", "Yes");
+        ucqMcq1.addModality("2", "No");
+        UcqVariable ucqMcq2 = new UcqVariable("MOTO_OWNER", rootGroup, VariableType.STRING, "50");
+        ucqMcq2.setQuestionItemName("VEHICLE_OWNER");
+        ucqMcq2.addModality("1", "Yes");
+        ucqMcq2.addModality("2", "No");
+        variablesMap.putVariable(ucqMcq1);
+        variablesMap.putVariable(ucqMcq2);
+
+        // multiple choices question variable
+        variablesMap.putVariable(McqVariable.builder()
+                .name("RELATIONSHIP_A").group(rootGroup).questionItemName("RELATIONSHIP").text("Spouse").build());
+        variablesMap.putVariable(McqVariable.builder()
+                .name("RELATIONSHIP_B").group(rootGroup).questionItemName("RELATIONSHIP").text("Child").build());
+        variablesMap.putVariable(McqVariable.builder()
+                .name("RELATIONSHIP_C").group(rootGroup).questionItemName("RELATIONSHIP").text("Parent").build());
+        variablesMap.putVariable(McqVariable.builder()
+                .name("RELATIONSHIP_D").group(rootGroup).questionItemName("RELATIONSHIP").text("Other").build());
+        
         return variablesMap;
     }
 

@@ -129,7 +129,7 @@ public class VariableTest {
 		assertTrue(vqsVariables.getVariable("RELATION1") instanceof McqVariable);
 		assertTrue(vqsVariables.getVariable("RELATION4") instanceof McqVariable);
 		McqVariable aidregA = (McqVariable) vqsVariables.getVariable("AIDREG_A");
-		assertEquals("AIDREG", aidregA.getMqcName());
+		assertEquals("AIDREG", aidregA.getQuestionItemName());
 		assertEquals("1 - Oui, une aide aux activités de la vie quotidienne", aidregA.getText());
 		//
 		assertFalse(vqsVariables.getVariable("ADRESSE") instanceof McqVariable);
