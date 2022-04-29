@@ -98,14 +98,15 @@
             </xsl:if>
             
             <!-- UCQ variables -->
+            <xsl:if test="$root//d:QuestionScheme/d:QuestionItem[r:OutParameter/r:ParameterName/r:String=$variable-name]">
+                <QuestionItemName><xsl:value-of select="$root//d:QuestionScheme/d:QuestionItem[r:OutParameter/r:ParameterName/r:String=$variable-name]/d:QuestionItemName/r:String"/></QuestionItemName>
+            </xsl:if>
             <xsl:if test="l:VariableRepresentation/r:CodeRepresentation and not(l:VariableRepresentation/r:CodeRepresentation//r:CodeReference/r:ID='INSEE-COMMUN-CL-Booleen-1')">
                 <xsl:variable name="code-id" select="current()/l:VariableRepresentation/r:CodeRepresentation/r:CodeListReference/r:ID"/>
                 <Values>
                     <xsl:apply-templates select="$root//l:CodeListScheme/l:CodeList[r:ID=$code-id]/l:Code" mode="ucqInfo"/>
                 </Values>
-                
             </xsl:if>
-            
         </Variable>
     </xsl:template>
     

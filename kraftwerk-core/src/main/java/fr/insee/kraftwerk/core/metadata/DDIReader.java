@@ -23,7 +23,7 @@ public class DDIReader {
 	 * written in the system temporary folder with the name 'variables.xml', and is
 	 * deleted when the virtual machine terminates.
 	 *
-	 * @param DDIUrl 	: Path to the DDI file.
+	 * @param DDIUrl : Path to the DDI file.
 	 *
 	 * @return The variables found in the DDI.
 	 */
@@ -118,6 +118,8 @@ public class DDIReader {
 					VariableType variableType = VariableType
 							.valueOf(variableElement.getFirstChildElement("Format").getValue());
 					String variableLength = variableElement.getFirstChildElement("Size").getValue();
+
+					Element questionItemName = variableElement.getFirstChildElement("QuestionItemName");
 					//
 					Element valuesElement = variableElement.getFirstChildElement("Values");
 					//
@@ -125,6 +127,13 @@ public class DDIReader {
 					//
 					if (valuesElement != null) {
 						UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
+						if (questionItemName != null) {
+							variable.setQuestionItemName(questionItemName.getValue());
+						} else {
+							if (mcqElement != null) {
+								variable.setQuestionItemName(mcqElement.getValue());
+							}
+						}
 						Elements valueElements = valuesElement.getChildElements("Value");
 						for (int k = 0; k < valueElements.size(); k++) {
 							Element valueElement = valueElements.get(k);
@@ -133,22 +142,24 @@ public class DDIReader {
 						variablesMap.putVariable(variable);
 					} else if (mcqElement != null) {
 						McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
-						variable.setMqcName(mcqElement.getValue());
+						variable.setQuestionItemName(mcqElement.getValue());
 						variable.setText(variableElement.getFirstChildElement("Label").getValue());
 						variablesMap.putVariable(variable);
 					} else {
 						Variable variable = new Variable(variableName, group, variableType, variableLength);
+						if (questionItemName != null) {
+							variable.setQuestionItemName(questionItemName.getValue());
+						} else {
+							variable.setQuestionItemName(variableName);
+						}
 						variablesMap.putVariable(variable);
 					}
 				}
 			} catch (NullPointerException e) {
-				log.error(String.format("Missing field in mandatory information for variable %s", groupElements.get(i).getAttributeValue("name")));
+				log.error(String.format("Missing field in mandatory information for variable %s",
+						groupElements.get(i).getAttributeValue("name")));
 			}
 
-			// Normalize the root group name
-			if (rootGroupName == null) {
-				log.debug("Failed to identify the root group while reading variables files: " + variablesFilePath);
-			}
 			for (String groupName : variablesMap.getSubGroupNames()) {
 				Group group = variablesMap.getGroup(groupName);
 				if (group.getParentName().equals(rootGroupName)) {
@@ -157,7 +168,10 @@ public class DDIReader {
 			}
 
 		}
-
+		// Normalize the root group name
+		if (rootGroupName == null) {
+			log.debug("Failed to identify the root group while reading variables files: " + variablesFilePath);
+		}
 		return variablesMap;
 	}
 }

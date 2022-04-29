@@ -174,13 +174,13 @@ public class VariablesMap {
         return variables.values().stream()
                 .filter(variable -> variable instanceof McqVariable)
                 .anyMatch(mcqVariable -> // (FILTER_RESULT variables are upper case)
-                        ((McqVariable) mcqVariable).getMqcName().equals(questionName)
-                                || ((McqVariable) mcqVariable).getMqcName().toUpperCase().equals(questionName));
+                        ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName)
+                                || ((McqVariable) mcqVariable).getQuestionItemName().toUpperCase().equals(questionName));
     }
     public Group getMcqGroup(String questionName) {
         return variables.values().stream()
                 .filter(variable -> variable instanceof McqVariable)
-                .filter(mcqVariable -> ((McqVariable) mcqVariable).getMqcName().equals(questionName))
+                .filter(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName))
                 .map(Variable::getGroup)
                 .findFirst().orElse(null);
     }
@@ -193,11 +193,38 @@ public class VariablesMap {
         }
         return false;
     }
+
+	/** Return true if there is a UCQ variable depending on a MCQ variable with the name given. */
+	public boolean hasUcqMcq(String variableName) {
+        Variable variable = variables.get(variableName);
+        if (variable != null) {
+            return variable instanceof UcqVariable && !((UcqVariable) variable).getQuestionItemName().isEmpty();
+        }
+        return false;
+    }
 	/** Return the list of all UCQ variables registered in the map. */
 	public List<UcqVariable> getUcqVariables() {
         return variables.values().stream()
                 .filter(variable -> variable instanceof UcqVariable)
                 .map(variable -> (UcqVariable) variable)
+                .collect(Collectors.toList());
+    }
+	/** Return the list of all names of UCQ variables registered in the map. */
+    public List<String> getUcqVariablesNames() {
+        return variables.values().stream()
+                .filter(variable -> variable instanceof UcqVariable)
+                .map(ucqVariable -> ((UcqVariable) ucqVariable).getQuestionItemName())
+                .filter(x -> x!=null)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+	/** Return the list of all names of MCQ variables registered in the map. */
+    public List<String> getMcqVariablesNames() {
+        return variables.values().stream()
+                .filter(variable -> variable instanceof McqVariable)
+                .map(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName())
+                .filter(x -> x!=null)
+                .distinct()
                 .collect(Collectors.toList());
     }
     /** Return the list of all paper UCQ indicators registered in the map. */
