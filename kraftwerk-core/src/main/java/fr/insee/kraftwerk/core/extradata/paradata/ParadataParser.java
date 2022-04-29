@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.McqVariable;
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -92,11 +95,7 @@ public class ParadataParser {
 				ParadataVariable paradataVariable = new ParadataVariable(identifier, event.getIdSession());
 				ParadataOrchestrator paradataOrchestrator = new ParadataOrchestrator(identifier, event.getIdSession());
 				ParadataSession paradataSession = new ParadataSession(identifier, event.getIdSession());
-				if (surveyRawData.getVariablesMap().getVariables().containsKey(event.getIdParadataObject().toUpperCase())) {
-					/*
-					 * For now, only the PRENOM variable is getting the treatment -> generalize
-					 * later
-					 */
+				if (surveyRawData.getVariablesMap().getVariableNames().contains(event.getIdParadataObject())) {
 					paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());
 					JSONObject jsonObj = new JSONObject(collected_event);
 					// Change value -> not String dependant
@@ -125,13 +124,17 @@ public class ParadataParser {
 					paradataUE.addParadataSessions(paradataSession);
 
 				} else {
-					log.warn("Unexpected paradata for SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
-							+ collected_event.get(timestamp));
+				String variableName = event.getIdParadataObject().substring(Constants.FILTER_RESULT_PREFIX.length());
+					if (!surveyRawData.getVariablesMap().getVariableNames().contains(variableName) &&
+							!surveyRawData.getVariablesMap().getUcqVariablesNames().contains(variableName) &&
+							!surveyRawData.getVariablesMap().getMcqVariablesNames().contains(variableName)) {
+						log.warn("Unexpected paradata (unknown variable " + variableName + ") with SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
+								+ collected_event.get(timestamp));
+					}
 				}
 				events.add(event);
 			}
 		}
-
 		paradataUE.setEvents(events);
 	}
 
@@ -164,17 +167,20 @@ public class ParadataParser {
 	 */
 	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
-		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "30");
-		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "20");
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "3");
+		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME,
+				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "30");
+		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
+				surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "20");
+		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME,
+				surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "3");
 		try {
 			surveyRawData.getVariablesMap().putVariable(variableDuree);
 			surveyRawData.getVariablesMap().putVariable(variableDureeBrute);
 			surveyRawData.getVariablesMap().putVariable(variableNombre);
 			for (String variableName : paradataVariables) {
 				if (variableName.contentEquals("PRENOM")) {
-					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName, surveyRawData.getVariablesMap().getRootGroup(),
-							VariableType.STRING, "3");
+					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName,
+							surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "3");
 					surveyRawData.getVariablesMap().putVariable(variable);
 				}
 			}
