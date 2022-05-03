@@ -196,7 +196,9 @@ public class ImportScripts {
 				// We write the format instructions if we have inrofmations on the length of the
 				// variables
 
-				if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
+				if (variable.getType().equals(VariableType.BOOLEAN)) {
+					script.append(String.format("informat %s $1. ;\n", variableName, length));
+				} else if (variable.getType().equals(VariableType.STRING)
 						|| variable.getType().equals(VariableType.DATE)) {
 					script.append(String.format("informat %s $%s. ;\n", variableName, length));
 				} else if (variable.getType().equals(VariableType.INTEGER)

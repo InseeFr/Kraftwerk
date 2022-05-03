@@ -76,7 +76,7 @@ public class TableScriptInfo {
 							// Filter results are boolean, value "true" or "false"
 							if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
 								result.put(variableName, new Variable(variableName,
-										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "5"));
+										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "1"));
 							} else {
 							// new Variable, we keep it like that
 							result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),

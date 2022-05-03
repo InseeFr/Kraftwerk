@@ -2,7 +2,10 @@ package fr.insee.kraftwerk.core.outputs;
 
 import com.opencsv.CSVWriter;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +77,7 @@ public class CsvTableWriter {
 					String[] csvRow = new String[rowSize];
 					for (String variableName : variablesList) {
 						int csvColumn = columnsMap.get(variableName);
-						String value = getDataPointValue(dataPoint, variableName);
+						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 						csvRow[csvColumn] = value;
 					}
 					writer.writeNext(csvRow);
@@ -91,7 +94,7 @@ public class CsvTableWriter {
 						// Verifying that the dataset contains the variable from existing CSV File
 						if (columnsMap.containsKey(variableName)) {
 							int csvColumn = columnsMap.get(variableName);
-							String value = getDataPointValue(dataPoint, variableName);
+							String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 							csvRow[csvColumn] = value;
 						}
 						variablesListToUse.remove(variableName);
@@ -100,7 +103,7 @@ public class CsvTableWriter {
 					for (String variableName : variablesListToUse) {
 
 						int csvColumn = columnsMap.get(variableName);
-						String value = getDataPointValue(dataPoint, variableName);
+						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 						csvRow[csvColumn] = value;
 					}
 
@@ -148,7 +151,7 @@ public class CsvTableWriter {
 			String[] csvRow = new String[rowSize];
 			for (String variableName : variablesList) {
 				int csvColumn = columnsMap.get(variableName);
-				String value = getDataPointValue(dataPoint, variableName);
+				String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 				csvRow[csvColumn] = value;
 			}
 			writer.writeNext(csvRow);
@@ -164,11 +167,18 @@ public class CsvTableWriter {
 	 * Return the datapoint properly formatted value for the variable given. Line
 	 * breaks are replaced by spaces. NOTE: may be improved/enriched later on.
 	 */
-	private static String getDataPointValue(DataPoint dataPoint, String variableName) {
-		Object content = dataPoint.get(variableName);
+	static String getDataPointValue(DataPoint dataPoint, Component variable) {
+		Object content = dataPoint.get(variable.getName());
 		if (content == null) {
 			return "";
 		} else {
+			if (variable.getType().equals(Boolean.class)) {
+				if (content.equals(true)) {
+					content = "1";
+				} else if (content.equals(false)) {
+					content = "0";
+				}
+			}
 			String value = content.toString();
 			value = value.replace('\n', ' ');
 			value = value.replace('\r', ' ');
