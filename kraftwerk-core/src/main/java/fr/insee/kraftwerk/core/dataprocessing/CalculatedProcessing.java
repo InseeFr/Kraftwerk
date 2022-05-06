@@ -74,7 +74,7 @@ public class CalculatedProcessing extends DataProcessing {
 
     /** If the variable name after "FILTER_RESULT_" is recognized in the variables map,
      * a variable corresponding to the given filter result is added in the map with the right group. */
-    private void addFilterResult(String filterResultName, VariablesMap variablesMap) {
+    public void addFilterResult(String filterResultName, VariablesMap variablesMap) {
         String correspondingVariableName = filterResultName.replace("FILTER_RESULT_", "");
         Group group;
         if (variablesMap.hasVariable(correspondingVariableName)) { // the variable is directly found
