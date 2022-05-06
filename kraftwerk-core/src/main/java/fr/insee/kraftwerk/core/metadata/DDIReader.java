@@ -129,10 +129,8 @@ public class DDIReader {
 						UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
 						if (questionItemName != null) {
 							variable.setQuestionItemName(questionItemName.getValue());
-						} else {
-							if (mcqElement != null) {
-								variable.setQuestionItemName(mcqElement.getValue());
-							}
+						} else if (mcqElement != null) {
+							variable.setQuestionItemName(mcqElement.getValue());
 						}
 						Elements valueElements = valuesElement.getChildElements("Value");
 						for (int k = 0; k < valueElements.size(); k++) {
