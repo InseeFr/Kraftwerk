@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.inputs.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.parsers.DataFormat;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -36,35 +38,16 @@ public class ImportScripts {
 		StringBuilder script = new StringBuilder();
 
 		for (TableScriptInfo tableScriptInfo : tableScriptInfoList) {
-
+			String tableName = tableScriptInfo.getTableName();
 			// function call
-			script.append(String.format("%s <- data.table::fread(\n", tableScriptInfo.getTableName()));
+			script.append(String.format("%s <- data.table::fread(\n", tableName));
 
 			// file, sep and header parameter
 			script.append(String.format("file=\"%s\", \n", tableScriptInfo.getCsvFileName()));
 			script.append(String.format("sep=\"%s\", \n", Constants.CSV_OUTPUTS_SEPARATOR));
+			script.append("encoding = \"UTF-8\", \n");
+
 			script.append("header=TRUE, \n");
-
-			// colClasses parameter
-			// NOTE: we don't specify variables in String or Number format since the
-			// instruction is too long if the dataset has many
-			// variables, and R seems to get them correctly anyway
-			script.append("colClasses = c( ");
-
-			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
-					metadataVariables);
-			for (String variableName : listVariables.keySet()) {
-				VariableType variableType = listVariables.get(variableName).getType();
-				if (!variableType.equals(VariableType.STRING) && !variableType.equals(VariableType.INTEGER)
-						&& !variableType.equals(VariableType.NUMBER)) {
-
-					script.append(String.format("'%s'='%s',", variableName, getDataTableType(variableType)));
-				}
-			}
-			script.deleteCharAt(script.length() - 1);
-			script.append("), \n");
-
 			// quote parameter
 			if (Constants.CSV_OUTPUTS_QUOTE_CHAR == '"') { // TODO: condition always true, but not later if we let the
 															// user choose
@@ -73,6 +56,38 @@ public class ImportScripts {
 				script.append(String.format("quote=\"%s\")", Constants.CSV_OUTPUTS_QUOTE_CHAR));
 			}
 
+			script.append("\n\n");
+
+			// specify format variables
+			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
+			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
+					metadataVariables);
+			for (String variableName : listVariables.keySet()) {
+				VariableType variableType = listVariables.get(variableName).getType();
+
+				script.append(String.format("%s$%s <- as.", tableName, variableName));
+				switch (variableType) {
+				case STRING:
+					script.append("character");
+					break;
+				case NUMBER:
+					script.append("numeric");
+					break;
+				case INTEGER:
+					script.append("integer");
+					break;
+				case BOOLEAN:
+					script.append("logical");
+					break;
+				case DATE:
+					script.append("Date");
+					break;
+				default:
+					throw new UnknownDataFormatException("Unknown data format: " + variableType);
+				}
+				script.append(String.format("(%s$%s)\n", tableName, variableName));
+
+			}
 			script.append("\n\n");
 		}
 
