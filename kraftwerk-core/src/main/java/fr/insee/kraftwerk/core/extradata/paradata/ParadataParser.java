@@ -177,9 +177,6 @@ public class ParadataParser {
 	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
-		for (String paradataVariableName : paradataVariables) {
-			CalculatedProcessing.addFilterResult(paradataVariableName, variablesMap);
-		}
 		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME,
 				variablesMap.getRootGroup(), VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
