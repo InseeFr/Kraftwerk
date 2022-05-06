@@ -19,7 +19,7 @@
 		<dependency>
 		    <groupId>fr.insee.kraftwerk</groupId>
 		    <artifactId>kraftwerk-core</artifactId>
-		    <version>1.1.0-SNAPSHOT</version>
+		    <version>1.1.1</version>
 	    </dependency>
 
 		<!-- Spring Batch -->
