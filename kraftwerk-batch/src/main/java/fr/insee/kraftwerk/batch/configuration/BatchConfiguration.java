@@ -33,8 +33,8 @@ public class BatchConfiguration {
 	private final Launcher launcher=new Launcher();
 
 	@Bean
-	public Job uniqueJob(Step stepEtl) {
-		return this.jobBuilderFactory.get("uniqueJob")
+	public Job batchJob(Step stepEtl) {
+		return this.jobBuilderFactory.get("batchJob")
 				.start(stepEtl)
 				.build();
 	}
