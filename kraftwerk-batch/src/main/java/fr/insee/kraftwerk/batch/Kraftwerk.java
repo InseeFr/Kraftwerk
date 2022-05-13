@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
-public class Kraftwerk{
+public class Kraftwerk {
 
 	public static void main(String[] args) {
-		System.exit(SpringApplication.exit(SpringApplication.run(Kraftwerk.class)));
+		System.exit(SpringApplication.exit(SpringApplication.run(Kraftwerk.class, args)));
 	}
 
 }
