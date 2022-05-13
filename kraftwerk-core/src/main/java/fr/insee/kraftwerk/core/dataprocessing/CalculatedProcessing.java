@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -75,7 +76,7 @@ public class CalculatedProcessing extends DataProcessing {
     /** If the variable name after "FILTER_RESULT_" is recognized in the variables map,
      * a variable corresponding to the given filter result is added in the map with the right group. */
     private void addFilterResult(String filterResultName, VariablesMap variablesMap) {
-        String correspondingVariableName = filterResultName.replace("FILTER_RESULT_", "");
+        String correspondingVariableName = filterResultName.replace(Constants.FILTER_RESULT_PREFIX, "");
         Group group;
         if (variablesMap.hasVariable(correspondingVariableName)) { // the variable is directly found
             group = variablesMap.getVariable(correspondingVariableName).getGroup();
