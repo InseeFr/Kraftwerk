@@ -96,7 +96,7 @@ public class Launcher {
 				}
 
 				/* Step 2.4a : Convert data object to a VTL Dataset */
-				data.setDataMode(dataMode);
+				data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
 				vtlBindings.convertToVtlDataset(data, dataMode);
 
 				/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
