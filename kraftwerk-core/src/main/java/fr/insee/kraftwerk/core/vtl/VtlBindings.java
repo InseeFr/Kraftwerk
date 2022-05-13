@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.vtl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -22,6 +24,7 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -84,6 +87,24 @@ public class VtlBindings {
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName);
+    }
+
+    /**
+     * Write the dataset registered under given name as a json file (Trevas module format).
+     * @param bindingName Name of a dataset stored in the bindings.
+     * @param jsonOutFile Path to write the output json file.
+     * */
+    public void writeJsonDataset(String bindingName, Path jsonOutFile) {
+        if (bindings.containsKey(bindingName)) {
+            try {
+                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(getDataset(bindingName)));
+            } catch (JsonProcessingException e) {
+                log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
+            }
+        } else {
+            log.debug(String.format("No dataset under name '%s' in the bindings.", bindingName));
+        }
+
     }
 
     /**
