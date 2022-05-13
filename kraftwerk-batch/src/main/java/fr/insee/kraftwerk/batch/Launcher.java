@@ -186,7 +186,7 @@ public class Launcher {
 	}
 
 	/**
-	 * Change /monDossier/in/vqs to /monDossier/out/vqs
+	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
 	 */
 	public Path transformToOut(Path inDirectory) {
 		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve("out")
