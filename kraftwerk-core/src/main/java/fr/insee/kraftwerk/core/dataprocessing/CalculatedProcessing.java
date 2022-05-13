@@ -82,7 +82,7 @@ public class CalculatedProcessing extends DataProcessing {
             group = variablesMap.getVariable(correspondingVariableName).getGroup();
         } else if (variablesMap.hasMcq(correspondingVariableName)) { // otherwise, it should be from a MCQ
             group = variablesMap.getMcqGroup(correspondingVariableName);
-        } else {
+        } else { //TODO : FIXME ?????
             group = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
             log.warn(String.format(
                     "No information from the DDI about question or variable named \"%s\".",
