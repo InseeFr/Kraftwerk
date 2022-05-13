@@ -42,7 +42,7 @@ public class Launcher {
 
 		if (verifyInDirectory(inDirectory)) {
 
-			String campaignName = readCampaignName(inDirectory);
+			String campaignName = inDirectory.getFileName().toString();
 
 			log.info("===============================================================================================");
 			log.info("Kraftwerk batch started for campaign: " + campaignName);
@@ -191,16 +191,6 @@ public class Launcher {
 	public Path transformToOut(Path inDirectory) {
 		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve("out")
 				: transformToOut(inDirectory.getParent()).resolve(inDirectory.getFileName());
-	}
-
-	/** Get the campaign name using the folder name. */
-	public static String readCampaignName(Path inDirectory) {
-		// If the path contains a "/in" folder, we get the following name in the path
-		return inDirectory.toString().contains("/in/")
-				? "in".equals(inDirectory.getParent().getFileName().toString()) ? inDirectory.getFileName().toString()
-						: readCampaignName(inDirectory.getParent())
-				// If not, then we get the last folder
-				: inDirectory.getFileName().toString();
 	}
 
 }
