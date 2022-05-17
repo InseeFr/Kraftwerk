@@ -3,10 +3,19 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.stream.Collectors;
+import static java.util.Comparator.comparingLong;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
+import net.sf.saxon.expr.PJConverter.ToCollection;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public class ParaDataUE {
 
@@ -138,15 +147,14 @@ public class ParaDataUE {
 	 * @param paraData the paradata
 	 */
 	public void sortEvents() {
-		List<Event> eventsToSort = this.getEvents();
-		Collections.sort(eventsToSort, Comparator.comparingLong(Event::getTimestamp));
-		for (int index = 0; index < eventsToSort.size() - 1; index++) {
-			// TODO : à discuter
-			if (eventsToSort.get(index).getTimestamp() == eventsToSort.get(index + 1).getTimestamp()) {
-				eventsToSort.remove(index + 1);
-			}
-		}
-		this.setEvents(eventsToSort);
+		this.setEvents(this.getEvents()
+				.stream()
+				.distinct()
+				.collect(collectingAndThen(toCollection(() -> new TreeSet<>(
+						Comparator
+						.comparingLong(Event::getTimestamp)
+						.thenComparing(Event::getIdParadataObject))),
+						ArrayList::new)));
 	}
 
 	/**
@@ -181,6 +189,7 @@ public class ParaDataUE {
 					session.setIdentifier(event.getIdSession());
 				}
 				if (event.getIdParadataObject().contentEquals("init-session")) {
+
 					if (session.getInitialization() == 0) {
 						session.setInitialization((long) event.getTimestamp());
 					} else {
@@ -203,7 +212,6 @@ public class ParaDataUE {
 				if (orchestrator.getInitialization() == 0
 						&& event.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
 					orchestrator.setInitialization((long) event.getTimestamp());
-
 				} else if (orchestrator.getInitialization() != 0
 						&& event.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
 
@@ -220,14 +228,20 @@ public class ParaDataUE {
 						}
 					}
 				} else if (event.getIdParadataObject().contentEquals("validate-button-orchestrator-collect")) {
+					// On valide l'orchestrateur
 					previous_event = listParadataEvents.get(j - 1);
 					// Si on n'a pas eu d'initialisation d'orchestrateur après l'initialisation de
 					// la session, on prend pour début le même timestamp que pour la session
 					if (orchestrator.getInitialization() == 0) {
-						orchestrator.setInitialization(
-								this.getSessions().get(this.getSessions().size() - 1).getInitialization());
+						if (this.getSessions().size() == 0) {
+							orchestrator.setInitialization(session.getInitialization());
+						} else {
+							orchestrator.setInitialization(
+									this.getSessions().get(this.getSessions().size() - 1).getInitialization());
+						}
 					}
 
+					// On ajoute l'orchestrateur
 					if (orchestrator.getInitialization() < previous_event.getTimestamp()) {
 						orchestrator.setValidation((long) event.getTimestamp());
 
