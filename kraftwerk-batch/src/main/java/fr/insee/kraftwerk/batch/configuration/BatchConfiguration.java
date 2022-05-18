@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.function.Function;
 
 @Configuration
@@ -24,6 +25,9 @@ public class BatchConfiguration {
 
 	@Value("${fr.insee.kraftwerk.inDirectory}")
 	private String inDirectory;
+
+	@Value("${spring.batch.job.names}")
+	private String[] jobEnabled;
 
 	@Autowired
 	Environment environment;
@@ -58,13 +62,15 @@ public class BatchConfiguration {
 	@Bean
 	protected Step userVtlStep() {
 		UserVtlBatch userVtlBatch = new UserVtlBatch();
-		String campaignName = environment.getProperty("campaignName");
-		if (campaignName != null) {
-			userVtlBatch.setCampaignDirectory(Path.of(inDirectory).resolve(campaignName));
-			return stepBuilderFactory.get("userVtlStep").tasklet(userVtlBatch).build();
-		} else {
-			throw new RuntimeException("Missing value for parameter 'campaignName'.");
+		if (Arrays.asList(jobEnabled).contains("userVtlJob")) {
+			String campaignName = environment.getProperty("campaignName");
+			if (campaignName != null) {
+				userVtlBatch.setCampaignDirectory(Path.of(inDirectory).resolve(campaignName));
+			} else {
+				throw new RuntimeException("Missing value for parameter 'campaignName'.");
+			}
 		}
+		return stepBuilderFactory.get("userVtlStep").tasklet(userVtlBatch).build();
 	}
 
 	@Bean
