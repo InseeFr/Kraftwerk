@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import org.json.simple.JSONArray;
@@ -64,7 +65,7 @@ public class ParadataParser {
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) {
 		// To convert to a entire folder instead of a single file
 		Path filePath = paradataUE.getFilepath();
-
+		VariablesMap variablesMap = surveyRawData.getVariablesMap();
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
@@ -92,11 +93,8 @@ public class ParadataParser {
 				ParadataVariable paradataVariable = new ParadataVariable(identifier, event.getIdSession());
 				ParadataOrchestrator paradataOrchestrator = new ParadataOrchestrator(identifier, event.getIdSession());
 				ParadataSession paradataSession = new ParadataSession(identifier, event.getIdSession());
-				if (surveyRawData.getVariablesMap().getVariables().containsKey(event.getIdParadataObject().toUpperCase())) {
-					/*
-					 * For now, only the PRENOM variable is getting the treatment -> generalize
-					 * later
-					 */
+				
+				if (variablesMap.getVariableNames().contains(event.getIdParadataObject())) {
 					paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());
 					JSONObject jsonObj = new JSONObject(collected_event);
 					// Change value -> not String dependant
@@ -118,20 +116,40 @@ public class ParadataParser {
 				} else if (event.getIdParadataObject().toUpperCase().contains("ORCHESTRATOR")) {
 					paradataOrchestrator.setTimestamp((long) collected_event.get(timestamp));
 					paradataOrchestrator.setObjectName((String) collected_event.get("idParadataObject"));
-					paradataUE.addParadataOrchestrators(paradataOrchestrator);
+					paradataUE.addParadataOrchestrator(paradataOrchestrator);
 
 				} else if (event.getIdParadataObject().toUpperCase().contains("SESSION")) {
 					paradataSession.setTimestamp((long) collected_event.get(timestamp));
-					paradataUE.addParadataSessions(paradataSession);
+					paradataUE.addParadataSession(paradataSession);
 
 				} else {
-					log.warn("Unexpected paradata for SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
-							+ collected_event.get(timestamp));
+					if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
+						String variableName = event.getIdParadataObject()
+								.substring(Constants.FILTER_RESULT_PREFIX.length());
+						if (!variablesMap.getVariableNames().contains(variableName)
+								&& !variablesMap.getUcqVariablesNames().contains(variableName)
+								&& !variablesMap.getMcqVariablesNames().contains(variableName)) {
+							// log.warn("Unexpected paradata (unknown variable " + variableName + ") with
+							// SurveyUnit " + event.getIdSurveyUnit() + " at timestamp "
+							// + collected_event.get(timestamp));
+
+						}
+						paradataVariable.setVariableName(event.getIdParadataObject());
+						paradataVariable.setTimestamp((long) collected_event.get(timestamp));
+						paradataVariable.setValue(collected_event.get("newValue"));
+						paradataUE.addParadataVariable(paradataVariable);
+
+					} else {
+						// log.warn("Unexpected paradata (unknown variable " +
+						// event.getIdParadataObject() + ") with SurveyUnit " + event.getIdSurveyUnit()
+						// + " at timestamp "
+						// + collected_event.get(timestamp));
+					}
 				}
+			
 				events.add(event);
 			}
 		}
-
 		paradataUE.setEvents(events);
 	}
 
@@ -163,19 +181,23 @@ public class ParadataParser {
 	 * @param surveyRawData dataset where the paradata will be saved
 	 */
 	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
+		VariablesMap variablesMap = surveyRawData.getVariablesMap();
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
-		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "30");
-		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG", surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "20");
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, surveyRawData.getVariablesMap().getRootGroup(), VariableType.INTEGER, "3");
+		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+				VariableType.STRING, "30");
+		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
+				variablesMap.getRootGroup(), VariableType.INTEGER, "20");
+		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+				VariableType.INTEGER, "3");
 		try {
-			surveyRawData.getVariablesMap().putVariable(variableDuree);
-			surveyRawData.getVariablesMap().putVariable(variableDureeBrute);
-			surveyRawData.getVariablesMap().putVariable(variableNombre);
+			variablesMap.putVariable(variableDuree);
+			variablesMap.putVariable(variableDureeBrute);
+			variablesMap.putVariable(variableNombre);
 			for (String variableName : paradataVariables) {
 				if (variableName.contentEquals("PRENOM")) {
-					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName, surveyRawData.getVariablesMap().getRootGroup(),
-							VariableType.STRING, "3");
-					surveyRawData.getVariablesMap().putVariable(variable);
+					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName,
+							variablesMap.getRootGroup(), VariableType.STRING, "3");
+					variablesMap.putVariable(variable);
 				}
 			}
 		} catch (Exception e) {

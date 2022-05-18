@@ -63,7 +63,7 @@ public abstract class DataProcessing {
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
         log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
                 vtlScript));
-        if (!(vtlScript.isEmpty() || vtlScript.toString().contentEquals(""))) {
+        if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
             vtlBindings.evalVtlScript(vtlScript);
         }
     }

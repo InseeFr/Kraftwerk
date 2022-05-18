@@ -1,15 +1,14 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +30,8 @@ public class CleanUpProcessing extends DataProcessing {
 
     /**
      * Clean up step consists in:
-     * - removing the paper ucq variables,
+     * - removing the paper ucq variables in the multimode dataset,
+     * - removing the corresponding variable objects from the variables object,
      * - removing the unimodal datasets.
      *
      * @param bindingName The name of the multimode dataset.
@@ -42,11 +42,13 @@ public class CleanUpProcessing extends DataProcessing {
     public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects) {
         // Get the metadata object
         metadataVariables = (Map<String, VariablesMap>) objects[0]; // TODO: better management of metadata object
-        // Remove paper UCQ variables
+        // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName, metadataVariables);
         log.info(String.format("Automated clean up instructions after step %s:\n%s", getStepName(),
                 cleanUpScript));
         vtlBindings.evalVtlScript(cleanUpScript);
+        // Remove corresponding variables in VariablesMap
+        removePaperUcqVariables();
         // Remove unimodal datasets
         removeUnimodalDatasets();
     }
@@ -75,6 +77,13 @@ public class CleanUpProcessing extends DataProcessing {
             vtlScript.add(dropInstruction.toString());
         }
         return vtlScript;
+    }
+
+    /** Remove PaperUcq variables from concerned VariablesMap */
+    private void removePaperUcqVariables() {
+        for (VariablesMap variablesMap : metadataVariables.values()) {
+            variablesMap.getVariables().values().removeIf(variable -> variable instanceof PaperUcq);
+        }
     }
 
     /** Remove unimodal dataset from the bindings. */

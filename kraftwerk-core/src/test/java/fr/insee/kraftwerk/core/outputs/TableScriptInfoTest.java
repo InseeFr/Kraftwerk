@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -35,21 +36,24 @@ public class TableScriptInfoTest {
 	}
 
 	private void instantiateMap() {
-		metadataVariables.put("CAWI", VariablesMapTest.createFakeVariablesMap());
+		metadataVariables.put("CAWI", VariablesMapTest.createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		srdWeb.setVariablesMap(VariablesMapTest.createFakeVariablesMap());
+		srdWeb.setVariablesMap(VariablesMapTest.createCompleteFakeVariablesMap());
 		vtlBindings.convertToVtlDataset(srdWeb, "CAWI");
 		
 		metadataVariables.put("PAPI", VariablesMapTest.createAnotherFakeVariablesMap());
 		SurveyRawData srdPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
 		srdPaper.setVariablesMap(VariablesMapTest.createAnotherFakeVariablesMap());
 		vtlBindings.convertToVtlDataset(srdPaper, "PAPI");
-		
+
+		// add group prefixes
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
+		groupProcessing.applyVtlTransformations("CAWI", null, srdWeb.getVariablesMap());
+		groupProcessing.applyVtlTransformations("PAPI", null, srdPaper.getVariablesMap());
+
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
-		System.out.println(dataStructure.keySet());
-		System.out.println(metadataVariables.get("CAWI").getVariableNames());
-		System.out.println(metadataVariables.get("CAWI").getFullyQualifiedNames());
+		
 	}
 	
 	@Test
@@ -59,7 +63,7 @@ public class TableScriptInfoTest {
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
 		assertEquals("50", listVariables.get("AGE").getLength());
-		assertEquals("500", listVariables.get("CARS_LOOP.CAR_COLOR").getLength());
+		assertEquals("500", listVariables.get("CAR_COLOR").getLength());
 	}
 
 	@Test

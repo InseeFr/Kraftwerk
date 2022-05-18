@@ -100,7 +100,7 @@ public class DDIReaderTest {
 	@Test
 	public void readVqsWebVariables() throws MalformedURLException {
 
-		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
+		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
 				"RESIDM", "NHAB");
 
@@ -118,7 +118,7 @@ public class DDIReaderTest {
 		}
 		//
 		assertEquals(Constants.ROOT_GROUP_NAME, vqsVariables.getVariable("ADRESSE").getGroup().getName());
-		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("PRENOM").getGroup().getName());
+		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("prenom").getGroup().getName());
 		// UCQ
 		assertTrue(vqsVariables.getVariable("ETAT_SANT") instanceof UcqVariable);
 		UcqVariable etatSant = (UcqVariable) vqsVariables.getVariable("ETAT_SANT");
@@ -129,7 +129,7 @@ public class DDIReaderTest {
 		assertTrue(vqsVariables.getVariable("RELATION1") instanceof McqVariable);
 		assertTrue(vqsVariables.getVariable("RELATION4") instanceof McqVariable);
 		McqVariable aidregA = (McqVariable) vqsVariables.getVariable("AIDREG_A");
-		assertEquals("AIDREG", aidregA.getMqcName());
+		assertEquals("AIDREG", aidregA.getQuestionItemName());
 		assertEquals("1 - Oui, une aide aux activités de la vie quotidienne", aidregA.getText());
 		//
 		assertFalse(vqsVariables.getVariable("ADRESSE") instanceof McqVariable);

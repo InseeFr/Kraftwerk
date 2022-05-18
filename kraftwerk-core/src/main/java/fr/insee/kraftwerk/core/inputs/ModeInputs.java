@@ -14,6 +14,7 @@ public class ModeInputs {
 
     @Getter @Setter protected Path dataFile;
     @Getter @Setter protected URL DDIURL;
+    @Getter @Setter protected Path lunaticFile;
     @Getter         protected DataFormat dataFormat;
     @Getter @Setter protected String dataMode;
     @Getter @Setter protected Path modeVtlFile;

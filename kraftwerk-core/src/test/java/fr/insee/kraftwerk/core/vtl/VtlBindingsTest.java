@@ -72,7 +72,7 @@ public class VtlBindingsTest {
 
 		Dataset capi = vtlBindings.getDataset("Capi avec espace");
 		assertEquals(4, capi.getDataPoints().size());
-		assertEquals(9, capi.getDataStructure().keySet().size());
+		assertEquals(15, capi.getDataStructure().keySet().size());
 	}
 
 	@Test

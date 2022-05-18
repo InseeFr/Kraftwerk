@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.batch.configuration;
 
+import fr.insee.kraftwerk.batch.Launcher;
+import fr.insee.kraftwerk.batch.UserVtlBatch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -10,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import fr.insee.kraftwerk.batch.Launcher;
+import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +26,9 @@ public class BatchConfiguration {
 	private String inDirectory;
 
 	@Autowired
+	Environment environment;
+
+	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
@@ -33,8 +37,8 @@ public class BatchConfiguration {
 	private final Launcher launcher=new Launcher();
 
 	@Bean
-	public Job uniqueJob(Step stepEtl) {
-		return this.jobBuilderFactory.get("uniqueJob")
+	public Job batchJob(Step stepEtl) {
+		return this.jobBuilderFactory.get("batchJob")
 				.start(stepEtl)
 				.build();
 	}
@@ -48,6 +52,24 @@ public class BatchConfiguration {
 				.processor(processor)
 				.writer(b->{})
 				.build();
+	}
+
+
+	@Bean
+	protected Step userVtlStep() {
+		UserVtlBatch userVtlBatch = new UserVtlBatch();
+		String campaignName = environment.getProperty("campaignName");
+		if (campaignName != null) {
+			userVtlBatch.setCampaignDirectory(Path.of(inDirectory).resolve(campaignName));
+			return stepBuilderFactory.get("userVtlStep").tasklet(userVtlBatch).build();
+		} else {
+			throw new RuntimeException("Missing value for parameter 'campaignName'.");
+		}
+	}
+
+	@Bean
+	protected Job userVtlJob() {
+		return jobBuilderFactory.get("userVtlJob").start(userVtlStep()).build();
 	}
 
 }

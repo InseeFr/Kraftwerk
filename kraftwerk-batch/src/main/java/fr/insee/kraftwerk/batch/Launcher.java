@@ -9,9 +9,14 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
+import fr.insee.kraftwerk.core.metadata.LunaticReader;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
+import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -37,7 +42,7 @@ public class Launcher {
 
 		if (verifyInDirectory(inDirectory)) {
 
-			String campaignName = readCampaignName(inDirectory);
+			String campaignName = inDirectory.getFileName().toString();
 
 			log.info("===============================================================================================");
 			log.info("Kraftwerk batch started for campaign: " + campaignName);
@@ -47,7 +52,7 @@ public class Launcher {
 
 			/* Step 1 : Init */
 
-			UserInputs userInputs = new UserInputs(inDirectory + "/" + Constants.USER_INPUT_FILE, inDirectory);
+			UserInputs userInputs = new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
 
 			VtlBindings vtlBindings = new VtlBindings();
 
@@ -90,17 +95,34 @@ public class Launcher {
 					}
 				}
 
-				/* Step 2.4 : Convert data object to a VTL Dataset */
-				data.setDataMode(dataMode);
+				/* Step 2.4a : Convert data object to a VTL Dataset */
+				data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
 				vtlBindings.convertToVtlDataset(data, dataMode);
+
+				/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
+				if (modeInputs.getLunaticFile() != null) {
+					CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
+							modeInputs.getLunaticFile());
+					DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
+					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
+				} else {
+					log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
+					if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
+							|| modeInputs.getDataFormat() == DataFormat.LUNATIC_JSON) {
+						log.warn(String.format(
+								"Calculated variables for lunatic data of mode \"%s\" will not be evaluated.",
+								dataMode));
+					}
+				}
+
+				/* Step 2.4c : Prefix variable names with their belonging group names */
+				new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, data.getVariablesMap());
 
 				/* Step 2.5 : Apply mode-specific VTL transformations */
 				UnimodalDataProcessing dataProcessing = DataProcessingManager
 						.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
 				dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
-				
-				/* Step 2.6 : Save variablesMap of the dataset */
-				metadataVariables.put(dataMode, data.getVariablesMap());
+
 			}
 
 			/* Step 3 : multimodal VTL data processing */
@@ -137,7 +159,7 @@ public class Launcher {
 
 			/* Step 4.3 : move kraftwerk.json to a secondary folder */
 			outputFiles.renameInputFile(inDirectory);
-			
+
 			/* Step 4.4 : move differential data to a secondary folder */
 			outputFiles.moveInputFiles(userInputs);
 
@@ -164,21 +186,11 @@ public class Launcher {
 	}
 
 	/**
-	 * Change /monDossier/in/vqs to /monDossier/out/vqs
+	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
 	 */
 	public Path transformToOut(Path inDirectory) {
 		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve("out")
 				: transformToOut(inDirectory.getParent()).resolve(inDirectory.getFileName());
-	}
-
-	/** Get the campaign name using the folder name. */
-	public static String readCampaignName(Path inDirectory) {
-		// If the path contains a "/in" folder, we get the following name in the path
-		return inDirectory.toString().contains("/in/")
-				? "in".equals(inDirectory.getParent().getFileName().toString()) ? inDirectory.getFileName().toString()
-						: readCampaignName(inDirectory.getParent())
-				// If not, then we get the last folder
-				: inDirectory.getFileName().toString();
 	}
 
 }

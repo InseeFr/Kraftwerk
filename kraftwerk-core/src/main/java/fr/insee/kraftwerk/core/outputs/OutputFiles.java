@@ -208,10 +208,12 @@ public class OutputFiles {
 					new File(getRoot(modeInputs.getReportingDataFile(), campaignName)).mkdirs();
 				}
 				moveDirectory(
-						modeInputs.getReportingDataFile().toFile(),
+						modeInputs.getReportingDataFile().getParent().toFile(),
 						inputFolder.resolve("Archive")
 								.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
 				new File(modeInputs.getReportingDataFile().toString()).delete();
+				if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent())) {
+				}
 			}
 		}
 	}

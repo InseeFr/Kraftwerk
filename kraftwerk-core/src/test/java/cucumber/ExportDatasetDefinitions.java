@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import javax.script.Bindings;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -40,11 +41,14 @@ public class ExportDatasetDefinitions {
 	@When("I try to import the dataset named {string}")
 	public void importDataset(String nameDataset) throws Exception {
 		vtlBindings.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT");
+		// add group prefixes
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
+		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, survey.getVariablesMap());
 	}
 
 	@Then("I should get some dataset values from {string}")
 	public void checkDataset(String nameDataset) throws Exception {
-		assertEquals(9, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
+		assertEquals(15, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
 		assertEquals(4, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().size());
 		assertEquals("Purple", vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().get(0).get("CARS_LOOP.CAR_COLOR"));
 		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().keySet().contains(Constants.ROOT_IDENTIFIER_NAME));

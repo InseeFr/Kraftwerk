@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-public class ParadataOrchestrator extends Event{
+public class ParadataOrchestrator extends Event {
 
 	private String idSurveyUnit;
 

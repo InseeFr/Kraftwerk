@@ -40,8 +40,8 @@ public class OutputFilesTest {
 		assertDoesNotThrow(() -> {
 			//
 			testUserInputs = new UserInputs(
-					TestConstants.UNIT_TESTS_DIRECTORY + "/user_inputs/inputs_valid_several_modes.json",
-					Paths.get("/whatever/in"));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY));
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
@@ -76,8 +76,9 @@ public class OutputFilesTest {
 	public void moveFiles() {
 		String campaignName = "move_files";
 		//
-		testUserInputs = new UserInputs(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/move_files.json",
-				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName));
+		testUserInputs = new UserInputs(
+				Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName, "move_files.json"),
+				Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName));
 		Path inputFolder = testUserInputs.getInputDirectory();
 
 		Map<String, ModeInputs> modeInputsMap = testUserInputs.getModeInputsMap();

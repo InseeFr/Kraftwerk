@@ -20,6 +20,10 @@ public class UcqVariable extends Variable {
 	@Getter
 	List<UcqModality> modalities = new ArrayList<>();
 
+
+    /** Common name of the different modalities of the UCQ variable, if this variable is itself a modality of a Mcq variable. */
+    String mcqName;
+    
 	public UcqVariable(String name, Group group, VariableType type) {
 		super(name, group, type);
 		if (type != VariableType.STRING) {
@@ -35,7 +39,7 @@ public class UcqVariable extends Variable {
             log.warn("Type of a UCQ variable should be STRING.");
         }
     }
-
+	
 	/** POJO class to store information about a UQC modality. */
 	public static class UcqModality {
 

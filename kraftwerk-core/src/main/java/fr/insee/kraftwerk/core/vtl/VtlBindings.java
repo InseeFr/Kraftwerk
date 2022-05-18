@@ -3,8 +3,10 @@ package fr.insee.kraftwerk.core.vtl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -13,6 +15,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -21,9 +24,11 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -82,6 +87,24 @@ public class VtlBindings {
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName);
+    }
+
+    /**
+     * Write the dataset registered under given name as a json file (Trevas module format).
+     * @param bindingName Name of a dataset stored in the bindings.
+     * @param jsonOutFile Path to write the output json file.
+     * */
+    public void writeJsonDataset(String bindingName, Path jsonOutFile) {
+        if (bindings.containsKey(bindingName)) {
+            try {
+                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(getDataset(bindingName)));
+            } catch (JsonProcessingException e) {
+                log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
+            }
+        } else {
+            log.debug(String.format("No dataset under name '%s' in the bindings.", bindingName));
+        }
+
     }
 
     /**
@@ -155,6 +178,26 @@ public class VtlBindings {
             } catch (ScriptException e) {
                 log.warn("The following VTL instruction given is invalid and has been skipped:\n" + vtlScript);
                 log.warn(e.getMessage());
+            } catch (NumberFormatException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
+                log.warn("NumberFormatException caused by following VTL instruction:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("Corresponding variable could not be calculated.");
+            } catch (UnsupportedOperationException e) { // TODO: send issue to Trevas
+                log.warn("UnsupportedOperationException caused by following VTL instruction:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("Corresponding variable could not be calculated.");
+            } catch (NullPointerException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
+                log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.debug(e.getMessage());
+                log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
+            } catch (Error e) { // TODO: send issue to Trevas
+                log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.error(e.getMessage());
+                log.error("Probable cause: Syntax error.");
+            } catch (Exception e) {
+                log.warn("Exception thrown when trying to evaluate following expression:\n" + vtlScript);
+                log.warn(e.getMessage());
+                log.warn("UNKNOWN EXCEPTION PLEASE REPORT IT!");
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
@@ -176,6 +219,42 @@ public class VtlBindings {
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");
         }
+    }
+
+    // TODO: these methods might be used in some data processing classes
+    public static List<String> getComponentNamesWithRole(Dataset dataset, Dataset.Role role) {
+        if (dataset != null) {
+            return dataset.getDataStructure().values().stream()
+                    .filter(component -> component.getRole() == role)
+                    .map(Structured.Component::getName)
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+
+    }
+    public static List<String> getDatasetIdentifierNames(Dataset dataset) {
+        return getComponentNamesWithRole(dataset, Dataset.Role.IDENTIFIER);
+    }
+    public static List<String> getDatasetMeasureNames(Dataset dataset) {
+        return getComponentNamesWithRole(dataset, Dataset.Role.MEASURE);
+    }
+
+    /**
+     * Return identifier names in the dataset registered in the bindings under the given name.
+     * @param datasetName Name of a dataset stored in the bindings.
+     * @return List of the identifier names in the dataset, or null if there is no dataset under the given name.
+     */
+    public List<String> getDatasetIdentifierNames(String datasetName) {
+        return getDatasetIdentifierNames(this.getDataset(datasetName));
+    }
+    /**
+     * Return measure names in the dataset registered in the bindings under the given name.
+     * @param datasetName Name of a dataset stored in the bindings.
+     * @return List of the measure names in the dataset, or null if there is no dataset under the given name.
+     */
+    public List<String> getDatasetMeasureNames(String datasetName) {
+        return getDatasetMeasureNames(this.getDataset(datasetName));
     }
 
     /**
