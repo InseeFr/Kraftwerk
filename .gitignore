@@ -3,6 +3,8 @@ local_files/in/*
 !local_files/in/.gitkeep
 local_files/out/*
 !local_files/out/.gitkeep
+local_files/logs/*
+!local_files/logs/.gitkeep
 
 # Config
 src/main/resources/application-*.properties
