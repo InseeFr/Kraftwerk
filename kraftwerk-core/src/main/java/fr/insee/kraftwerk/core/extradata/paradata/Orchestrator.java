@@ -9,8 +9,6 @@ public class Orchestrator {
 
 	private long validation;
 
-	private long duree;
-
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -34,15 +32,7 @@ public class Orchestrator {
 	public void setValidation(long validation) {
 		this.validation = validation;
 	}
-
-	public long getDuree() {
-		return duree;
-	}
-
-	public void setDuree(long duree) {
-		this.duree = duree;
-	}
-
+	
 	public Orchestrator() {
 		super();
 	}
