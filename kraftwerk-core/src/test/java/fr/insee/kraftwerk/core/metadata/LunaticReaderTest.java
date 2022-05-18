@@ -36,5 +36,18 @@ public class LunaticReaderTest {
         assertTrue(calculatedVariables.getDependantVariables("ANNEENQ").isEmpty());
 
     }
+    
+    @Test
+    public void readLogX22WebLunaticFile() {
+        //
+        CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
+                lunaticSamplesPath.resolve("log2021x22_web.json"));
+
+        //
+        assertNotNull(calculatedVariables);
+        assertTrue(calculatedVariables.containsKey("S2_MAA1AT"));
+       
+    }
+
 
 }
