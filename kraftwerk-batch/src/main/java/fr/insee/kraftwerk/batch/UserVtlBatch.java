@@ -43,7 +43,7 @@ public class UserVtlBatch implements Tasklet {
 
         String campaignName = campaignDirectory.getFileName().toString();
 
-        Path userInputFile = campaignDirectory.resolve(Constants.USER_INPUT_FILE);
+        Path userInputFile = campaignDirectory.resolve(Constants.USER_VTL_INPUT_FILE);
 
         Path vtlOutputDir = campaignDirectory.getParent().getParent().resolve("out").resolve(campaignName);
         Files.createDirectories(vtlOutputDir);
@@ -51,7 +51,7 @@ public class UserVtlBatch implements Tasklet {
         if (Files.exists(userInputFile)) {
 
             log.info(String.format("Found '%s' input file at location %s",
-                    Constants.USER_INPUT_FILE, campaignDirectory));
+                    Constants.USER_VTL_INPUT_FILE, campaignDirectory));
             log.info("Vtl datasets job started.");
 
             UserInputs userInputs = new UserInputs(userInputFile, campaignDirectory);
@@ -150,7 +150,7 @@ public class UserVtlBatch implements Tasklet {
 
         else {
             log.error(String.format("No '%s' configuration file found at location: %s",
-                    Constants.USER_INPUT_FILE, campaignDirectory));
+                    Constants.USER_VTL_INPUT_FILE, campaignDirectory));
         }
 
         return RepeatStatus.FINISHED;

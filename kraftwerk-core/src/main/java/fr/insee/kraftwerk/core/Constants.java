@@ -22,6 +22,7 @@ public final class Constants {
 	private Constants() {}
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
+	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
 
 	// ----- Main resources folders
 	public static final String RESOURCES_FOLDER = "src/main/resources";
