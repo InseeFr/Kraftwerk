@@ -1,14 +1,15 @@
 package fr.insee.kraftwerk.core.vtl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.vtl.engine.exceptions.VtlScriptException;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import org.junit.jupiter.api.Test;
 
 import javax.script.*;
 import java.io.IOException;
-import java.net.URL;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TrevasTests {
@@ -19,7 +20,6 @@ public class TrevasTests {
         Bindings bindings = new SimpleBindings();
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new TrevasModule());
-        URL toto = TrevasTests.class.getClassLoader().getResource("unit_tests/vtl/sample.json");
         Dataset dataset = mapper.readValue(
                 TrevasTests.class.getClassLoader().getResource("unit_tests/vtl/sample.json"),
                 Dataset.class);
@@ -42,9 +42,10 @@ public class TrevasTests {
                 "];";
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("vtl");
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-        engine.eval(expression);
 
         //
-        assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("S2_MAA1AT"));
+        assertThrows(VtlScriptException.class, () -> engine.eval(expression));
+        //
+        //assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("S2_MAA1AT"));
     }
 }
