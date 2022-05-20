@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <property resource="application.properties" />
-
   <!-- https://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
   <!-- https://logback.qos.ch/manual/layouts.html#formatModifiers -->
   <property name="LOG_CONSOLE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-50.50logger{50} : %msg%n" />
@@ -17,7 +15,7 @@
   <!-- https://logback.qos.ch/manual/appenders.html#uniquelyNamed -->
   <timestamp key="startTimestamp" datePattern="yyyyMMddHHmm"/>
   <appender name="vtlLog" class="ch.qos.logback.core.FileAppender">
-    <file>${fr.insee.kraftwerk.vtlLogDirectory}/kraftwerk-vtl-${startTimestamp}.log</file>
+    <file>${LOG_PATH}/kraftwerk-vtl-${startTimestamp}.log</file>
 	<encoder>
       <pattern>${LOG_VTL_PATTERN}</pattern>
     </encoder>
