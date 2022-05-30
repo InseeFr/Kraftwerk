@@ -187,10 +187,6 @@ public class LunaticXmlDataParser extends DataParser {
 					if (!variableNode.getAttribute("type").getValue().equals("null")) {
 						//
 						if (variableName.startsWith("FILTER_RESULT_")) {
-		                    if (variableName.startsWith("FILTER_RESULT_CLASSIF")) {
-		                    	System.out.println("BALISE2");
-		                    	
-		                    }
 							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
 						}
 						//
