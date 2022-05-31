@@ -103,6 +103,7 @@ public class Launcher {
 				if (modeInputs.getLunaticFile() != null) {
 					CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
 							modeInputs.getLunaticFile());
+					// FIXME instruction written in code, bad habit, to generalize if possible
 					DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
 					calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
 				} else {

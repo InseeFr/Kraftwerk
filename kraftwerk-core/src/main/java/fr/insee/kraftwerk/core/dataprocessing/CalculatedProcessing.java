@@ -67,6 +67,7 @@ public class CalculatedProcessing extends DataProcessing {
 			}
 
 			String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
+			// TODO stop using "current_date()" instruction and automatize it
 			if (vtlExpression != null && !vtlExpression.equals("") && !vtlExpression.contains("current_date()")) {
 				vtlScript.add(String.format("%s := %s [calc %s := %s];", bindingName, bindingName, calculatedName,
 						vtlExpression));
