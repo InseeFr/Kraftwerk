@@ -33,7 +33,8 @@ public enum StateType {
 	STATE21("HC", "HC"),
 	STATE22("VALPAP", "VALPAP"),
 	STATE23("VALINT", "VALINT"),
-	STATE24("REFUS", "REFUS");
+	STATE24("REFUS", "REFUS"),
+	STATE25("RELANCE", "RELANCE");
 
     private final String key;
     private final String value;
