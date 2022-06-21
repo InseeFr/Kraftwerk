@@ -22,8 +22,7 @@ import java.util.Arrays;
 public class LunaticXmlDataParser extends DataParser {
 
 	/** Words used to filter VTL expressions in "calculated" elements.
-	 * Deprecated since we don't read calculated values in the parser anymore. */
-	@Deprecated
+	 */
 	private static final String[] forbiddenWords = {"cast", "isnull", "if "};
 
 	/**
@@ -76,7 +75,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-			//readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); // TODO: remove this line
+			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 			data.addQuestionnaire(questionnaireData);
 		}
@@ -165,7 +164,6 @@ public class LunaticXmlDataParser extends DataParser {
 	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
-	@Deprecated
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
 											 VariablesMap variables) {
 
@@ -242,11 +240,9 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Check if the given value is a VTL expression using the 'forbiddenWords' attribute.
-	 * Deprecated since we don't read calculated values in the parser anymore.
 	 * @see fr.insee.kraftwerk.core.metadata.LunaticReader
 	 * @see fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing
 	 */
-	@Deprecated
 	private static boolean isNotVtlExpression(String value) {
 		return Arrays.stream(forbiddenWords).noneMatch(value::contains);
 	}

@@ -43,8 +43,9 @@ public class ParadataParser {
 					ParaDataUE paraDataUE = new ParaDataUE();
 					paraDataUE.setFilepath(Paths.get(fileParaDataPath));
 					parseParadataUE(paraDataUE, surveyRawData);
-					paraDataUE.sortEvents();
-					paraDataUE.createOrchestratorsAndSessions();
+					paraDataUE.sortEvents();			
+					if (paraDataUE.getEvents().size() > 2) {
+						paraDataUE.createOrchestratorsAndSessions();
 					try {
 						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
 					} catch (Exception e) {
@@ -53,6 +54,7 @@ public class ParadataParser {
 					}
 					listParaDataUE.add(paraDataUE);
 
+					}
 				}
 				paradata.setListParadataUE(listParaDataUE);
 			} catch (IOException e) {
