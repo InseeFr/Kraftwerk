@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.vtl.engine.exceptions.VtlScriptException;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.InMemoryDataset;
+import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
 import javax.script.*;
 import java.io.IOException;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TrevasTests {
 
@@ -47,5 +49,61 @@ public class TrevasTests {
         assertThrows(VtlScriptException.class, () -> engine.eval(expression));
         //
         //assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("S2_MAA1AT"));
+    }
+
+    @Test
+    public void expressionFailingForEveryone() throws IOException, ScriptException {
+        //
+        Bindings bindings = new SimpleBindings();
+        Dataset dataset = new InMemoryDataset(
+                List.of(
+                        List.of(1L, "9"),
+                        List.of(2L, "8"),
+                        List.of(3L, "")),
+                List.of(
+                        new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER),
+                        new Structured.Component("FOO", String.class, Dataset.Role.MEASURE))
+        );
+        bindings.put("ds", dataset);
+        //
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("vtl");
+        engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+
+        //
+        engine.eval("ds := ds [calc FOO_NUM := cast(FOO, integer)];");
+
+        //
+        assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("FOO_NUM"));
+        assertEquals(9L, ((Dataset) bindings.get("ds")).getDataPoints().get(0).get("FOO_NUM"));
+        assertEquals(8L, ((Dataset) bindings.get("ds")).getDataPoints().get(1).get("FOO_NUM"));
+        assertNull(((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO_NUM"));
+    }
+
+    @Test
+    public void elseWithSameVariable() throws IOException, ScriptException {
+        //
+        Bindings bindings = new SimpleBindings();
+        Dataset dataset = new InMemoryDataset(
+                List.of(
+                        List.of(1L, "9"),
+                        List.of(2L, "8"),
+                        List.of(3L, "7")),
+                List.of(
+                        new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER),
+                        new Structured.Component("FOO", String.class, Dataset.Role.MEASURE))
+        );
+        bindings.put("ds", dataset);
+        //
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("vtl");
+        engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+
+        //
+        engine.eval("ds := ds [calc FOO := if FOO=\"9\" then \"5\" else FOO];");
+
+        //
+        assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("FOO"));
+        assertEquals("5", ((Dataset) bindings.get("ds")).getDataPoints().get(0).get("FOO"));
+        assertEquals("8", ((Dataset) bindings.get("ds")).getDataPoints().get(1).get("FOO"));
+        assertEquals("7", ((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO"));
     }
 }
