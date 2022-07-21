@@ -19,12 +19,13 @@ public enum StateType {
 	STATE08("APS", "RDV pris (qui inclut enquête acceptée)"),
 	STATE09("INS", "Questionnaire démarré"),
 	STATE10("WFT", "UE en attente de transmission"),
-	STATE11("WFS", "[UE en attente de synchronisation"),
-	STATE12("TBR", "[UE à relire DEM"),
+	STATE11("WFS", "UE en attente de synchronisation"),
+	STATE12("TBR", "UE à relire DEM"),
 	STATE13("FIN", "UE finalisée"),
 	STATE14("QNA", "Questionnaire non accessible enquêteur"),
 	STATE15("CLO", "UE close"),
 	STATE16("NVA", "UE non visible gestionnaire"),
+	
 	STATE17("INITLA", "INITLA"),
 	STATE18("PND", "PND"),
 	STATE19("DECHET", "DECHET"),
@@ -32,7 +33,8 @@ public enum StateType {
 	STATE21("HC", "HC"),
 	STATE22("VALPAP", "VALPAP"),
 	STATE23("VALINT", "VALINT"),
-	STATE24("REFUS", "REFUS");
+	STATE24("REFUS", "REFUS"),
+	STATE25("RELANCE", "RELANCE");
 
     private final String key;
     private final String value;
