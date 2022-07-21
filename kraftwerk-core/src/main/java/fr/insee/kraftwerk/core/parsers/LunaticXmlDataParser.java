@@ -225,8 +225,11 @@ public class LunaticXmlDataParser extends DataParser {
 									variableName, groupName));
 						}
 					} else {
-						
+						if (variables.getVariable(variableName) != null) {
 						groupName = variables.getVariable(variableName).getGroupName();
+						} else {
+							groupName = Constants.ROOT_GROUP_NAME;
+						}
 					}
 					//
 					GroupData groupData = answers.getSubGroup(groupName);
