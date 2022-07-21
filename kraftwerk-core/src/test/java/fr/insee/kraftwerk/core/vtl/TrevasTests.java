@@ -59,7 +59,7 @@ public class TrevasTests {
                 List.of(
                         List.of(1L, "9"),
                         List.of(2L, "8"),
-                        List.of(3L, "")),
+                        List.of(3L, "101")),
                 List.of(
                         new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER),
                         new Structured.Component("FOO", String.class, Dataset.Role.MEASURE))
@@ -76,7 +76,7 @@ public class TrevasTests {
         assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("FOO_NUM"));
         assertEquals(9L, ((Dataset) bindings.get("ds")).getDataPoints().get(0).get("FOO_NUM"));
         assertEquals(8L, ((Dataset) bindings.get("ds")).getDataPoints().get(1).get("FOO_NUM"));
-        assertNull(((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO_NUM"));
+        assertEquals(101L, ((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO_NUM"));
     }
 
     @Test
