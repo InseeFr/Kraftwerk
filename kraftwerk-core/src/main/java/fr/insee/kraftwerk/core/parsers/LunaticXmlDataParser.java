@@ -214,7 +214,9 @@ public class LunaticXmlDataParser extends DataParser {
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else {
 							Group group = variables.getGroup(variables.getGroupNames().get(0));
-							groupName = group.getName(); //TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
+							groupName = group.getName();
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
+							//TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
 							log.warn(String.format(
 									"No information from the DDI about question named \"%s\".",
 									correspondingVariableName));
@@ -223,6 +225,7 @@ public class LunaticXmlDataParser extends DataParser {
 									variableName, groupName));
 						}
 					} else {
+						
 						groupName = variables.getVariable(variableName).getGroupName();
 					}
 					//
