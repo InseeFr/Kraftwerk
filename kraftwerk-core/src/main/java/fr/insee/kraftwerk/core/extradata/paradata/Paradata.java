@@ -4,22 +4,19 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Paradata {
-
 	private Path filepath;
-	
+
 	public List<ParaDataUE> listParadataUE;
 
 	public Paradata() {
-		super();
 	}
 
 	public Paradata(Path filepath) {
-		super();
 		this.filepath = filepath;
 	}
 
 	public Path getFilepath() {
-		return filepath;
+		return this.filepath;
 	}
 
 	public void setFilepath(Path filepath) {
@@ -27,13 +24,12 @@ public class Paradata {
 	}
 
 	public List<ParaDataUE> getListParadataUE() {
-		return listParadataUE;
+		return this.listParadataUE;
 	}
 
 	public ParaDataUE getParadataUE(String identifier) {
-		ParaDataUE paradataUE = listParadataUE.stream()
-				.filter(paradataUEToSearch -> identifier
-						.equals(paradataUEToSearch.getIdentifier()))
+		ParaDataUE paradataUE = this.listParadataUE.stream()
+				.filter(paradataUEToSearch -> identifier.equals(paradataUEToSearch.getIdentifier()))
 				.findAny().orElse(null);
 		return paradataUE;
 	}
@@ -41,5 +37,4 @@ public class Paradata {
 	public void setListParadataUE(List<ParaDataUE> listParadataUE) {
 		this.listParadataUE = listParadataUE;
 	}
-	
 }

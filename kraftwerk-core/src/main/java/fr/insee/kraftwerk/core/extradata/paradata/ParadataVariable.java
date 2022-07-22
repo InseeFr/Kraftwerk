@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-public class ParadataVariable extends Event{
-
+public class ParadataVariable extends Event {
 	private String idSurveyUnit;
 
 	private String variableName;
@@ -11,27 +10,23 @@ public class ParadataVariable extends Event{
 	private long timestamp;
 
 	public ParadataVariable() {
-		super();
 	}
-	
+
 	public ParadataVariable(String idSurveyUnit) {
-		super();
 		this.idSurveyUnit = idSurveyUnit;
 	}
-	
+
 	public ParadataVariable(String idSurveyUnit, String idSession) {
-		super();
 		this.idSurveyUnit = idSurveyUnit;
 	}
-	
+
 	public ParadataVariable(String idSurveyUnit, String idSession, String variableName) {
-		super();
 		this.idSurveyUnit = idSurveyUnit;
 		this.variableName = variableName;
 	}
 
 	public String getIdSurveyUnit() {
-		return idSurveyUnit;
+		return this.idSurveyUnit;
 	}
 
 	public void setIdSurveyUnit(String idSurveyUnit) {
@@ -39,7 +34,7 @@ public class ParadataVariable extends Event{
 	}
 
 	public String getVariableName() {
-		return variableName;
+		return this.variableName;
 	}
 
 	public void setVariableName(String variableName) {
@@ -47,7 +42,7 @@ public class ParadataVariable extends Event{
 	}
 
 	public Object getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(Object object) {
@@ -55,11 +50,10 @@ public class ParadataVariable extends Event{
 	}
 
 	public long getTimestamp() {
-		return timestamp;
+		return this.timestamp;
 	}
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
-
 }
