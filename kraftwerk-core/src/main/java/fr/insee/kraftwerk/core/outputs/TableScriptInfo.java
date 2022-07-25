@@ -59,7 +59,6 @@ public class TableScriptInfo {
 						
 						// We already got the variable, so we check to see if the lengthes are different -> take the maximum one then
 					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-						// problème pour des variables comme IND_TEL
 						if (result.containsKey(variableName)) {
 							result.replace(variableName, new Variable(variableName,
 									 result.get(variableName).getGroup(), VariableType.STRING, "255"));
