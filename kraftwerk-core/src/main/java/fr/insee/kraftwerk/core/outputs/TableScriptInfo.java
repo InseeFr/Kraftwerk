@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -44,7 +43,6 @@ public class TableScriptInfo {
 				VariablesMap variablesMap = metadataVariables.get(datasetName);
 
 				// We treat the identifiers
-
 				if (variablesMap.getIdentifierNames().contains(variableName)) {
 					Variable idGroupVariable = new Variable(variableName, variablesMap.getGroup(variableName),
 							VariableType.STRING, "32");
@@ -54,11 +52,21 @@ public class TableScriptInfo {
 				}
 				if (variablesMap.getFullyQualifiedNames().contains(variableName)
 						|| variablesMap.getVariableNames().contains(variableName)) {
+					
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
+						
 						// We already got the variable, so we check to see if the lengthes are different -> take the maximum one then
 					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+						// problème pour des variables comme IND_TEL
+						if (result.containsKey(variableName)) {
+							result.replace(variableName, new Variable(variableName,
+									 result.get(variableName).getGroup(), VariableType.STRING, "255"));
+						} else {
+							result.put(variableName, new Variable(variableName,
+									variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
+						}
 					} else {
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getLength();
