@@ -18,6 +18,8 @@ public class XMLReportingDataParser extends ReportingDataParser {
     Path filePath = reportingData.getFilepath();
     readFile(filePath);
     Element root = this.document.getRootElement();
+    // Read information on each survey unit
+
     Element surveyUnitsNode = root.getFirstChildElement("SurveyUnits");
     Elements surveyUnitsNodeList = surveyUnitsNode.getChildElements("SurveyUnit");
     for (int i = 0; i < surveyUnitsNodeList.size(); i++) {
@@ -31,6 +33,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
       reportingDataUE.setInterviewerId(interviewerIdentifier);
       Element organizationalUnitIdentifierElement = surveyUnitElement
         .getFirstChildElement("OrganizationalUnitId");
+      // Get adress values
       String organizationalUnitIdentifier = organizationalUnitIdentifierElement.getValue();
       reportingDataUE.setOrganizationUnitId(organizationalUnitIdentifier);
       Element adressElement = surveyUnitElement.getFirstChildElement("InseeSampleIdentiers");
@@ -50,6 +53,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
         reportingDataUE.addState(new State(type, Long.parseLong(timestamp)));
       } 
       reportingDataUE.sortStates();
+      // Get outcome values
       Element contactOutcomeElement = surveyUnitElement.getFirstChildElement("ContactOutcome");
       reportingDataUE.setContactOutcome(new ContactOutcome());
       if (contactOutcomeElement != null) {
