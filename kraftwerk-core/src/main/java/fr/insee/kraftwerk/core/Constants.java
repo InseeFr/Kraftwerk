@@ -76,7 +76,7 @@ public final class Constants {
 	  public static final String SURVEY_DATE_MONTH_NAME = "MOISENQ";
 	  public static final String SURVEY_DATE_YEAR_NAME = "ANNEENQ";
 	  public static final String OUTCOME_NAME = "OUTCOME";
-	  public static final String NUMBER_ATTEMPS_NAME = "NUMBER_CONTACT_ATTEMPTS";
+	  public static final String NUMBER_ATTEMPTS_NAME = "NUMBER_CONTACT_ATTEMPTS";
 	  public static final String OUTCOME_ATTEMPT_SUFFIX_NAME = "ATTEMPT";
 	
 	// ---------- Functions
