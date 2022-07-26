@@ -189,12 +189,18 @@ public class ParadataParser {
 				VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
 				variablesMap.getRootGroup(), VariableType.INTEGER, "20");
+		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
+				VariableType.INTEGER, "20");
+		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, variablesMap.getRootGroup(),
+				VariableType.INTEGER, "20");
 		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3");
 		try {
 			variablesMap.putVariable(variableDuree);
 			variablesMap.putVariable(variableDureeBrute);
 			variablesMap.putVariable(variableNombre);
+			variablesMap.putVariable(variableStart);
+			variablesMap.putVariable(variableEnd);
 			for (String variableName : paradataVariables) {
 				if (variableName.contentEquals("PRENOM")) {
 					Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName,
@@ -216,6 +222,9 @@ public class ParadataParser {
 				questionnaire.getAnswers().putValue(variableDuree.getName(),
 						Constants.convertToDateFormat(lengthOrchestrators));
 				questionnaire.getAnswers().putValue(variableDureeBrute.getName(), Long.toString(lengthOrchestrators));
+				System.out.println("BALISE");
+				questionnaire.getAnswers().putValue(variableStart.getName(), Long.toString(paraDataUE.getSessions().get(0).getInitialization()));
+				questionnaire.getAnswers().putValue(variableEnd.getName(), Long.toString(paraDataUE.getSessions().get(paraDataUE.getSessions().size()-1).getTermination()));
 				questionnaire.getAnswers().putValue(variableNombre.getName(),
 						Long.toString(paraDataUE.getOrchestrators().size()));
 				for (String variableName : paradataVariables) {
