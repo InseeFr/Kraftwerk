@@ -222,7 +222,6 @@ public class ParadataParser {
 				questionnaire.getAnswers().putValue(variableDuree.getName(),
 						Constants.convertToDateFormat(lengthOrchestrators));
 				questionnaire.getAnswers().putValue(variableDureeBrute.getName(), Long.toString(lengthOrchestrators));
-				System.out.println("BALISE");
 				questionnaire.getAnswers().putValue(variableStart.getName(), Long.toString(paraDataUE.getSessions().get(0).getInitialization()));
 				questionnaire.getAnswers().putValue(variableEnd.getName(), Long.toString(paraDataUE.getSessions().get(paraDataUE.getSessions().size()-1).getTermination()));
 				questionnaire.getAnswers().putValue(variableNombre.getName(),
