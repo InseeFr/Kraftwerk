@@ -6,6 +6,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.ICSVParser;
 import com.opencsv.exceptions.CsvValidationException;
+
+import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,9 +25,14 @@ public class CSVReportingDataParser extends ReportingDataParser {
 
 	private CSVReader csvReader;
 
-	public void parseReportingData(ReportingData reportingData, SurveyRawData data) {
+	public void parseReportingData(ReportingData reportingData, SurveyRawData data) throws NullException {
 		Path filePath = reportingData.getFilepath();
-		readFile(filePath);
+	    try{
+	    	readFile(filePath);
+	    } catch (NullPointerException e) {
+	    	throw new NullException();
+	    }
+	    
 		try {
 			String[] header = this.csvReader.readNext();
 			if (controlHeader(header)) {

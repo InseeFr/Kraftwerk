@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
 import java.nio.file.Path;
@@ -14,10 +15,15 @@ public class XMLReportingDataParser extends ReportingDataParser {
   
   private Document document;
   
-  public void parseReportingData(ReportingData reportingData, SurveyRawData data) {
+  public void parseReportingData(ReportingData reportingData, SurveyRawData data) throws NullException {
     Path filePath = reportingData.getFilepath();
     readFile(filePath);
-    Element root = this.document.getRootElement();
+	Element root = null;
+    try{
+    	root = this.document.getRootElement();
+    } catch (NullPointerException e) {
+    	throw new NullException();
+    }
     // Read information on each survey unit
 
     Element surveyUnitsNode = root.getFirstChildElement("SurveyUnits");

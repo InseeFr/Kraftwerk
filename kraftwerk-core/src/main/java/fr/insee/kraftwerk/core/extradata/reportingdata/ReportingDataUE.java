@@ -111,8 +111,8 @@ public class ReportingDataUE {
     this.setStates((List<State>) this.getStates()
         .stream()
         .distinct()
-        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(State::getTimestamp))), 
-            ArrayList::new)));
+        .sorted(Comparator.comparing(State::getTimestamp))
+        .collect(Collectors.toList()));
   }
   
 }

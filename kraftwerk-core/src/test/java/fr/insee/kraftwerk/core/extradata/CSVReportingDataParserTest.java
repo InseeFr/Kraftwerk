@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
@@ -25,7 +26,12 @@ public class CSVReportingDataParserTest {
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
-		csvReportingDataParser.parseReportingData(reportingData, data);
+		try {
+			csvReportingDataParser.parseReportingData(reportingData, data);
+		} catch (NullException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Check the reporting data is well captured
 		assertEquals(3, reportingData.getListReportingDataUE().size());

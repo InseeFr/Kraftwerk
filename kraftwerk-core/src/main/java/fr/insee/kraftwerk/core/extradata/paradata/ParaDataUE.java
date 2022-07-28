@@ -10,6 +10,8 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import fr.insee.kraftwerk.core.extradata.reportingdata.State;
+
 public class ParaDataUE {
   private Path filepath;
   
@@ -120,14 +122,14 @@ public class ParaDataUE {
   public void addOrchestrator(Orchestrator orchestrator) {
     this.orchestrators.add(orchestrator);
   }
+
   
   public void sortEvents() {
-    this.setEvents((List<Event>)getEvents()
+    this.setEvents((List<Event>) this.getEvents()
         .stream()
         .distinct()
-        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))), 
-            
-            ArrayList::new)));
+        .sorted(Comparator.comparing(Event::getTimestamp))
+        .collect(Collectors.toList()));
   }
   
   public long createLengthOrchestratorsVariable() {
