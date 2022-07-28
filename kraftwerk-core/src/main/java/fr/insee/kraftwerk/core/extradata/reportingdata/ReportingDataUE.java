@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import fr.insee.kraftwerk.core.extradata.paradata.Event;
+
 public class ReportingDataUE {
   private String identifier;
   
@@ -111,8 +113,9 @@ public class ReportingDataUE {
     this.setStates((List<State>) this.getStates()
         .stream()
         .distinct()
-        .sorted(Comparator.comparing(State::getTimestamp))
-        .collect(Collectors.toList()));
+        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(State::getTimestamp))), 
+                
+                ArrayList::new)));;
   }
   
 }
