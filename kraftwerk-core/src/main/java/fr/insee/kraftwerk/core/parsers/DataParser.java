@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.parsers;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
