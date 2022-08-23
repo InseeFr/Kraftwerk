@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
@@ -25,7 +26,12 @@ public class XMLReportingDataParserTest {
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
-		xMLReportingDataParser.parseReportingData(reportingData, data);
+		try {
+			xMLReportingDataParser.parseReportingData(reportingData, data);
+		} catch (NullException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Check the reporting data is well captured
 		assertEquals(4, reportingData.getListReportingDataUE().size());
@@ -46,7 +52,7 @@ public class XMLReportingDataParserTest {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 		ReportingData reportingData = new ReportingData();
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
-		assertEquals(8, xMLReportingDataParser.max(reportingData));
+		assertEquals(8, xMLReportingDataParser.maxStates(reportingData));
 	}
 
 }

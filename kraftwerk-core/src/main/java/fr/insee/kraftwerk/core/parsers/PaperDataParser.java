@@ -40,8 +40,9 @@ public class PaperDataParser extends DataParser {
 
 	/**
 	 * Parser constructor.
-	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
-	 *             The variables must have been previously set.
+	 * 
+	 * @param data The SurveyRawData to be filled by the parseSurveyData method. The
+	 *             variables must have been previously set.
 	 */
 	public PaperDataParser(SurveyRawData data) {
 		super(data);
@@ -49,6 +50,7 @@ public class PaperDataParser extends DataParser {
 
 	/**
 	 * Instantiate a CSVReader.
+	 * 
 	 * @param filePath Path to the CSV file.
 	 */
 	private void readCsvFile(Path filePath) {
@@ -62,19 +64,15 @@ public class PaperDataParser extends DataParser {
 
 			// create csvParser object with
 			// custom separator semicolon
-			CSVParser parser = new CSVParserBuilder()
-					.withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR)
-					.build();
+			CSVParser parser = new CSVParserBuilder().withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR).build();
 
 			// create csvReader object with parameter
 			// file reader and parser
 			csvReader = new CSVReaderBuilder(filereader)
-					//.withSkipLines(1) // (uncomment to ignore header)
-					.withCSVParser(parser)
-					.build();
+					// .withSkipLines(1) // (uncomment to ignore header)
+					.withCSVParser(parser).build();
 
-		}
-		catch(FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			log.error(String.format("Unable to find the file %s", filePath), e);
 		}
 	}
@@ -86,43 +84,47 @@ public class PaperDataParser extends DataParser {
 
 		try {
 
-			/* We first map the variables in the header (first line) of the CSV file
-			to the variables of the data object.
-			(Column 0 is the identifier). */
+			/*
+			 * We first map the variables in the header (first line) of the CSV file to the
+			 * variables of the data object. (Column 0 is the identifier).
+			 */
 
 			// Variables
 			String[] header = csvReader.readNext();
 			VariablesMap variables = data.getVariablesMap();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
-			for (int j=1; j<header.length; j++) {
+			for (int j = 1; j < header.length; j++) {
 				String variableName = header[j];
 				// If the variable name is in the DDI we map it directly
-				if(variables.hasVariable(variableName)){
+				if (variables.hasVariable(variableName)) {
 					csvVariablesMap.put(j, variableName);
 				}
 				// Else the variable might be from a unique choice question that has been split
-				else{
+				else {
 					String variableStem = getVariableStem(variableName);
-					if(variables.hasUcq(variableStem)){
+					if (variables.hasUcq(variableStem)) {
 						String ucqValue = getUcqValue(variableName);
 						// Reminder: at this point we have value and text registered from the DDI.
-						// We want to register the corresponding variable name in the ucq modality object,
-						// and have the indicator variable in the variables map associated with the data object.
+						// We want to register the corresponding variable name in the ucq modality
+						// object,
+						// and have the indicator variable in the variables map associated with the data
+						// object.
 						UcqVariable ucqVariable = (UcqVariable) variables.getVariable(variableStem);
 						PaperUcq indicatorVariable = new PaperUcq(variableName, ucqVariable, ucqValue);
 						variables.putVariable(indicatorVariable);
 						csvVariablesMap.put(j, variableName);
 					} else {
-						log.warn(String.format(
-								"Unable to find a variable corresponding to CSV column \"%s\"", variableName));
+						log.warn(String.format("Unable to find a variable corresponding to CSV column \"%s\"",
+								variableName));
 						log.warn("Values of this column will be ignored.");
 					}
 
 				}
 			}
 
-        	/* Then we read each data line
-        	and carefully put values at the right place. */
+			/*
+			 * Then we read each data line and carefully put values at the right place.
+			 */
 
 			// Survey answers
 			String[] nextRecord;
@@ -133,26 +135,29 @@ public class PaperDataParser extends DataParser {
 
 				// Identifiers
 				String rowIdentifier = nextRecord[0];
-				String[] rowIdentifiers = rowIdentifier.split("_");
+				String[] rowIdentifiers = rowIdentifier.split(Constants.PAPER_IDENTIFIER_SEPARATOR);
 				questionnaireData.setIdentifier(rowIdentifiers[0]);
 
-				if (rowIdentifiers.length > 1) {
-					String subGroupId = rowIdentifiers[1];
+				if (rowIdentifiers.length >= 1) {
 
 					// Read variables values
 					for (int j : csvVariablesMap.keySet()) {
 						// Get the value
 						String value = nextRecord[j];
+
 						// Get the variable
 						String variableName = csvVariablesMap.get(j);
 						Variable variable = variables.getVariable(variableName);
 						// Put the value
 						if (variable.getGroup().isRoot()) {
-							questionnaireData.putValue(variableName, value);
-						} else {
+							answers.putValue(variableName, value);
+						} else if (rowIdentifiers.length > 1) {
+							answers.putValue(variableName, value);
+							String subGroupId = rowIdentifiers[1];
 							String groupName = variable.getGroupName();
-							answers.getSubGroup(groupName)
-									.putValue(value, variableName, createGroupId(groupName, subGroupId));
+							answers.getSubGroup(groupName).putValue(value, variableName,
+									createGroupId(groupName, subGroupId));
+
 						}
 					}
 				}
@@ -160,16 +165,15 @@ public class PaperDataParser extends DataParser {
 			}
 			filereader.close();
 			csvReader.close();
-		}
-		catch(CsvValidationException e) {
+		} catch (CsvValidationException e) {
 			log.error(String.format("Following CSV file is malformed: %s", filePath), e);
-		}
-		catch(IOException e) {
+		} catch (IOException e) {
 			log.error(String.format("Could not connect to data file %s", filePath), e);
 		}
 	}
 
-	// TODO: do something more robust here (-> needs of standardisation for paper data files)
+	// TODO: do something more robust here (-> needs of standardisation for paper
+	// data files)
 	private String getVariableStem(String variableName) {
 		String[] decomposition = variableName.split("_");
 		if (decomposition.length == 2) { // (no "_" in the variable name)
@@ -178,6 +182,7 @@ public class PaperDataParser extends DataParser {
 			return String.join("_", Arrays.copyOf(decomposition, decomposition.length - 1));
 		}
 	}
+
 	private String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
 		return decomposition[decomposition.length - 1];
@@ -188,12 +193,13 @@ public class PaperDataParser extends DataParser {
 	 *
 	 * Example: //TODO: write explanations for this
 	 *
-	 * @param subGroupId The group level identifier for all variables of a given questionnaire.
-	 * @param groupName A group name.
+	 * @param subGroupId The group level identifier for all variables of a given
+	 *                   questionnaire.
+	 * @param groupName  A group name.
 	 *
 	 * @return A concatenation of these which is a group instance identifier.
 	 */
-	private String createGroupId(String groupName, String subGroupId){
+	private String createGroupId(String groupName, String subGroupId) {
 		return groupName + "-" + subGroupId;
 	}
 

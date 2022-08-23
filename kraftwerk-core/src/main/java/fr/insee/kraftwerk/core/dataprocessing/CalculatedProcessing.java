@@ -84,12 +84,12 @@ public class CalculatedProcessing extends DataProcessing {
             group = variablesMap.getMcqGroup(correspondingVariableName);
         } else { //TODO : FIXME ?????
             group = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
-            log.warn(String.format(
-                    "No information from the DDI about question or variable named \"%s\".",
-                    correspondingVariableName));
-            log.warn(String.format(
-                    "\"%s\" has been arbitrarily associated with group \"%s\".",
-                    filterResultName, group.getName()));
+         //   log.warn(String.format(
+          //          "No information from the DDI about question or variable named \"%s\".",
+          //          correspondingVariableName));
+          //  log.warn(String.format(
+         //           "\"%s\" has been arbitrarily associated with group \"%s\".",
+         //           filterResultName, group.getName()));
         }
         variablesMap.putVariable(new Variable(filterResultName, group, VariableType.BOOLEAN));
     }

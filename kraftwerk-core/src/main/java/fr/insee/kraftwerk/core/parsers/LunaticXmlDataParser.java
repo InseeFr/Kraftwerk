@@ -22,8 +22,7 @@ import java.util.Arrays;
 public class LunaticXmlDataParser extends DataParser {
 
 	/** Words used to filter VTL expressions in "calculated" elements.
-	 * Deprecated since we don't read calculated values in the parser anymore. */
-	@Deprecated
+	 */
 	private static final String[] forbiddenWords = {"cast", "isnull", "if "};
 
 	/**
@@ -76,7 +75,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-			//readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap()); // TODO: remove this line
+			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 			data.addQuestionnaire(questionnaireData);
 		}
@@ -165,7 +164,6 @@ public class LunaticXmlDataParser extends DataParser {
 	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
-	@Deprecated
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
 											 VariablesMap variables) {
 
@@ -216,7 +214,9 @@ public class LunaticXmlDataParser extends DataParser {
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else {
 							Group group = variables.getGroup(variables.getGroupNames().get(0));
-							groupName = group.getName(); //TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
+							groupName = group.getName();
+							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
+							//TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
 							log.warn(String.format(
 									"No information from the DDI about question named \"%s\".",
 									correspondingVariableName));
@@ -225,7 +225,11 @@ public class LunaticXmlDataParser extends DataParser {
 									variableName, groupName));
 						}
 					} else {
+						if (variables.getVariable(variableName) != null) {
 						groupName = variables.getVariable(variableName).getGroupName();
+						} else {
+							groupName = Constants.ROOT_GROUP_NAME;
+						}
 					}
 					//
 					GroupData groupData = answers.getSubGroup(groupName);
@@ -242,11 +246,9 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Check if the given value is a VTL expression using the 'forbiddenWords' attribute.
-	 * Deprecated since we don't read calculated values in the parser anymore.
 	 * @see fr.insee.kraftwerk.core.metadata.LunaticReader
 	 * @see fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing
 	 */
-	@Deprecated
 	private static boolean isNotVtlExpression(String value) {
 		return Arrays.stream(forbiddenWords).noneMatch(value::contains);
 	}

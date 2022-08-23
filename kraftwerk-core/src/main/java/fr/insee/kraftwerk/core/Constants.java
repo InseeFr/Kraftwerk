@@ -11,7 +11,9 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-
+import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains paths and fixed parameters used in the application.
@@ -20,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 public final class Constants {
 
 	private Constants() {}
+	
+	  private static final Logger log = LoggerFactory.getLogger(Constants.class);
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
@@ -35,6 +39,7 @@ public final class Constants {
 
 	// ----- Batch parameters from properties
 	public static final String METADATA_SEPARATOR = ".";
+	public static final String PAPER_IDENTIFIER_SEPARATOR = "_"; //TODO: get it from properties
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
@@ -46,14 +51,36 @@ public final class Constants {
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
-	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_SESSION";
-	public static final String NUMBER_ORCHESTRATORS_NAME = "NB_ORCHESTRATORS";
-	public static final String STATE_SUFFIX_NAME = "STATE";
-	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
-	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 
 
+	// ----- Paradata Variables Names
+	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_SESSION";
+	public static final String START_SESSION_NAME = "DEBUT_SESSION";
+	public static final String FINISH_SESSION_NAME = "FIN_SESSION";
+	public static final String NUMBER_ORCHESTRATORS_NAME = "NB_ORCHESTRATORS";
+	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
+
+
+	// ----- Reporting Variables Names
+	public static final String STATE_SUFFIX_NAME = "STATE";
+	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
+	  
+	  public static final String INTERVIEWER_ID_NAME = "IDENQ";
+	  public static final String ORGANIZATION_UNIT_ID_NAME = "ORGANIZATION_UNIT_ID";
+	  public static final String ADRESS_RGES_NAME = "RGES";
+	  public static final String ADRESS_NUMFA_NAME = "NUMFA";
+	  public static final String ADRESS_SSECH_NAME = "SSECH";
+	  public static final String ADRESS_LE_NAME = "LE";
+	  public static final String ADRESS_EC_NAME = "EC";
+	  public static final String ADRESS_BS_NAME = "BS";
+	  public static final String ADRESS_NOI_NAME = "NOI";
+	  public static final String SURVEY_DATE_DAY_NAME = "JOURENQ";
+	  public static final String SURVEY_DATE_MONTH_NAME = "MOISENQ";
+	  public static final String SURVEY_DATE_YEAR_NAME = "ANNEENQ";
+	  public static final String OUTCOME_NAME = "OUTCOME";
+	  public static final String NUMBER_ATTEMPTS_NAME = "NUMBER_CONTACT_ATTEMPTS";
+	  public static final String OUTCOME_ATTEMPT_SUFFIX_NAME = "ATTEMPT";
 	
 	// ---------- Functions
 	// ---------- Get a file
