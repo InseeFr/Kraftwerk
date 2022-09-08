@@ -1,14 +1,10 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import fr.insee.kraftwerk.core.extradata.paradata.Event;
 
 public class ReportingDataUE {
   private String identifier;

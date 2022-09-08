@@ -1,12 +1,12 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.util.List;
+
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * Implementation of the UnimodalDataProcessing class for data from digitized paper.

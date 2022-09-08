@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class GroupTest {
 
     @Test
-    @SuppressWarnings({"null", "ConstantConditions"})
+   // @SuppressWarnings({"null", "ConstantConditions"})
     public void nullParentName() {
         assertThrows(NullPointerException.class, () -> new Group("TEST", null));
     }

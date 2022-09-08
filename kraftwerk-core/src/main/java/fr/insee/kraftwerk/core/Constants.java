@@ -1,8 +1,5 @@
 package fr.insee.kraftwerk.core;
 
-import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.JSONParser;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -11,9 +8,10 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
 import org.json.simple.parser.JSONParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class contains paths and fixed parameters used in the application.
@@ -23,7 +21,6 @@ public final class Constants {
 
 	private Constants() {}
 	
-	  private static final Logger log = LoggerFactory.getLogger(Constants.class);
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
