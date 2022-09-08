@@ -6,11 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import fr.insee.kraftwerk.core.extradata.reportingdata.State;
 
 public class ParaDataUE {
   private Path filepath;
@@ -125,12 +122,11 @@ public class ParaDataUE {
 
   
   public void sortEvents() {
-    this.setEvents((List<Event>) this.getEvents()
+    this.setEvents(this.getEvents()
         .stream()
         .distinct()
-        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))), 
-                
-                ArrayList::new)));;
+        .sorted(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))
+        .collect(Collectors.toList()));
   }
   
   public long createLengthOrchestratorsVariable() {

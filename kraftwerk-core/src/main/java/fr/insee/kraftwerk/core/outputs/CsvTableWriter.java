@@ -1,20 +1,24 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.CSVWriter;
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Structured.Component;
-import fr.insee.vtl.model.Structured.DataPoint;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import com.opencsv.CSVWriter;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Structured.Component;
+import fr.insee.vtl.model.Structured.DataPoint;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * To write in memory data into CSV files.

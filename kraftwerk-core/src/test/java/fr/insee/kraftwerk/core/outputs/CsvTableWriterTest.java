@@ -1,16 +1,8 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.InMemoryDataset;
-import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,8 +10,17 @@ import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
+import fr.insee.vtl.model.InMemoryDataset;
+import fr.insee.vtl.model.Structured;
 
 public class CsvTableWriterTest {
 

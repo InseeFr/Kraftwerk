@@ -1,16 +1,17 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.vtl.jackson.DatasetSerializer;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 public class DatasetSerializerTest {
 

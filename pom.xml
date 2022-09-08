@@ -27,6 +27,7 @@
 	<modules>
 	    <module>kraftwerk-core</module>
 		<module>kraftwerk-batch</module>
+		<module>kraftwerk-api</module>
 	</modules>
 
 	<dependencies>

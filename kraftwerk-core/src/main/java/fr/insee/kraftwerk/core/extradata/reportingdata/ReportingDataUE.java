@@ -1,14 +1,9 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import fr.insee.kraftwerk.core.extradata.paradata.Event;
 
 public class ReportingDataUE {
   private String identifier;
@@ -111,11 +106,10 @@ public class ReportingDataUE {
   
   public void sortStates() {
     this.setStates((List<State>) this.getStates()
-        .stream()
-        .distinct()
-        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(State::getTimestamp))), 
-                
-                ArrayList::new)));;
+    		.stream()
+            .distinct()
+            .sorted(Comparator.comparingLong(State::getTimestamp))
+            .collect(Collectors.toList()));
   }
   
 }

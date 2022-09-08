@@ -6,16 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Paths;
 
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Test;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
-import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
 public class CSVReportingDataParserTest {
 

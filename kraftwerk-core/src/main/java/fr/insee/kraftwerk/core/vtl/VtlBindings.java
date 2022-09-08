@@ -28,7 +28,6 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**

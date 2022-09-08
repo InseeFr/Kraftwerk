@@ -1,16 +1,15 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.inputs.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.parsers.DataFormat;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Class to generate import scripts for the csv output tables.
