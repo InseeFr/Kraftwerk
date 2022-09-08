@@ -125,9 +125,8 @@ public class ParaDataUE {
     this.setEvents(this.getEvents()
         .stream()
         .distinct()
-        .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))), 
-                
-                ArrayList::new)));;
+        .sorted(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))
+        .collect(Collectors.toList()));
   }
   
   public long createLengthOrchestratorsVariable() {
