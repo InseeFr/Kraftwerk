@@ -169,7 +169,7 @@ public class CsvTableWriter {
 	 * Return the datapoint properly formatted value for the variable given. Line
 	 * breaks are replaced by spaces. NOTE: may be improved/enriched later on.
 	 */
-	private static String getDataPointValue(DataPoint dataPoint, Component variable) {
+	public static String getDataPointValue(DataPoint dataPoint, Component variable) {
 		Object content = dataPoint.get(variable.getName());
 		if (content == null) {
 			return "";
