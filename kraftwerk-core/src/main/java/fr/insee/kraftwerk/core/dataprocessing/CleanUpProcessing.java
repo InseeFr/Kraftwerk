@@ -68,7 +68,7 @@ public class CleanUpProcessing extends DataProcessing {
                             .collect(Collectors.toList())
             );
         }
-        if (paperUcqVtlNames.size() > 0) {
+        if (!paperUcqVtlNames.isEmpty()) {
             StringBuilder dropInstruction = new StringBuilder(
                     String.format("%s := %s [ drop ", bindingName, bindingName)
             );

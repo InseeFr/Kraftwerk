@@ -1,5 +1,17 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -9,16 +21,6 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CSVReportingDataParser extends ReportingDataParser {
 	private static final Logger log = LoggerFactory.getLogger(CSVReportingDataParser.class);
@@ -71,7 +73,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 		try {
 			parsedDate = dateFormat.parse(rowTimestamp);
 		} catch (ParseException e1) {
-			e1.printStackTrace();
+			log.error("Parsinng error : {}", e1.getMessage());
 		}
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}

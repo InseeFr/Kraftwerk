@@ -3,7 +3,9 @@ package fr.insee.kraftwerk.core.parsers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,16 +33,23 @@ public abstract class DataParser {
 	 * Fill the data object with the content of the file or folder given.
 	 *
 	 * @param dataPath A data file, or a folder only containing data files.
+	 * @throws NullException 
 	 */
-	public final void parseSurveyData(Path dataPath) {
+	public final void parseSurveyData(Path dataPath) throws NullException {
 
 		if (Files.isRegularFile(dataPath)) {
 			parseDataFile(dataPath);
 		}
 
 		else if (Files.isDirectory(dataPath)) {
-			try {
-				Files.list(dataPath).forEach(this::parseDataFile);
+			try (Stream<Path> stream = Files.list(dataPath)){
+				stream.forEach(t -> {
+					try {
+						parseDataFile(t);
+					} catch (NullException e) {
+						log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+					}
+				});
 			} catch (IOException e) {
 				log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
 			}
@@ -55,7 +64,8 @@ public abstract class DataParser {
 	/**
 	 * Fill the data object with the content of the given file.
 	 * @param dataFilePath Path to a data file.
+	 * @throws NullException 
 	 */
-	abstract void parseDataFile(Path dataFilePath);
+	abstract void parseDataFile(Path dataFilePath) throws NullException;
 
 }

@@ -70,8 +70,7 @@ public class ParadataParser {
 		try {
 			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NullException("Can't read JSON file - "+e.getClass()+" "+ e.getMessage());
 		}
 		if (jsonObject== null) throw new NullException("Error reading file - NullPointer");
 		// Get Identifier

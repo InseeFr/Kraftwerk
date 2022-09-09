@@ -1,6 +1,16 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -8,20 +18,13 @@ import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import org.junit.jupiter.api.Test;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
 
 	@Test
-	public void parseLunaticDataFolder() {
+	public void parseLunaticDataFolder() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		VariablesMap variablesMap = new VariablesMap();
@@ -43,7 +46,7 @@ public class LunaticXmlDataParserTest {
 	}
 
 	@Test
-	public void parseLunaticXml_rootOnly() {
+	public void parseLunaticXml_rootOnly() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_rootOnly());
@@ -76,7 +79,7 @@ public class LunaticXmlDataParserTest {
 	}
 
 	@Test
-	public void parseLunaticXml_oneLevel() {
+	public void parseLunaticXml_oneLevel() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_oneLevel());
