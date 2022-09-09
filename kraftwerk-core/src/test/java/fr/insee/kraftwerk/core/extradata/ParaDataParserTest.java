@@ -6,17 +6,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.extradata.paradata.ParaDataUE;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.extradata.paradata.ParaDataUE;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
 public class ParaDataParserTest {
 
@@ -37,7 +38,12 @@ public class ParaDataParserTest {
 			e.printStackTrace();
 		}
 		paraData.setFilepath(Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata/LOG2021T01"));
-		paraDataParser.parseParadata(paraData, srdTest);
+		try {
+			paraDataParser.parseParadata(paraData, srdTest);
+		} catch (NullException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// Test we get the raw data correctly
 		assertEquals("init-session", paraData.getListParadataUE().get(1).getEvents().get(0).getIdParadataObject());
 		// Test we get the raw data correctly

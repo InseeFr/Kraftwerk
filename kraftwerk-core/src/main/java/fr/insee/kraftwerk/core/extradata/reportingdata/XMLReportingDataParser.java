@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
-import fr.insee.kraftwerk.core.NullException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
 import java.nio.file.Path;

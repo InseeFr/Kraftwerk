@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.batch;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;

@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
-import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;

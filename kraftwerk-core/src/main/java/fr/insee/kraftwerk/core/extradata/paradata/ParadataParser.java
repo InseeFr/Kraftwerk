@@ -3,22 +3,22 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,45 +26,43 @@ public class ParadataParser {
 
 	private String timestamp = "timestamp";
 
-	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) {
+	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
-		log.info("Para data parser being implemented!");
+		log.info("Paradata parser being implemented!");
 		Path filePath = paradata.getFilepath();
 		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
 			try (Stream<Path> walk = Files.walk(filePath)) {
-				List<String> listFilePaths = walk.filter(Files::isRegularFile).map(x -> x.toString())
-						.collect(Collectors.toList());
+				List<Path> listFilePaths = walk.filter(Files::isRegularFile)
+												.collect(Collectors.toList());
 				// Parse each ParaDataUE
-				List<ParaDataUE> listParaDataUE = new ArrayList<ParaDataUE>();
+				List<ParaDataUE> listParaDataUE = new ArrayList<>();
 
-				for (String fileParaDataPath : listFilePaths) {
+				for (Path fileParaDataPath : listFilePaths) {
 					ParaDataUE paraDataUE = new ParaDataUE();
-					paraDataUE.setFilepath(Paths.get(fileParaDataPath));
+					paraDataUE.setFilepath(fileParaDataPath);
 					parseParadataUE(paraDataUE, surveyRawData);
 					paraDataUE.sortEvents();			
 					if (paraDataUE.getEvents().size() > 2) {
 						paraDataUE.createOrchestratorsAndSessions();
-					try {
-						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					listParaDataUE.add(paraDataUE);
-
+						try {
+							integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
+						} catch (Exception e) {
+							log.error(e.getMessage());
+						}
+						listParaDataUE.add(paraDataUE);
 					}
 				}
 				paradata.setListParadataUE(listParaDataUE);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error(e.getMessage());
 			}
 		}
 
 	}
 
-	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) {
+	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
 		// To convert to a entire folder instead of a single file
 		Path filePath = paradataUE.getFilepath();
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
@@ -75,6 +73,7 @@ public class ParadataParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if (jsonObject== null) throw new NullException("Error reading file - NullPointer");
 		// Get Identifier
 		String identifier = (String) jsonObject.get("idSu");
 		paradataUE.setIdentifier(identifier);
@@ -212,7 +211,7 @@ public class ParadataParser {
 			// TODO: handle exception
 		}
 
-		if (paraDataUE.getOrchestrators().size() > 0) {
+		if (!paraDataUE.getOrchestrators().isEmpty()) {
 			long lengthOrchestrators = paraDataUE.createLengthOrchestratorsVariable();
 			QuestionnaireData questionnaire = surveyRawData.getQuestionnaires().stream()
 					.filter(questionnaireToSearch -> paraDataUE.getOrchestrators().get(0).getIdentifier()

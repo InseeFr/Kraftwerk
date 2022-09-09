@@ -7,7 +7,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.ICSVParser;
 import com.opencsv.exceptions.CsvValidationException;
 
-import fr.insee.kraftwerk.core.NullException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
