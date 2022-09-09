@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.vtl.model.Dataset;
@@ -28,18 +29,17 @@ public class CsvTableWriter {
 
 	static CSVWriter writer;
 
-	static void setCSVWriter(Path filePath) {
-		try {
-			File file = filePath.toFile();
-			FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
+	private static void setCSVWriter(Path filePath) {
+		File file = filePath.toFile();
+		try (FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true)){
 			writer = new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.CSV_OUTPUTS_QUOTE_CHAR,
-					CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
+					ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END);
 		} catch (Exception e) {
 			log.error("Unable to write csv file: " + filePath, e);
 		}
 	}
 
-	static void closeWriter(Path filePath) {
+	private static void closeWriter(Path filePath) {
 		try {
 			writer.close();
 		} catch (IOException e) {
@@ -58,7 +58,6 @@ public class CsvTableWriter {
 		setCSVWriter(filePath);
 		try {
 			Scanner scanner = new Scanner(file);
-
 			String[] headers = null;
 			if (scanner.hasNextLine())
 				headers = scanner.nextLine().split(Character.toString(Constants.CSV_OUTPUTS_SEPARATOR));
@@ -118,7 +117,6 @@ public class CsvTableWriter {
 			writer.close();
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to update CSV table: %s", filePath));
-			e.printStackTrace();
 		}
 
 	}
@@ -171,7 +169,7 @@ public class CsvTableWriter {
 	 * Return the datapoint properly formatted value for the variable given. Line
 	 * breaks are replaced by spaces. NOTE: may be improved/enriched later on.
 	 */
-	static String getDataPointValue(DataPoint dataPoint, Component variable) {
+	private static String getDataPointValue(DataPoint dataPoint, Component variable) {
 		Object content = dataPoint.get(variable.getName());
 		if (content == null) {
 			return "";
@@ -179,7 +177,7 @@ public class CsvTableWriter {
 			if (variable.getType().equals(Boolean.class)) {
 				if (content.equals(true)) {
 					content = "1";
-				} else if (content.equals(false)) {
+				} else {
 					content = "0";
 				}
 			}

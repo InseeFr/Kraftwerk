@@ -122,7 +122,6 @@ public class VtlBindings {
         }
         catch(IOException e){
             log.error(String.format("Unable to connect dataset from url: %s", url));
-            e.printStackTrace();
         }
     }
 
