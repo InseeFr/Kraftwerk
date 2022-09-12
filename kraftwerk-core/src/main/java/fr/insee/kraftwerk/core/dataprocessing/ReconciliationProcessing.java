@@ -138,18 +138,6 @@ public class ReconciliationProcessing extends DataProcessing {
 				modeName, modeName, modeVariableIdentifier, modeName);
 	}
 
-	/** Return the list of all different variables that can be find in the datasets in the bindings. */
-	private Set<String> getAllVariables() {
-
-		Set<String> allVariables = new TreeSet<>();
-
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
-			allVariables.addAll(
-					vtlBindings.getDataset(datasetName).getDataStructure().keySet());
-		}
-
-		return allVariables;
-	}
 
 	/** Return a set containing identifiers variable names that are in the bindings datasets. */
 	public Set<String> getIdentifiers() {
