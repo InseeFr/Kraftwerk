@@ -1,5 +1,12 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
@@ -7,10 +14,6 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 public class ReconciliationProcessing extends DataProcessing {
@@ -113,7 +116,7 @@ public class ReconciliationProcessing extends DataProcessing {
 			// Get the other variables
 			Set<String> otherVariables = getOtherVariables(datasetName, commonMeasures);
 
-			if (otherVariables.size() > 0) {
+			if (!otherVariables.isEmpty()) {
 				String vtlOtherVariables = VtlMacros.toVtlSyntax(otherVariables);
 
 				// Keep on the dataset to be joined
@@ -147,7 +150,8 @@ public class ReconciliationProcessing extends DataProcessing {
 		for (String datasetName : vtlBindings.getBindings().keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
 			identifiers.addAll( dataStructure.keySet()
-					.stream().filter(name -> dataStructure.get(name).getRole() == Role.IDENTIFIER)
+					.stream()
+					.filter(name -> dataStructure.get(name).getRole() == Role.IDENTIFIER)
 					.collect(Collectors.toSet()) );
 		}
 		return identifiers;
