@@ -6,7 +6,7 @@ import java.util.List;
 public class Paradata {
 	private Path filepath;
 
-	public List<ParaDataUE> listParadataUE;
+	private List<ParaDataUE> listParadataUE;
 
 	public Paradata() {
 	}
@@ -28,10 +28,9 @@ public class Paradata {
 	}
 
 	public ParaDataUE getParadataUE(String identifier) {
-		ParaDataUE paradataUE = this.listParadataUE.stream()
+		return this.listParadataUE.stream()
 				.filter(paradataUEToSearch -> identifier.equals(paradataUEToSearch.getIdentifier()))
 				.findAny().orElse(null);
-		return paradataUE;
 	}
 
 	public void setListParadataUE(List<ParaDataUE> listParadataUE) {

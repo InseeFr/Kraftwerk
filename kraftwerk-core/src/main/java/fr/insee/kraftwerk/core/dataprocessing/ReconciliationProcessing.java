@@ -62,7 +62,7 @@ public class ReconciliationProcessing extends DataProcessing {
 		} else {
 			log.debug(String.format(
 					"Invalid number of datasets in the bindings (%d) at reconciliation step", modesCount));
-			return null;
+			return new VtlScript();
 		}
 
 	}

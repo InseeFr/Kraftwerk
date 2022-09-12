@@ -1,15 +1,15 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
 public class Event {
-  private String idSurveyUnit;
+  protected String idSurveyUnit;
   
   private String idParadataObject;
   
-  private String idSession;
+  protected String idSession;
   
   private Object value;
   
-  private long timestamp;
+  protected long timestamp;
   
   public Event() {}
   

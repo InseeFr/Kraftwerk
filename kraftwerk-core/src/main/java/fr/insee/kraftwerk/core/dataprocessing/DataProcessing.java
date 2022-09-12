@@ -21,7 +21,7 @@ public abstract class DataProcessing {
 
     protected final VtlBindings vtlBindings;
 
-    public DataProcessing(VtlBindings vtlBindings){
+    protected DataProcessing(VtlBindings vtlBindings){
         this.vtlBindings = vtlBindings;
     }
 
@@ -52,7 +52,7 @@ public abstract class DataProcessing {
 
     protected void applyAutomatedVtlInstructions(String bindingName, Object... objects){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
-        log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
+        log.info(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
                 automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
             vtlBindings.evalVtlScript(automatedInstructions);
@@ -61,7 +61,7 @@ public abstract class DataProcessing {
 
     protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
-        log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
+        log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
             vtlBindings.evalVtlScript(vtlScript);
