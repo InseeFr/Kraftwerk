@@ -5,7 +5,9 @@ import java.util.Arrays;
 
 public class VtlScript extends ArrayList<String> {
 
-    public VtlScript() {
+    private static final long serialVersionUID = -1324236008014518483L;
+
+	public VtlScript() {
         super();
     }
 

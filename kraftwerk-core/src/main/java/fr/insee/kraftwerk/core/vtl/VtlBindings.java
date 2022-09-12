@@ -210,7 +210,7 @@ public class VtlBindings {
      * A string containing vtl instructions.
      */
     public void evalVtlScript(VtlScript vtlScript){
-        if(vtlScript != null && vtlScript.size() > 0) {
+        if(vtlScript != null && !vtlScript.isEmpty()) {
             for(String vtlInstruction : vtlScript) {
                 evalVtlScript(vtlInstruction);
             }
@@ -291,7 +291,7 @@ public class VtlBindings {
                     String[] decomposition = fullyQualifiedName.split("\\" + Constants.METADATA_SEPARATOR);
                     VariableType type = VariableType.getTypeFromJavaClass(datasetVariable.getType());
                     if (decomposition.length == 0) {
-                        log.debug("Unable to decompose fully qualified name given: " + fullyQualifiedName);
+                        log.debug("Unable to decompose fully qualified name given: {}", fullyQualifiedName);
                         return null;
                     } else if (decomposition.length == 1) {
                         String variableName = decomposition[0];

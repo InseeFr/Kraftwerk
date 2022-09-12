@@ -22,7 +22,7 @@ public abstract class DataParser {
 	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
 	 *             The variables must have been previously set.
 	 */
-	public DataParser(SurveyRawData data) {
+	protected DataParser(SurveyRawData data) {
 		if (data.getVariablesMap() == null) {
 			log.debug("No variables map set on data object. Parsing will most likely fail.");
 		}

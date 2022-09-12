@@ -1,16 +1,17 @@
 package fr.insee.kraftwerk.batch.configuration;
 
-import lombok.NonNull;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
+
+import lombok.NonNull;
 
 public class DirectoryItemReader implements ItemReader<Path> {
 
@@ -21,7 +22,7 @@ public class DirectoryItemReader implements ItemReader<Path> {
     }
 
     @Override
-    public Path read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public Path read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         return directories.isEmpty()?null:directories.remove(0);
     }
 }

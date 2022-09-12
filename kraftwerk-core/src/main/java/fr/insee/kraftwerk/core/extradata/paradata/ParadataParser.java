@@ -180,7 +180,7 @@ public class ParadataParser {
 	 * @param paradataUE    the paradata
 	 * @param surveyRawData dataset where the paradata will be saved
 	 */
-	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) throws Exception {
+	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData){
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
 		Set<String> paradataVariables = paraDataUE.getParadataVariables().keySet();
 		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
@@ -193,7 +193,6 @@ public class ParadataParser {
 				VariableType.INTEGER, "20");
 		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3");
-		try {
 			variablesMap.putVariable(variableDuree);
 			variablesMap.putVariable(variableDureeBrute);
 			variablesMap.putVariable(variableNombre);
@@ -206,9 +205,6 @@ public class ParadataParser {
 					variablesMap.putVariable(variable);
 				}
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
 
 		if (!paraDataUE.getOrchestrators().isEmpty()) {
 			long lengthOrchestrators = paraDataUE.createLengthOrchestratorsVariable();

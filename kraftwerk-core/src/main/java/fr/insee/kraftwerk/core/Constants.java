@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -151,8 +153,10 @@ public final class Constants {
 	// ---------- Parse a file
 	/** Parse JSON from fileName
 	 * @param filename
+	 * @throws ParseException 
+	 * @throws IOException 
 	 */
-	public static Object readJsonSimple(Path filename) throws Exception {
+	public static Object readJsonSimple(Path filename) throws IOException, ParseException {
 		FileReader reader = new FileReader(filename.toString());
 		JSONParser jsonParser = new JSONParser();
 		return jsonParser.parse(reader);
@@ -162,7 +166,7 @@ public final class Constants {
 	/** Convert a long into a text value standardized
 	 * @param datelong
 	 */
-	public static String convertToDateFormat(long datelong) throws Exception {
+	public static String convertToDateFormat(long datelong) {
 		return String.format("%2d jours, %02d:%02d:%02d", TimeUnit.MILLISECONDS.toDays(datelong),
 				TimeUnit.MILLISECONDS.toHours(datelong) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(datelong)),
 				TimeUnit.MILLISECONDS.toMinutes(datelong)

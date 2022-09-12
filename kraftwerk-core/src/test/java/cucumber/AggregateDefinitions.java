@@ -23,7 +23,7 @@ public class AggregateDefinitions {
 	public String tempDatasetPath = "";
 
 	@Given("We have some VTLBindings named {string} and {string}")
-	public void initialize(String firstDataset, String secondDataset) throws Exception {
+	public void initialize(String firstDataset, String secondDataset){
 		// create datasets
 		SurveyRawData fakeCawiData = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		SurveyRawData fakePapiData = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -40,7 +40,7 @@ public class AggregateDefinitions {
 	}
 
 	@When("I try to aggregate the bindings")
-	public void collect_variables() throws Exception {
+	public void collect_variables() {
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 		reconciliationProcessing.applyVtlTransformations(
 				"MULTIMODE", null);

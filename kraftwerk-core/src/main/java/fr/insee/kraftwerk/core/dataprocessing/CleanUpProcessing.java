@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -46,8 +47,7 @@ public class CleanUpProcessing extends DataProcessing {
         metadataVariables = (Map<String, VariablesMap>) objects[0]; // TODO: better management of metadata object
         // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName, metadataVariables);
-        log.info(String.format("Automated clean up instructions after step %s:\n%s", getStepName(),
-                cleanUpScript));
+        log.info("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
         vtlBindings.evalVtlScript(cleanUpScript);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
@@ -60,8 +60,8 @@ public class CleanUpProcessing extends DataProcessing {
     protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
         VtlScript vtlScript = new VtlScript();
         List<String> paperUcqVtlNames = new ArrayList<>();
-        for (String modeName : metadataVariables.keySet()) {
-            VariablesMap variablesMap = metadataVariables.get(modeName);
+        for (Entry<String,VariablesMap> mode : metadataVariables.entrySet()) {
+            VariablesMap variablesMap = mode.getValue();
             paperUcqVtlNames.addAll(
                     variablesMap.getPaperUcq().stream()
                             .map(variable -> variablesMap.getFullyQualifiedName(variable.getName()))
@@ -84,7 +84,7 @@ public class CleanUpProcessing extends DataProcessing {
     /** Remove PaperUcq variables from concerned VariablesMap */
     private void removePaperUcqVariables() {
         for (VariablesMap variablesMap : metadataVariables.values()) {
-            variablesMap.getVariables().values().removeIf(variable -> variable instanceof PaperUcq);
+            variablesMap.getVariables().values().removeIf(PaperUcq.class::isInstance);
         }
     }
 

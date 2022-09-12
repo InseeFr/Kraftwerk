@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.batch;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -22,6 +23,7 @@ import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
@@ -43,11 +45,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserVtlBatch implements Tasklet {
 
-    @Setter
+    private static final String JSON = ".json";
+	@Setter
     Path campaignDirectory;
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws IOException, NullException  {
 
         String campaignName = campaignDirectory.getFileName().toString();
 
@@ -116,7 +119,7 @@ public class UserVtlBatch implements Tasklet {
                         .getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
                 dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
 
-                vtlBindings.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + ".json"));
+                vtlBindings.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON));
 
             }
 
@@ -137,7 +140,7 @@ public class UserVtlBatch implements Tasklet {
                     userInputs.getVtlTransformationsFile());
 
             vtlBindings.writeJsonDataset(multimodeDatasetName,
-                    vtlOutputDir.resolve("3_" + multimodeDatasetName + ".json"));
+                    vtlOutputDir.resolve("3_" + multimodeDatasetName + JSON));
 
             DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
             informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
@@ -149,7 +152,7 @@ public class UserVtlBatch implements Tasklet {
                     .collect(Collectors.toSet());
             for(String datasetName : finalNames) {
                 vtlBindings.writeJsonDataset(datasetName,
-                        vtlOutputDir.resolve("4_" + datasetName + ".json"));
+                        vtlOutputDir.resolve("4_" + datasetName + JSON));
             }
 
             log.info("Vtl datasets job terminated.");

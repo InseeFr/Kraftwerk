@@ -1,13 +1,5 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +11,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to manage the writing of output tables.
@@ -165,16 +165,6 @@ public class OutputFiles {
 			if (!Files.exists(newDataPath)) {
 				new File(newDataPath.getParent().toString()).mkdirs();
 			}
-
-			// TODO: remove following code block (unused)
-			// ---------------------------------------------------------------
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			// get the last modified date and format it to the defined format
-//			String nameNewFile = modeInputs.getDataFile().toString();
-//			nameNewFile = nameNewFile.substring(0, nameNewFile.lastIndexOf(".")) + "-" + sdf.format(timestamp)
-//					+ nameNewFile.substring(nameNewFile.lastIndexOf(".")); // <- throws an exception when data path is a folder (not containing "."), also might not work as expected if some folder name contains a "."
-			// ---------------------------------------------------------------
 
 			if (Files.isRegularFile(dataPath)) {
 				try {

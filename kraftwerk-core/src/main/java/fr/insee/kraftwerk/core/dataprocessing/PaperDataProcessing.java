@@ -6,12 +6,10 @@ import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of the UnimodalDataProcessing class for data from digitized paper.
  */
-@Slf4j
 public class PaperDataProcessing extends UnimodalDataProcessing {
 
     public PaperDataProcessing(VtlBindings vtlBindings) {

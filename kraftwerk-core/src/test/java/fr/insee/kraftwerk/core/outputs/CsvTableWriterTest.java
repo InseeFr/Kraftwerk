@@ -22,7 +22,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
-public class CsvTableWriterTest {
+class CsvTableWriterTest {
 
 	Path outTestFilePath = Paths.get(TestConstants.UNIT_TESTS_DUMP, "test.csv");
 
@@ -57,7 +57,7 @@ public class CsvTableWriterTest {
 	);
 
 	@Test
-	public void writeCsvFromDatasetTest() throws IOException, CsvException {
+	void writeCsvFromDatasetTest() throws IOException, CsvException {
 		// Clean the existing file
 		Files.deleteIfExists(outTestFilePath);
 		
@@ -79,7 +79,7 @@ public class CsvTableWriterTest {
 	}
 
 	@Test
-	public void getDataPointValueTest() {
+	void getDataPointValueTest() {
 		/*
 		 * 
 					List.of("T01", "foostring1", 1, 11L, true, new Date(100000)),
@@ -87,20 +87,20 @@ public class CsvTableWriterTest {
 					List.of("T02", "foostring3", 3, 21L, true, new Date(300000))
 		 */
 		// String variable
-		assertEquals(CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
-				testCompleteVariablesDataset.getDataStructure().get("FOO_STR")), "foostring1");
+		assertEquals("foostring1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+				testCompleteVariablesDataset.getDataStructure().get("FOO_STR")));
 		// Integer variable
-		assertEquals(CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
-				testCompleteVariablesDataset.getDataStructure().get("FOO_INT")), "1");
+		assertEquals("1",CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+				testCompleteVariablesDataset.getDataStructure().get("FOO_INT")));
 		// Numeric variable
-		assertEquals(CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
-				testCompleteVariablesDataset.getDataStructure().get("FOO_NUM")), "123456789");
+		assertEquals("123456789", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+				testCompleteVariablesDataset.getDataStructure().get("FOO_NUM")));
 		// Boolean variable
-		assertEquals(CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
-				testCompleteVariablesDataset.getDataStructure().get("FOO_BOO")), "1");
+		assertEquals("1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+				testCompleteVariablesDataset.getDataStructure().get("FOO_BOO")));
 		// Date variable
-		assertEquals(CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(1),
-				testCompleteVariablesDataset.getDataStructure().get("FOO_DAT")), "1970-01-01");
+		assertEquals("1970-01-01", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(1),
+				testCompleteVariablesDataset.getDataStructure().get("FOO_DAT")));
 		
 	}
 
