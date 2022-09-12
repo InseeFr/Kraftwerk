@@ -233,29 +233,4 @@ public class ReconciliationProcessing extends DataProcessing {
 		return res;
 	}
 
-
-
-	/**
-	 * Unused method, but we might use it if we want to optimize the selection of
-	 * common variables.
-	 *
-	 * Return a list of integers consecutive integers from 'start' (included) to
-	 * 'end' (excluded) without the 'except'.
-	 *
-	 * Example: listOfIntegers(0, 5, 2) will return a list containing 0, 1, 3, 4.
-	 *
-	 * Code sample found thanks to:
-	 * https://www.baeldung.com/java-listing-numbers-within-a-range
-	 * https://howtodoinjava.com/java8/stream-if-else-logic/
-	 *
-	 * @param start  First integer
-	 * @param end    Last integer (excluded)
-	 * @param except Integer that will not be in output list.
-	 *
-	 * @return A list of integers (int type).
-	 */
-	private List<Integer> rangeOfIntegers(int start, int end, int except) {
-		return IntStream.range(start, end).boxed().filter(k -> k != except).collect(Collectors.toList());
-	}
-
 }
