@@ -14,7 +14,7 @@ import java.util.List;
 public class CalculatedProcessing extends DataProcessing {
 
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
-    public static int MAXIMAL_RESOLVING_ITERATIONS = 100;
+    public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
 
     public CalculatedProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
@@ -84,12 +84,8 @@ public class CalculatedProcessing extends DataProcessing {
             group = variablesMap.getMcqGroup(correspondingVariableName);
         } else { //TODO : FIXME ?????
             group = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
-         //   log.warn(String.format(
-          //          "No information from the DDI about question or variable named \"%s\".",
-          //          correspondingVariableName));
-          //  log.warn(String.format(
-         //           "\"%s\" has been arbitrarily associated with group \"%s\".",
-         //           filterResultName, group.getName()));
+            // No information from the DDI about question or variable
+            // It has been arbitrarily associated with the group above
         }
         variablesMap.putVariable(new Variable(filterResultName, group, VariableType.BOOLEAN));
     }
