@@ -92,9 +92,9 @@ public class ParadataParser {
 				event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
 				event.setIdSession((String) collectedEvent.get("idSession"));
 				event.setTimestamp((long) collectedEvent.get(timestamp));
-				ParadataVariable paradataVariable = new ParadataVariable(identifier, event.getIdSession());
+				ParadataVariable paradataVariable = new ParadataVariable(identifier);
 				ParadataOrchestrator paradataOrchestrator = new ParadataOrchestrator(identifier, event.getIdSession());
-				ParadataSession paradataSession = new ParadataSession(identifier, event.getIdSession());
+				Event paradataSession = new Event(identifier, event.getIdSession());
 				
 				if (variablesMap.getVariableNames().contains(event.getIdParadataObject())) {
 					paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());

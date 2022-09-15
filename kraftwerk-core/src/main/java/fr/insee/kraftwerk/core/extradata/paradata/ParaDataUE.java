@@ -8,8 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 public class ParaDataUE {
+	@Getter @Setter
   private Path filepath;
   
   private String identifier;
@@ -20,20 +24,12 @@ public class ParaDataUE {
   
   private List<ParadataOrchestrator> paraDataOrchestrators = new ArrayList<>();
   
-  private List<ParadataSession> paraDataSessions = new ArrayList<>();
+  private List<Event> paraDataSessions = new ArrayList<>();
   
   private List<Session> sessions = new ArrayList<>();
   
   private List<Orchestrator> orchestrators = new ArrayList<>();
-  
-  public Path getFilepath() {
-    return this.filepath;
-  }
-  
-  public void setFilepath(Path filepath) {
-    this.filepath = filepath;
-  }
-  
+
   public String getIdentifier() {
     return this.identifier;
   }
@@ -84,15 +80,15 @@ public class ParaDataUE {
     this.paraDataOrchestrators.add(paraDataOrchestrator);
   }
   
-  public List<ParadataSession> getParadataSessions() {
+  public List<Event> getParadataSessions() {
     return this.paraDataSessions;
   }
   
-  public void setParadataSessions(List<ParadataSession> paraDataSessions) {
+  public void setParadataSessions(List<Event> paraDataSessions) {
     this.paraDataSessions = paraDataSessions;
   }
   
-  public void addParadataSession(ParadataSession paraDataSession) {
+  public void addParadataSession(Event paraDataSession) {
     this.paraDataSessions.add(paraDataSession);
   }
   

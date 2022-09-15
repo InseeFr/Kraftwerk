@@ -3,28 +3,20 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 import java.nio.file.Path;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class Paradata {
+	@Getter@Setter
 	private Path filepath;
 
+	@Getter@Setter
 	private List<ParaDataUE> listParadataUE;
-
-	public Paradata() {
-	}
 
 	public Paradata(Path filepath) {
 		this.filepath = filepath;
-	}
-
-	public Path getFilepath() {
-		return this.filepath;
-	}
-
-	public void setFilepath(Path filepath) {
-		this.filepath = filepath;
-	}
-
-	public List<ParaDataUE> getListParadataUE() {
-		return this.listParadataUE;
 	}
 
 	public ParaDataUE getParadataUE(String identifier) {
@@ -33,7 +25,4 @@ public class Paradata {
 				.findAny().orElse(null);
 	}
 
-	public void setListParadataUE(List<ParaDataUE> listParadataUE) {
-		this.listParadataUE = listParadataUE;
-	}
 }
