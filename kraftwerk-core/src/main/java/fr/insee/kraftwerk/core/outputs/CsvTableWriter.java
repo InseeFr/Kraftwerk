@@ -30,8 +30,9 @@ public class CsvTableWriter {
 	static CSVWriter writer;
 
 	private static void setCSVWriter(Path filePath) {
-		File file = filePath.toFile();
-		try (FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true)){
+		try{
+			File file = filePath.toFile();
+			FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
 			writer = new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.CSV_OUTPUTS_QUOTE_CHAR,
 					ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END);
 		} catch (Exception e) {
