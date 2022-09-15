@@ -3,9 +3,9 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -16,7 +16,7 @@ public class ParaDataUE {
   
   private List<Event> events = new ArrayList<>();
   
-  private HashMap<String, List<ParadataVariable>> paraDataVariables = new LinkedHashMap<>();
+  private Map<String, List<ParadataVariable>> paraDataVariables = new LinkedHashMap<>();
   
   private List<ParadataOrchestrator> paraDataOrchestrators = new ArrayList<>();
   
@@ -50,7 +50,7 @@ public class ParaDataUE {
     this.events = events;
   }
   
-  public HashMap<String, List<ParadataVariable>> getParadataVariables() {
+  public Map<String, List<ParadataVariable>> getParadataVariables() {
     return this.paraDataVariables;
   }
   
@@ -58,17 +58,17 @@ public class ParaDataUE {
     return this.paraDataVariables.get(variableName);
   }
   
-  public void setParadataVariables(HashMap<String, List<ParadataVariable>> paraDataVariables) {
+  public void setParadataVariables(Map<String, List<ParadataVariable>> paraDataVariables) {
     this.paraDataVariables = paraDataVariables;
   }
   
   public void addParadataVariable(ParadataVariable paraDataVariable) {
     String variableName = paraDataVariable.getVariableName();
     if (this.paraDataVariables.containsKey(variableName)) {
-      ((List<ParadataVariable>)this.paraDataVariables.get(variableName)).add(paraDataVariable);
+      this.paraDataVariables.get(variableName).add(paraDataVariable);
     } else {
       this.paraDataVariables.put(variableName, new ArrayList<>());
-      ((List<ParadataVariable>)this.paraDataVariables.get(variableName)).add(paraDataVariable);
+      this.paraDataVariables.get(variableName).add(paraDataVariable);
     } 
   }
   
@@ -131,61 +131,60 @@ public class ParaDataUE {
   
   public long createLengthOrchestratorsVariable() {
     long result = 0L;
-    List<Orchestrator> orchestrators = getOrchestrators();
-    for (Orchestrator orchestrator : orchestrators)
+    for (Orchestrator orchestrator : getOrchestrators())
       result += orchestrator.getValidation() - orchestrator.getInitialization(); 
     return result;
   }
   
   public void createOrchestratorsAndSessions() {
-    String identifier = getIdentifier();
     List<Event> listParadataEvents = getEvents();
     Session session = new Session("Initialization ongoing", 0L, 0L);
     Orchestrator orchestrator = new Orchestrator(identifier, 0L, 0L);
-    if (listParadataEvents.size() > 0) {
+    if (!listParadataEvents.isEmpty()) {
       for (int j = 0; j < listParadataEvents.size() - 1; j++) {
         Event event1 = listParadataEvents.get(j);
-        Event previous_event = new Event();
+        Event previousEvent;
         if (session.getIdentifier().contentEquals("Initialization ongoing"))
           session.setIdentifier(event1.getIdSession()); 
-        if (event1.getIdParadataObject().contentEquals("init-session"))
+        if (event1.getIdParadataObject().contentEquals("init-session")) {
           if (session.getInitialization() == 0L) {
             session.setInitialization(event1.getTimestamp());
           } else {
-            previous_event = listParadataEvents.get(j - 1);
-            session.setTermination(previous_event.getTimestamp());
+            previousEvent = listParadataEvents.get(j - 1);
+            session.setTermination(previousEvent.getTimestamp());
             addSession(session);
             session = new Session(event1.getIdSession(), event1.getTimestamp(), 0L);
             if (orchestrator.getInitialization() != 0L && 
-              orchestrator.getInitialization() < previous_event.getTimestamp()) {
-              orchestrator.setValidation(previous_event.getTimestamp());
+              orchestrator.getInitialization() < previousEvent.getTimestamp()) {
+              orchestrator.setValidation(previousEvent.getTimestamp());
               addOrchestrator(orchestrator);
               orchestrator = new Orchestrator(identifier, 0L, 0L);
             } 
-          }  
+          } 
+        }
         if (orchestrator.getInitialization() == 0L && 
           event1.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
           orchestrator.setInitialization(event1.getTimestamp());
         } else if (orchestrator.getInitialization() != 0L && 
           event1.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
-          Session previous_session = getSessions().get(getSessions().size() - 1);
-          if (previous_session.getTermination() != orchestrator.getInitialization())
-            if (orchestrator.getInitialization() != 0L) {
-              previous_event = listParadataEvents.get(j - 1);
+          Session previousSession = getSessions().get(getSessions().size() - 1);
+          if (previousSession.getTermination() != orchestrator.getInitialization() && orchestrator.getInitialization() != 0L) {
+              previousEvent = listParadataEvents.get(j - 1);
               addOrchestrator(new Orchestrator(identifier, orchestrator.getInitialization(), 
-                    previous_event.getTimestamp()));
+                    previousEvent.getTimestamp()));
               orchestrator.setInitialization(event1.getTimestamp());
-            }  
+          }
         } else if (event1.getIdParadataObject().contentEquals("validate-button-orchestrator-collect")) {
-          previous_event = listParadataEvents.get(j - 1);
-          if (orchestrator.getInitialization() == 0L)
-            if (getSessions().size() == 0) {
+          previousEvent = listParadataEvents.get(j - 1);
+          if (orchestrator.getInitialization() == 0L) {
+            if (getSessions().isEmpty()) {
               orchestrator.setInitialization(session.getInitialization());
             } else {
               orchestrator.setInitialization((
-                  (Session)getSessions().get(getSessions().size() - 1)).getInitialization());
+                  getSessions().get(getSessions().size() - 1)).getInitialization());
             }  
-          if (orchestrator.getInitialization() < previous_event.getTimestamp()) {
+          }
+          if (orchestrator.getInitialization() < previousEvent.getTimestamp()) {
             orchestrator.setValidation(event1.getTimestamp());
             addOrchestrator(orchestrator);
           } 
