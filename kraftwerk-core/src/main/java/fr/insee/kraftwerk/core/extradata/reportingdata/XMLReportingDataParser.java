@@ -1,18 +1,18 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.nio.file.Path;
+
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
-import java.nio.file.Path;
+import lombok.extern.slf4j.Slf4j;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class XMLReportingDataParser extends ReportingDataParser {
-  private static final Logger log = LoggerFactory.getLogger(XMLReportingDataParser.class);
-  
+ 
   private Document document;
   
   public void parseReportingData(ReportingData reportingData, SurveyRawData data) throws NullException {
@@ -28,6 +28,8 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
     Element surveyUnitsNode = root.getFirstChildElement("SurveyUnits");
     Elements surveyUnitsNodeList = surveyUnitsNode.getChildElements("SurveyUnit");
+	log.info("Read {} surveyUnit in file {}", surveyUnitsNodeList.size(),filePath);
+
     for (int i = 0; i < surveyUnitsNodeList.size(); i++) {
       Element surveyUnitElement = surveyUnitsNodeList.get(i);
       ReportingDataUE reportingDataUE = new ReportingDataUE();

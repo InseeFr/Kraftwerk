@@ -72,6 +72,8 @@ public class CsvTableWriter {
 			for (int j = 0; j < rowSize; j++) {
 				columnsMap.put(variablesList.get(j), j);
 			}
+			
+			log.info("{} rows to write in file {}", dataset.getDataPoints().size(), filePath);
 
 			// We check if the header has the same variables as the dataset
 			if (Arrays.equals(headers, convertWithStream(variablesList))) {
@@ -110,7 +112,7 @@ public class CsvTableWriter {
 						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 						csvRow[csvColumn] = value;
 					}
-
+					log.info("ligne {}", i );
 					writer.writeNext(csvRow);
 				}
 
