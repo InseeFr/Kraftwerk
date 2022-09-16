@@ -3,24 +3,24 @@ package fr.insee.kraftwerk.core.outputs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.inputs.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to generate import scripts for the csv output tables.
  */
 
-@Slf4j
+
 public class ImportScripts {
 
-	private final List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
+	private final List<TableScriptInfo> tableScriptInfoList;
 
 	public ImportScripts() {
+		tableScriptInfoList = new ArrayList<>();
 	};
 
 	/** @see TableScriptInfo */
@@ -61,30 +61,11 @@ public class ImportScripts {
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
 			Map<String, Variable> listVariables = tableScriptInfo.getAllLength(tableScriptInfo.getDataStructure(),
 					metadataVariables);
-			for (String variableName : listVariables.keySet()) {
-				VariableType variableType = listVariables.get(variableName).getType();
-
-				script.append(String.format("%s$%s <- as.", tableName, variableName));
-				switch (variableType) {
-				case STRING:
-					script.append("character");
-					break;
-				case NUMBER:
-					script.append("numeric");
-					break;
-				case INTEGER:
-					script.append("integer");
-					break;
-				case BOOLEAN:
-					script.append("logical");
-					break;
-				case DATE:
-					script.append("Date");
-					break;
-				default:
-					throw new UnknownDataFormatException("Unknown data format: " + variableType);
-				}
-				script.append(String.format("(%s$%s)\n", tableName, variableName));
+			for (Entry<String, Variable> varEntry : listVariables.entrySet()) {
+				VariableType variableType = varEntry.getValue().getType();
+				script.append(String.format("%s$%s <- as.", tableName, varEntry.getKey()));
+				script.append(variableType.getFormatR());
+				script.append(String.format("(%s$%s)\n", tableName, varEntry.getKey()));
 
 			}
 			script.append("\n\n");
@@ -147,31 +128,6 @@ public class ImportScripts {
 	}
 
 	/**
-	 * Convert Kraftwerk in memory type to a type argument for the data.table::fread
-	 * colClasses option.
-	 * 
-	 * @param variableType a VariableType from the Kraftwerk enum class
-	 * @return eiter: character, integer, numeric, Date, logical
-	 */
-	private String getDataTableType(VariableType variableType) {
-		switch (variableType) {
-		case STRING:
-			return "character";
-		case INTEGER:
-			return "integer";
-		case NUMBER:
-			return "number";
-		case DATE:
-			return "Date";
-		case BOOLEAN:
-			return "logical";
-		default:
-			log.debug("Missing variable type: this should not happen!");
-			return null;
-		}
-	}
-
-	/**
 	 * Get the length in SAS standards
 	 * 
 	 * @param length a value of the dataset variable
@@ -203,28 +159,24 @@ public class ImportScripts {
 	public String scriptSASPart1(Map<String, Variable> listVariables) {
 
 		StringBuilder script = new StringBuilder();
-		for (String variableName : listVariables.keySet()) {
-			Variable variable = listVariables.get(variableName);
+		for (Entry<String, Variable> varEntry : listVariables.entrySet()) {
+			Variable variable = varEntry.getValue();
 			String length = variable.getLength();
 			if (!length.contentEquals("0")) {
 				// We write the format instructions if we have inrofmations on the length of the
 				// variables
 
 				if (variable.getType().equals(VariableType.BOOLEAN)) {
-					script.append(String.format("informat %s $1. ;\n", variableName, length));
+					script.append(String.format("informat %s $1. ;\n", varEntry.getKey(), length));
 				} else if (variable.getType().equals(VariableType.STRING)
 						|| variable.getType().equals(VariableType.DATE)) {
-					script.append(String.format("informat %s $%s. ;\n", variableName, length));
+					script.append(String.format("informat %s $%s. ;\n", varEntry.getKey(), length));
 				} else if (variable.getType().equals(VariableType.INTEGER)
 						|| variable.getType().equals(VariableType.NUMBER)) {
-					if (length.contains(".")) {
-						script.append(String.format("informat %s %s. ;\n", variableName, getSASNumericLength(length)));
-					} else {
-						script.append(String.format("informat %s %s. ;\n", variableName, getSASNumericLength(length)));
-					}
+					script.append(String.format("informat %s %s. ;\n", varEntry.getKey(), getSASNumericLength(length)));
 				}
 			} else {
-				script.append(String.format("informat %s $32. ;\n", variableName));
+				script.append(String.format("informat %s $32. ;\n", varEntry.getKey()));
 			}
 		}
 		script.append("\n");
@@ -240,26 +192,22 @@ public class ImportScripts {
 	public String scriptSASPart2(Map<String, Variable> listVariables) {
 
 		StringBuilder script = new StringBuilder();
-		for (String variableName : listVariables.keySet()) {
-			Variable variable = listVariables.get(variableName);
+		for (Entry<String, Variable> varEntry : listVariables.entrySet()) {
+			Variable variable = varEntry.getValue();
 			String length = variable.getLength();
 			if (!length.contentEquals("0")) {
-				// We write the format instructions if we have inrofmations on the length of the
+				// We write the format instructions if we have informations on the length of the
 				// variables
 
 				if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
 						|| variable.getType().equals(VariableType.DATE)) {
-					script.append(String.format("format %s $%s. ;\n", variableName, length));
+					script.append(String.format("format %s $%s. ;\n", varEntry.getKey(), length));
 				} else if (variable.getType().equals(VariableType.INTEGER)
 						|| variable.getType().equals(VariableType.NUMBER)) {
-					if (length.contains(".")) {
-						script.append(String.format("format %s %s. ;\n", variableName, getSASNumericLength(length)));
-					} else {
-						script.append(String.format("format %s %s. ;\n", variableName, getSASNumericLength(length)));
-					}
+					script.append(String.format("format %s %s. ;\n", varEntry.getKey(), getSASNumericLength(length)));
 				}
 			} else {
-				script.append(String.format("format %s $32. ;\n", variableName));
+				script.append(String.format("format %s $32. ;\n", varEntry.getKey()));
 			}
 		}
 		script.append("\n");
