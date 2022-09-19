@@ -46,7 +46,10 @@ public class ReportingDataUE {
   }
   
   public void addState(State state) {
-	  if (state != null) this.states.add(state);
+	  if (state != null) {
+		 long nbEquals = states.stream().filter(s -> s.equals(state)).count(); //count nb states equals to the state to insert
+		 if (nbEquals==0) this.states.add(state);
+	  }
   }
   
   public int size() {

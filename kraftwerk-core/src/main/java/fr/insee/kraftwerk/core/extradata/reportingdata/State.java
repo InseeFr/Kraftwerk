@@ -1,35 +1,28 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
-public class State {
+@AllArgsConstructor
+@Getter@Setter
+public class State{
 	@NonNull
   private String stateType;
-  
   private long timestamp;
    
   public State(String stateType) {
     this.stateType = stateType;
   }
+
+  @Override
+  public boolean equals(Object obj){
+	    if(obj instanceof State){
+	       return (((State) obj).getStateType().equals(this.getStateType()) && ((State)obj).getTimestamp()==this.getTimestamp()); 
+	    }
+	    return false;
+	}
   
-  public State(String stateType, long timestamp) {
-    this.stateType = stateType;
-    this.timestamp = timestamp;
-  }
   
-  public String getStateType() {
-    return this.stateType;
-  }
-  
-  public void setStateType(String stateType) {
-    this.stateType = stateType;
-  }
-  
-  public long getTimestamp() {
-    return this.timestamp;
-  }
-  
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
-  }
 }
