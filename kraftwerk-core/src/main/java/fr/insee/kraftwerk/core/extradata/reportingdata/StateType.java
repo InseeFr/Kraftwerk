@@ -1,7 +1,8 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Getter;
 
 public enum StateType {
   STATE01("NVM", "UE non visible gestionnaire"),
@@ -30,8 +31,9 @@ public enum StateType {
   STATE24("REFUS", "REFUS"),
   STATE25("RELANCE", "RELANCE");
   
+	@Getter
   private final String key;
-  
+	@Getter
   private final String value;
   
   private static Map<String, String> valueToTextMapping;
@@ -41,21 +43,15 @@ public enum StateType {
     this.value = value;
   }
   
-  private static void initMapping() {
-    valueToTextMapping = new HashMap<>();
-    byte b;
-    int i;
-    StateType[] arrayOfStateType;
-    for (i = (arrayOfStateType = values()).length, b = 0; b < i; ) {
-      StateType s = arrayOfStateType[b];
-      valueToTextMapping.put(s.key, s.value);
-      b++;
-    } 
-  }
+
+	static {
+		// Populate out lookup when enum is created
+		for (StateType e : StateType.values()) {
+			valueToTextMapping.put(e.getKey(), e.getValue());
+		}
+	}
   
-  public static String getStateType(String key) {
-    if (valueToTextMapping == null)
-      initMapping(); 
+  public static String getStateType(String key) { 
     return valueToTextMapping.get(key);
   }
 }
