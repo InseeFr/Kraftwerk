@@ -52,7 +52,7 @@ public class XMLReportingDataParserTest {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 		ReportingData reportingData = new ReportingData();
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
-		assertEquals(8, xMLReportingDataParser.maxStates(reportingData));
+		assertEquals(8, xMLReportingDataParser.countMaxStates(reportingData));
 	}
 
 }

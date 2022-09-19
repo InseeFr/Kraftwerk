@@ -20,8 +20,8 @@ public abstract class ReportingDataParser {
 	public int maxAttempts = 0;
 
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData) {
-		this.maxStates = maxStates(reportingData);
-		this.maxAttempts = maxAttempts(reportingData);
+		this.maxStates = countMaxStates(reportingData);
+		this.maxAttempts = countMaxAttempts(reportingData);
 		createReportingVariables(surveyRawData, reportingData);
 		addReportingValues(surveyRawData, reportingData);
 	}
@@ -109,13 +109,13 @@ public abstract class ReportingDataParser {
 				questionnaire.getAnswers().putValue(Constants.ADRESS_NOI_NAME, String.format("%02d", new Object[] {
 						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getNoi())) }));
 			}
-			if (reportingDataUE.getStates().size() > 0) {
+			if (!reportingDataUE.getStates().isEmpty()) {
 				for (int k = 1; k <= reportingDataUE.getStates().size(); k++)
 					questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + " _" + k,
-							StateType.getStateType(((State) reportingDataUE.getStates().get(k - 1)).getStateType()));
+							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
 				questionnaire.getAnswers().putValue(Constants.LAST_STATE_NAME,
 						StateType.getStateType(
-								((State) reportingDataUE.getStates().get(reportingDataUE.getStates().size() - 1))
+								(reportingDataUE.getStates().get(reportingDataUE.getStates().size() - 1))
 										.getStateType()));
 			}
 			if (reportingDataUE.getContactOutcome() != null) {
@@ -137,20 +137,18 @@ public abstract class ReportingDataParser {
 					questionnaire.getAnswers().putValue(Constants.NUMBER_ATTEMPTS_NAME,
 							Integer.toString(reportingDataUE.getContactOutcome().getTotalNumberOfContactAttempts()));
 			}
-			if (reportingDataUE.getContactAttempts().size() > 0)
+			if (!reportingDataUE.getContactAttempts().isEmpty())
 				for (int k = 1; k <= reportingDataUE.getContactAttempts().size(); k++)
 					questionnaire.getAnswers().putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
-
-							ContactAttemptType.getAttemptType(
-									((ContactAttempt) reportingDataUE.getContactAttempts().get(k - 1)).getStatus()));
+							ContactAttemptType.getAttemptType(reportingDataUE.getContactAttempts().get(k - 1).getStatus()));
 		}
 	}
 
-	public int maxStates(ReportingData reportingData) {
+	public int countMaxStates(ReportingData reportingData) {
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getStates().size()).max().getAsInt();
 	}
 
-	public int maxAttempts(ReportingData reportingData) {
+	public int countMaxAttempts(ReportingData reportingData) {
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getContactAttempts().size()).max()
 				.getAsInt();
 	}
