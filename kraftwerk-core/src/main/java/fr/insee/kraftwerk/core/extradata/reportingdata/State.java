@@ -1,12 +1,13 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import lombok.NonNull;
+
 public class State {
+	@NonNull
   private String stateType;
   
   private long timestamp;
-  
-  public State() {}
-  
+   
   public State(String stateType) {
     this.stateType = stateType;
   }

@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
@@ -36,14 +37,13 @@ public enum StateType {
 	@Getter
   private final String value;
   
-  private static Map<String, String> valueToTextMapping;
+  private static Map<String, String> valueToTextMapping  = new HashMap<>();
   
   StateType(String key, String value) {
     this.key = key;
     this.value = value;
   }
   
-
 	static {
 		// Populate out lookup when enum is created
 		for (StateType e : StateType.values()) {

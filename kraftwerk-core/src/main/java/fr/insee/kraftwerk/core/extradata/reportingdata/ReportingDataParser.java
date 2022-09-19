@@ -85,8 +85,7 @@ public abstract class ReportingDataParser {
 				questionnaire = new QuestionnaireData();
 				questionnaire.setIdentifier(reportingDataUE.getIdentifier());
 				surveyRawData.addQuestionnaire(questionnaire);
-				log.info(String.format("Missing questionnaire for reporting data: %s.",
-						new Object[] { reportingDataUE.getIdentifier() }));
+				log.info("Missing questionnaire for reporting data: {}.",	reportingDataUE.getIdentifier() );
 			}
 			if (reportingDataUE.getInterviewerId() != null)
 				questionnaire.getAnswers().putValue(Constants.INTERVIEWER_ID_NAME, reportingDataUE.getInterviewerId());
@@ -110,9 +109,10 @@ public abstract class ReportingDataParser {
 						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getNoi())) }));
 			}
 			if (!reportingDataUE.getStates().isEmpty()) {
-				for (int k = 1; k <= reportingDataUE.getStates().size(); k++)
-					questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + " _" + k,
+				for (int k = 1; k <= reportingDataUE.size(); k++) {
+					questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
 							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
+				}
 				questionnaire.getAnswers().putValue(Constants.LAST_STATE_NAME,
 						StateType.getStateType(
 								(reportingDataUE.getStates().get(reportingDataUE.getStates().size() - 1))
