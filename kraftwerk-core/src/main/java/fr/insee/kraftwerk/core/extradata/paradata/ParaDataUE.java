@@ -1,14 +1,15 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 public class ParaDataUE {
 	@Getter
@@ -60,16 +61,15 @@ public class ParaDataUE {
 	public void addOrchestrator(Orchestrator orchestrator) {
 		this.orchestrators.add(orchestrator);
 	}
-
+	
 	public void sortEvents() {
-      this.setEvents(this.getEvents()
-              .stream()
-              .distinct()
-              .collect(collectingAndThen(toCollection(() -> new TreeSet<>(
-                              Comparator
-                                      .comparingLong(Event::getTimestamp)
-                                      .thenComparing(Event::getIdParadataObject))),
-                      ArrayList::new)));
+		this.setEvents(
+				this.getEvents()
+				.stream()
+				.distinct()
+				.sorted(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))
+				.collect(Collectors.toList())
+		);
 	}
 
 	public long createLengthOrchestratorsVariable() {
