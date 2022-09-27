@@ -14,15 +14,10 @@ import lombok.ToString;
 @EqualsAndHashCode(of = {"timestamp", "idParadataObject"})
 @ToString
 public class Event {
-	@Getter	@Setter
 	protected String idSurveyUnit;
-	@Getter	@Setter
 	private String idParadataObject;
-	@Getter	@Setter
 	protected String idSession;
-	@Getter	@Setter
 	protected Object value;
-	@Getter	@Setter
 	protected long timestamp;
 
 	public Event(String idSurveyUnit) {
