@@ -49,7 +49,7 @@ public class LauncherService {
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 
 	@PutMapping(value = "/main")
-	@Operation(operationId = "main", summary = "Replaces batch")
+	@Operation(operationId = "main", summary = "Main service : call all steps")
 	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) {
 		Path inDirectory = Paths.get(inDirectoryParam);
 
@@ -60,7 +60,7 @@ public class LauncherService {
 
 				log.info(
 						"===============================================================================================");
-				log.info("Kraftwerk batch started for campaign: " + campaignName);
+				log.info("Kraftwerk main service started for campaign: " + campaignName);
 				log.info(
 						"===============================================================================================");
 
@@ -177,14 +177,14 @@ public class LauncherService {
 				outputFiles.writeImportScripts(metadataVariables);
 
 				/* Step 4.3 : move kraftwerk.json to a secondary folder */
-				outputFiles.renameInputFile(inDirectory);
+		//		outputFiles.renameInputFile(inDirectory);
 
 				/* Step 4.4 : move differential data to a secondary folder */
-				outputFiles.moveInputFiles(userInputs);
+		//		outputFiles.moveInputFiles(userInputs);
 
 				log.info(
 						"===============================================================================================");
-				log.info("Kraftwerk batch terminated for campaign: " + campaignName);
+				log.info("Kraftwerk main service terminated for campaign: " + campaignName);
 				log.info(
 						"===============================================================================================\n");
 
@@ -193,7 +193,7 @@ public class LauncherService {
 		} catch (NullException e) {
 			// TODO Auto-generated catch block
 			NullException nullException = new NullException();
-			nullException.renameInputFile(inDirectory);
+			e.renameInputFile(inDirectory);
 		}
 
 		return true;
@@ -206,7 +206,7 @@ public class LauncherService {
 		if (Files.exists(userInputFile)) {
 			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
 		} else {
-			log.info("No batch configuration file found in campaign folder: " + inDirectory);
+			log.info("No configuration file found in campaign folder: " + inDirectory);
 			return false;
 		}
 		return true;
