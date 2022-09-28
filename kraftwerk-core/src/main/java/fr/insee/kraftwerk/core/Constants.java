@@ -35,7 +35,7 @@ public final class Constants {
 	// ----- XSL scripts
 	public static final String XSLT_STRUCTURED_VARIABLES = "xslt/structured-variables.xsl";
 
-	// ----- Batch parameters from properties
+	// ----- Parameters from properties
 	public static final String METADATA_SEPARATOR = ".";
 	public static final String PAPER_IDENTIFIER_SEPARATOR = "_"; //TODO: get it from properties
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
@@ -43,7 +43,7 @@ public final class Constants {
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_QUOTE_CHAR = '"'; //TODO: get it from properties
 
-	// ----- Batch fixed parameters
+	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
 

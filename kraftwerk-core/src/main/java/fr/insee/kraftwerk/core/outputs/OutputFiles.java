@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OutputFiles {
 
-	/** Final absolute path to the batch output folder */
+	/** Final absolute path of the output folder */
 	@Getter
 	private final Path outputFolder;
 
@@ -35,8 +35,7 @@ public class OutputFiles {
 	private final Set<String> datasetToCreate = new HashSet<>();
 
 	/**
-	 * When an instance is created, the output folder for the concerned batch
-	 * execution is created.
+	 * When an instance is created, the output folder is created.
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.

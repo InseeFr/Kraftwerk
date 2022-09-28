@@ -39,7 +39,7 @@ public class CleanUpProcessing extends DataProcessing {
      *
      * @param bindingName The name of the multimode dataset.
      * @param userVtlInstructionsPath User vtl script (none for this step).
-     * @param objects The batch metadata object instance is expected here.
+     * @param objects The metadata object instance is expected here.
      */
     @Override
     public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects) {
