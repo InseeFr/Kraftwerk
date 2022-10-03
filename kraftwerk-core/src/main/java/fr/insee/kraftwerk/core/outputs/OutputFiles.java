@@ -34,12 +34,6 @@ public class OutputFiles {
 
 	private final VtlBindings vtlBindings;
 
-	/**
-	 * We don't want to output unimodal datasets and the multimode dataset. This
-	 * method return the list of dataset names to be output, that are the dataset
-	 * created during the information levels processing step (one per group), and
-	 * those that might have been created by user VTL instructions.
-	 */
 	@Getter
 	private final Set<String> datasetToCreate = new HashSet<>();
 
@@ -167,6 +161,7 @@ public class OutputFiles {
 			// MANAGE DATA
 			Path dataPath = modeInputs.getDataFile();
 			Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
+
 			if (!Files.exists(newDataPath)) {
 				new File(newDataPath.getParent().toString()).mkdirs();
 			}
@@ -199,6 +194,7 @@ public class OutputFiles {
 					Files.delete(modeInputs.getReportingDataFile());
 				} catch (IOException e) {
 					throw new KraftwerkException(500, "Can't delete file " + modeInputs.getReportingDataFile());
+
 				}
 			}
 		}

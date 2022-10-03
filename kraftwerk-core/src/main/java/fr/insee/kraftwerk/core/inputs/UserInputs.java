@@ -116,7 +116,7 @@ public class UserInputs {
 	}
 
 	private Path convertToPath(String userField) {
-		if (userField != null && "null".equals(userField) && "".equals(userField)) {
+		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
 			return inputDirectory.resolve(userField);
 		} else {
 			return null;

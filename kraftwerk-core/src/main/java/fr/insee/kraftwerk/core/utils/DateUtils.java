@@ -32,6 +32,4 @@ public class DateUtils {
 		}
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}
-
-	
 }

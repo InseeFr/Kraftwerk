@@ -36,28 +36,30 @@ public abstract class DataParser {
 	 * @throws NullException 
 	 */
 	public final void parseSurveyData(Path dataPath) throws NullException {
-
-		if (Files.isRegularFile(dataPath)) {
-			parseDataFile(dataPath);
-		}
-
-		else if (Files.isDirectory(dataPath)) {
-			try (Stream<Path> stream = Files.list(dataPath)){
-				stream.forEach(t -> {
-					try {
-						parseDataFile(t);
-					} catch (NullException e) {
-						log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
-					}
-				});
-			} catch (IOException e) {
-				log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
-			}
-		}
-
+		if (dataPath == null) log.error("Datapath is null");
 		else {
-			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-			log.warn("No data was parsed.");
+			if (Files.isRegularFile(dataPath)) {
+				parseDataFile(dataPath);
+			}
+	
+			else if (Files.isDirectory(dataPath)) {
+				try (Stream<Path> stream = Files.list(dataPath)){
+					stream.forEach(t -> {
+						try {
+							parseDataFile(t);
+						} catch (NullException e) {
+							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+						}
+					});
+				} catch (IOException e) {
+					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
+				}
+			}
+	
+			else {
+				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+				log.warn("No data was parsed.");
+			}
 		}
 	}
 
