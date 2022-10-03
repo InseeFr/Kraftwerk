@@ -37,6 +37,7 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,7 +65,7 @@ public class LauncherService {
 				log.info(
 						"===============================================================================================");
 
-				Path outDirectory = transformToOut(inDirectory);
+				Path outDirectory = FileUtils.transformToOut(inDirectory);
 
 				/* Step 1 : Init */
 
@@ -212,12 +213,5 @@ public class LauncherService {
 		return true;
 	}
 
-	/**
-	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
-	 */
-	public Path transformToOut(Path inDirectory) {
-		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve("out")
-				: transformToOut(inDirectory.getParent()).resolve(inDirectory.getFileName());
-	}
 
 }
