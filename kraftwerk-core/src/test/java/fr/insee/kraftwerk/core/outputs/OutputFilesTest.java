@@ -1,18 +1,8 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.InMemoryDataset;
-import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +13,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.InMemoryDataset;
+import fr.insee.vtl.model.Structured;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class OutputFilesTest {
+class OutputFilesTest {
 
 	private static UserInputs testUserInputs;
 	private static OutputFiles outputFiles;
@@ -36,7 +40,7 @@ public class OutputFilesTest {
 
 	@Test
 	@Order(1)
-	public void createInstance() {
+	void createInstance() {
 		assertDoesNotThrow(() -> {
 			//
 			testUserInputs = new UserInputs(
@@ -58,9 +62,9 @@ public class OutputFilesTest {
 
 	@Test
 	@Order(2)
-	public void testGetDatasetOutputNames() {
+	void testGetDatasetOutputNames() {
 		//
-		Set<String> outputDatasetNames = outputFiles.getOutputDatasetNames();
+		Set<String> outputDatasetNames = outputFiles.getDatasetToCreate();
 
 		//
 		for (String mode : testUserInputs.getModes()) {
@@ -73,7 +77,7 @@ public class OutputFilesTest {
 	@Test
 	@Order(3)
 	@Disabled
-	public void moveFiles() {
+	void moveFiles() throws KraftwerkException {
 		String campaignName = "move_files";
 		//
 		testUserInputs = new UserInputs(

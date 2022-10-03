@@ -4,17 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.DateUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -26,12 +26,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OutputFiles {
 
+	private static final String ARCHIVE = "Archive";
+
 	/** Final absolute path of the output folder */
 	@Getter
 	private final Path outputFolder;
 
 	private final VtlBindings vtlBindings;
 
+	/**
+	 * We don't want to output unimodal datasets and the multimode dataset. This
+	 * method return the list of dataset names to be output, that are the dataset
+	 * created during the information levels processing step (one per group), and
+	 * those that might have been created by user VTL instructions.
+	 */
+	@Getter
 	private final Set<String> datasetToCreate = new HashSet<>();
 
 	/**
@@ -79,16 +88,6 @@ public class OutputFiles {
 	}
 
 	/**
-	 * We don't want to output unimodal datasets and the multimode dataset. This
-	 * method return the list of dataset names to be output, that are the dataset
-	 * created during the information levels processing step (one per group), and
-	 * those that might have been created by user VTL instructions.
-	 */
-	public Set<String> getOutputDatasetNames() {
-		return datasetToCreate;
-	}
-
-	/**
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
 	public void writeOutputCsvTables() {
@@ -114,9 +113,11 @@ public class OutputFiles {
 			importScripts.registerTable(tableScriptInfo);
 		}
 		// NOTE: commented unimplemented scripts
-		//TextFileWriter.writeFile(outputFolder.resolve("import_base.R"), importScripts.scriptR_base());
+		// TextFileWriter.writeFile(outputFolder.resolve("import_base.R"),
+		// importScripts.scriptR_base());
 		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"), importScripts.scriptR_dataTable());
-		//TextFileWriter.writeFile(outputFolder.resolve("import_with_pandas.py"), importScripts.scriptPython_pandas());
+		// TextFileWriter.writeFile(outputFolder.resolve("import_with_pandas.py"),
+		// importScripts.scriptPython_pandas());
 		TextFileWriter.writeFile(outputFolder.resolve("import.sas"), importScripts.scriptSAS());
 	}
 
@@ -131,27 +132,31 @@ public class OutputFiles {
 	 * Move the input file to another directory to archive it
 	 */
 	public void renameInputFile(Path inDirectory) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
 		File file = inDirectory.resolve("kraftwerk.json").toFile();
-		File file2 = inDirectory.resolve("kraftwerk-" + sdf.format(timestamp) + ".json").toFile();
+		String fileWithTime = "kraftwerk-" + DateUtils.getCurrentTimeStamp() + ".json";
+		File file2 = inDirectory.resolve(fileWithTime).toFile();
 		if (file2.exists()) {
 			log.warn(String.format("Trying to rename '%s' to '%s', but second file already exists.", file, file2));
 			log.warn("Timestamped input file will be over-written.");
-			file2.delete();
+			try {
+				Files.delete(file2.toPath());
+			} catch (IOException e) {
+				log.error("Can't delete file {}, IOException : {}", fileWithTime, e.getMessage());
+			}
 		}
 		file.renameTo(file2);
 	}
 
-	public void moveInputFiles(UserInputs userInputs) {
+	public void moveInputFiles(UserInputs userInputs) throws KraftwerkException {
 		//
 		Path inputFolder = userInputs.getInputDirectory();
 		String[] directories = inputFolder.toString().split(Pattern.quote(File.separator));
-		String campaignName = directories[directories.length-1];
+		String campaignName = directories[directories.length - 1];
 
 		// First we create an archive directory in case it doesn't exist
-		if (!Files.exists(inputFolder.resolve("Archive"))) {
-			inputFolder.resolve("Archive").toFile().mkdir();
+		if (!Files.exists(inputFolder.resolve(ARCHIVE))) {
+			inputFolder.resolve(ARCHIVE).toFile().mkdir();
 		}
 
 		//
@@ -159,58 +164,58 @@ public class OutputFiles {
 			ModeInputs modeInputs = userInputs.getModeInputs(mode);
 
 			// Move data file or folder in the archive
+			// MANAGE DATA
 			Path dataPath = modeInputs.getDataFile();
-			Path newDataPath = inputFolder.resolve("Archive").resolve(getRoot(modeInputs.getDataFile(), campaignName));
+			Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
 			if (!Files.exists(newDataPath)) {
 				new File(newDataPath.getParent().toString()).mkdirs();
 			}
-
 			if (Files.isRegularFile(dataPath)) {
-				try {
-					Files.move(modeInputs.getDataFile(), newDataPath);
-				} catch (IOException e) {
-					log.error("Error occurred when trying to move data file or folder in the \"Archive\" directory.");
-					log.error(e.getMessage());
-				}
+				moveFile(dataPath, newDataPath);
 			} else if (Files.isDirectory(dataPath)) {
-				moveDirectory(
-						dataPath.toFile(),
-						inputFolder.resolve("Archive").resolve(getRoot(dataPath, campaignName)).toFile());
+				moveDirectory(dataPath.toFile(),
+						inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName)).toFile());
 			} else {
 				log.debug(String.format("No file or directory at path: %s", dataPath));
 			}
 
+			// MANAGE PARADATA
 			// If paradata, we move the paradata folder
-			if (modeInputs.getParadataFolder() != null // TODO: simplify condition (UserInputs class shouldn't allow field content to equal "" or "null" (should be either a value or null)
-					&& !modeInputs.getParadataFolder().toString().contentEquals("")
-					&& !modeInputs.getParadataFolder().toString().contentEquals("null")) {
-				moveDirectory(
-						modeInputs.getParadataFolder().toFile(),
-						inputFolder.resolve("Archive")
-								.resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toFile());
+			if (modeInputs.getParadataFolder() != null) {
+				moveDirectory(modeInputs.getParadataFolder().toFile(), inputFolder.resolve(ARCHIVE)
+						.resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toFile());
 			}
 
+			// MANAGE REPORTINGDATA
 			// If reporting data, we move reporting data files
-			if (modeInputs.getReportingDataFile() != null // TODO: simplify condition (see above)
-					&& !modeInputs.getReportingDataFile().toString().equals("")) {
-				if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent())) {
+			if (modeInputs.getReportingDataFile() != null) {
+				if (!Files
+						.exists(inputFolder.resolve(ARCHIVE).resolve(modeInputs.getReportingDataFile()).getParent())) {
 					new File(getRoot(modeInputs.getReportingDataFile(), campaignName)).mkdirs();
 				}
-				moveDirectory(
-						modeInputs.getReportingDataFile().getParent().toFile(),
-						inputFolder.resolve("Archive")
-								.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
-				new File(modeInputs.getReportingDataFile().toString()).delete();
-				if (!Files.exists(inputFolder.resolve("Archive").resolve(modeInputs.getReportingDataFile()).getParent())) {
+				moveDirectory(modeInputs.getReportingDataFile().getParent().toFile(), inputFolder.resolve(ARCHIVE)
+						.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
+				try {
+					Files.delete(modeInputs.getReportingDataFile());
+				} catch (IOException e) {
+					throw new KraftwerkException(500, "Can't delete file " + modeInputs.getReportingDataFile());
 				}
 			}
+		}
+	}
+
+	public void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
+		try {
+			Files.move(dataPath, newDataPath);
+		} catch (IOException e) {
+			throw new KraftwerkException(500, "Can't move file " + dataPath + " to " + newDataPath);
 		}
 	}
 
 	private static String getRoot(Path path, String campaignName) {
 		String[] directories = path.toString().split(Pattern.quote(File.separator));
 		int campaignIndex = Arrays.asList(directories).indexOf(campaignName);
-		String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex+1, directories.length);
+		String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex + 1, directories.length);
 		StringBuilder result = new StringBuilder();
 		String sep = "";
 		for (String directory : newDirectories) {
@@ -220,19 +225,22 @@ public class OutputFiles {
 		return result.toString();
 	}
 
-	private static void moveDirectory(File sourceFile, File destFile) {
+	private static void moveDirectory(File sourceFile, File destFile) throws KraftwerkException {
 		if (sourceFile.isDirectory()) {
 			File[] files = sourceFile.listFiles();
-			assert files != null;
+			assert files != null : "List of files in sourceFile is null";
 			for (File file : files)
 				moveDirectory(file, new File(destFile, file.getName()));
-			if (!sourceFile.delete()) throw new RuntimeException();
+			try {
+				Files.delete(sourceFile.toPath());
+			} catch (IOException e) {
+				throw new KraftwerkException(500, "Can't delete " + sourceFile + " - IOException : " + e.getMessage());
+			}
 		} else {
-			if (!destFile.getParentFile().exists())
-				if (!destFile.getParentFile().mkdirs())
-					throw new RuntimeException();
+			if (!destFile.getParentFile().exists() && !destFile.getParentFile().mkdirs())
+				throw new KraftwerkException(500, "Can't create directory to archive");
 			if (!sourceFile.renameTo(destFile))
-				throw new RuntimeException();
+				throw new KraftwerkException(500, "Can't rename file " + sourceFile + " to " + destFile);
 		}
 	}
 

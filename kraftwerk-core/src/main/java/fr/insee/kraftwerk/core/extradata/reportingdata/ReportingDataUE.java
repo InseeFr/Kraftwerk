@@ -7,27 +7,21 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
-
+@Getter@Setter
 public class ReportingDataUE {
-	@Getter@Setter
+	
   private String identifier;
-  
-  @Getter@Setter
+
   private List<State> states;
-  
-  @Getter@Setter
+
   private String OrganizationUnitId;
-  
-  @Getter@Setter
+
   private String InterviewerId;
-  
-  @Getter@Setter
+
   private InseeSampleIdentiers inseeSampleIdentiers;
-  
-  @Getter@Setter
+
   private ContactOutcome contactOutcome;
   
-  @Getter@Setter
   private List<ContactAttempt> contactAttempts;
   
   public ReportingDataUE() {

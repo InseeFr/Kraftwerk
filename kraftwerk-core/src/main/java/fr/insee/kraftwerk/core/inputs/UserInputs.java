@@ -67,7 +67,7 @@ public class UserInputs {
 				//
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataFile);
-				modeInputs.setDDIURL(ddiFile);
+				modeInputs.setDdiUrl(ddiFile);
 				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
 				modeInputs.setParadataFolder(paradataFolder);
@@ -116,7 +116,7 @@ public class UserInputs {
 	}
 
 	private Path convertToPath(String userField) {
-		if (userField != null) {
+		if (userField != null && "null".equals(userField) && "".equals(userField)) {
 			return inputDirectory.resolve(userField);
 		} else {
 			return null;

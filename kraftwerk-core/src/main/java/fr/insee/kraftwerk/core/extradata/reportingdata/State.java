@@ -1,12 +1,14 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 @AllArgsConstructor
 @Getter@Setter
+@EqualsAndHashCode(of = {"stateType","timestamp"})
 public class State{
 	@NonNull
   private String stateType;
@@ -15,14 +17,6 @@ public class State{
   public State(String stateType) {
     this.stateType = stateType;
   }
-
-  @Override
-  public boolean equals(Object obj){
-	    if(obj instanceof State){
-	       return (((State) obj).getStateType().equals(this.getStateType()) && ((State)obj).getTimestamp()==this.getTimestamp()); 
-	    }
-	    return false;
-	}
   
   
 }
