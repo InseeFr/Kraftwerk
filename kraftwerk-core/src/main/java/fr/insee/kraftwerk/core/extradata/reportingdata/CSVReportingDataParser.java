@@ -4,6 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +21,6 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.DateUtils;
 
 public class CSVReportingDataParser extends ReportingDataParser {
 	private static final Logger log = LoggerFactory.getLogger(CSVReportingDataParser.class);
@@ -40,7 +43,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 					String rowIdentifier = nextRecord[2];
 					String rowState = nextRecord[0];
 					String rowTimestamp = nextRecord[1];
-					State state = new State(rowState, DateUtils.convertToTimestamp(rowTimestamp));
+					State state = new State(rowState, convertToTimestamp(rowTimestamp));
 					if (reportingData.containsReportingDataUE(rowIdentifier)) {
 						ReportingDataUE reportingDataUE1 = reportingData.getListReportingDataUE().stream().filter(
 								reportingDataUEToSearch -> rowIdentifier.equals(reportingDataUEToSearch.getIdentifier()))
@@ -64,6 +67,16 @@ public class CSVReportingDataParser extends ReportingDataParser {
 		}
 	}
 
+	public long convertToTimestamp(String rowTimestamp) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date parsedDate = null;
+		try {
+			parsedDate = dateFormat.parse(rowTimestamp);
+		} catch (ParseException e1) {
+			log.error("Parsinng error : {}", e1.getMessage());
+		}
+		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
+	}
 
 	public boolean controlHeader(String[] header) {
 		return (header.length == 8 && header[0].contentEquals("statut") && header[1].contentEquals("dateInfo")

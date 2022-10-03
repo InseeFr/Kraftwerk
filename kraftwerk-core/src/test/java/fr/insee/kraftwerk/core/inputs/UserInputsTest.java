@@ -28,7 +28,7 @@ public class UserInputsTest {
 		//
 		ModeInputs modeInputs = userInputs.getModeInputs("CAPI");
 		assertNotNull(modeInputs.getDataFile());
-		assertNotNull(modeInputs.getDdiUrl());
+		assertNotNull(modeInputs.getDDIURL());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNull(modeInputs.getParadataFolder());
 		assertNull(modeInputs.getReportingDataFile());
@@ -57,7 +57,7 @@ public class UserInputsTest {
 		//
 		ModeInputs modeInputs = userInputs.getModeInputs("CAWI");
 		assertNotNull(modeInputs.getDataFile());
-		assertNotNull(modeInputs.getDdiUrl());
+		assertNotNull(modeInputs.getDDIURL());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNotNull(modeInputs.getParadataFolder());
 		assertNotNull(modeInputs.getReportingDataFile());

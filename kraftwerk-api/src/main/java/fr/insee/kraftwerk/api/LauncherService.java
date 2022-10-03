@@ -20,7 +20,6 @@ import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -51,7 +50,7 @@ public class LauncherService {
 
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
-	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) throws KraftwerkException {
+	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) {
 		Path inDirectory = Paths.get(inDirectoryParam);
 
 		try {
@@ -80,7 +79,7 @@ public class LauncherService {
 					SurveyRawData data = new SurveyRawData();
 
 					/* Step 2.0 : Read the DDI file to get survey variables */
-					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
+					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
 					metadataVariables.put(dataMode, data.getVariablesMap());
 
 					/* Step 2.1 : Fill the data object with the survey answers file */
@@ -169,10 +168,19 @@ public class LauncherService {
 						userInputs.getVtlInformationLevelsFile());
 
 				/* Step 4 : Write output files */
-				OutputFiles outputFiles = writeOutputFiles(outDirectory, userInputs, vtlBindings);
 
-				/* Step 4.3 - 4.4 : Archive files in an output directory */ 
-				archive(inDirectory, userInputs, outputFiles);
+				/* Step 4.1 : write csv output tables */
+				OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
+				outputFiles.writeOutputCsvTables();
+
+				/* Step 4.2 : write scripts to import csv tables in several languages */
+				outputFiles.writeImportScripts(metadataVariables);
+
+				/* Step 4.3 : move kraftwerk.json to a secondary folder */
+		//		outputFiles.renameInputFile(inDirectory);
+
+				/* Step 4.4 : move differential data to a secondary folder */
+		//		outputFiles.moveInputFiles(userInputs);
 
 				log.info(
 						"===============================================================================================");
@@ -183,28 +191,12 @@ public class LauncherService {
 			}
 
 		} catch (NullException e) {
+			// TODO Auto-generated catch block
+			NullException nullException = new NullException();
 			e.renameInputFile(inDirectory);
 		}
 
 		return true;
-	}
-
-	private OutputFiles writeOutputFiles(Path outDirectory, UserInputs userInputs, VtlBindings vtlBindings) {
-		/* Step 4.1 : write csv output tables */
-		OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
-		outputFiles.writeOutputCsvTables();
-
-		/* Step 4.2 : write scripts to import csv tables in several languages */
-		outputFiles.writeImportScripts(metadataVariables);
-		return outputFiles;
-	}
-
-	private void archive(Path inDirectory, UserInputs userInputs, OutputFiles outputFiles) throws KraftwerkException {
-		/* Step 4.3 : move kraftwerk.json to a secondary folder */
-		outputFiles.renameInputFile(inDirectory);
-
-		/* Step 4.4 : move differential data to a secondary folder */
-		outputFiles.moveInputFiles(userInputs);
 	}
 
 	private boolean verifyInDirectory(Path inDirectory) {

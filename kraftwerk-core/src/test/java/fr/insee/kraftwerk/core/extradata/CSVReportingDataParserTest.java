@@ -16,10 +16,10 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
-class CSVReportingDataParserTest {
+public class CSVReportingDataParserTest {
 
 	@Test
-	void parseReportingDataTest() {
+	public void parseReportingDataTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -50,7 +50,7 @@ class CSVReportingDataParserTest {
 	}
 
 	@Test
-	void controlHeaderTest() {
+	public void controlHeaderTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 		String[] validHeaderToControl = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot"};
 		String[] invalidHeaderWrongValues = new String [] {"statut", "dateInfo", "idUe2", "idContact", "nom", "prenom", "adresse2", "numeroDeLot2"};
@@ -61,6 +61,14 @@ class CSVReportingDataParserTest {
 		assertFalse(csvReportingDataParser.controlHeader(headerToControlWrongSize));
 	}
 
-
+	@Test
+	public void convertDateTest() {
+		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
+		assertEquals(1645007098, csvReportingDataParser.convertToTimestamp("16/02/2022 11:24:58"));
+		assertEquals(1566544132, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));
+		assertEquals(1111111111, csvReportingDataParser.convertToTimestamp("18/03/2005 02:58:31"));
+		assertEquals(1, csvReportingDataParser.convertToTimestamp("01/01/1970 01:00:01"));
+		
+	}
 
 }

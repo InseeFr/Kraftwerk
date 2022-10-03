@@ -124,11 +124,13 @@ public class ParadataParser {
 					paradataSession.setTimestamp((long) collectedEvent.get(timestamp));
 					paradataUE.addParadataSession(paradataSession);
 
-				} else if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
+				} else {
+					if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
 						paradataVariable.setVariableName(event.getIdParadataObject());
 						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
 						paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
 						paradataUE.addParadataVariable(paradataVariable);
+					}
 				}
 			
 				events.add(event);
