@@ -77,7 +77,7 @@ public class UserVtlBatch implements Tasklet {
 
                 SurveyRawData data = new SurveyRawData();
 
-                data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
+                data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
                 metadataVariables.put(dataMode, data.getVariablesMap());
 
                 DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);

@@ -1,7 +1,20 @@
 package fr.insee.kraftwerk.batch;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -22,11 +35,6 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * App main class.
@@ -65,7 +73,7 @@ public class Launcher {
 					SurveyRawData data = new SurveyRawData();
 
 					/* Step 2.0 : Read the DDI file to get survey variables */
-					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
+					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
 					metadataVariables.put(dataMode, data.getVariablesMap());
 
 					/* Step 2.1 : Fill the data object with the survey answers file */
