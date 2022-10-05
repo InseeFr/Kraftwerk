@@ -15,6 +15,7 @@ import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -45,7 +46,7 @@ public class Launcher {
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 
-	public Boolean main(@NonNull Path inDirectory) {
+	public Boolean main(@NonNull Path inDirectory){
 
 		try {
 			if (verifyInDirectory(inDirectory)) {
@@ -174,7 +175,11 @@ public class Launcher {
 				outputFiles.renameInputFile(inDirectory);
 
 				/* Step 4.4 : move differential data to a secondary folder */
-				outputFiles.moveInputFiles(userInputs);
+				try {
+					outputFiles.moveInputFiles(userInputs);
+				} catch (KraftwerkException e) {
+					log.error(e.getMessage());
+				}
 
 				log.info(
 						"===============================================================================================");
