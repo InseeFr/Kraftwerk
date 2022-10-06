@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<log4j2.version>2.17.2</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
+		<cucumber.reporting.version>7.3.0</cucumber.reporting.version>
 	</properties>
 	
 	<modules>
@@ -85,7 +86,14 @@
 		<dependency>
 			<groupId>me.jvt.cucumber</groupId>
 			<artifactId>reporting-plugin</artifactId>
+			<version>${cucumber.reporting.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>io.cucumber</groupId>
+					<artifactId>messages</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- AssertJ -->
 		<!-- https://www.baeldung.com/introduction-to-assertj -->
