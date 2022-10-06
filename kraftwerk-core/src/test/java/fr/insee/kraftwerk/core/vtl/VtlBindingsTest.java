@@ -1,24 +1,26 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static fr.insee.vtl.model.Dataset.Role;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class VtlBindingsTest {
+class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
 
@@ -44,12 +46,12 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void removeNonExistingDataset() {
+	void removeNonExistingDataset() {
 		Assertions.assertDoesNotThrow(() -> vtlBindings.getBindings().remove("NOT_IN_BINDINGS"));
 	}
 
 	@Test
-	public void constructorsAndDataModeTest() {
+	void constructorsAndDataModeTest() {
 		SurveyRawData surveyRawData = SurveyRawDataTest.createFakePapiSurveyRawData();
 		vtlBindings.convertToVtlDataset(surveyRawData, "SRD1");
 		Dataset dataset = vtlBindings.getDataset("SRD1");
@@ -58,7 +60,7 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void convertToVtlDatasetTest() {
+	void convertToVtlDatasetTest() {
 		SurveyRawData surveyRawDataPapi = SurveyRawDataTest.createFakePapiSurveyRawData();
 		SurveyRawData surveyRawDataCapi = SurveyRawDataTest.createFakeCapiSurveyRawData();
 		SurveyRawData surveyRawDataCawi = SurveyRawDataTest.createFakeCawiSurveyRawData();
@@ -76,7 +78,7 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void evalVtlScriptTest_uniqueString() {
+	void evalVtlScriptTest_uniqueString() {
 		//
 		vtlBindings.getBindings().put("TEST", ds1);
 		//
@@ -100,15 +102,20 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void evalEmptyVtlString() {
+	void evalEmptyVtlString() {
 		vtlBindings.evalVtlScript((String) null);
 		vtlBindings.evalVtlScript((VtlScript) null);
 		vtlBindings.evalVtlScript("");
+	}
+	
+
+	@Test
+	void evalEmptyVtlScriptObject() {
 		vtlBindings.evalVtlScript(new VtlScript());
 	}
 
 	@Test
-	public void evalVtlScriptTest_scriptObject() {
+	void evalVtlScriptTest_scriptObject() {
 		//
 		vtlBindings.getBindings().put("TEST", ds1);
 		//
@@ -125,13 +132,9 @@ public class VtlBindingsTest {
 		assertTrue(ds.getDataStructure().containsKey("new2"));
 	}
 
-	@Test
-	public void evalEmptyVtlScriptObject() {
-		vtlBindings.evalVtlScript(new VtlScript());
-	}
 
 	@Test
-	public void testGetDatasetVariablesMap(){
+	void testGetDatasetVariablesMap(){
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.getBindings().put("TEST", ds1);
 		VariablesMap variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
