@@ -8,7 +8,7 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public abstract class UnimodalDataProcessing extends DataProcessing {
 
-    public UnimodalDataProcessing(VtlBindings vtlBindings){
+    protected UnimodalDataProcessing(VtlBindings vtlBindings){
         super(vtlBindings);
     }
 
