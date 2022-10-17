@@ -1,14 +1,18 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlScript;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CalculatedProcessing extends DataProcessing {
@@ -55,7 +59,7 @@ public class CalculatedProcessing extends DataProcessing {
             */
 
             if (!variablesMap.hasVariable(calculatedName)) {
-                if (calculatedName.startsWith("FILTER_RESULT")) {
+                if (calculatedName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
                     addFilterResult(calculatedName, variablesMap);
                 } else {
                     log.warn(String.format("Unknown CALCULATED variable \"%s\".", calculatedName));

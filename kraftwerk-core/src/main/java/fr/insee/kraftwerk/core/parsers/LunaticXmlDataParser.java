@@ -1,5 +1,8 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import java.nio.file.Path;
+import java.util.Arrays;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -14,9 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
-
-import java.nio.file.Path;
-import java.util.Arrays;
 
 @Slf4j
 public class LunaticXmlDataParser extends DataParser {
@@ -186,7 +186,7 @@ public class LunaticXmlDataParser extends DataParser {
 				if (variableNode.getAttribute("type") != null) {
 					if (!variableNode.getAttribute("type").getValue().equals("null")) {
 						//
-						if (variableName.startsWith("FILTER_RESULT_")) {
+						if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
 							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
 						}
 						//

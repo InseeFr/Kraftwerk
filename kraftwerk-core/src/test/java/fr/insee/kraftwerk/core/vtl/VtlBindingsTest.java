@@ -139,7 +139,7 @@ class VtlBindingsTest {
 		vtlBindings.getBindings().put("TEST", ds1);
 		VariablesMap variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
 		//
-		assertEquals(2, variablesMap.getGroups().size());
+		assertEquals(2, variablesMap.getGroupsCount());
 		assertTrue(variablesMap.hasGroup(Constants.ROOT_GROUP_NAME));
 		assertTrue(variablesMap.hasGroup("INDIVIDU"));
 		// Variable objects = measures in VTL dataset => 3 variables expected

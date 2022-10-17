@@ -192,8 +192,6 @@ public class LauncherService {
 			}
 
 		} catch (NullException e) {
-			// TODO Auto-generated catch block
-			NullException nullException = new NullException();
 			e.renameInputFile(inDirectory);
 		}
 
@@ -201,9 +199,7 @@ public class LauncherService {
 	}
 
 	private boolean verifyInDirectory(Path inDirectory) {
-
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-
 		if (Files.exists(userInputFile)) {
 			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
 		} else {
