@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -48,15 +50,17 @@ import lombok.extern.slf4j.Slf4j;
 public class LauncherService {
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+	
+	@Value("${fr.insee.postcollecte.files}")
+	private String defaultDirectory;
 
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
-	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) {
+	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) throws KraftwerkException {
 		Path inDirectory = Paths.get(inDirectoryParam);
-
+		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
+		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
 		try {
-			if (verifyInDirectory(inDirectory)) {
-
 				String campaignName = inDirectory.getFileName().toString();
 
 				log.info(
@@ -189,7 +193,7 @@ public class LauncherService {
 				log.info(
 						"===============================================================================================\n");
 
-			}
+			
 
 		} catch (NullException e) {
 			e.renameInputFile(inDirectory);

@@ -112,7 +112,7 @@ public class CsvTableWriter {
 						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
 						csvRow[csvColumn] = value;
 					}
-					log.info("ligne {}", i );
+					log.debug("line {}", i );
 					writer.writeNext(csvRow);
 				}
 
