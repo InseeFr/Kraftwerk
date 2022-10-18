@@ -23,11 +23,11 @@ public class DDIReader {
 	 * written in the system temporary folder with the name 'variables.xml', and is
 	 * deleted when the virtual machine terminates.
 	 *
-	 * @param DDIUrl : Path to the DDI file.
+	 * @param ddiUrl : Path to the DDI file.
 	 *
 	 * @return The variables found in the DDI.
 	 */
-	public static VariablesMap getVariablesFromDDI(URL DDIUrl) {
+	public static VariablesMap getVariablesFromDDI(URL ddiUrl) {
 
 		try {
 			// Path of the output 'variables.xml' temp file
@@ -36,12 +36,12 @@ public class DDIReader {
 			Path variablesTempFilePath = variablesFile.toPath();
 
 			//
-			transformDDI(DDIUrl, variablesTempFilePath);
+			transformDDI(ddiUrl, variablesTempFilePath);
 			return getVariablesFromTransformed(variablesTempFilePath);
 		}
 
 		catch (MalformedURLException e) {
-			log.error(String.format("Error when converting file path '%s' to an URL.", DDIUrl), e);
+			log.error(String.format("Error when converting file path '%s' to an URL.", ddiUrl), e);
 			return null;
 		} catch (IOException e) {
 			log.error("Unable to write temp file.", e);
@@ -62,12 +62,12 @@ public class DDIReader {
 	/**
 	 * Apply the XSLT_STRUCTURED_VARIABLES transformation.
 	 *
-	 * @param DDIUrl            : URL of the DDI file.
+	 * @param ddiUrl            : URL of the DDI file.
 	 * @param variablesFilePath : Path of the 'variables.xml' file to be generated.
 	 */
-	private static void transformDDI(URL DDIUrl, Path variablesFilePath) {
+	private static void transformDDI(URL ddiUrl, Path variablesFilePath) {
 		SaxonTransformer saxonTransformer = new SaxonTransformer();
-		saxonTransformer.xslTransform(DDIUrl, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
+		saxonTransformer.xslTransform(ddiUrl, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
 	}
 
 	/**
