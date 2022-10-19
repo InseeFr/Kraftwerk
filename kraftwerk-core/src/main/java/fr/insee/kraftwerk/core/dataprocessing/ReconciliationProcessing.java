@@ -52,7 +52,7 @@ public class ReconciliationProcessing extends DataProcessing {
 	 * @return VTL instructions to aggregate all the unimodal datasets.
 	 */
 	@Override
-	protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+	protected VtlScript generateVtlInstructions(String bindingName) {
 		int modesCount = vtlBindings.getBindings().size();
 		if (modesCount == 1) {
 			String singleInstruction = String.format("%s := %s;", bindingName, vtlBindings.getDatasetNames().get(0));

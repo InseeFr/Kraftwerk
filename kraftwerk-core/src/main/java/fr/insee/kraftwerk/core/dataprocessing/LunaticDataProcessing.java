@@ -24,7 +24,7 @@ public class LunaticDataProcessing extends UnimodalDataProcessing {
      * @return ""
      */
     @Override
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    public VtlScript generateVtlInstructions(String bindingName) {
         return new VtlScript();
     }
 

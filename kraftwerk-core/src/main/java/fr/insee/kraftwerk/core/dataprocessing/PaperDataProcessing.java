@@ -12,8 +12,11 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public class PaperDataProcessing extends UnimodalDataProcessing {
 
-    public PaperDataProcessing(VtlBindings vtlBindings) {
+    private VariablesMap variablesMap;
+	
+    public PaperDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
         super(vtlBindings);
+        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -35,11 +38,7 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
      * @return VTL instructions
      */
     @Override
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-
-        // Rich variables map
-        VariablesMap variablesMap = (VariablesMap) objects[0];
-
+    public VtlScript generateVtlInstructions(String bindingName) {
         // Get UCQ variables
         List<UcqVariable> ucqVariables = variablesMap.getUcqVariables();
 

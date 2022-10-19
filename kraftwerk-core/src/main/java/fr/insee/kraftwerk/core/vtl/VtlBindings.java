@@ -28,6 +28,7 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,6 +40,7 @@ public class VtlBindings {
     /** Mapper to convert json files into VTL Datasets. */
     private final ObjectMapper mapper;
     /** Bindings for VTL datasets */
+    @Getter
     private Bindings bindings;
     /** Engine that will execute VTL instructions */
     private final ScriptEngine engine;
@@ -54,14 +56,6 @@ public class VtlBindings {
         engine = new ScriptEngineManager()
                 .getEngineByName("vtl");
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-    }
-
-    public void clearBindings(){
-        bindings = new SimpleBindings();
-    }
-
-    public Bindings getBindings(){
-        return bindings;
     }
 
     /** Return an array list of all names registered in the bindings. */

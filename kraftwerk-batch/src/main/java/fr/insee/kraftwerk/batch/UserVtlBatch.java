@@ -109,15 +109,15 @@ public class UserVtlBatch implements Tasklet {
                 if (modeInputs.getLunaticFile() != null) {
                     CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                             modeInputs.getLunaticFile());
-                    DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
-                    calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
+                    DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, data.getVariablesMap());
+                    calculatedProcessing.applyVtlTransformations(dataMode, null);
                 }
 
-                new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, data.getVariablesMap());
+                new GroupProcessing(vtlBindings, data.getVariablesMap()).applyVtlTransformations(dataMode, null);
 
                 UnimodalDataProcessing dataProcessing = DataProcessingManager
-                        .getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
-                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
+                        .getProcessingClass(modeInputs.getDataFormat(), vtlBindings, data.getVariablesMap());
+                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
 
                 vtlBindings.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON));
 
@@ -132,8 +132,8 @@ public class UserVtlBatch implements Tasklet {
             vtlBindings.writeJsonDataset(multimodeDatasetName,
                     vtlOutputDir.resolve("2_" + multimodeDatasetName + "_reconciliation.json"));
 
-            CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, metadataVariables);
+            CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
 
             DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
             multimodeTransformations.applyVtlTransformations(multimodeDatasetName,

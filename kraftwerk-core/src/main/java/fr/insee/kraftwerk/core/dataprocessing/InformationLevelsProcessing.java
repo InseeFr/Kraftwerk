@@ -31,7 +31,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 	 * NOTE: for now, only works with at most one level of group under root group.
 	 */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    protected VtlScript generateVtlInstructions(String bindingName) {
 
     	VtlScript vtlScript = new VtlScript();
 		

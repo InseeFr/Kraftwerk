@@ -24,7 +24,7 @@ public class XformsDataProcessing extends UnimodalDataProcessing {
      *
      * @return ""
      */
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    public VtlScript generateVtlInstructions(String bindingName) {
         return new VtlScript();
     }
 }

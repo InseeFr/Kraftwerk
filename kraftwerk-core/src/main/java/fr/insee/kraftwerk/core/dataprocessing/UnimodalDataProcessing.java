@@ -22,5 +22,5 @@ public abstract class UnimodalDataProcessing extends DataProcessing {
      *
      * @return a String of VTL instructions
      */
-    public abstract VtlScript generateVtlInstructions(String bindingName, Object... objects);
+    public abstract VtlScript generateVtlInstructions(String bindingName);
 }

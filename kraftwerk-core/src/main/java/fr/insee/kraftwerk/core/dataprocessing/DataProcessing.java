@@ -27,12 +27,15 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects){
-        // First step
-        applyAutomatedVtlInstructions(bindingName, objects);
-        // Second step
+    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath){
+        // Generate automated instructions and apply
+    	VtlScript automatedInstructions = generateVtlInstructions(bindingName);
+    	applyVtlInstructions(automatedInstructions.toString());
+        
+        // Apply user's instructions
         if(userVtlInstructionsPath != null) {
-            applyUserVtlInstructions(userVtlInstructionsPath);
+            String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
+        	applyVtlInstructions(vtlScript);
         } else {
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));
@@ -48,24 +51,16 @@ public abstract class DataProcessing {
      *
      * @return a VTL script.
      */
-    protected abstract VtlScript generateVtlInstructions(String bindingName, Object... objects);
+    protected abstract VtlScript generateVtlInstructions(String bindingName);
 
-    protected void applyAutomatedVtlInstructions(String bindingName, Object... objects){
-        VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
-        log.info(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
-                automatedInstructions));
-        if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
-            vtlBindings.evalVtlScript(automatedInstructions);
+
+    private void applyVtlInstructions(String vtl){
+    	if (vtl == null) { return;}
+        log.info(String.format("VTL instructions applied for step %s:%n%s", getStepName(), vtl));
+        if (!(vtl.isEmpty() || vtl.contentEquals(""))) {
+            vtlBindings.evalVtlScript(vtl);
         }
     }
 
-    protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
-        String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
-        log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
-                vtlScript));
-        if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
-            vtlBindings.evalVtlScript(vtlScript);
-        }
-    }
 
 }

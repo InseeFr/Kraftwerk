@@ -30,9 +30,10 @@ public class AggregateDefinitions {
 		vtlBindings.convertToVtlDataset(fakeCawiData, firstDataset);
 		vtlBindings.convertToVtlDataset(fakePapiData, secondDataset);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations(firstDataset, null, fakeCawiData.getVariablesMap());
-		groupProcessing.applyVtlTransformations(secondDataset, null, fakePapiData.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getVariablesMap());
+		groupProcessing.applyVtlTransformations(firstDataset, null);
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getVariablesMap());
+		groupProcessing2.applyVtlTransformations(secondDataset, null);
 
 		//
 		assertTrue(vtlBindings.getBindings().containsKey(firstDataset));
