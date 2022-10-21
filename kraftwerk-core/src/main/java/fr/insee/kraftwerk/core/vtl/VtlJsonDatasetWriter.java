@@ -5,20 +5,23 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to write temporary VTL datasets. These datasets are JSON files that has
@@ -201,29 +204,11 @@ public class VtlJsonDatasetWriter {
 	}
 
 	public static String convertToVtlType(VariableType variableType) {
-		//
 		if (variableType == null) {
 			log.debug("null variable type given to convertToVtlType method, this should NEVER happen!");
 			return "STRING";
 		}
-		//
-		String vtlType = null;
-		switch (variableType) {
-		case STRING:
-		case DATE: // TODO: (note) date type not yet supported by Trevas
-			vtlType = "STRING";
-			break;
-		case BOOLEAN:
-			vtlType = "BOOLEAN";
-			break;
-		case INTEGER:
-			vtlType = "INTEGER";
-			break;
-		case NUMBER:
-			vtlType = "NUMBER";
-			break;
-		}
-		return vtlType;
+		return variableType.getVtlType();
 	}
 
 	/** Compatible boolean values for "true */

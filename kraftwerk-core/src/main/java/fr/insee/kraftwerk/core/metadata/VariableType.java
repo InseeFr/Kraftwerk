@@ -10,21 +10,22 @@ import lombok.extern.slf4j.Slf4j;
  *
  *  */
 @Slf4j
+@Getter
 public enum VariableType {
-	STRING ("character","character"),
-	INTEGER ("integer","integer"),
-	NUMBER ("number","numeric"),
-	BOOLEAN ("logical","logical"),
-	DATE ("Date","Date");
+	STRING ("character","character", "STRING"),
+	INTEGER ("integer","integer", "INTEGER"),
+	NUMBER ("number","numeric", "NUMBER"),
+	BOOLEAN ("logical","logical", "BOOLEAN"),
+	DATE ("Date","Date", "STRING");
 	
-	@Getter
 	private String dataTableType;
-	@Getter
 	private String formatR;
-
-	VariableType(String dataTableType,String formatR) {
+	private String vtlType;	
+	
+	VariableType(String dataTableType,String formatR, String vtlType) {
 		this.dataTableType =dataTableType;
 		this.formatR=formatR;
+		this.vtlType=vtlType;
 	}
 
 	public static VariableType getTypeFromJavaClass(Class<?> clazz){
