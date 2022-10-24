@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -17,14 +17,14 @@ public class DataProcessingManager {
 	 *
 	 * @return One of the concrete parsers.
 	 */
-	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat, VtlBindings vtlBindings, VariablesMap variablesMap) {
+	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat, VtlBindings vtlBindings) {
 		UnimodalDataProcessing dataProcessing = null;
 		switch (dataFormat) {
 		case XFORMS:
 			dataProcessing = new XformsDataProcessing(vtlBindings);
 			break;
 		case PAPER:
-			dataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
+			dataProcessing = new PaperDataProcessing(vtlBindings);
 			break;
 		case LUNATIC_XML:
 		case LUNATIC_JSON:

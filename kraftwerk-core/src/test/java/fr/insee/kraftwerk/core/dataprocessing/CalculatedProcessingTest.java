@@ -1,26 +1,22 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import static fr.insee.vtl.model.Dataset.Role;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatedProcessingTest {
 
@@ -51,8 +47,8 @@ public class CalculatedProcessingTest {
     @Test
     public void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
-        VtlScript vtlScript = processing.generateVtlInstructions("TEST" );
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
+        VtlScript vtlScript = processing.generateVtlInstructions("TEST", fooCalculated, fooVariables);
 
         //
         assertTrue(vtlScript.get(0).contains("FOO3"));
@@ -77,8 +73,8 @@ public class CalculatedProcessingTest {
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.getBindings().put("TEST", fooDataset);
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings,  fooCalculated, fooVariables);
-        processing.applyVtlTransformations("TEST",null);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
+        processing.applyAutomatedVtlInstructions("TEST", fooCalculated, fooVariables);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 

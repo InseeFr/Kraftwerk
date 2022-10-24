@@ -1,12 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -15,11 +8,17 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.Test;
 
-class GroupProcessingTest {
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class GroupProcessingTest {
 
     @Test
-    void addPrefixes() {
+    public void addPrefixes() {
         //
         Dataset initialDataset = new InMemoryDataset(
                 List.of(
@@ -42,7 +41,7 @@ class GroupProcessingTest {
         variablesMap.putVariable(new Variable("FOO1", variablesMap.getGroup("DEPTH1"), VariableType.NUMBER));
         variablesMap.putVariable(new Variable("FOO2", variablesMap.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings, variablesMap).applyVtlTransformations("TEST",null);
+        new GroupProcessing(vtlBindings).applyAutomatedVtlInstructions("TEST", variablesMap);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //

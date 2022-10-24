@@ -22,9 +22,8 @@ public class CleanUpProcessing extends DataProcessing {
 
     private Map<String, VariablesMap> metadataVariables;
 
-    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables) {
+    public CleanUpProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
-        this.metadataVariables = metadataVariables;
     }
 
     @Override
@@ -43,9 +42,11 @@ public class CleanUpProcessing extends DataProcessing {
      * @param objects The metadata object instance is expected here.
      */
     @Override
-    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath) {
+    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects) {
+        // Get the metadata object
+        metadataVariables = (Map<String, VariablesMap>) objects[0]; // TODO: better management of metadata object
         // Remove paper UCQ variables in vtl multimode dataset
-        VtlScript cleanUpScript = generateVtlInstructions(bindingName);
+        VtlScript cleanUpScript = generateVtlInstructions(bindingName, metadataVariables);
         log.info("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
         vtlBindings.evalVtlScript(cleanUpScript);
         // Remove corresponding variables in VariablesMap
@@ -56,7 +57,7 @@ public class CleanUpProcessing extends DataProcessing {
 
     /** Generate VTL script to remove the paper indicator variables. */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName) {
+    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
         VtlScript vtlScript = new VtlScript();
         List<String> paperUcqVtlNames = new ArrayList<>();
         for (Entry<String,VariablesMap> mode : metadataVariables.entrySet()) {

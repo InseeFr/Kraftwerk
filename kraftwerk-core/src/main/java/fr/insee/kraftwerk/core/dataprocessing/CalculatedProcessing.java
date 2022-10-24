@@ -19,14 +19,9 @@ public class CalculatedProcessing extends DataProcessing {
 
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
-    
-    private CalculatedVariables calculatedVariables;
-    private VariablesMap variablesMap;
-    
-    public CalculatedProcessing(VtlBindings vtlBindings, CalculatedVariables calculatedVariables, VariablesMap variablesMap) {
+
+    public CalculatedProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
-        this.calculatedVariables = calculatedVariables;
-        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -44,12 +39,18 @@ public class CalculatedProcessing extends DataProcessing {
      * @return a VtlScript with one instruction for each "calculated" variable.
      */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName) {
+    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+
+        CalculatedVariables calculatedVariables = (CalculatedVariables) objects[0];
+
+        VariablesMap variablesMap = (VariablesMap) objects[1];
 
         List<String> orderedCalculatedNames = resolveCalculated(calculatedVariables);
+
         VtlScript vtlScript = new VtlScript();
 
         for (String calculatedName : orderedCalculatedNames) {
+
             /*
             If the variable is not registered in the variables map (DDI variables),
             it can be a FILTER_RESULT variable created by Lunatic.

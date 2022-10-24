@@ -5,12 +5,9 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
 public class GroupProcessing extends DataProcessing{
-	
-    private VariablesMap variablesMap;
 
-    public GroupProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
+    public GroupProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
-        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -30,9 +27,11 @@ public class GroupProcessing extends DataProcessing{
      * @return A VTL script.
      */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName) {
+    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
 
         VtlScript vtlScript = new VtlScript();
+
+        VariablesMap variablesMap = (VariablesMap) objects[0];
 
         for (String variableName : variablesMap.getVariableNames()) {
             if (variablesMap.getVariable(variableName).getGroup() != variablesMap.getRootGroup()) {

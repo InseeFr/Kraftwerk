@@ -1,15 +1,5 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -22,6 +12,13 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.DataStructure;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TableScriptInfoTest {
 	
@@ -50,10 +47,9 @@ public class TableScriptInfoTest {
 		vtlBindings.convertToVtlDataset(srdPaper, "PAPI");
 
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
-		groupProcessing.applyVtlTransformations("CAWI", null);
-		GroupProcessing groupProcessingP = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
-		groupProcessingP.applyVtlTransformations("PAPI", null);
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
+		groupProcessing.applyVtlTransformations("CAWI", null, srdWeb.getVariablesMap());
+		groupProcessing.applyVtlTransformations("PAPI", null, srdPaper.getVariablesMap());
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);

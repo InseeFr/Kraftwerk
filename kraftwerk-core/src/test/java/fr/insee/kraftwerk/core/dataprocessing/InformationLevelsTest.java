@@ -1,21 +1,20 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
+import org.junit.jupiter.api.Test;
 
-class InformationLevelsTest {
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class InformationLevelsTest {
 	
 	private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
 
@@ -32,13 +31,13 @@ class InformationLevelsTest {
 	);
 
 	@Test
-	void applyInformationLevelsProcessing() {
+	public void applyInformationLevelsProcessing() {
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.getBindings().put("MULTIMODE", testDataset);
 		//
 		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings);
-		processing.applyVtlTransformations("MULTIMODE", null);
+		processing.applyAutomatedVtlInstructions("MULTIMODE");
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");
