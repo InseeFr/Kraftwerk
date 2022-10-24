@@ -106,7 +106,6 @@ public class LauncherService {
 						ReportingData reportingData = new ReportingData(reportingDataFile);
 						if (reportingDataFile.toString().contains(".xml")) {
 							XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
-
 							xMLReportingDataParser.parseReportingData(reportingData, data);
 
 						} else {
