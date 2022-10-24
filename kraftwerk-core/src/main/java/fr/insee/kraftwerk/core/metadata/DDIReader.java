@@ -123,7 +123,7 @@ public class DDIReader {
 					//
 					Element valuesElement = variableElement.getFirstChildElement("Values");
 					//
-					Element mcqElement = variableElement.getFirstChildElement("MCQ");
+					Element mcqElement = variableElement.getFirstChildElement("QGrid");
 					//
 					if (valuesElement != null) {
 						UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
@@ -131,6 +131,7 @@ public class DDIReader {
 							variable.setQuestionItemName(questionItemName.getValue());
 						} else if (mcqElement != null) {
 							variable.setQuestionItemName(mcqElement.getValue());
+							variable.setInQuestionGrid(true);
 						}
 						Elements valueElements = valuesElement.getChildElements("Value");
 						for (int k = 0; k < valueElements.size(); k++) {
@@ -141,6 +142,7 @@ public class DDIReader {
 					} else if (mcqElement != null) {
 						McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
 						variable.setQuestionItemName(mcqElement.getValue());
+						variable.setInQuestionGrid(true);
 						variable.setText(variableElement.getFirstChildElement("Label").getValue());
 						variablesMap.putVariable(variable);
 					} else {

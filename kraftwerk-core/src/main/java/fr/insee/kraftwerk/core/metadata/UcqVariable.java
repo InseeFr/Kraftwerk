@@ -22,6 +22,8 @@ public class UcqVariable extends Variable {
 
 
     /** Common name of the different modalities of the UCQ variable, if this variable is itself a modality of a Mcq variable. */
+	@Getter
+	@Setter
     String mcqName;
     
 	public UcqVariable(String name, Group group, VariableType type) {
@@ -39,40 +41,6 @@ public class UcqVariable extends Variable {
             log.warn("Type of a UCQ variable should be STRING.");
         }
     }
-	
-	/** POJO class to store information about a UQC modality. */
-	public static class UcqModality {
-
-		/** Value associated to the modality in survey data. */
-		@Getter
-		@Setter
-		String value;
-		/** Text associated to the modality */
-		@Getter
-		@Setter
-		String text;
-		/**
-		 * If an indicator variable is associated to the modality (in a paper data
-		 * files).
-		 */
-		@Getter
-		@Setter
-		String variableName;
-
-		UcqModality() {
-		}
-
-		UcqModality(String value, String text) {
-			this.value = value;
-			this.text = text;
-		}
-
-		UcqModality(String value, String text, String variableName) {
-			this.value = value;
-			this.text = text;
-			this.variableName = variableName;
-		}
-	}
 
 	/** Add a modality using the object. */
 	public void addModality(UcqModality modality) {
@@ -81,7 +49,7 @@ public class UcqVariable extends Variable {
 
 	/**
 	 * Method to register a modality of the UCQ.
-	 * 
+	 *
 	 * @param value A possible value of the variable.
 	 * @param text  The text associated with the value.
 	 */
@@ -91,7 +59,7 @@ public class UcqVariable extends Variable {
 
 	/**
 	 * Method to register a modality of the UCQ.
-	 * 
+	 *
 	 * @param value        A possible value of the UCQ variable.
 	 * @param text         The text associated with the value.
 	 * @param variableName The name of the variable associated with the modality
@@ -113,7 +81,7 @@ public class UcqVariable extends Variable {
 
 	/**
 	 * Get a modality from its associated value.
-	 * 
+	 *
 	 * @param value One of the possible values of the variable.
 	 * @return The modality object that corresponds to this value. If there is no
 	 *         modality with this value, a null is returned. If several modalities
@@ -138,7 +106,7 @@ public class UcqVariable extends Variable {
 	/**
 	 * Get a modality from its name (that may be filled when carrying out paper
 	 * data).
-	 * 
+	 *
 	 * @param modalityName The variable name of a modality of the UCQ.
 	 * @return The modality object that corresponds to this name. If there is no
 	 *         modality with this name, a null is returned. If several modalities

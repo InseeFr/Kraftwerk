@@ -168,10 +168,28 @@ public class VariablesMap {
                         ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName)
                                 || ((McqVariable) mcqVariable).getQuestionItemName().toUpperCase().equals(questionName));
     }
+
     public Group getMcqGroup(String questionName) {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
                 .filter(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName))
+                .map(Variable::getGroup)
+                .findFirst().orElse(null);
+    }
+
+    /** Return true if there is a variable from a question grid that has the given question name in its questionName attribute. */
+    public boolean isInQuestionGrid(String questionName){
+        return variables.values().stream()
+                .filter(var -> var.isInQuestionGrid())
+                .anyMatch(var -> // (FILTER_RESULT variables are upper case)
+                        (var.getQuestionItemName().equals(questionName)
+                                || var.getQuestionItemName().toUpperCase().equals(questionName)));
+    }
+
+    public Group getQuestionGridGroup(String questionName) {
+        return variables.values().stream()
+                .filter(var -> var.isInQuestionGrid())
+                .filter(var -> var.getQuestionItemName().equals(questionName))
                 .map(Variable::getGroup)
                 .findFirst().orElse(null);
     }

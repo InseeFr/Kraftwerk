@@ -208,8 +208,8 @@ public class LunaticXmlDataParser extends DataParser {
 							Group group = variables.getVariable(correspondingVariableName).getGroup();
 							groupName = group.getName();
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else if (variables.hasMcq(correspondingVariableName)) { // otherwise, it should be from a MCQ
-							Group group = variables.getMcqGroup(correspondingVariableName);
+						} else if (variables.isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
+							Group group = variables.getQuestionGridGroup(correspondingVariableName);
 							groupName = group.getName();
 							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
 						} else {

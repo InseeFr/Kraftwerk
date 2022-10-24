@@ -30,6 +30,11 @@ public class Variable {
 	@Setter
 	protected String questionItemName;
 
+	/** Identifies if the variable is part a question grid */
+	@Getter
+	@Setter
+	protected boolean isInQuestionGrid;
+
 	public Variable(String name, Group group, VariableType type) {
 		this.name = name;
 		this.group = group;
