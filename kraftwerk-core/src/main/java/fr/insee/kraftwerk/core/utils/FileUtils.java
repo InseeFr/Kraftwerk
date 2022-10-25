@@ -22,9 +22,24 @@ public class FileUtils {
 	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
 	 */
 	public static Path transformToOut(Path inDirectory) {
-		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve("out")
+		return transformToOther(inDirectory, "out");
+	}
+	
+	/**
+	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
+	 */
+	public static Path transformToTemp(Path inDirectory) {
+		return transformToOther(inDirectory, "temp");
+	}
+
+	/**
+	 * Change /some/path/in/campaign-name to /some/path/__other__/campaign-name
+	 */
+	private static Path transformToOther(Path inDirectory, String other) {
+		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve(other)
 				: transformToOut(inDirectory.getParent()).resolve(inDirectory.getFileName());
 	}
+	
 
 	
 	/**

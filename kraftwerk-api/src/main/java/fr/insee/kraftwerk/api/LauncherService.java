@@ -164,7 +164,7 @@ public class LauncherService {
 						userInputs.getVtlInformationLevelsFile());
 
 				/* Step 4 : Write output files */
-				writeOutputFiles(inDirectoryParam, vtlBindings);
+				writeOutputFiles(inDirectory, vtlBindings);
 
 				/* Step 4.3- 4.4  : Archive */
 		//		archive(outputFiles, userInputs);
@@ -182,10 +182,16 @@ public class LauncherService {
 	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
 	public void writeOutputFiles(
 			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam, 
-			@Parameter(description = "vtlBindings ?", required = true) @RequestBody VtlBindings vtlBindings) throws KraftwerkException {
+			@Parameter(description = "Bindings file name in temp directory", required = true) @RequestBody String bindingFilename,
+			@Parameter(description = "Data mode") @RequestBody String datamode
+			) throws KraftwerkException {
 		Path inDirectory = getInDirectory(inDirectoryParam);
-		Path outDirectory = FileUtils.transformToOut(inDirectory);
+		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),datamode);
+		writeOutputFiles(inDirectory, vtlBindings);
+	}
 
+	private void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings) {
+		Path outDirectory = FileUtils.transformToOut(inDirectory);
 		UserInputs userInputs = getUserInputs(inDirectory);
 		/* Step 4.1 : write csv output tables */
 		OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
@@ -230,6 +236,18 @@ public class LauncherService {
 		}
 		return true;
 	}
+	
+	private VtlBindings readDataset(String path, String bindingName) {
+		VtlBindings vtlBindings = new VtlBindings();
+		vtlExecute.putVtlDataset(path, bindingName, vtlBindings);
+		return vtlBindings;
+
+	}
+	
+   // WRITE vtlExecute.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON), vtlBindings);
+	//	READ	vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
+
+
 
 
 }
