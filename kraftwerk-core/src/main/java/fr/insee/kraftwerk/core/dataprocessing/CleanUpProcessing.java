@@ -48,7 +48,7 @@ public class CleanUpProcessing extends DataProcessing {
         // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName, metadataVariables);
         log.info("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
-        vtlBindings.evalVtlScript(cleanUpScript);
+        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
         // Remove unimodal datasets
@@ -92,10 +92,10 @@ public class CleanUpProcessing extends DataProcessing {
     private void removeUnimodalDatasets() {
         for (String datasetName : metadataVariables.keySet()) {
             // unimodal datasets
-            vtlBindings.getBindings().remove(datasetName);
+            vtlBindings.remove(datasetName);
             log.info(String.format("%s unimodal dataset removed from vtl bindings.", datasetName));
             // datasets created during the reconciliation step
-            vtlBindings.getBindings().remove(datasetName + "_keep");
+            vtlBindings.remove(datasetName + "_keep");
             log.info(String.format("%s generated dataset removed from vtl bindings.", datasetName + "_keep"));
         }
     }

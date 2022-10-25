@@ -53,7 +53,7 @@ public class ReconciliationProcessing extends DataProcessing {
 	 */
 	@Override
 	protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-		int modesCount = vtlBindings.getBindings().size();
+		int modesCount = vtlBindings.size();
 		if (modesCount == 1) {
 			String singleInstruction = String.format("%s := %s;", bindingName, vtlBindings.getDatasetNames().get(0));
 			return new VtlScript(singleInstruction);
@@ -147,7 +147,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		Set<String> identifiers = new TreeSet<>();
 
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
+		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
 			identifiers.addAll( dataStructure.keySet()
 					.stream()
@@ -162,7 +162,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		List<Set<String>> variableNamesList = new ArrayList<>();
 
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
+		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
 			variableNamesList.add( dataStructure.keySet()
 					.stream().filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)

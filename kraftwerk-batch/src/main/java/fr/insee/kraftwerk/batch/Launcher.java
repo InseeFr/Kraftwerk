@@ -33,7 +33,9 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 public class Launcher {
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	public Boolean main(@NonNull Path inDirectory){
 
@@ -109,7 +113,7 @@ public class Launcher {
 
 					/* Step 2.4a : Convert data object to a VTL Dataset */
 					data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
-					vtlBindings.convertToVtlDataset(data, dataMode);
+					vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 
 					/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 					if (modeInputs.getLunaticFile() != null) {
@@ -172,11 +176,11 @@ public class Launcher {
 				outputFiles.writeImportScripts(metadataVariables);
 
 				/* Step 4.3 : move kraftwerk.json to a secondary folder */
-				outputFiles.renameInputFile(inDirectory);
+				FileUtils.renameInputFile(inDirectory);
 
 				/* Step 4.4 : move differential data to a secondary folder */
 				try {
-					outputFiles.moveInputFiles(userInputs);
+					FileUtils.moveInputFiles(userInputs);
 				} catch (KraftwerkException e) {
 					log.error(e.getMessage());
 				}

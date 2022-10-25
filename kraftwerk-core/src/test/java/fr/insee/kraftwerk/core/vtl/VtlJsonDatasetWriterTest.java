@@ -1,24 +1,33 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.vtl.model.Dataset;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class VtlJsonDatasetWriterTest {
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.vtl.model.Dataset;
+
+class VtlJsonDatasetWriterTest {
 
 	private VtlBindings vtlBindings;
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	@BeforeEach
 	public void initVtlBindings() {
@@ -26,13 +35,13 @@ public class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	public void testConvertToVtlDataset_rootOnly() {
+	void testConvertToVtlDataset_rootOnly() {
 		//
 		VariablesMap variablesMap = VariablesMapTest.createVariablesMap_rootOnly();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_rootOnly();
 		//
-		vtlBindings.convertToVtlDataset(testData, "TEST");
+		vtlExecute.convertToVtlDataset(testData, "TEST", vtlBindings);
 		Dataset ds = vtlBindings.getDataset("TEST");
 
 		//
@@ -63,13 +72,13 @@ public class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	public void testConvertToVtlDataset_oneLevel() {
+	void testConvertToVtlDataset_oneLevel() {
 		//
 		VariablesMap variablesMap = VariablesMapTest.createVariablesMap_oneLevel();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_oneLevel();
 		//
-		vtlBindings.convertToVtlDataset(testData, "TEST");
+		vtlExecute.convertToVtlDataset(testData, "TEST", vtlBindings);
 		Dataset ds = vtlBindings.getDataset("TEST");
 
 		//
@@ -102,7 +111,7 @@ public class VtlJsonDatasetWriterTest {
 	/** In paper data, a single survey unit may be split into several questionnaires.
 	 * This method test if VTL conversion works well in that case. */
 	@Test
-	public void convertToVtlDataset_withSplitQuestionnaires() {
+	void convertToVtlDataset_withSplitQuestionnaires() {
 		//
 		SurveyRawData paperLikeData = new SurveyRawData();
 		//
@@ -129,7 +138,7 @@ public class VtlJsonDatasetWriterTest {
 		paperLikeData.addQuestionnaire(q2);
 
 		//
-		vtlBindings.convertToVtlDataset(paperLikeData, "TEST");
+		vtlExecute.convertToVtlDataset(paperLikeData, "TEST", vtlBindings);
 		Dataset ds = vtlBindings.getDataset("TEST");
 
 		//
@@ -146,7 +155,7 @@ public class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	public void convertSurveyRawDataWithEmptyGroup() {
+	void convertSurveyRawDataWithEmptyGroup() {
 		//
 		SurveyRawData srd = new SurveyRawData();
 		//
@@ -162,7 +171,7 @@ public class VtlJsonDatasetWriterTest {
 		srd.addQuestionnaire(questionnaire);
 
 		//
-		vtlBindings.convertToVtlDataset(srd, "test");
+		vtlExecute.convertToVtlDataset(srd, "test", vtlBindings);
 		Dataset dataset = vtlBindings.getDataset("test");
 
 		//
@@ -170,7 +179,7 @@ public class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	public void convertSurveyRawDataWithTwoParallelGroups() {
+	void convertSurveyRawDataWithTwoParallelGroups() {
 		//
 		SurveyRawData srd = new SurveyRawData();
 		//
@@ -194,7 +203,7 @@ public class VtlJsonDatasetWriterTest {
 		srd.addQuestionnaire(oneGroupQuestionnaire);
 
 		//
-		vtlBindings.convertToVtlDataset(srd, "test");
+		vtlExecute.convertToVtlDataset(srd, "test", vtlBindings);
 		Dataset dataset = vtlBindings.getDataset("test");
 
 		//

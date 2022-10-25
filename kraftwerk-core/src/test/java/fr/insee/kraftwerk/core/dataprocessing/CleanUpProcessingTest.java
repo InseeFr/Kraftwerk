@@ -1,21 +1,26 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.InMemoryDataset;
-import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.Test;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
+import fr.insee.vtl.model.InMemoryDataset;
+import fr.insee.vtl.model.Structured;
 
 public class CleanUpProcessingTest {
 
@@ -90,9 +95,9 @@ public class CleanUpProcessingTest {
 
         // Datasets
         VtlBindings vtlBindings = new VtlBindings();
-        vtlBindings.getBindings().put("CAWI", cawiDataset);
-        vtlBindings.getBindings().put("PAPI", papiDataset);
-        vtlBindings.getBindings().put("MULTIMODE", multimodeDataset);
+        vtlBindings.put("CAWI", cawiDataset);
+        vtlBindings.put("PAPI", papiDataset);
+        vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
         CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
@@ -105,6 +110,6 @@ public class CleanUpProcessingTest {
         assertFalse(papiVariables.hasVariable("GENDER_1"));
         assertFalse(papiVariables.hasVariable("GENDER_2"));
         // Are unimodal datasets removed ?
-        assertEquals(Set.of("MULTIMODE"), vtlBindings.getBindings().keySet());
+        assertEquals(Set.of("MULTIMODE"), vtlBindings.keySet());
     }
 }

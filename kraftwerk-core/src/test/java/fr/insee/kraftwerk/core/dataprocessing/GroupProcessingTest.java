@@ -1,5 +1,12 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -8,12 +15,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GroupProcessingTest {
 
@@ -32,7 +33,7 @@ public class GroupProcessingTest {
                 )
         );
         VtlBindings vtlBindings = new VtlBindings();
-        vtlBindings.getBindings().put("TEST", initialDataset);
+        vtlBindings.put("TEST", initialDataset);
         //
         VariablesMap variablesMap = new VariablesMap();
         variablesMap.putGroup(new Group("DEPTH1", variablesMap.getRootGroup().getName()));

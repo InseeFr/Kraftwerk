@@ -22,7 +22,6 @@ import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
@@ -41,6 +40,7 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
@@ -51,31 +51,23 @@ public class LauncherService {
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 	
+	VtlExecute vtlExecute = new VtlExecute();
+	
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
 
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
 	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) throws KraftwerkException {
-		Path inDirectory = Paths.get(inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
-		try {
-				String campaignName = inDirectory.getFileName().toString();
+		/* Step 1 : Init */
+		Path inDirectory = getInDirectory(inDirectoryParam);
+		String campaignName = inDirectory.getFileName().toString();
+		log.info("===============================================================================================");
+		log.info("Kraftwerk main service started for campaign: " + campaignName);
+		log.info("===============================================================================================");
 
-				log.info(
-						"===============================================================================================");
-				log.info("Kraftwerk main service started for campaign: " + campaignName);
-				log.info(
-						"===============================================================================================");
-
-				Path outDirectory = FileUtils.transformToOut(inDirectory);
-
-				/* Step 1 : Init */
-
-				UserInputs userInputs = new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
-
-				VtlBindings vtlBindings = new VtlBindings();
+		UserInputs userInputs = getUserInputs(inDirectory);
+		VtlBindings vtlBindings = new VtlBindings();
 
 				/* Step 2 : unimodal data */
 				for (String dataMode : userInputs.getModeInputsMap().keySet()) {
@@ -118,7 +110,7 @@ public class LauncherService {
 
 					/* Step 2.4a : Convert data object to a VTL Dataset */
 					data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
-					vtlBindings.convertToVtlDataset(data, dataMode);
+					vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 
 					/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 					if (modeInputs.getLunaticFile() != null) {
@@ -172,19 +164,10 @@ public class LauncherService {
 						userInputs.getVtlInformationLevelsFile());
 
 				/* Step 4 : Write output files */
+				writeOutputFiles(inDirectoryParam, vtlBindings);
 
-				/* Step 4.1 : write csv output tables */
-				OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
-				outputFiles.writeOutputCsvTables();
-
-				/* Step 4.2 : write scripts to import csv tables in several languages */
-				outputFiles.writeImportScripts(metadataVariables);
-
-				/* Step 4.3 : move kraftwerk.json to a secondary folder */
-		//		outputFiles.renameInputFile(inDirectory);
-
-				/* Step 4.4 : move differential data to a secondary folder */
-		//		outputFiles.moveInputFiles(userInputs);
+				/* Step 4.3- 4.4  : Archive */
+		//		archive(outputFiles, userInputs);
 
 				log.info(
 						"===============================================================================================");
@@ -192,15 +175,51 @@ public class LauncherService {
 				log.info(
 						"===============================================================================================\n");
 
-			
-
-		} catch (NullException e) {
-			e.renameInputFile(inDirectory);
-		}
-
 		return true;
 	}
 
+	@PutMapping(value = "/writeOutputFiles")
+	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
+	public void writeOutputFiles(
+			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam, 
+			@Parameter(description = "vtlBindings ?", required = true) @RequestBody VtlBindings vtlBindings) throws KraftwerkException {
+		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path outDirectory = FileUtils.transformToOut(inDirectory);
+
+		UserInputs userInputs = getUserInputs(inDirectory);
+		/* Step 4.1 : write csv output tables */
+		OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
+		outputFiles.writeOutputCsvTables();
+
+		/* Step 4.2 : write scripts to import csv tables in several languages */
+		outputFiles.writeImportScripts(metadataVariables);
+	}
+	
+	@PutMapping(value = "/archive")
+	@Operation(operationId = "archive", summary = "Archive files")
+	public void archive(
+			@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) 
+			throws KraftwerkException {
+		Path inDirectory = getInDirectory(inDirectoryParam);
+		
+		/* Step 4.3 : move kraftwerk.json to a secondary folder */
+		FileUtils.renameInputFile(inDirectory);
+
+		/* Step 4.4 : move differential data to a secondary folder */
+		FileUtils.moveInputFiles(getUserInputs(inDirectory));
+	}
+	
+	private UserInputs getUserInputs(Path inDirectory) {
+		return new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
+	}
+	
+	private Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
+		Path inDirectory = Paths.get(inDirectoryParam);
+		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
+		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
+		return inDirectory;
+	}
+	
 	private boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
 		if (Files.exists(userInputFile)) {

@@ -24,6 +24,8 @@ class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
 
+	VtlExecute vtlExecute = new VtlExecute();
+
 	Dataset ds1 = new InMemoryDataset(
 			List.of(
 					List.of("UE001", "Lille", "INDIVIDU-1", "Jean", 30),
@@ -47,13 +49,13 @@ class VtlBindingsTest {
 
 	@Test
 	void removeNonExistingDataset() {
-		Assertions.assertDoesNotThrow(() -> vtlBindings.getBindings().remove("NOT_IN_BINDINGS"));
+		Assertions.assertDoesNotThrow(() -> vtlBindings.remove("NOT_IN_BINDINGS"));
 	}
 
 	@Test
 	void constructorsAndDataModeTest() {
 		SurveyRawData surveyRawData = SurveyRawDataTest.createFakePapiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyRawData, "SRD1");
+		vtlExecute.convertToVtlDataset(surveyRawData, "SRD1", vtlBindings);
 		Dataset dataset = vtlBindings.getDataset("SRD1");
 		assertEquals("Simpson in PAPI", dataset.getDataPoints().get(0).get("LAST_NAME"));
 		assertEquals(8, dataset.getDataPoints().size());
@@ -64,13 +66,13 @@ class VtlBindingsTest {
 		SurveyRawData surveyRawDataPapi = SurveyRawDataTest.createFakePapiSurveyRawData();
 		SurveyRawData surveyRawDataCapi = SurveyRawDataTest.createFakeCapiSurveyRawData();
 		SurveyRawData surveyRawDataCawi = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyRawDataPapi, "Papi");
-		vtlBindings.convertToVtlDataset(surveyRawDataCapi, "Capi avec espace");
-		vtlBindings.convertToVtlDataset(surveyRawDataCawi, "Cawi avec accent é");
-		assertEquals(3, vtlBindings.getBindings().size());
-		assertTrue(vtlBindings.getBindings().containsKey("Papi"));
-		assertTrue(vtlBindings.getBindings().containsKey("Capi avec espace"));
-		assertTrue(vtlBindings.getBindings().containsKey("Cawi avec accent é"));
+		vtlExecute.convertToVtlDataset(surveyRawDataPapi, "Papi", vtlBindings);
+		vtlExecute.convertToVtlDataset(surveyRawDataCapi, "Capi avec espace", vtlBindings);
+		vtlExecute.convertToVtlDataset(surveyRawDataCawi, "Cawi avec accent é", vtlBindings);
+		assertEquals(3, vtlBindings.size());
+		assertTrue(vtlBindings.containsKey("Papi"));
+		assertTrue(vtlBindings.containsKey("Capi avec espace"));
+		assertTrue(vtlBindings.containsKey("Cawi avec accent é"));
 
 		Dataset capi = vtlBindings.getDataset("Capi avec espace");
 		assertEquals(4, capi.getDataPoints().size());
@@ -80,7 +82,7 @@ class VtlBindingsTest {
 	@Test
 	void evalVtlScriptTest_uniqueString() {
 		//
-		vtlBindings.getBindings().put("TEST", ds1);
+		vtlBindings.put("TEST", ds1);
 		//
 		StringBuilder vtlScript = new StringBuilder("\n");
 		vtlScript.append("TEST := TEST [calc CODE_POSTAL := \n");
@@ -89,7 +91,7 @@ class VtlBindingsTest {
 		vtlScript.append("    \"\" ))];");
 		log.info("Test VTL script:");
 		log.info(vtlScript.toString());
-		vtlBindings.evalVtlScript(vtlScript.toString());
+		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -103,27 +105,27 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlString() {
-		vtlBindings.evalVtlScript((String) null);
-		vtlBindings.evalVtlScript((VtlScript) null);
-		vtlBindings.evalVtlScript("");
+		vtlExecute.evalVtlScript((String) null, vtlBindings);
+		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings);
+		vtlExecute.evalVtlScript("", vtlBindings);
 	}
 	
 
 	@Test
 	void evalEmptyVtlScriptObject() {
-		vtlBindings.evalVtlScript(new VtlScript());
+		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings);
 	}
 
 	@Test
 	void evalVtlScriptTest_scriptObject() {
 		//
-		vtlBindings.getBindings().put("TEST", ds1);
+		vtlBindings.put("TEST", ds1);
 		//
 		VtlScript vtlScript = new VtlScript();
 		vtlScript.add("TEST := TEST [calc new1 := \"new\"];");
 		vtlScript.add("nOt VtL cOdE "); // should write a warning in the log but not throw an exception
 		vtlScript.add("TEST := TEST [calc new2 := 2];");
-		vtlBindings.evalVtlScript(vtlScript);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -135,8 +137,8 @@ class VtlBindingsTest {
 
 	@Test
 	void testGetDatasetVariablesMap(){
-		VtlBindings vtlBindings = new VtlBindings();
-		vtlBindings.getBindings().put("TEST", ds1);
+		vtlBindings = new VtlBindings();
+		vtlBindings.put("TEST", ds1);
 		VariablesMap variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
 		//
 		assertEquals(2, variablesMap.getGroupsCount());

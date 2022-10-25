@@ -69,7 +69,7 @@ public class PaperDataProcessingTest {
 		//addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
-		vtlBindings.getBindings().put("TEST", paperDataset);
+		vtlBindings.put("TEST", paperDataset);
 		//
 		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings);
 		paperDataProcessing.applyAutomatedVtlInstructions("TEST", variablesMap);

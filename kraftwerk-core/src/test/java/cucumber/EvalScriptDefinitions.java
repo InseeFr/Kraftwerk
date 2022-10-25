@@ -2,11 +2,10 @@ package cucumber;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.script.Bindings;
-
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -14,21 +13,22 @@ import io.cucumber.java.en.When;
 // Used in do_we_apply_vtl_instruction and do_we_apply_vtl_script
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-	public Bindings bindings = vtlBindings.getBindings();
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() throws Exception {
 		SurveyRawData surveyColeman = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyColeman, "COLEMAN");
+		vtlExecute.convertToVtlDataset(surveyColeman, "COLEMAN", vtlBindings);
 		SurveyRawData surveyPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyPaper, "PAPER");
+		vtlExecute.convertToVtlDataset(surveyPaper, "PAPER", vtlBindings);
 
 		assertEquals(15, vtlBindings.getDataset("COLEMAN").getDataStructure().size());
 	} 
 	
 	@When("I try to apply some VTL instruction : {string}")
 	public void exportDataset(String vtlScript) throws Exception {
-		vtlBindings.evalVtlScript(vtlScript);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings);
 	}
 
 	@Then("The binding {string} should have {int} variables")

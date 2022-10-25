@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,9 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class DataProcessing {
 
     protected final VtlBindings vtlBindings;
+	VtlExecute vtlExecute;
 
     protected DataProcessing(VtlBindings vtlBindings){
         this.vtlBindings = vtlBindings;
+        vtlExecute = new VtlExecute();
     }
 
     public abstract String getStepName();
@@ -55,7 +58,7 @@ public abstract class DataProcessing {
         log.info(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
                 automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
-            vtlBindings.evalVtlScript(automatedInstructions);
+        	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings);
         }
     }
 
@@ -64,7 +67,7 @@ public abstract class DataProcessing {
         log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
-            vtlBindings.evalVtlScript(vtlScript);
+        	vtlExecute.evalVtlScript(vtlScript, vtlBindings);
         }
     }
 

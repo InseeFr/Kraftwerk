@@ -24,6 +24,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -49,12 +50,12 @@ class OutputFilesTest {
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
-				vtlBindings.getBindings().put(mode, fooDataset);
+				vtlBindings.put(mode, fooDataset);
 			}
-			vtlBindings.getBindings().put(testUserInputs.getMultimodeDatasetName(), fooDataset);
-			vtlBindings.getBindings().put(Constants.ROOT_GROUP_NAME, fooDataset);
-			vtlBindings.getBindings().put("LOOP", fooDataset);
-			vtlBindings.getBindings().put("FROM_USER", fooDataset);
+			vtlBindings.put(testUserInputs.getMultimodeDatasetName(), fooDataset);
+			vtlBindings.put(Constants.ROOT_GROUP_NAME, fooDataset);
+			vtlBindings.put("LOOP", fooDataset);
+			vtlBindings.put("FROM_USER", fooDataset);
 			//
 			outputFiles = new OutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs);
 		});
@@ -112,7 +113,7 @@ class OutputFilesTest {
 			}
 		}
 
-		outputFiles.moveInputFiles(testUserInputs);
+		FileUtils.moveInputFiles(testUserInputs);
 		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/papier").exists());
 		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/web").exists());
 		assertTrue(
