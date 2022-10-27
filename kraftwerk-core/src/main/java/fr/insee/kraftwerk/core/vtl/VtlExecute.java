@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.vtl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.script.ScriptContext;
@@ -107,6 +108,15 @@ public class VtlExecute {
      * @param jsonOutFile Path to write the output json file.
      * */
     public void writeJsonDataset(String bindingName, Path jsonOutFile, VtlBindings bindings) {
+    	// Create folder if doesn't exist
+    		try {
+    			Files.createDirectories(jsonOutFile.getParent());
+    			log.info(String.format("Created folder: %s", jsonOutFile.getParent().toFile().getAbsolutePath()));
+    		} catch (IOException e) {
+    			log.error("Permission refused to create output folder: " + jsonOutFile.getParent(), e);
+    		}
+    	
+    	//Write file    	
         if (bindings.containsKey(bindingName)) {
             try {
                 TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)));

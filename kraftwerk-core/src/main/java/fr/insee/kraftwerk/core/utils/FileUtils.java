@@ -37,7 +37,7 @@ public class FileUtils {
 	 */
 	private static Path transformToOther(Path inDirectory, String other) {
 		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve(other)
-				: transformToOut(inDirectory.getParent()).resolve(inDirectory.getFileName());
+				: transformToOther(inDirectory.getParent(),other).resolve(inDirectory.getFileName());
 	}
 	
 
