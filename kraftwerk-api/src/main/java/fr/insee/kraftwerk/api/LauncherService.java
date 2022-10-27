@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -93,8 +94,8 @@ public class LauncherService {
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
 	public void buildVtlBindings(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "Data mode", required = true) @RequestBody String dataMode
+			@Parameter(description = "directory with input files", required = true) @RequestParam String inDirectoryParam,
+			@Parameter(description = "Data mode", required = true) @RequestParam String dataMode
 			) throws KraftwerkException {
 		//Read data files
 		Path inDirectory = getInDirectory(inDirectoryParam);
