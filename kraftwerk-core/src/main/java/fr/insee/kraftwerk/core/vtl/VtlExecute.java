@@ -60,7 +60,6 @@ public class VtlExecute {
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName, bindings);
-     //TODO remove if unused   return new ArrayList<>(this.keySet());
     }
 
 
