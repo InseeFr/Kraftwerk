@@ -59,7 +59,7 @@ public class LauncherService {
 	
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
-	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestParam String inDirectoryParam) throws KraftwerkException {
+	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) throws KraftwerkException {
 		/* Step 1 : Init */
 		Path inDirectory = getInDirectory(inDirectoryParam);
 		String campaignName = inDirectory.getFileName().toString();
@@ -95,7 +95,7 @@ public class LauncherService {
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
 	public void buildVtlBindings(
-			@Parameter(description = "directory with input files", required = true) @RequestParam String inDirectoryParam
+			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
 			) throws KraftwerkException {
 		//Read data files
 		Path inDirectory = getInDirectory(inDirectoryParam);
@@ -117,7 +117,7 @@ public class LauncherService {
 	@PutMapping(value = "/buildVtlBindings/{dataMode}")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
 	public void buildVtlBindingsByDataMode(
-			@Parameter(description = "directory with input files", required = true) @RequestParam String inDirectoryParam,
+			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam,
 			@Parameter(description = "Data mode", required = true) @PathVariable String dataMode
 			) throws KraftwerkException {
 		//Read data files
@@ -161,7 +161,7 @@ public class LauncherService {
 	@PutMapping(value = "/unimodalProcessing")
 	@Operation(operationId = "unimodalProcessing", summary = "Apply transformation on one mode")
 	public void unimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestParam  String inDirectoryParam,
+			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "Data mode", required = true) @RequestParam  String dataMode
 			) throws KraftwerkException {
 		//Read data in JSON file
@@ -251,7 +251,7 @@ public class LauncherService {
 	@PutMapping(value = "/multimodalProcessing")
 	@Operation(operationId = "multimodalProcessing", summary = "Write output files in outDirectory")
 	public void multimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestParam String inDirectoryParam
+			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
 			) throws KraftwerkException {
 		//Read data in JSON file
 		Path inDirectory = getInDirectory(inDirectoryParam);
@@ -293,7 +293,7 @@ public class LauncherService {
 	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
 	public void writeOutputFiles(
-			@Parameter(description = "directory with input files", required = true) @RequestParam  String inDirectoryParam, 
+			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam, 
 			@Parameter(description = "Bindings file name in temp directory", required = true) @RequestParam  String bindingFilename,
 			@Parameter(description = "Data mode") @RequestBody String datamode
 			) throws KraftwerkException {
@@ -316,7 +316,7 @@ public class LauncherService {
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "Archive files")
 	public void archive(
-			@Parameter(description = "directory with files", required = true) @RequestParam  String inDirectoryParam) 
+			@Parameter(description = "directory with files", required = true) @RequestBody  String inDirectoryParam) 
 			throws KraftwerkException {
 		Path inDirectory = getInDirectory(inDirectoryParam);
 		
