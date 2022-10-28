@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,12 +108,11 @@ public class LauncherService {
 			buildVtlBindings(userInputs, dataMode, vtlBindings);
 			
 			//Write data in JSON file
-			Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve("unimodalProcessing" +"_"+ dataMode+".json");
-			vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
+			writeTempBindings(inDirectory, dataMode, vtlBindings);
 		}
 
 	}
-	
+
 	
 	@PutMapping(value = "/buildVtlBindings/{dataMode}")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
@@ -129,7 +129,26 @@ public class LauncherService {
 		buildVtlBindings(userInputs, dataMode, vtlBindings);
 		
 		//Write data in JSON file
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve("unimodalProcessing" +"_"+ dataMode );
+		writeTempBindings(inDirectory, dataMode, vtlBindings);
+	}
+
+	private String getMethodName() throws KraftwerkException {
+		String methodName = "";
+		try {
+			StackWalker walker = StackWalker.getInstance();
+			Optional<String> methodNameOptional = walker.walk(frames -> frames
+			  .skip(1)
+		      .findFirst()
+		      .map(StackWalker.StackFrame::getMethodName));
+		    if (methodNameOptional.isPresent()) methodName =methodNameOptional.get();
+		} catch (Exception e) {
+			throw new KraftwerkException(500, "Can't get method name : "  +e.getClass()+ " - "+ e.getMessage());
+		}
+		return methodName;
+	}
+	
+	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings) throws KraftwerkException {
+		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(getMethodName() +"_"+ dataMode+".json");
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
 	
@@ -173,8 +192,8 @@ public class LauncherService {
 		unimodalProcessing(userInputs, dataMode, vtlBindings);
 		
 		//Write data in JSON file
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve("unimodalProcessing" +"_"+ dataMode );
-		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
+		writeTempBindings(inDirectory, dataMode, vtlBindings);
+
 	}
 	
 	private void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings) {
@@ -263,8 +282,8 @@ public class LauncherService {
 		multimodalProcessing(userInputs, vtlBindings);
 		
 		//Write data in JSON file
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve("multimodalProcessing" +"_"+ multimodeDatasetName );
-		vtlExecute.writeJsonDataset(multimodeDatasetName, tempOutputPath, vtlBindings);
+		writeTempBindings(inDirectory, multimodeDatasetName, vtlBindings);
+
 	}
 	
 	private void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings) {
