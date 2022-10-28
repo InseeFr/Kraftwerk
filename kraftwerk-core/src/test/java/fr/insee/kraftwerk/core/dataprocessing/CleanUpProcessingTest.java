@@ -100,8 +100,8 @@ public class CleanUpProcessingTest {
         vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
-        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null, metadataVariables);
+        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null);
 
         // Are paper indicator variables removed in VTL multimode dataset ?
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));

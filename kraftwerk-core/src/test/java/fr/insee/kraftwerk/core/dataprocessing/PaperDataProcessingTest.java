@@ -71,8 +71,8 @@ public class PaperDataProcessingTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", paperDataset);
 		//
-		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings);
-		paperDataProcessing.applyAutomatedVtlInstructions("TEST", variablesMap);
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
+		paperDataProcessing.applyAutomatedVtlInstructions("TEST");
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 

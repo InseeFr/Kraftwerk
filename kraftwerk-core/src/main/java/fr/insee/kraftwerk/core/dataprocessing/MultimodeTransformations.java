@@ -15,7 +15,7 @@ public class MultimodeTransformations extends DataProcessing {
     }
 
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    protected VtlScript generateVtlInstructions(String bindingName) {
         return new VtlScript();
     }
 }

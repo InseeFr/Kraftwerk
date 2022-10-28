@@ -42,7 +42,7 @@ public class GroupProcessingTest {
         variablesMap.putVariable(new Variable("FOO1", variablesMap.getGroup("DEPTH1"), VariableType.NUMBER));
         variablesMap.putVariable(new Variable("FOO2", variablesMap.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings).applyAutomatedVtlInstructions("TEST", variablesMap);
+        new GroupProcessing(vtlBindings, variablesMap).applyAutomatedVtlInstructions("TEST");
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //

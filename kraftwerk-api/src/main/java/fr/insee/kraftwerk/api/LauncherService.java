@@ -266,9 +266,9 @@ public class LauncherService {
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
-			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
-			calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables,
+			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables,
 					metadata);
+			calculatedProcessing.applyVtlTransformations(dataMode, null);
 		} else {
 			log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
 			if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
@@ -280,13 +280,12 @@ public class LauncherService {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, metadata);
+		new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null);
 
 		/* Step 2.5 : Apply mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager
-				.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
-		dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(),
-				metadata);
+				.getProcessingClass(modeInputs.getDataFormat(), vtlBindings, metadata);
+		dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
 	}
 	
 	private VariablesMap getMetadata(UserInputs userInputs, String dataMode){
@@ -369,8 +368,8 @@ public class LauncherService {
 				userInputs.getVtlReconciliationFile());
 
 		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-		cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, getMetadata(userInputs));
+		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, getMetadata(userInputs));
+		cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
 		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);

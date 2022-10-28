@@ -53,9 +53,10 @@ class TableScriptInfoTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations("CAWI", null, srdWeb.getVariablesMap());
-		groupProcessing.applyVtlTransformations("PAPI", null, srdPaper.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
+		groupProcessing.applyVtlTransformations("CAWI", null);
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
+		groupProcessing2.applyVtlTransformations("PAPI", null);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
@@ -63,7 +64,7 @@ class TableScriptInfoTest {
 	}
 	
 	@Test
-	public void getAllLengthTest() {
+	void getAllLengthTest() {
 		instantiateMap();
 		Map<String, Variable> listVariables = tableScriptInfo.getAllLength(dataStructure, metadataVariables);
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
@@ -73,7 +74,7 @@ class TableScriptInfoTest {
 	}
 
 	@Test
-	public void testGetAllLengthWithNumberType() {
+	void testGetAllLengthWithNumberType() {
 		//
 		VariablesMap testVariablesMap1 = new VariablesMap();
 		testVariablesMap1.putVariable(new Variable("FOO", testVariablesMap1.getRootGroup(), VariableType.NUMBER, "4.1"));
@@ -93,7 +94,7 @@ class TableScriptInfoTest {
 	}
 
 	@Test
-	private void numberTypeInDatasets() {
+	void numberTypeInDatasets() {
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))

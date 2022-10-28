@@ -42,8 +42,8 @@ public class ExportDatasetDefinitions {
 	public void importDataset(String nameDataset) throws Exception {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, survey.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getVariablesMap());
+		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null);
 	}
 
 	@Then("I should get some dataset values from {string}")

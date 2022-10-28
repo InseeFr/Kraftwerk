@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -8,8 +9,8 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public class XformsDataProcessing extends UnimodalDataProcessing {
 
-    public XformsDataProcessing(VtlBindings vtlBindings) {
-        super(vtlBindings);
+    public XformsDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
+        super(vtlBindings, variablesMap);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class XformsDataProcessing extends UnimodalDataProcessing {
      *
      * @return ""
      */
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    public VtlScript generateVtlInstructions(String bindingName) {
         return new VtlScript();
     }
 }

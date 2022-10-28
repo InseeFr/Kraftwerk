@@ -19,9 +19,13 @@ public class CalculatedProcessing extends DataProcessing {
 
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
+    private CalculatedVariables calculatedVariables;
+    private  VariablesMap variablesMap;
 
-    public CalculatedProcessing(VtlBindings vtlBindings) {
+    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, VariablesMap variablesMap) {
         super(vtlBindings);
+        this.calculatedVariables = calculatedVariables;
+        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -39,11 +43,7 @@ public class CalculatedProcessing extends DataProcessing {
      * @return a VtlScript with one instruction for each "calculated" variable.
      */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-
-        CalculatedVariables calculatedVariables = (CalculatedVariables) objects[0];
-
-        VariablesMap variablesMap = (VariablesMap) objects[1];
+    protected VtlScript generateVtlInstructions(String bindingName) {
 
         List<String> orderedCalculatedNames = resolveCalculated(calculatedVariables);
 

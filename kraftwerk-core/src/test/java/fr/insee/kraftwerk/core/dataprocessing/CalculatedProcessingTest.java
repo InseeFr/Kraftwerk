@@ -51,8 +51,8 @@ public class CalculatedProcessingTest {
     @Test
     public void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        VtlScript vtlScript = processing.generateVtlInstructions("TEST", fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        VtlScript vtlScript = processing.generateVtlInstructions("TEST");
 
         //
         assertTrue(vtlScript.get(0).contains("FOO3"));
@@ -77,8 +77,8 @@ public class CalculatedProcessingTest {
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", fooDataset);
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        processing.applyAutomatedVtlInstructions("TEST", fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        processing.applyAutomatedVtlInstructions("TEST");
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 

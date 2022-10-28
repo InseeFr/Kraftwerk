@@ -1,4 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -7,8 +8,8 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public class LunaticDataProcessing extends UnimodalDataProcessing {
 
-    public LunaticDataProcessing(VtlBindings vtlBindings) {
-        super(vtlBindings);
+    public LunaticDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
+        super(vtlBindings, variablesMap);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class LunaticDataProcessing extends UnimodalDataProcessing {
      * @return ""
      */
     @Override
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
+    public VtlScript generateVtlInstructions(String bindingName) {
         return new VtlScript();
     }
 
