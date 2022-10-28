@@ -68,7 +68,7 @@ public class LauncherService {
 	@Operation(operationId = "main", summary = "Main service : call all steps")
 	public ResponseEntity<String> main(
 			@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "True if want to archive, default = false") @PathVariable Boolean archiveAtEnd
+			@Parameter(description = "True if want to archive, default = false", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
 		/* Step 1 : Init */
 		Path inDirectory;

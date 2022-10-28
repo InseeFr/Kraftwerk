@@ -14,14 +14,13 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
  * Class to generate import scripts for the csv output tables.
  */
 
-
 public class ImportScripts {
 
 	private final List<TableScriptInfo> tableScriptInfoList;
 
 	public ImportScripts() {
 		tableScriptInfoList = new ArrayList<>();
-	};
+	}
 
 	/** @see TableScriptInfo */
 	public void registerTable(TableScriptInfo tableScriptInfo) {
