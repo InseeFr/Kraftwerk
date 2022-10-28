@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,9 +51,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 
+
+
 @Slf4j
 @RestController
 public class LauncherService {
+
+	private static final String LOG_FRAME = "===============================================================================================";
 
 	VtlExecute vtlExecute = new VtlExecute();
 	
@@ -60,20 +66,32 @@ public class LauncherService {
 	
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
-	public Boolean main(@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam) throws KraftwerkException {
+	public ResponseEntity<String> main(
+			@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam,
+			@Parameter(description = "True if want to archive, default = false") @PathVariable Boolean archiveAtEnd
+			) {
 		/* Step 1 : Init */
-		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		String campaignName = inDirectory.getFileName().toString();
-		log.info("===============================================================================================");
+		log.info(LOG_FRAME);
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
-		log.info("===============================================================================================");
+		log.info(LOG_FRAME);
 
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 
 		/* Step 2 : unimodal data */
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildVtlBindings(userInputs, dataMode, vtlBindings);
+			try {
+				buildVtlBindings(userInputs, dataMode, vtlBindings);
+			} catch (NullException e) {
+				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+			}
 			unimodalProcessing(userInputs, dataMode, vtlBindings);
 		}
 
@@ -84,52 +102,84 @@ public class LauncherService {
 		writeOutputFiles(inDirectory, vtlBindings);
 
 		/* Step 4.3- 4.4 : Archive */
-		// archive(outputFiles, userInputs);
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
 
-		log.info("===============================================================================================");
+		log.info(LOG_FRAME);
 		log.info("Kraftwerk main service terminated for campaign: " + campaignName);
-		log.info("===============================================================================================\n");
+		log.info(LOG_FRAME);
 
-		return true;
+		return ResponseEntity.ok(campaignName);
 	}
-
+	
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
-	public void buildVtlBindings(
+	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
-			) throws KraftwerkException {
+			)  {
 		//Read data files
-		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		UserInputs userInputs = getUserInputs(inDirectory);
 		
 		//Process
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
-			buildVtlBindings(userInputs, dataMode, vtlBindings);
+			try {
+				buildVtlBindings(userInputs, dataMode, vtlBindings);
+			} catch (NullException e) {
+				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+			}
 			
 			//Write data in JSON file
-			writeTempBindings(inDirectory, dataMode, vtlBindings);
+			try {
+				writeTempBindings(inDirectory, dataMode, vtlBindings);
+			} catch (KraftwerkException e) {
+				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+			}
 		}
+		
+		return ResponseEntity.ok(inDirectoryParam);
+
 
 	}
 
 	
 	@PutMapping(value = "/buildVtlBindings/{dataMode}")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
-	public void buildVtlBindingsByDataMode(
+	public ResponseEntity<String> buildVtlBindingsByDataMode(
 			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam,
 			@Parameter(description = "Data mode", required = true) @PathVariable String dataMode
-			) throws KraftwerkException {
+			)  {
 		//Read data files
-		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 		
 		//Process
-		buildVtlBindings(userInputs, dataMode, vtlBindings);
+		try {
+			buildVtlBindings(userInputs, dataMode, vtlBindings);
+		} catch (NullException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		
 		//Write data in JSON file
-		writeTempBindings(inDirectory, dataMode, vtlBindings);
+		try {
+			writeTempBindings(inDirectory, dataMode, vtlBindings);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+		
+		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
+
 	}
 
 	private String getMethodName() throws KraftwerkException {
@@ -172,19 +222,24 @@ public class LauncherService {
 		parseReportingData(modeInputs, data);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
-		data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
+		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
 
 	@PutMapping(value = "/unimodalProcessing")
 	@Operation(operationId = "unimodalProcessing", summary = "Apply transformation on one mode")
-	public void unimodalProcessing(
+	public ResponseEntity<String> unimodalProcessing(
 			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "Data mode", required = true) @RequestParam  String dataMode
-			) throws KraftwerkException {
+			)  {
 		//Read data in JSON file
-		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode);
 		
@@ -192,7 +247,14 @@ public class LauncherService {
 		unimodalProcessing(userInputs, dataMode, vtlBindings);
 		
 		//Write data in JSON file
-		writeTempBindings(inDirectory, dataMode, vtlBindings);
+		try {
+			writeTempBindings(inDirectory, dataMode, vtlBindings);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+		
+		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
+
 
 	}
 	
@@ -269,11 +331,16 @@ public class LauncherService {
 
 	@PutMapping(value = "/multimodalProcessing")
 	@Operation(operationId = "multimodalProcessing", summary = "Write output files in outDirectory")
-	public void multimodalProcessing(
+	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
-			) throws KraftwerkException {
+			)  {
 		//Read data in JSON file
-		Path inDirectory = getInDirectory(inDirectoryParam);
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		UserInputs userInputs = getUserInputs(inDirectory);
 		String multimodeDatasetName = userInputs.getMultimodeDatasetName();
 		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),multimodeDatasetName);
@@ -282,7 +349,14 @@ public class LauncherService {
 		multimodalProcessing(userInputs, vtlBindings);
 		
 		//Write data in JSON file
-		writeTempBindings(inDirectory, multimodeDatasetName, vtlBindings);
+		try {
+			writeTempBindings(inDirectory, multimodeDatasetName, vtlBindings);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+		
+		return ResponseEntity.ok(inDirectoryParam);
+
 
 	}
 	
@@ -311,14 +385,21 @@ public class LauncherService {
 
 	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
-	public void writeOutputFiles(
+	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam, 
 			@Parameter(description = "Bindings file name in temp directory", required = true) @RequestParam  String bindingFilename,
 			@Parameter(description = "Data mode") @RequestBody String datamode
-			) throws KraftwerkException {
-		Path inDirectory = getInDirectory(inDirectoryParam);
+			) {
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),datamode);
 		writeOutputFiles(inDirectory, vtlBindings);
+		return ResponseEntity.ok(inDirectoryParam+ " - "+datamode);
+
 	}
 
 	private void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings) {
@@ -334,18 +415,35 @@ public class LauncherService {
 	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "Archive files")
-	public void archive(
+	public ResponseEntity<String> archive(
 			@Parameter(description = "directory with files", required = true) @RequestBody  String inDirectoryParam) 
-			throws KraftwerkException {
-		Path inDirectory = getInDirectory(inDirectoryParam);
+			{
+		Path inDirectory;
+		try {
+			inDirectory = getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		
 		/* Step 4.3 : move kraftwerk.json to a secondary folder */
 		FileUtils.renameInputFile(inDirectory);
 
 		/* Step 4.4 : move differential data to a secondary folder */
-		FileUtils.moveInputFiles(getUserInputs(inDirectory));
+		try {
+			FileUtils.moveInputFiles(getUserInputs(inDirectory));
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		
-		//TODO delete temp directory
+		//delete temp directory
+		Path tempOutputPath = FileUtils.transformToTemp(inDirectory);
+		try {
+			FileUtils.deleteDirectory(tempOutputPath);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+		return ResponseEntity.ok(inDirectoryParam);
+
 	}
 	
 	private UserInputs getUserInputs(Path inDirectory) {
@@ -355,7 +453,7 @@ public class LauncherService {
 	private Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
 		Path inDirectory = Paths.get(inDirectoryParam);
 		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
+		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(HttpStatus.BAD_REQUEST.hashCode(), "Configuration file not found");
 		return inDirectory;
 	}
 	
@@ -376,11 +474,6 @@ public class LauncherService {
 		return vtlBindings;
 
 	}
-	
-   // WRITE vtlExecute.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON), vtlBindings);
-	//	READ	vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
-
-
 
 
 }

@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import org.springframework.util.FileSystemUtils;
+
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
@@ -159,6 +161,15 @@ public class FileUtils {
 			sep = File.separator;
 		}
 		return result.toString();
+	}
+	
+	
+	public static void deleteDirectory(Path directoryPath) throws KraftwerkException {
+		try {
+			FileSystemUtils.deleteRecursively(directoryPath);
+		} catch (IOException e) {
+			throw new KraftwerkException(500, "IOException when deleting temp folder : "+e.getMessage());
+		}
 	}
 	
 }
