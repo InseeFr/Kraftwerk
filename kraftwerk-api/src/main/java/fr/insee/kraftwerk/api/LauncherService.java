@@ -57,8 +57,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class LauncherService {
 
-	private static final String LOG_FRAME = "===============================================================================================";
-
 	VtlExecute vtlExecute = new VtlExecute();
 	
 	@Value("${fr.insee.postcollecte.files}")
@@ -78,9 +76,7 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
-		log.info(LOG_FRAME);
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
-		log.info(LOG_FRAME);
 
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
@@ -103,10 +99,6 @@ public class LauncherService {
 
 		/* Step 4.3- 4.4 : Archive */
 		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
-
-		log.info(LOG_FRAME);
-		log.info("Kraftwerk main service terminated for campaign: " + campaignName);
-		log.info(LOG_FRAME);
 
 		return ResponseEntity.ok(campaignName);
 	}
