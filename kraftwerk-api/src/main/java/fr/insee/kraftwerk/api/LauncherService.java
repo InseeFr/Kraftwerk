@@ -444,7 +444,7 @@ public class LauncherService {
 	private Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
 		Path inDirectory = Paths.get(inDirectoryParam);
 		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(HttpStatus.BAD_REQUEST.hashCode(), "Configuration file not found");
+		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(HttpStatus.BAD_REQUEST.value(), "Configuration file not found");
 		return inDirectory;
 	}
 	
