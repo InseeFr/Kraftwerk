@@ -12,11 +12,15 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 
 /**
  * Class to generate import scripts for the csv output tables.
+ * 
+ * Some methods should be implemented later : 
+ * - scriptR_base
+ * - scriptPython_pandas
  */
-
 public class ImportScripts {
 
 	private final List<TableScriptInfo> tableScriptInfoList;
+	private static final String END_LINE = "\n";
 
 	public ImportScripts() {
 		tableScriptInfoList = new ArrayList<>();
@@ -27,34 +31,29 @@ public class ImportScripts {
 		tableScriptInfoList.add(tableScriptInfo);
 	}
 
-	public String scriptR_base() {
-		return "Not implemented yet.";
-	}
-
-	public String scriptR_dataTable() {
+	public String scriptRdataTable() {
 
 		StringBuilder script = new StringBuilder();
 
 		for (TableScriptInfo tableScriptInfo : tableScriptInfoList) {
 			String tableName = tableScriptInfo.getTableName();
 			// function call
-			script.append(String.format("%s <- data.table::fread(\n", tableName));
+			script.append(String.format("%s <- data.table::fread(", tableName)).append(END_LINE);
 
 			// file, sep and header parameter
-			script.append(String.format("file=\"%s\", \n", tableScriptInfo.getCsvFileName()));
-			script.append(String.format("sep=\"%s\", \n", Constants.CSV_OUTPUTS_SEPARATOR));
-			script.append("encoding = \"UTF-8\", \n");
+			script.append(String.format("file=\"%s\", ", tableScriptInfo.getCsvFileName())).append(END_LINE);
+			script.append(String.format("sep=\"%s\", ", Constants.CSV_OUTPUTS_SEPARATOR)).append(END_LINE);
+			script.append("encoding = \"UTF-8\", ").append(END_LINE);
 
-			script.append("header=TRUE, \n");
+			script.append("header=TRUE, ").append(END_LINE);
 			// quote parameter
-			if (Constants.CSV_OUTPUTS_QUOTE_CHAR == '"') { // TODO: condition always true, but not later if we let the
-															// user choose
-				script.append(String.format("quote='%s')", Constants.CSV_OUTPUTS_QUOTE_CHAR));
+			if (Constants.csvOutputQuoteChar == '"') {
+				script.append(String.format("quote='%s')", Constants.csvOutputQuoteChar));
 			} else {
-				script.append(String.format("quote=\"%s\")", Constants.CSV_OUTPUTS_QUOTE_CHAR));
+				script.append(String.format("quote=\"%s\")", Constants.csvOutputQuoteChar));
 			}
 
-			script.append("\n\n");
+			script.append(END_LINE).append(END_LINE);
 
 			// specify format variables
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
@@ -64,40 +63,36 @@ public class ImportScripts {
 				VariableType variableType = varEntry.getValue().getType();
 				script.append(String.format("%s$%s <- as.", tableName, varEntry.getKey()));
 				script.append(variableType.getFormatR());
-				script.append(String.format("(%s$%s)\n", tableName, varEntry.getKey()));
+				script.append(String.format("(%s$%s)", tableName, varEntry.getKey())).append(END_LINE);
 
 			}
-			script.append("\n\n");
+			script.append(END_LINE).append(END_LINE);
 		}
 
 		return script.toString();
 
 	}
 
-	public String scriptPython_pandas() {
-		return "Not implemented yet.";
-	}
-
 	public String scriptSAS() {
 
 		StringBuilder script = new StringBuilder();
-		script.append(String.format("/****************************************************/ \n"));
-		script.append(String.format("/*****  Automated import for Kraftwerk outputs  *****/ \n"));
-		script.append(String.format("/****************************************************/ \n"));
-		script.append(String.format("%%let path = local_folder; \n\n"));
+		script.append("/****************************************************/ ").append(END_LINE);
+		script.append("/*****  Automated import for Kraftwerk outputs  *****/ ").append(END_LINE);
+		script.append("/****************************************************/ ").append(END_LINE);
+		script.append("%%let path = local_folder; ").append(END_LINE).append(END_LINE);
 
 		for (TableScriptInfo tableScriptInfo : tableScriptInfoList) {
 			String tableName = tableScriptInfo.getTableName();
 			// filename reference to the file
-			script.append(String.format("filename %s \"&path\\%s\" ENCODING=\"UTF-8\" ;\n",
-					tableName.substring(0, Math.min(tableName.length(), 6)), tableScriptInfo.getCsvFileName()));
+			script.append(String.format("filename %s \"&path\\%s\" ENCODING=\"UTF-8\" ;",
+					tableName.substring(0, Math.min(tableName.length(), 6)), tableScriptInfo.getCsvFileName())).append(END_LINE);
 
 			// PROC IMPORT
 			// careful about special characters, which can't be imported in SAS
-			script.append(String.format("data %s; \n", tableName));
-			script.append("%let _EFIERR_ = 0; /* set the ERROR detection macro variable */ \n");
-			script.append(String.format("infile %s delimiter=\"%s\" MISSOVER DSD lrecl=13106 firstobs=2;\n",
-					tableName.substring(0, Math.min(tableName.length(), 6)), Constants.CSV_OUTPUTS_SEPARATOR));
+			script.append(String.format("data %s; ", tableName)).append(END_LINE);
+			script.append("%let _EFIERR_ = 0; /* set the ERROR detection macro variable */ ").append(END_LINE);
+			script.append(String.format("infile %s delimiter=\"%s\" MISSOVER DSD lrecl=13106 firstobs=2;",
+					tableName.substring(0, Math.min(tableName.length(), 6)), Constants.CSV_OUTPUTS_SEPARATOR)).append(END_LINE);
 
 			// Special treatment to display the length of the variables
 			Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
@@ -166,16 +161,16 @@ public class ImportScripts {
 				// variables
 
 				if (variable.getType().equals(VariableType.BOOLEAN)) {
-					script.append(String.format("informat %s $1. ;\n", varEntry.getKey(), length));
+					script.append(String.format("informat %s $1. ;", varEntry.getKey())).append(END_LINE);
 				} else if (variable.getType().equals(VariableType.STRING)
 						|| variable.getType().equals(VariableType.DATE)) {
-					script.append(String.format("informat %s $%s. ;\n", varEntry.getKey(), length));
+					script.append(String.format("informat %s $%s. ;", varEntry.getKey(), length)).append(END_LINE);
 				} else if (variable.getType().equals(VariableType.INTEGER)
 						|| variable.getType().equals(VariableType.NUMBER)) {
-					script.append(String.format("informat %s %s. ;\n", varEntry.getKey(), getSASNumericLength(length)));
+					script.append(String.format("informat %s %s. ;", varEntry.getKey(), getSASNumericLength(length))).append(END_LINE);
 				}
 			} else {
-				script.append(String.format("informat %s $32. ;\n", varEntry.getKey()));
+				script.append(String.format("informat %s $32. ;", varEntry.getKey())).append(END_LINE);
 			}
 		}
 		script.append("\n");
@@ -200,13 +195,13 @@ public class ImportScripts {
 
 				if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
 						|| variable.getType().equals(VariableType.DATE)) {
-					script.append(String.format("format %s $%s. ;\n", varEntry.getKey(), length));
+					script.append(String.format("format %s $%s. ;", varEntry.getKey(), length)).append(END_LINE);
 				} else if (variable.getType().equals(VariableType.INTEGER)
 						|| variable.getType().equals(VariableType.NUMBER)) {
-					script.append(String.format("format %s %s. ;\n", varEntry.getKey(), getSASNumericLength(length)));
+					script.append(String.format("format %s %s. ;", varEntry.getKey(), getSASNumericLength(length))).append(END_LINE);
 				}
 			} else {
-				script.append(String.format("format %s $32. ;\n", varEntry.getKey()));
+				script.append(String.format("format %s $32. ;", varEntry.getKey())).append(END_LINE);
 			}
 		}
 		script.append("\n");
@@ -223,24 +218,23 @@ public class ImportScripts {
 
 		StringBuilder script = new StringBuilder();
 
-		script.append(String.format("input \n"));
-		for (String variableName : listVariables.keySet()) {
-			Variable variable = listVariables.get(variableName);
-			String length = variable.getLength();
+		script.append("input ").append(END_LINE);
+		for (Entry<String,Variable> variableEntry : listVariables.entrySet()) {
+			Variable variable = variableEntry.getValue();
 
 			// We write the format instructions if we have informations on the length of the
 			// variables
 			if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
 					|| variable.getType().equals(VariableType.DATE)) {
-				script.append(String.format("%s $ \n", variableName, length));
+				script.append(String.format("%s $ ", variableEntry.getKey())).append(END_LINE);
 			} else if (variable.getType().equals(VariableType.INTEGER)
 					|| variable.getType().equals(VariableType.NUMBER)) {
 
-				script.append(String.format("%s \n", variableName, length));
+				script.append(String.format("%s ", variableEntry.getKey())).append(END_LINE);
 
 			}
 		}
-		script.append(";\n");
+		script.append(";").append(END_LINE);
 		return script.toString();
 	}
 }

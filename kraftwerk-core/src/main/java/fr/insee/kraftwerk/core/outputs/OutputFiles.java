@@ -103,7 +103,7 @@ public class OutputFiles {
 		// NOTE: commented unimplemented scripts
 		// TextFileWriter.writeFile(outputFolder.resolve("import_base.R"),
 		// importScripts.scriptR_base());
-		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"), importScripts.scriptR_dataTable());
+		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"), importScripts.scriptRdataTable());
 		// TextFileWriter.writeFile(outputFolder.resolve("import_with_pandas.py"),
 		// importScripts.scriptPython_pandas());
 		TextFileWriter.writeFile(outputFolder.resolve("import.sas"), importScripts.scriptSAS());
