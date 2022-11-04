@@ -379,7 +379,7 @@ public class LauncherService {
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam, 
 			@Parameter(description = "Bindings file name in temp directory", required = true) @RequestParam  String bindingFilename,
-			@Parameter(description = "Data mode") @RequestBody String datamode
+			@Parameter(description = "Data mode") @RequestParam String datamode
 			) {
 		Path inDirectory;
 		try {
@@ -387,7 +387,7 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),datamode);
+		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory.resolve(bindingFilename)).toString(),datamode);
 		writeOutputFiles(inDirectory, vtlBindings);
 		return ResponseEntity.ok(inDirectoryParam+ " - "+datamode);
 

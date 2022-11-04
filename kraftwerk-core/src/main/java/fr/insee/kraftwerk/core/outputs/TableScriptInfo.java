@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.outputs;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -31,7 +32,7 @@ public class TableScriptInfo {
 
 	public Map<String, Variable> getAllLength(DataStructure dataStructure,
 			Map<String, VariablesMap> metadataVariables) {
-		Map<String, Variable> result = new LinkedHashMap<String, Variable>();
+		Map<String, Variable> result = new LinkedHashMap<>();
 		// datastructure : noms complets
 		// metadata : suffixe du nom
 		// We loop with all variables in the current dataset we want to export
@@ -39,8 +40,8 @@ public class TableScriptInfo {
 			// We try to find it from the first datasets containing together all variables
 			// (except VTL and Kraftwerk-created ones)
 
-			for (String datasetName : metadataVariables.keySet()) {
-				VariablesMap variablesMap = metadataVariables.get(datasetName);
+			for (Entry<String, VariablesMap> metadata : metadataVariables.entrySet()) {
+				VariablesMap variablesMap = metadata.getValue();
 
 				// We treat the identifiers
 				if (variablesMap.getIdentifierNames().contains(variableName)) {
@@ -57,7 +58,7 @@ public class TableScriptInfo {
 						variableName = getRootName(variableName);
 						String newLengthString = variable.getLength();
 						
-						// We already got the variable, so we check to see if the lengthes are different -> take the maximum one then
+						// We already got the variable, so we check to see if the lengths are different -> take the maximum one then
 					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
 						if (result.containsKey(variableName)) {
 							result.replace(variableName, new Variable(variableName,
