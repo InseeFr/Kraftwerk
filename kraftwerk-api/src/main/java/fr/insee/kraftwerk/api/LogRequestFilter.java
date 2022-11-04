@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -25,22 +24,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogRequestFilter extends OncePerRequestFilter {
 	
-	private static final String REQUEST_MESSAGE_FORMAT = "\n=================================================\n "
-			+ "CALL {} {}  \n "
-			+ "Content-Type :  {} \n "
-			+ "Headers : {} \n "
-			+ "Params : {} \n "
-			+ "Body : {} \n "
-			+ "Test : {} \n"
-			+ "=================================================";
+	private static final String REQUEST_MESSAGE_FORMAT = 
+			 "CALL {} {} - "
+		//	+ "Content-Type :  {} \n "
+		//	+ "Headers : {} \n "
+			+ "Params : {} - "
+			+ "Body : {} \n ";
 	
-	private static final String RESPONSE_MESSAGE_FORMAT = "\n=================================================\n "
-			+ "END {} {}  \n "
-			+ "Status :  {} \n "
-			+ "Content-Type : {} \n "
-			+ "Headers : {} \n "
-			+ "Body : {} \n"
-	+ "=================================================";
+	private static final String RESPONSE_MESSAGE_FORMAT = 
+			 "END {} {}  - "
+			+ "Status :  {} - "
+		//	+ "Content-Type : {} \n "
+		//	+ "Headers : {} \n "
+			+ "Body : {} \n";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,11 +48,10 @@ public class LogRequestFilter extends OncePerRequestFilter {
         
         log.info(REQUEST_MESSAGE_FORMAT, 
         		req.getMethod(), req.getRequestURI(), 
-        		req.getContentType(),
-                new ServletServerHttpRequest(req).getHeaders(), //Headers
+        	//	req.getContentType(),
+            //    new ServletServerHttpRequest(req).getHeaders(), //Headers
                 request.getQueryString(),//Params
-                new String(req.getContentAsByteArray(), StandardCharsets.UTF_8),//Body
-                req.getContextPath()); 
+                new String(req.getContentAsByteArray(), StandardCharsets.UTF_8));//Body
 
 
         // Execution request chain
@@ -68,8 +63,8 @@ public class LogRequestFilter extends OncePerRequestFilter {
         log.info(RESPONSE_MESSAGE_FORMAT, 
         		req.getMethod(), req.getRequestURI(), 
         		resp.getStatus(),
-        		resp.getContentType(), 
-        		headers.toString(),
+   //     		resp.getContentType(), 
+   //     		headers.toString(),
                 new String(resp.getContentAsByteArray(), StandardCharsets.UTF_8)); //Body
         
         // Finally remember to respond to the client with the cached data.
