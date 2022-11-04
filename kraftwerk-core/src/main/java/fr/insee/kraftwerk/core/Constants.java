@@ -41,7 +41,7 @@ public final class Constants {
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
-	public static final char CSV_OUTPUTS_QUOTE_CHAR = '"'; //TODO: get it from properties
+	public static char csvOutputQuoteChar = '"'; //TODO: get it from properties
 
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
@@ -207,6 +207,11 @@ public final class Constants {
 	 * */
 	public static URL convertToUrl(Path filePath) throws MalformedURLException {
 		return filePath.toFile().toURI().toURL();
+	}
+
+
+	public static void setCsvOutputQuoteChar(char csvOutputQuoteChar) {
+		Constants.csvOutputQuoteChar = csvOutputQuoteChar;
 	}
 		
 }

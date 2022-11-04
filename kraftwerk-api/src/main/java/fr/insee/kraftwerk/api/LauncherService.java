@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +62,19 @@ public class LauncherService {
 
 	VtlExecute vtlExecute = new VtlExecute();
 	
+	@Value("${fr.insee.postcollecte.csv.output.quote}")
+	private String csvOutputsQuoteChar;
+	
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
 	
+	@PostConstruct
+	public void initializeWithProperties() {
+		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
+			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
+		}
+	}
+
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "Main service : call all steps")
 	public ResponseEntity<String> main(
