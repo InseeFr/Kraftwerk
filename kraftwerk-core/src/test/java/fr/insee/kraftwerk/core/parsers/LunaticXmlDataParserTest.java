@@ -19,12 +19,12 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 
-public class LunaticXmlDataParserTest {
+class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
 
 	@Test
-	public void parseLunaticDataFolder() throws NullException {
+	void parseLunaticDataFolder() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		VariablesMap variablesMap = new VariablesMap();
@@ -46,7 +46,7 @@ public class LunaticXmlDataParserTest {
 	}
 
 	@Test
-	public void parseLunaticXml_rootOnly() throws NullException {
+	void parseLunaticXml_rootOnly() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_rootOnly());
@@ -79,7 +79,7 @@ public class LunaticXmlDataParserTest {
 	}
 
 	@Test
-	public void parseLunaticXml_oneLevel() throws NullException {
+	void parseLunaticXml_oneLevel() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setVariablesMap(VariablesMapTest.createVariablesMap_oneLevel());

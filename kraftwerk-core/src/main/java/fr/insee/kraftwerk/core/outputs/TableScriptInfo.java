@@ -44,15 +44,10 @@ public class TableScriptInfo {
 				VariablesMap variablesMap = metadata.getValue();
 
 				// We treat the identifiers
-				if (variablesMap.getIdentifierNames().contains(variableName)) {
-					Variable idGroupVariable = new Variable(variableName, variablesMap.getGroup(variableName),
-							VariableType.STRING, "32");
-					if (!result.containsKey(variableName)) {
-						result.put(variableName, idGroupVariable);
-					}
+				if (variablesMap.getIdentifierNames().contains(variableName) && !result.containsKey(variableName)) {
+					result.put(variableName, new Variable(variableName, variablesMap.getGroup(variableName),VariableType.STRING, "32"));					
 				}
-				if (variablesMap.getFullyQualifiedNames().contains(variableName)
-						|| variablesMap.getVariableNames().contains(variableName)) {
+				if (variablesMap.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
 					
 						Variable variable = variablesMap.getVariable(getRootName(variableName));
 						variableName = getRootName(variableName);
@@ -70,7 +65,7 @@ public class TableScriptInfo {
 					} else {
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getLength();
-							if (!newLengthString.contains(".") && !existingLengthString.contains(".")) {
+							if (newLengthString!=null && !newLengthString.contains(".") && !existingLengthString.contains(".")) {
 								// Variable already put in result, and not a float (if float exists, we do nothing)
 								int newLength = Integer.parseInt(newLengthString);
 								if (Integer.parseInt(existingLengthString) < newLength) {
@@ -86,9 +81,9 @@ public class TableScriptInfo {
 								result.put(variableName, new Variable(variableName,
 										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "1"));
 							} else {
-							// new Variable, we keep it like that
-							result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
-									variable.getLength()));
+								// new Variable, we keep it like that
+								result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
+										variable.getLength()));
 							}
 
 						}

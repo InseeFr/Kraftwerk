@@ -13,7 +13,7 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
-public class DatasetSerializerTest {
+class DatasetSerializerTest {
 
     Dataset ds1 = new InMemoryDataset(
             List.of(
@@ -32,7 +32,7 @@ public class DatasetSerializerTest {
     );
 
     @Test
-    public void testSerializeDataset() throws JsonProcessingException {
+    void testSerializeDataset() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new TrevasModule());
         String res = objectMapper.writeValueAsString(ds1);

@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.metadata;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,13 @@ public class VariablesMap {
     /** Return the names of all variables in the map. */
     public Set<String> getVariableNames() {
         return variables.keySet();
+    }
+    
+    public Set<String> getDistinctVariableNamesAndFullyQualifiedNames(){
+    	Set<String> set  = new HashSet<>();
+    	set.addAll(getFullyQualifiedNames());
+    	set.addAll(getVariableNames());
+    	return set;
     }
 
 

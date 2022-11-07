@@ -41,7 +41,7 @@ public final class Constants {
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
-	public static char csvOutputQuoteChar = '"'; //TODO: get it from properties
+	public static char csvOutputQuoteChar = '"'; 
 
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
