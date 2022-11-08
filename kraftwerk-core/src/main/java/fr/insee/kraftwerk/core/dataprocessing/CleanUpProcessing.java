@@ -43,15 +43,16 @@ public class CleanUpProcessing extends DataProcessing {
      * @param objects The metadata object instance is expected here.
      */
     @Override
-    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath) {
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath) {
         // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName);
-        log.info("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
+        log.debug("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
         vtlExecute.evalVtlScript(cleanUpScript, vtlBindings);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
         // Remove unimodal datasets
         removeUnimodalDatasets();
+        return cleanUpScript.toString();
     }
 
     /** Generate VTL script to remove the paper indicator variables. */

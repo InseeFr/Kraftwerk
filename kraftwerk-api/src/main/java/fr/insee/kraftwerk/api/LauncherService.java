@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,6 +49,7 @@ import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
@@ -266,14 +268,17 @@ public class LauncherService {
 	private void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		VariablesMap metadata = getMetadata(userInputs, dataMode);
-
+		String vtlGenerate;
+		
 		/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
 			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables,
 					metadata);
-			calculatedProcessing.applyVtlTransformations(dataMode, null);
+			vtlGenerate = calculatedProcessing.applyVtlTransformations(dataMode, null);
+			TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CalculatedProcessing",dataMode), vtlGenerate);
+
 		} else {
 			log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
 			if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
@@ -285,12 +290,16 @@ public class LauncherService {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null);
+		vtlGenerate = new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null);
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "GroupProcessing",dataMode), vtlGenerate);
+
 
 		/* Step 2.5 : Apply mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager
 				.getProcessingClass(modeInputs.getDataFormat(), vtlBindings, metadata);
-		dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
+		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, dataProcessing.getStepName(),dataMode), vtlGenerate);
+		
 	}
 	
 	private VariablesMap getMetadata(UserInputs userInputs, String dataMode){
@@ -369,22 +378,38 @@ public class LauncherService {
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
-		reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
+		String vtlGenerate = reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlReconciliationFile());
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.1.b : clean up processing */
 		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, getMetadata(userInputs));
-		cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
+		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
 		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
-		multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
+		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlTransformationsFile());
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
-		informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
+		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlInformationLevelsFile());
+		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
+
+	}
+
+	private Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
+    	// Create folder if doesn't exist
+		try {
+			Files.createDirectories(FileUtils.transformToTemp(userInputs.getInputDirectory()));
+			log.info(String.format("Created folder: %s", FileUtils.transformToTemp(userInputs.getInputDirectory()).toFile().getAbsolutePath()));
+		} catch (IOException e) {
+			log.error("Permission refused to create output folder: " + FileUtils.transformToTemp(userInputs.getInputDirectory()).getParent(), e);
+		}
+		return FileUtils.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
 	}
 
 	@PutMapping(value = "/writeOutputFiles")

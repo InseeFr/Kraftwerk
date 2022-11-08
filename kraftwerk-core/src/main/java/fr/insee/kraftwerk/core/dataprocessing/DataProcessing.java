@@ -30,9 +30,9 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath){
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath){
         // First step
-        applyAutomatedVtlInstructions(bindingName);
+        String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName);
         // Second step
         if(userVtlInstructionsPath != null) {
             applyUserVtlInstructions(userVtlInstructionsPath);
@@ -40,6 +40,7 @@ public abstract class DataProcessing {
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));
         }
+        return automatedVtlInstructions;
     }
 
     /**
@@ -53,13 +54,14 @@ public abstract class DataProcessing {
      */
     protected abstract VtlScript generateVtlInstructions(String bindingName);
 
-    protected void applyAutomatedVtlInstructions(String bindingName){
+    protected String applyAutomatedVtlInstructions(String bindingName){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName);
-        log.info(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
+        log.debug(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
                 automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings);
         }
+        return automatedInstructions.toString();
     }
 
     protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
