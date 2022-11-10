@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
@@ -17,7 +16,7 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 
-public class PaperDataProcessingTest {
+class PaperDataProcessingTest {
 
 	Dataset paperDataset = new InMemoryDataset(
 			List.of(
@@ -60,13 +59,13 @@ public class PaperDataProcessingTest {
 	}
 
 	@Test
-	public void testPaperDataProcessing() {
+	void testPaperDataProcessing() {
 		//
 		VariablesMap variablesMap = new VariablesMap();
 		Group rootGroup = variablesMap.getRootGroup();
 		variablesMap.putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
-		//addPaperUcq(variablesMap, rootGroup, "GENDER", 2);
-		//addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
+		addPaperUcq(variablesMap, rootGroup, "GENDER", 2);
+		addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", paperDataset);
@@ -78,8 +77,6 @@ public class PaperDataProcessingTest {
 
 		//
 		assertNotNull(paperDsModified);
-		//
-		assertEquals(1, 1);
-		// TODO: UPDATE THIS TEST CLASS
+		
 	}
 }
