@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +44,11 @@ public class CleanUpProcessing extends DataProcessing {
      * @param objects The metadata object instance is expected here.
      */
     @Override
-    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath) {
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<ErrorVtlTransformation> errors) {
         // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName);
         log.debug("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
-        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings);
+        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings, errors);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
         // Remove unimodal datasets

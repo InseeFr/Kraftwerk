@@ -2,9 +2,11 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.metadata.Group;
@@ -61,6 +63,7 @@ class PaperDataProcessingTest {
 	@Test
 	void testPaperDataProcessing() {
 		//
+		List<ErrorVtlTransformation> errors =new ArrayList<ErrorVtlTransformation>();
 		VariablesMap variablesMap = new VariablesMap();
 		Group rootGroup = variablesMap.getRootGroup();
 		variablesMap.putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
@@ -71,7 +74,7 @@ class PaperDataProcessingTest {
 		vtlBindings.put("TEST", paperDataset);
 		//
 		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
-		paperDataProcessing.applyAutomatedVtlInstructions("TEST");
+		paperDataProcessing.applyAutomatedVtlInstructions("TEST", errors);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 

@@ -3,10 +3,12 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -33,12 +35,13 @@ public class InformationLevelsTest {
 
 	@Test
 	public void applyInformationLevelsProcessing() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
 		//
 		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings);
-		processing.applyAutomatedVtlInstructions("MULTIMODE");
+		processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");

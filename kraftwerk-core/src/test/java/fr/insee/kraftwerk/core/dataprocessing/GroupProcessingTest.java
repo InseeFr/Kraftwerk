@@ -2,9 +2,11 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.metadata.Group;
@@ -32,6 +34,7 @@ public class GroupProcessingTest {
                         new Structured.Component("FOO2", Long.class, Dataset.Role.MEASURE)
                 )
         );
+        List<ErrorVtlTransformation> errors = new ArrayList<>();
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
         //
@@ -42,7 +45,7 @@ public class GroupProcessingTest {
         variablesMap.putVariable(new Variable("FOO1", variablesMap.getGroup("DEPTH1"), VariableType.NUMBER));
         variablesMap.putVariable(new Variable("FOO2", variablesMap.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings, variablesMap).applyAutomatedVtlInstructions("TEST");
+        new GroupProcessing(vtlBindings, variablesMap).applyAutomatedVtlInstructions("TEST",errors);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //

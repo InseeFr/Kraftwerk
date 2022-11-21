@@ -1,15 +1,19 @@
 package fr.insee.kraftwerk.api;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,15 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
-import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
-import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -63,6 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LauncherService {
 
 	VtlExecute vtlExecute = new VtlExecute();
+	List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
 	@Value("${fr.insee.postcollecte.csv.output.quote}")
 	private String csvOutputsQuoteChar;
@@ -103,21 +99,47 @@ public class LauncherService {
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
-			unimodalProcessing(userInputs, dataMode, vtlBindings);
+			unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		}
 
 		/* Step 3 : multimodal VTL data processing */
-		multimodalProcessing(userInputs, vtlBindings);
+		multimodalProcessing(userInputs, vtlBindings, errors);
 
 		/* Step 4 : Write output files */
 		writeOutputFiles(inDirectory, vtlBindings);
+		writeErrorsFile(inDirectory);
 
 		/* Step 4.3- 4.4 : Archive */
 		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
 
 		return ResponseEntity.ok(campaignName);
 	}
-	
+
+	private void writeErrorsFile(Path inDirectory) {
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
+		// Create folder if doesn't exist
+		try {
+			Files.createDirectories(tempOutputPath.getParent());
+			log.info(String.format("Created folder: %s", tempOutputPath.getParent().toFile().getAbsolutePath()));
+		} catch (IOException e) {
+			log.error("Permission refused to create output folder: " + tempOutputPath.getParent(), e);
+		}
+
+		//Write errors file
+		if (errors.size()>0) {
+			try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
+				for (ErrorVtlTransformation error : errors){
+					myWriter.write(error.toString());
+				}
+				log.info(String.format("Text file: %s successfully written", tempOutputPath));
+			} catch (IOException e) {
+				log.warn(String.format("Error occurred when trying to write text file: %s", tempOutputPath), e);
+			}
+		} else {
+			log.debug(String.format("No error found during VTL transformations"));
+		}
+	}
+
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
 	public ResponseEntity<String> buildVtlBindings(
@@ -143,7 +165,7 @@ public class LauncherService {
 			
 			//Write data in JSON file
 			try {
-				writeTempBindings(inDirectory, dataMode, vtlBindings);
+				writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 			} catch (KraftwerkException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -180,7 +202,7 @@ public class LauncherService {
 		
 		//Write data in JSON file
 		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings);
+			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -204,8 +226,8 @@ public class LauncherService {
 		return methodName;
 	}
 	
-	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings) throws KraftwerkException {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(getMethodName() +"_"+ dataMode+".json");
+	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step) throws KraftwerkException {
+		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+".json");
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
 	
@@ -248,24 +270,26 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		UserInputs userInputs = getUserInputs(inDirectory);
-		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode);
-		
+		VtlBindings vtlBindings = new VtlBindings();
+		readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 		//Process
-		unimodalProcessing(userInputs, dataMode, vtlBindings);
+		unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		
 		//Write data in JSON file
 		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings);
+			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
+
+		writeErrorsFile(inDirectory);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
 
 	}
 	
-	private void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings) {
+	private void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, List<ErrorVtlTransformation> errors) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		VariablesMap metadata = getMetadata(userInputs, dataMode);
 		String vtlGenerate;
@@ -276,7 +300,7 @@ public class LauncherService {
 					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
 			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables,
 					metadata);
-			vtlGenerate = calculatedProcessing.applyVtlTransformations(dataMode, null);
+			vtlGenerate = calculatedProcessing.applyVtlTransformations(dataMode, null, errors);
 			TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CalculatedProcessing",dataMode), vtlGenerate);
 
 		} else {
@@ -290,14 +314,14 @@ public class LauncherService {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null);
+		vtlGenerate = new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null, errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "GroupProcessing",dataMode), vtlGenerate);
 
 
 		/* Step 2.5 : Apply mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager
 				.getProcessingClass(modeInputs.getDataFormat(), vtlBindings, metadata);
-		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
+		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, dataProcessing.getStepName(),dataMode), vtlGenerate);
 		
 	}
@@ -355,48 +379,56 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		UserInputs userInputs = getUserInputs(inDirectory);
-		String multimodeDatasetName = userInputs.getMultimodeDatasetName();
-		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory).toString(),multimodeDatasetName);
-		
+
+		//Test
+		VtlBindings vtlBindings = new VtlBindings();
+		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+			readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
+		}
+
 		//Process
-		multimodalProcessing(userInputs, vtlBindings);
-		
+		multimodalProcessing(userInputs, vtlBindings, errors);
+
+
 		//Write data in JSON file
 		try {
-			writeTempBindings(inDirectory, multimodeDatasetName, vtlBindings);
+			for (String datasetName : vtlBindings.getDatasetNames()) {
+				writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
+			}
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
+
+		writeErrorsFile(inDirectory);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
-
 	}
 	
-	private void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings) {
+	private void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<ErrorVtlTransformation> errors) {
 		String multimodeDatasetName = userInputs.getMultimodeDatasetName();
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 		String vtlGenerate = reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlReconciliationFile());
+				userInputs.getVtlReconciliationFile(), errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.1.b : clean up processing */
 		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, getMetadata(userInputs));
-		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
+		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
 		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
 		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlTransformationsFile());
+				userInputs.getVtlTransformationsFile(), errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlInformationLevelsFile());
+				userInputs.getVtlInformationLevelsFile(), errors);
 		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
 
 	}
@@ -415,9 +447,7 @@ public class LauncherService {
 	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
 	public ResponseEntity<String> writeOutputFiles(
-			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam, 
-			@Parameter(description = "Bindings file name in temp directory", required = true) @RequestParam  String bindingFilename,
-			@Parameter(description = "Data mode") @RequestParam String datamode
+			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam
 			) {
 		Path inDirectory;
 		try {
@@ -425,9 +455,19 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		VtlBindings vtlBindings = readDataset(FileUtils.transformToTemp(inDirectory.resolve(bindingFilename)).toString(),datamode);
+		VtlBindings vtlBindings = new VtlBindings();
+		// Read all bindings necessary to produce output
+		String path = FileUtils.transformToTemp(inDirectory).toString();
+		List<String> fileNames = FileUtils.listFiles(path);
+		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+".json")).collect(Collectors.toList());
+		for (String name : fileNames){
+			String pathBindings = path + "/" + name;
+			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
+			vtlExecute.putVtlDataset(pathBindings, bindingName, vtlBindings);
+		}
+
 		writeOutputFiles(inDirectory, vtlBindings);
-		return ResponseEntity.ok(inDirectoryParam+ " - "+datamode);
+		return ResponseEntity.ok(inDirectoryParam);
 
 	}
 
@@ -496,13 +536,10 @@ public class LauncherService {
 		}
 		return true;
 	}
-	
-	private VtlBindings readDataset(String path, String bindingName) {
-		VtlBindings vtlBindings = new VtlBindings();
-		vtlExecute.putVtlDataset(path, bindingName, vtlBindings);
-		return vtlBindings;
 
+	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
+		String pathBinding = path + "/" + bindingName + "_" + previousStep.getStepLabel() +".json";
+		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
 	}
-
 
 }

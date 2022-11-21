@@ -3,10 +3,12 @@ package fr.insee.kraftwerk.core.outputs;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,10 +55,11 @@ class TableScriptInfoTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
-		groupProcessing.applyVtlTransformations("CAWI", null);
+		groupProcessing.applyVtlTransformations("CAWI", null, errors);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
-		groupProcessing2.applyVtlTransformations("PAPI", null);
+		groupProcessing2.applyVtlTransformations("PAPI", null, errors);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
@@ -95,12 +98,13 @@ class TableScriptInfoTest {
 
 	@Test
 	void numberTypeInDatasets() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
 		);
 		vtlBindings.put("test", ds);
-		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings);
+		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings,errors);
 		Dataset outDs = vtlBindings.getDataset("test");
 		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
 		// => "NUMBER" type in Trevas datasets is java "Double" type

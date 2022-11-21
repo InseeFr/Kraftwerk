@@ -3,10 +3,12 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +23,7 @@ import fr.insee.vtl.model.InMemoryDataset;
 public class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
+	private List<ErrorVtlTransformation> errors;
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -69,6 +72,7 @@ public class ReconciliationTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
+		errors = new ArrayList<>();
 	}
 
 	@ParameterizedTest
@@ -78,7 +82,7 @@ public class ReconciliationTest {
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		assertNotNull(multimodeDataset);
@@ -90,7 +94,7 @@ public class ReconciliationTest {
 		vtlBindings.put(mode2, testDatasets.get(mode2));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		return vtlBindings.getDataset("MULTIMODE");
 	}
@@ -134,7 +138,7 @@ public class ReconciliationTest {
 		vtlBindings.put("PAPI", papiDataset);
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		//

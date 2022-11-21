@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.util.FileSystemUtils;
 
@@ -28,7 +31,7 @@ public class FileUtils {
 	}
 	
 	/**
-	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
+	 * Change /some/path/in/campaign-name to /some/path/temp/campaign-name
 	 */
 	public static Path transformToTemp(Path inDirectory) {
 		return transformToOther(inDirectory, "temp");
@@ -170,6 +173,18 @@ public class FileUtils {
 		} catch (IOException e) {
 			throw new KraftwerkException(500, "IOException when deleting temp folder : "+e.getMessage());
 		}
+	}
+
+	/**
+	 * List the files in the directory
+	 * @param dir
+	 * @return
+	 */
+	public static List<String> listFiles(String dir) {
+		return Stream.of(new File(dir).listFiles())
+				.filter(file -> !file.isDirectory())
+				.map(File::getName)
+				.collect(Collectors.toList());
 	}
 	
 }

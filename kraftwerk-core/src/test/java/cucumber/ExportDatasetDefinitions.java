@@ -7,12 +7,15 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.util.ArrayList;
 
 // Used in do_we_export_datasets
 public class ExportDatasetDefinitions {
@@ -43,7 +46,7 @@ public class ExportDatasetDefinitions {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getVariablesMap());
-		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null);
+		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<ErrorVtlTransformation>());
 	}
 
 	@Then("I should get some dataset values from {string}")

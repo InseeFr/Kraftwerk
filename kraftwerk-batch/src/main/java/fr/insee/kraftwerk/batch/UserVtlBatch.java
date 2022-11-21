@@ -3,11 +3,10 @@ package fr.insee.kraftwerk.batch;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -52,6 +51,7 @@ public class UserVtlBatch implements Tasklet {
 	
 	
 	VtlExecute vtlExecute = new VtlExecute();
+    List<ErrorVtlTransformation> errors = new ArrayList<>();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws IOException, NullException  {
@@ -114,14 +114,14 @@ public class UserVtlBatch implements Tasklet {
                     CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                             modeInputs.getLunaticFile());
                     DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, data.getVariablesMap());
-                    calculatedProcessing.applyVtlTransformations(dataMode, null);
+                    calculatedProcessing.applyVtlTransformations(dataMode, null,errors);
                 }
 
-                new GroupProcessing(vtlBindings, data.getVariablesMap()).applyVtlTransformations(dataMode, null);
+                new GroupProcessing(vtlBindings, data.getVariablesMap()).applyVtlTransformations(dataMode, null,errors);
 
                 UnimodalDataProcessing dataProcessing = DataProcessingManager
                         .getProcessingClass(modeInputs.getDataFormat(), vtlBindings, data.getVariablesMap());
-                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile());
+                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(),errors);
 
                 vtlExecute.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON), vtlBindings);
 
@@ -131,24 +131,24 @@ public class UserVtlBatch implements Tasklet {
 
             DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
             reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlReconciliationFile());
+                    userInputs.getVtlReconciliationFile(),errors);
 
             vtlExecute.writeJsonDataset(multimodeDatasetName,
                     vtlOutputDir.resolve("2_" + multimodeDatasetName + "_reconciliation.json"), vtlBindings);
 
             CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
-            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null);
+            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null,errors);
 
             DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
             multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlTransformationsFile());
+                    userInputs.getVtlTransformationsFile(),errors);
 
             vtlExecute.writeJsonDataset(multimodeDatasetName,
                     vtlOutputDir.resolve("3_" + multimodeDatasetName + JSON), vtlBindings);
 
             DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
             informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlInformationLevelsFile());
+                    userInputs.getVtlInformationLevelsFile(),errors);
 
             Set<String> finalNames = vtlBindings.keySet().stream()
                     .filter(bindingName ->

@@ -11,17 +11,22 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	public Bindings bindings = vtlBindings;
 	public String tempDatasetPath = "";
+	public List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
 	VtlExecute vtlExecute = new VtlExecute();
 
@@ -34,9 +39,9 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getVariablesMap());
-		groupProcessing.applyVtlTransformations(firstDataset, null);
+		groupProcessing.applyVtlTransformations(firstDataset, null,errors);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getVariablesMap());
-		groupProcessing2.applyVtlTransformations(secondDataset, null);
+		groupProcessing2.applyVtlTransformations(secondDataset, null,errors);
 
 		//
 		assertTrue(vtlBindings.containsKey(firstDataset));
@@ -47,7 +52,7 @@ public class AggregateDefinitions {
 	public void collect_variables() {
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 		reconciliationProcessing.applyVtlTransformations(
-				"MULTIMODE", null);
+				"MULTIMODE", null,errors);
 	}
 
 	@Then("The datasets I try to aggregate should return an aggregated dataset")

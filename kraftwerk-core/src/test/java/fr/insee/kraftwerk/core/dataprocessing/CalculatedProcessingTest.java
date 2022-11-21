@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +29,7 @@ public class CalculatedProcessingTest {
     private static CalculatedVariables fooCalculated;
     private static VariablesMap fooVariables;
     private static VtlBindings vtlBindings;
+    private static List<ErrorVtlTransformation> errors;
 
     @BeforeAll
     static void setFooCalculated() {
@@ -46,6 +49,7 @@ public class CalculatedProcessingTest {
         fooVariables.putVariable(new Variable("FOO3", fooVariables.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
+        errors = new ArrayList<>();
     }
 
     @Test
@@ -78,7 +82,7 @@ public class CalculatedProcessingTest {
         vtlBindings.put("TEST", fooDataset);
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
-        processing.applyAutomatedVtlInstructions("TEST");
+        processing.applyAutomatedVtlInstructions("TEST", errors);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 

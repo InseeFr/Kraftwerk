@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.vtl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
+	private List<ErrorVtlTransformation> errors;
 
 	VtlExecute vtlExecute = new VtlExecute();
 
@@ -45,6 +47,7 @@ class VtlBindingsTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
+		errors = new ArrayList<>();
 	}
 
 	@Test
@@ -81,6 +84,7 @@ class VtlBindingsTest {
 
 	@Test
 	void evalVtlScriptTest_uniqueString() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		//
 		vtlBindings.put("TEST", ds1);
 		//
@@ -91,7 +95,7 @@ class VtlBindingsTest {
 		vtlScript.append("    \"\" ))];");
 		log.info("Test VTL script:");
 		log.info(vtlScript.toString());
-		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings);
+		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings,errors);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -105,15 +109,16 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlString() {
-		vtlExecute.evalVtlScript((String) null, vtlBindings);
-		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings);
-		vtlExecute.evalVtlScript("", vtlBindings);
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
+		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
+		vtlExecute.evalVtlScript("", vtlBindings, errors);
 	}
 	
 
 	@Test
 	void evalEmptyVtlScriptObject() {
-		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings);
+		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings,errors);
 	}
 
 	@Test
@@ -125,7 +130,7 @@ class VtlBindingsTest {
 		vtlScript.add("TEST := TEST [calc new1 := \"new\"];");
 		vtlScript.add("nOt VtL cOdE "); // should write a warning in the log but not throw an exception
 		vtlScript.add("TEST := TEST [calc new2 := 2];");
-		vtlExecute.evalVtlScript(vtlScript, vtlBindings);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings,errors);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 

@@ -5,12 +5,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -147,7 +150,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(String vtlScript, VtlBindings bindings){
+    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
         if(vtlScript != null && !vtlScript.equals("")) {
             try {
                 // set script context
@@ -161,26 +164,32 @@ public class VtlExecute {
             } catch (ScriptException e) {
                 log.warn("The following VTL instruction given is invalid and has been skipped:\n" + vtlScript);
                 log.warn(e.getMessage());
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (NumberFormatException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
                 log.warn("NumberFormatException caused by following VTL instruction:\n" + vtlScript);
                 log.warn(e.getMessage());
                 log.warn("Corresponding variable could not be calculated.");
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (UnsupportedOperationException e) { // TODO: send issue to Trevas
                 log.warn("UnsupportedOperationException caused by following VTL instruction:\n" + vtlScript);
                 log.warn(e.getMessage());
                 log.warn("Corresponding variable could not be calculated.");
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (NullPointerException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
                 log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.debug(e.getMessage());
                 log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (Error e) { // TODO: send issue to Trevas
                 log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.error(e.getMessage());
                 log.error("Probable cause: Syntax error.");
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (Exception e) {
                 log.warn("Exception thrown when trying to evaluate following expression:\n" + vtlScript);
                 log.warn(e.getMessage());
                 log.warn("UNKNOWN EXCEPTION PLEASE REPORT IT!");
+                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
@@ -194,14 +203,16 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings){
+    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
         if(vtlScript != null && !vtlScript.isEmpty()) {
             for(String vtlInstruction : vtlScript) {
-                evalVtlScript(vtlInstruction, bindings);
+                evalVtlScript(vtlInstruction, bindings, errors);
             }
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");
         }
+        System.out.println("Taille de la liste d'erreurs : "+ errors.size());
+
     }
 
 
