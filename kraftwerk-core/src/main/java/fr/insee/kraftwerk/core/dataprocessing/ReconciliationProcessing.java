@@ -67,7 +67,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 	}
 
-	private VtlScript severalModesInstructions(String bindingName) {
+	private VtlScript severalModesInstructions(String bindingName)  {
 
 		/*
 		 * The idea of the generated vtl instructions is as follows :
@@ -92,6 +92,17 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		// Get the common measures
 		Set<String> commonMeasures = getCommonMeasures();
+
+
+		// Cast Integer into Number to ensure numerical measure have the same type
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			for (String measure : commonMeasures){
+				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
+					vtlScript.add(String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",datasetName, measure));
+				}
+			};
+		}
+
 		commonMeasures.add(modeVariableIdentifier);
 
 		// List of all common variables (identifiers + measures) in the vtl syntax

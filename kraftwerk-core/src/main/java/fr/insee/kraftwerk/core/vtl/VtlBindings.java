@@ -65,6 +65,35 @@ public class VtlBindings extends SimpleBindings {
     }
 
     /**
+     * Return a string corresponding to the type of a measure in a given dataset
+     * @param datasetName Name of the dataset containing the measure
+     * @param measure Label of the measure
+     * @return
+     */
+    public String getMeasureType(String datasetName, String measure){
+        String type="";
+        Class<?> measureClass = this.getDataset(datasetName).getDataStructure().get(measure).getType();
+        try {
+            if (measureClass == Class.forName("java.lang.Long")){
+                type="integer";
+            };
+            if (measureClass == Class.forName("java.lang.Double")){
+                type="number";
+            };
+            if (measureClass == Class.forName("java.lang.Boolean")){
+                type="boolean";
+            };
+            if (measureClass == Class.forName("java.lang.String")){
+                type="string";
+            };
+            return type;
+        } catch (ClassNotFoundException e) {
+            log.error("Class not recognized");
+            return "";
+        }
+    }
+
+    /**
      * Return identifier names in the dataset registered in the bindings under the given name.
      * @param datasetName Name of a dataset stored in the bindings.
      * @return List of the identifier names in the dataset, or null if there is no dataset under the given name.
