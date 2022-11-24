@@ -1,8 +1,9 @@
 
+import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
-import io.cucumber.junit.platform.engine.Cucumber;
+import org.junit.runner.RunWith;
 
-@Cucumber
+@RunWith(Cucumber.class)
 @CucumberOptions(plugin = {"pretty"})
 public class RunCucumberTest {
 }

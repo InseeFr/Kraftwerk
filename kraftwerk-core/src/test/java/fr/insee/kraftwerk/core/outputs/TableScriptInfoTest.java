@@ -1,5 +1,17 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -8,19 +20,13 @@ import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.DataStructure;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class TableScriptInfoTest {
+class TableScriptInfoTest {
 	
 	VtlBindings vtlBindings = new VtlBindings();
 
@@ -29,6 +35,8 @@ public class TableScriptInfoTest {
 	TableScriptInfo tableScriptInfo;
 
 	Map<String, VariablesMap> metadataVariables;
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	@BeforeEach
 	public void initMetadataVariablesMap() {
@@ -39,17 +47,19 @@ public class TableScriptInfoTest {
 		metadataVariables.put("CAWI", VariablesMapTest.createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		srdWeb.setVariablesMap(VariablesMapTest.createCompleteFakeVariablesMap());
-		vtlBindings.convertToVtlDataset(srdWeb, "CAWI");
+		vtlExecute.convertToVtlDataset(srdWeb, "CAWI", vtlBindings);
 		
 		metadataVariables.put("PAPI", VariablesMapTest.createAnotherFakeVariablesMap());
 		SurveyRawData srdPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
 		srdPaper.setVariablesMap(VariablesMapTest.createAnotherFakeVariablesMap());
-		vtlBindings.convertToVtlDataset(srdPaper, "PAPI");
+		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations("CAWI", null, srdWeb.getVariablesMap());
-		groupProcessing.applyVtlTransformations("PAPI", null, srdPaper.getVariablesMap());
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
+		groupProcessing.applyVtlTransformations("CAWI", null, errors);
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
+		groupProcessing2.applyVtlTransformations("PAPI", null, errors);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
@@ -57,7 +67,7 @@ public class TableScriptInfoTest {
 	}
 	
 	@Test
-	public void getAllLengthTest() {
+	void getAllLengthTest() {
 		instantiateMap();
 		Map<String, Variable> listVariables = tableScriptInfo.getAllLength(dataStructure, metadataVariables);
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
@@ -67,7 +77,7 @@ public class TableScriptInfoTest {
 	}
 
 	@Test
-	public void testGetAllLengthWithNumberType() {
+	void testGetAllLengthWithNumberType() {
 		//
 		VariablesMap testVariablesMap1 = new VariablesMap();
 		testVariablesMap1.putVariable(new Variable("FOO", testVariablesMap1.getRootGroup(), VariableType.NUMBER, "4.1"));
@@ -87,13 +97,14 @@ public class TableScriptInfoTest {
 	}
 
 	@Test
-	private void numberTypeInDatasets() {
+	void numberTypeInDatasets() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
 		);
-		vtlBindings.getBindings().put("test", ds);
-		vtlBindings.evalVtlScript("test := test [calc foo := 4.1];");
+		vtlBindings.put("test", ds);
+		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings,errors);
 		Dataset outDs = vtlBindings.getDataset("test");
 		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
 		// => "NUMBER" type in Trevas datasets is java "Double" type

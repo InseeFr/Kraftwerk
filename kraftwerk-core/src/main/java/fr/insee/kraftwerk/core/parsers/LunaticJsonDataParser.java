@@ -1,11 +1,11 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import fr.insee.kraftwerk.core.Constants;
-
 import java.nio.file.Path;
 
 import org.json.simple.JSONObject;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -24,7 +24,7 @@ public class LunaticJsonDataParser extends DataParser {
 	}
 
 	@Override
-	void parseDataFile(Path filePath) {
+	void parseDataFile(Path filePath) throws NullException {
 		log.warn("Lunatic data parser being implemented!");
 
 		//
@@ -32,8 +32,7 @@ public class LunaticJsonDataParser extends DataParser {
 		try {
 			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NullException("Can't read JSON file - "+e.getClass()+" "+ e.getMessage());
 		}
 		//JSONObject stateData = (JSONObject) jsonObject.get("stateData");
 		JSONObject jsonData = (JSONObject) jsonObject.get("data");

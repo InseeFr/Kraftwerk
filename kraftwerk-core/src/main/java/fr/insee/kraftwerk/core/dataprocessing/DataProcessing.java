@@ -1,9 +1,13 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.insee.kraftwerk.core.utils.TextFileReader;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,23 +24,26 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class DataProcessing {
 
     protected final VtlBindings vtlBindings;
+	VtlExecute vtlExecute;
 
-    public DataProcessing(VtlBindings vtlBindings){
+    protected DataProcessing(VtlBindings vtlBindings){
         this.vtlBindings = vtlBindings;
+        vtlExecute = new VtlExecute();
     }
 
     public abstract String getStepName();
 
-    public void applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, Object... objects){
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<ErrorVtlTransformation> errors){
         // First step
-        applyAutomatedVtlInstructions(bindingName, objects);
+        String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
         // Second step
         if(userVtlInstructionsPath != null) {
-            applyUserVtlInstructions(userVtlInstructionsPath);
+            applyUserVtlInstructions(userVtlInstructionsPath, errors);
         } else {
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));
         }
+        return automatedVtlInstructions;
     }
 
     /**
@@ -48,23 +55,24 @@ public abstract class DataProcessing {
      *
      * @return a VTL script.
      */
-    protected abstract VtlScript generateVtlInstructions(String bindingName, Object... objects);
+    protected abstract VtlScript generateVtlInstructions(String bindingName);
 
-    protected void applyAutomatedVtlInstructions(String bindingName, Object... objects){
-        VtlScript automatedInstructions = generateVtlInstructions(bindingName, objects);
-        log.info(String.format("Automated VTL instructions generated for step %s:\n%s", getStepName(),
+    protected String applyAutomatedVtlInstructions(String bindingName, List<ErrorVtlTransformation> errors){
+        VtlScript automatedInstructions = generateVtlInstructions(bindingName);
+        log.debug(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
                 automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
-            vtlBindings.evalVtlScript(automatedInstructions);
+        	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, errors);
         }
+        return automatedInstructions.toString();
     }
 
-    protected void applyUserVtlInstructions(Path userVtlInstructionsPath){
+    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, List<ErrorVtlTransformation> errors){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
-        log.info(String.format("User VTL instructions read for step %s:\n%s", getStepName(),
+        log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
-            vtlBindings.evalVtlScript(vtlScript);
+        	vtlExecute.evalVtlScript(vtlScript, vtlBindings,errors);
         }
     }
 

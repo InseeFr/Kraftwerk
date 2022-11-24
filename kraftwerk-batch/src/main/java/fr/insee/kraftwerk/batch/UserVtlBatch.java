@@ -1,7 +1,28 @@
 package fr.insee.kraftwerk.batch;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
@@ -13,33 +34,27 @@ import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.metadata.LunaticReader;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.RepeatStatus;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class UserVtlBatch implements Tasklet {
 
-    @Setter
+    private static final String JSON = ".json";
+	@Setter
     Path campaignDirectory;
+	
+	
+	VtlExecute vtlExecute = new VtlExecute();
+    List<ErrorVtlTransformation> errors = new ArrayList<>();
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws IOException, NullException  {
 
         String campaignName = campaignDirectory.getFileName().toString();
 
@@ -66,7 +81,7 @@ public class UserVtlBatch implements Tasklet {
 
                 SurveyRawData data = new SurveyRawData();
 
-                data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
+                data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
                 metadataVariables.put(dataMode, data.getVariablesMap());
 
                 DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
@@ -93,22 +108,22 @@ public class UserVtlBatch implements Tasklet {
                     }
                 }
 
-                vtlBindings.convertToVtlDataset(data, dataMode);
+                vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 
                 if (modeInputs.getLunaticFile() != null) {
                     CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                             modeInputs.getLunaticFile());
-                    DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
-                    calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables, data.getVariablesMap());
+                    DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, data.getVariablesMap());
+                    calculatedProcessing.applyVtlTransformations(dataMode, null,errors);
                 }
 
-                new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, data.getVariablesMap());
+                new GroupProcessing(vtlBindings, data.getVariablesMap()).applyVtlTransformations(dataMode, null,errors);
 
                 UnimodalDataProcessing dataProcessing = DataProcessingManager
-                        .getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
-                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), data.getVariablesMap());
+                        .getProcessingClass(modeInputs.getDataFormat(), vtlBindings, data.getVariablesMap());
+                dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(),errors);
 
-                vtlBindings.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + ".json"));
+                vtlExecute.writeJsonDataset(dataMode, vtlOutputDir.resolve("1_" + dataMode + JSON), vtlBindings);
 
             }
 
@@ -116,32 +131,32 @@ public class UserVtlBatch implements Tasklet {
 
             DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
             reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlReconciliationFile());
+                    userInputs.getVtlReconciliationFile(),errors);
 
-            vtlBindings.writeJsonDataset(multimodeDatasetName,
-                    vtlOutputDir.resolve("2_" + multimodeDatasetName + "_reconciliation.json"));
+            vtlExecute.writeJsonDataset(multimodeDatasetName,
+                    vtlOutputDir.resolve("2_" + multimodeDatasetName + "_reconciliation.json"), vtlBindings);
 
-            CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, metadataVariables);
+            CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+            cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null,errors);
 
             DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
             multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlTransformationsFile());
+                    userInputs.getVtlTransformationsFile(),errors);
 
-            vtlBindings.writeJsonDataset(multimodeDatasetName,
-                    vtlOutputDir.resolve("3_" + multimodeDatasetName + ".json"));
+            vtlExecute.writeJsonDataset(multimodeDatasetName,
+                    vtlOutputDir.resolve("3_" + multimodeDatasetName + JSON), vtlBindings);
 
             DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
             informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-                    userInputs.getVtlInformationLevelsFile());
+                    userInputs.getVtlInformationLevelsFile(),errors);
 
-            Set<String> finalNames = vtlBindings.getBindings().keySet().stream()
+            Set<String> finalNames = vtlBindings.keySet().stream()
                     .filter(bindingName ->
                             !(metadataVariables.containsKey(bindingName) || bindingName.equals(multimodeDatasetName)))
                     .collect(Collectors.toSet());
             for(String datasetName : finalNames) {
-                vtlBindings.writeJsonDataset(datasetName,
-                        vtlOutputDir.resolve("4_" + datasetName + ".json"));
+            	vtlExecute.writeJsonDataset(datasetName,
+                        vtlOutputDir.resolve("4_" + datasetName + JSON), vtlBindings);
             }
 
             log.info("Vtl datasets job terminated.");

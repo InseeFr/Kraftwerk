@@ -1,21 +1,24 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.*;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class CleanUpProcessingTest {
 
@@ -68,6 +71,8 @@ public class CleanUpProcessingTest {
     public void applyCleanUp() {
         // Metadata variables object
         Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+        // Errors list
+        List<ErrorVtlTransformation> errors = new ArrayList<>();
         //
         VariablesMap cawiVariables = new VariablesMap();
         cawiVariables.putVariable(new Variable("FOO", cawiVariables.getRootGroup(), VariableType.STRING));
@@ -90,13 +95,13 @@ public class CleanUpProcessingTest {
 
         // Datasets
         VtlBindings vtlBindings = new VtlBindings();
-        vtlBindings.getBindings().put("CAWI", cawiDataset);
-        vtlBindings.getBindings().put("PAPI", papiDataset);
-        vtlBindings.getBindings().put("MULTIMODE", multimodeDataset);
+        vtlBindings.put("CAWI", cawiDataset);
+        vtlBindings.put("PAPI", papiDataset);
+        vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
-        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null, metadataVariables);
+        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,errors);
 
         // Are paper indicator variables removed in VTL multimode dataset ?
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));
@@ -105,6 +110,6 @@ public class CleanUpProcessingTest {
         assertFalse(papiVariables.hasVariable("GENDER_1"));
         assertFalse(papiVariables.hasVariable("GENDER_2"));
         // Are unimodal datasets removed ?
-        assertEquals(Set.of("MULTIMODE"), vtlBindings.getBindings().keySet());
+        assertEquals(Set.of("MULTIMODE"), vtlBindings.keySet());
     }
 }

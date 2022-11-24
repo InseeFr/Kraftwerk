@@ -1,21 +1,20 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.util.List;
+
+import fr.insee.kraftwerk.core.metadata.UcqModality;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * Implementation of the UnimodalDataProcessing class for data from digitized paper.
  */
-@Slf4j
 public class PaperDataProcessing extends UnimodalDataProcessing {
 
-    public PaperDataProcessing(VtlBindings vtlBindings) {
-        super(vtlBindings);
+    public PaperDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
+        super(vtlBindings, variablesMap);
     }
 
     @Override
@@ -37,11 +36,7 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
      * @return VTL instructions
      */
     @Override
-    public VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-
-        // Rich variables map
-        VariablesMap variablesMap = (VariablesMap) objects[0];
-
+    public VtlScript generateVtlInstructions(String bindingName) {
         // Get UCQ variables
         List<UcqVariable> ucqVariables = variablesMap.getUcqVariables();
 
@@ -59,25 +54,25 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
             String variableVtlName = variablesMap.getFullyQualifiedName(ucqVariable.getName());
 
             // Get UCQ modalities
-            List<UcqVariable.UcqModality> ucqModalities = ucqVariable.getModalities();
+            List<UcqModality> ucqModalities = ucqVariable.getModalities();
             int modalitiesCount = ucqModalities.size();
 
             // First modality and first line of the VTL instruction
-            UcqVariable.UcqModality firstModality = ucqModalities.get(0);
+            UcqModality firstModality = ucqModalities.get(0);
             String firstModalityVtlName = variablesMap.getFullyQualifiedName(firstModality.getVariableName());
-            vtlInstruction.append(String.format("%s := if %s = \"1\" then \"%s\" else (\n",
+            vtlInstruction.append(String.format("%s := if %s = \"1\" then \"%s\" else (%n",
                     variableVtlName, firstModalityVtlName, firstModality.getValue()));
 
             // Middle lines of the VTL instruction
             for (int k = 1; k < modalitiesCount - 1; k++) {
-                UcqVariable.UcqModality modality = ucqModalities.get(k);
+                UcqModality modality = ucqModalities.get(k);
                 String modalityVtlName = variablesMap.getFullyQualifiedName(modality.getVariableName());
-                vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else (\n",
+                vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else (%n",
                         modalityVtlName, modality.getValue()));
             }
 
             // Last line of the VTL instruction
-            UcqVariable.UcqModality lastModality = ucqModalities.get(modalitiesCount - 1);
+            UcqModality lastModality = ucqModalities.get(modalitiesCount - 1);
             String latsModalityVtlName = variablesMap.getFullyQualifiedName(lastModality.getVariableName());
             vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else \"\" ",
                     latsModalityVtlName, lastModality.getValue()));

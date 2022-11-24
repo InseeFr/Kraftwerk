@@ -1,18 +1,19 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.vtl.jackson.DatasetSerializer;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-public class DatasetSerializerTest {
+class DatasetSerializerTest {
 
     Dataset ds1 = new InMemoryDataset(
             List.of(
@@ -31,7 +32,7 @@ public class DatasetSerializerTest {
     );
 
     @Test
-    public void testSerializeDataset() throws JsonProcessingException {
+    void testSerializeDataset() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new TrevasModule());
         String res = objectMapper.writeValueAsString(ds1);

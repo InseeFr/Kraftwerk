@@ -1,5 +1,12 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
@@ -7,10 +14,6 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 public class ReconciliationProcessing extends DataProcessing {
@@ -49,8 +52,8 @@ public class ReconciliationProcessing extends DataProcessing {
 	 * @return VTL instructions to aggregate all the unimodal datasets.
 	 */
 	@Override
-	protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-		int modesCount = vtlBindings.getBindings().size();
+	protected VtlScript generateVtlInstructions(String bindingName) {
+		int modesCount = vtlBindings.size();
 		if (modesCount == 1) {
 			String singleInstruction = String.format("%s := %s;", bindingName, vtlBindings.getDatasetNames().get(0));
 			return new VtlScript(singleInstruction);
@@ -59,12 +62,12 @@ public class ReconciliationProcessing extends DataProcessing {
 		} else {
 			log.debug(String.format(
 					"Invalid number of datasets in the bindings (%d) at reconciliation step", modesCount));
-			return null;
+			return new VtlScript();
 		}
 
 	}
 
-	private VtlScript severalModesInstructions(String bindingName) {
+	private VtlScript severalModesInstructions(String bindingName)  {
 
 		/*
 		 * The idea of the generated vtl instructions is as follows :
@@ -89,6 +92,17 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		// Get the common measures
 		Set<String> commonMeasures = getCommonMeasures();
+
+
+		// Cast Integer into Number to ensure numerical measure have the same type
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			for (String measure : commonMeasures){
+				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
+					vtlScript.add(String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",datasetName, measure));
+				}
+			};
+		}
+
 		commonMeasures.add(modeVariableIdentifier);
 
 		// List of all common variables (identifiers + measures) in the vtl syntax
@@ -113,7 +127,7 @@ public class ReconciliationProcessing extends DataProcessing {
 			// Get the other variables
 			Set<String> otherVariables = getOtherVariables(datasetName, commonMeasures);
 
-			if (otherVariables.size() > 0) {
+			if (!otherVariables.isEmpty()) {
 				String vtlOtherVariables = VtlMacros.toVtlSyntax(otherVariables);
 
 				// Keep on the dataset to be joined
@@ -138,28 +152,17 @@ public class ReconciliationProcessing extends DataProcessing {
 				modeName, modeName, modeVariableIdentifier, modeName);
 	}
 
-	/** Return the list of all different variables that can be find in the datasets in the bindings. */
-	private Set<String> getAllVariables() {
-
-		Set<String> allVariables = new TreeSet<>();
-
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
-			allVariables.addAll(
-					vtlBindings.getDataset(datasetName).getDataStructure().keySet());
-		}
-
-		return allVariables;
-	}
 
 	/** Return a set containing identifiers variable names that are in the bindings datasets. */
 	public Set<String> getIdentifiers() {
 
 		Set<String> identifiers = new TreeSet<>();
 
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
+		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
 			identifiers.addAll( dataStructure.keySet()
-					.stream().filter(name -> dataStructure.get(name).getRole() == Role.IDENTIFIER)
+					.stream()
+					.filter(name -> dataStructure.get(name).getRole() == Role.IDENTIFIER)
 					.collect(Collectors.toSet()) );
 		}
 		return identifiers;
@@ -170,7 +173,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		List<Set<String>> variableNamesList = new ArrayList<>();
 
-		for (String datasetName : vtlBindings.getBindings().keySet()) {
+		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
 			variableNamesList.add( dataStructure.keySet()
 					.stream().filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)
@@ -231,31 +234,6 @@ public class ReconciliationProcessing extends DataProcessing {
 			res.addAll(set);
 		}
 		return res;
-	}
-
-
-
-	/**
-	 * Unused method, but we might use it if we want to optimize the selection of
-	 * common variables.
-	 *
-	 * Return a list of integers consecutive integers from 'start' (included) to
-	 * 'end' (excluded) without the 'except'.
-	 *
-	 * Example: listOfIntegers(0, 5, 2) will return a list containing 0, 1, 3, 4.
-	 *
-	 * Code sample found thanks to:
-	 * https://www.baeldung.com/java-listing-numbers-within-a-range
-	 * https://howtodoinjava.com/java8/stream-if-else-logic/
-	 *
-	 * @param start  First integer
-	 * @param end    Last integer (excluded)
-	 * @param except Integer that will not be in output list.
-	 *
-	 * @return A list of integers (int type).
-	 */
-	private List<Integer> rangeOfIntegers(int start, int end, int except) {
-		return IntStream.range(start, end).boxed().filter(k -> k != except).collect(Collectors.toList());
 	}
 
 }

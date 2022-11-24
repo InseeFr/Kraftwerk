@@ -1,8 +1,24 @@
 package fr.insee.kraftwerk.batch;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.NullException;
-import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
@@ -19,14 +35,12 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * App main class.
@@ -36,8 +50,11 @@ import java.util.Map;
 public class Launcher {
 
 	private final Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+	
+	VtlExecute vtlExecute = new VtlExecute();
+	List<ErrorVtlTransformation> errors = new ArrayList<>();
 
-	public Boolean main(@NonNull Path inDirectory) {
+	public Boolean main(@NonNull Path inDirectory){
 
 		try {
 			if (verifyInDirectory(inDirectory)) {
@@ -65,7 +82,7 @@ public class Launcher {
 					SurveyRawData data = new SurveyRawData();
 
 					/* Step 2.0 : Read the DDI file to get survey variables */
-					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDDIURL()));
+					data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
 					metadataVariables.put(dataMode, data.getVariablesMap());
 
 					/* Step 2.1 : Fill the data object with the survey answers file */
@@ -100,15 +117,15 @@ public class Launcher {
 
 					/* Step 2.4a : Convert data object to a VTL Dataset */
 					data.setDataMode(dataMode); // TODO: remove useless dataMode attribute from data object
-					vtlBindings.convertToVtlDataset(data, dataMode);
+					vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 
 					/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 					if (modeInputs.getLunaticFile() != null) {
 						CalculatedVariables calculatedVariables = LunaticReader
 								.getCalculatedFromLunatic(modeInputs.getLunaticFile());
-						DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings);
-						calculatedProcessing.applyVtlTransformations(dataMode, null, calculatedVariables,
+						DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables,
 								data.getVariablesMap());
+						calculatedProcessing.applyVtlTransformations(dataMode, null,errors);
 					} else {
 						log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
 						if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
@@ -120,13 +137,12 @@ public class Launcher {
 					}
 
 					/* Step 2.4c : Prefix variable names with their belonging group names */
-					new GroupProcessing(vtlBindings).applyVtlTransformations(dataMode, null, data.getVariablesMap());
+					new GroupProcessing(vtlBindings, data.getVariablesMap()).applyVtlTransformations(dataMode, null,errors);
 
 					/* Step 2.5 : Apply mode-specific VTL transformations */
 					UnimodalDataProcessing dataProcessing = DataProcessingManager
-							.getProcessingClass(modeInputs.getDataFormat(), vtlBindings);
-					dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(),
-							data.getVariablesMap());
+							.getProcessingClass(modeInputs.getDataFormat(), vtlBindings, data.getVariablesMap());
+					dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(),errors);
 
 				}
 
@@ -137,21 +153,21 @@ public class Launcher {
 				/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 				DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 				reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-						userInputs.getVtlReconciliationFile());
+						userInputs.getVtlReconciliationFile(),errors);
 
 				/* Step 3.1.b : clean up processing */
-				CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings);
-				cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, metadataVariables);
+				CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+				cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null,errors);
 
 				/* Step 3.2 : treatments on the multimodal dataset */
 				DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
 				multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-						userInputs.getVtlTransformationsFile());
+						userInputs.getVtlTransformationsFile(),errors);
 
 				/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 				DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 				informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-						userInputs.getVtlInformationLevelsFile());
+						userInputs.getVtlInformationLevelsFile(),errors);
 
 				/* Step 4 : Write output files */
 
@@ -163,10 +179,14 @@ public class Launcher {
 				outputFiles.writeImportScripts(metadataVariables);
 
 				/* Step 4.3 : move kraftwerk.json to a secondary folder */
-				outputFiles.renameInputFile(inDirectory);
+				FileUtils.renameInputFile(inDirectory);
 
 				/* Step 4.4 : move differential data to a secondary folder */
-				outputFiles.moveInputFiles(userInputs);
+				try {
+					FileUtils.moveInputFiles(userInputs);
+				} catch (KraftwerkException e) {
+					log.error(e.getMessage());
+				}
 
 				log.info(
 						"===============================================================================================");

@@ -10,6 +10,11 @@
 	<artifactId>kraftwerk-core</artifactId>
 	<packaging>jar</packaging>
 	<name>kraftwerk-core</name>
+	
+	<properties>
+		<trevas.version>0.4.4</trevas.version>
+	</properties>
+	
 
 	<dependencies>
 
@@ -74,13 +79,13 @@
 		<dependency>
 			<groupId>fr.insee.trevas</groupId>
 			<artifactId>vtl-engine</artifactId>
-			<version>0.4.0</version>
+			<version>${trevas.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-jackson -->
 		<dependency>
 			<groupId>fr.insee.trevas</groupId>
 			<artifactId>vtl-jackson</artifactId>
-			<version>0.4.0</version>
+			<version>${trevas.version}</version>
 		</dependency>
 
 	</dependencies>

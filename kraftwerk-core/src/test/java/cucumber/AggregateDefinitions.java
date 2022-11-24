@@ -11,45 +11,54 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-	public Bindings bindings = vtlBindings.getBindings();
+	public Bindings bindings = vtlBindings;
 	public String tempDatasetPath = "";
+	public List<ErrorVtlTransformation> errors = new ArrayList<>();
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	@Given("We have some VTLBindings named {string} and {string}")
-	public void initialize(String firstDataset, String secondDataset) throws Exception {
+	public void initialize(String firstDataset, String secondDataset){
 		// create datasets
 		SurveyRawData fakeCawiData = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		SurveyRawData fakePapiData = SurveyRawDataTest.createFakePapiSurveyRawData();
-		vtlBindings.convertToVtlDataset(fakeCawiData, firstDataset);
-		vtlBindings.convertToVtlDataset(fakePapiData, secondDataset);
+		vtlExecute.convertToVtlDataset(fakeCawiData, firstDataset, vtlBindings);
+		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations(firstDataset, null, fakeCawiData.getVariablesMap());
-		groupProcessing.applyVtlTransformations(secondDataset, null, fakePapiData.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getVariablesMap());
+		groupProcessing.applyVtlTransformations(firstDataset, null,errors);
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getVariablesMap());
+		groupProcessing2.applyVtlTransformations(secondDataset, null,errors);
 
 		//
-		assertTrue(vtlBindings.getBindings().containsKey(firstDataset));
-		assertTrue(vtlBindings.getBindings().containsKey(secondDataset));
+		assertTrue(vtlBindings.containsKey(firstDataset));
+		assertTrue(vtlBindings.containsKey(secondDataset));
 	}
 
 	@When("I try to aggregate the bindings")
-	public void collect_variables() throws Exception {
+	public void collect_variables() {
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
 		reconciliationProcessing.applyVtlTransformations(
-				"MULTIMODE", null);
+				"MULTIMODE", null,errors);
 	}
 
 	@Then("The datasets I try to aggregate should return an aggregated dataset")
 	public void the_aggregated_dataset_shoud_exist() {
 		assertEquals(17, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
-		// On check que l'aggregation a conserv� les identifiants
+		// On check que l'aggregation a conservé les identifiants
 		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains(Constants.ROOT_IDENTIFIER_NAME));
 		// On check que l'aggregation a conserve les variables qui sont en commun.
 		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains("LAST_NAME"));

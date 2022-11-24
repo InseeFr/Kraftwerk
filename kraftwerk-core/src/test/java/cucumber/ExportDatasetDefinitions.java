@@ -3,24 +3,27 @@ package cucumber;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import javax.script.Bindings;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.util.ArrayList;
+
 // Used in do_we_export_datasets
 public class ExportDatasetDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-	public Bindings bindings = vtlBindings.getBindings();
 	public String tempDatasetPath = "";
 	public SurveyRawData survey = null;
+	
+	VtlExecute vtlExecute = new VtlExecute();
 
 	@Given("We have some SurveyRawData named {string}")
 	public void initialize(String nameDataset) throws Exception {
@@ -40,10 +43,10 @@ public class ExportDatasetDefinitions {
 
 	@When("I try to import the dataset named {string}")
 	public void importDataset(String nameDataset) throws Exception {
-		vtlBindings.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT");
+		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings);
-		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, survey.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getVariablesMap());
+		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<ErrorVtlTransformation>());
 	}
 
 	@Then("I should get some dataset values from {string}")

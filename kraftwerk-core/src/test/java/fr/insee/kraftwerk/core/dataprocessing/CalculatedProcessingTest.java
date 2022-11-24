@@ -1,28 +1,35 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-import static fr.insee.vtl.model.Dataset.Role;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatedProcessingTest {
 
     private static CalculatedVariables fooCalculated;
     private static VariablesMap fooVariables;
     private static VtlBindings vtlBindings;
+    private static List<ErrorVtlTransformation> errors;
 
     @BeforeAll
     static void setFooCalculated() {
@@ -42,13 +49,14 @@ public class CalculatedProcessingTest {
         fooVariables.putVariable(new Variable("FOO3", fooVariables.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
+        errors = new ArrayList<>();
     }
 
     @Test
     public void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        VtlScript vtlScript = processing.generateVtlInstructions("TEST", fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        VtlScript vtlScript = processing.generateVtlInstructions("TEST");
 
         //
         assertTrue(vtlScript.get(0).contains("FOO3"));
@@ -71,10 +79,10 @@ public class CalculatedProcessingTest {
                         new Structured.Component("FOO", String.class, Role.MEASURE))
         );
         VtlBindings vtlBindings = new VtlBindings();
-        vtlBindings.getBindings().put("TEST", fooDataset);
+        vtlBindings.put("TEST", fooDataset);
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings);
-        processing.applyAutomatedVtlInstructions("TEST", fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        processing.applyAutomatedVtlInstructions("TEST", errors);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 

@@ -1,12 +1,16 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Object class to represent a group of variables.
  */
 @Slf4j
+@Getter
+@Setter
 public class Group {
 
     protected String name;
@@ -29,21 +33,8 @@ public class Group {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public String getParentName() {
-        return parentName;
-    }
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
-    }
-
-    public boolean hasParent() {
+    private boolean hasParent() {
         return parentName != null && !(parentName.equals(""));
     }
     public boolean isRoot() {

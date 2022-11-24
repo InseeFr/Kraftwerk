@@ -4,17 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Paths;
 
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.NullException;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
 public class XMLReportingDataParserTest {
 
@@ -52,7 +52,7 @@ public class XMLReportingDataParserTest {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 		ReportingData reportingData = new ReportingData();
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
-		assertEquals(8, xMLReportingDataParser.maxStates(reportingData));
+		assertEquals(5, xMLReportingDataParser.countMaxStates(reportingData)); //remove double
 	}
 
 }

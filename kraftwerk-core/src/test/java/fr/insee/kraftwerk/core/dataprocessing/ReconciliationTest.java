@@ -1,25 +1,29 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.InMemoryDataset;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
+import fr.insee.vtl.model.InMemoryDataset;
 
 public class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
+	private List<ErrorVtlTransformation> errors;
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -68,16 +72,17 @@ public class ReconciliationTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
+		errors = new ArrayList<>();
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = {"CAPI", "CAWI", "PAPI"})
 	public void applyReconciliation_singleMode(String dsName) {
 		//
-		vtlBindings.getBindings().put("SINGLE_MODE", testDatasets.get(dsName));
+		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		assertNotNull(multimodeDataset);
@@ -85,11 +90,11 @@ public class ReconciliationTest {
 
 	private Dataset applyReconciliation_twoModes(String mode1, String mode2) {
 		//
-		vtlBindings.getBindings().put(mode1, testDatasets.get(mode1));
-		vtlBindings.getBindings().put(mode2, testDatasets.get(mode2));
+		vtlBindings.put(mode1, testDatasets.get(mode1));
+		vtlBindings.put(mode2, testDatasets.get(mode2));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		return vtlBindings.getDataset("MULTIMODE");
 	}
@@ -128,12 +133,12 @@ public class ReconciliationTest {
 
 	@Test
 	public void applyReconciliation_threeModes() {
-		vtlBindings.getBindings().put("CAPI", cawiDataset);
-		vtlBindings.getBindings().put("CAWI", capiDataset);
-		vtlBindings.getBindings().put("PAPI", papiDataset);
+		vtlBindings.put("CAPI", cawiDataset);
+		vtlBindings.put("CAWI", capiDataset);
+		vtlBindings.put("PAPI", papiDataset);
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
-		reconciliation.applyVtlTransformations("MULTIMODE", null);
+		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		//

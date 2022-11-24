@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -7,9 +8,12 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  * Interface to apply automated unimodal VTL instructions.
  */
 public abstract class UnimodalDataProcessing extends DataProcessing {
+	
+	protected VariablesMap variablesMap;
 
-    public UnimodalDataProcessing(VtlBindings vtlBindings){
+    protected UnimodalDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap){
         super(vtlBindings);
+        this.variablesMap = variablesMap;
     }
 
     /**
@@ -22,5 +26,5 @@ public abstract class UnimodalDataProcessing extends DataProcessing {
      *
      * @return a String of VTL instructions
      */
-    public abstract VtlScript generateVtlInstructions(String bindingName, Object... objects);
+    public abstract VtlScript generateVtlInstructions(String bindingName);
 }

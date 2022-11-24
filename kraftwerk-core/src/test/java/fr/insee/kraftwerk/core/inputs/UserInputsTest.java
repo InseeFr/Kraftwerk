@@ -1,33 +1,34 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.parsers.DataFormat;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-public class UserInputsTest {
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.parsers.DataFormat;
+
+class UserInputsTest {
 
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 
 	@Test
-	public void testReadValidUserInput_singleMode() {
+	void testReadValidUserInput_singleMode() {
 		UserInputs userInputs = new UserInputs(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory);
 		//
 		ModeInputs modeInputs = userInputs.getModeInputs("CAPI");
 		assertNotNull(modeInputs.getDataFile());
-		assertNotNull(modeInputs.getDDIURL());
+		assertNotNull(modeInputs.getDdiUrl());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNull(modeInputs.getParadataFolder());
 		assertNull(modeInputs.getReportingDataFile());
@@ -40,14 +41,14 @@ public class UserInputsTest {
 	}
 
 	@Test
-	public void testReadValidUserInput_missingOptionalFields() {
+	void testReadValidUserInput_missingOptionalFields() {
 		assertDoesNotThrow(() -> new UserInputs(
 				inputSamplesDirectory.resolve("inputs_valid_missing_fields.json"),
 				inputSamplesDirectory));
 	}
 
 	@Test
-	public void testReadValidUserInput_severalModes() {
+	void testReadValidUserInput_severalModes() {
 		UserInputs userInputs = new UserInputs(
 				inputSamplesDirectory.resolve("inputs_valid_several_modes.json"),
 				inputSamplesDirectory);
@@ -56,7 +57,7 @@ public class UserInputsTest {
 		//
 		ModeInputs modeInputs = userInputs.getModeInputs("CAWI");
 		assertNotNull(modeInputs.getDataFile());
-		assertNotNull(modeInputs.getDDIURL());
+		assertNotNull(modeInputs.getDdiUrl());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNotNull(modeInputs.getParadataFolder());
 		assertNotNull(modeInputs.getReportingDataFile());
@@ -69,7 +70,7 @@ public class UserInputsTest {
 	}
 
 	@Test
-	public void testReadInvalidUserInput_wrongDataFormat() {
+	void testReadInvalidUserInput_wrongDataFormat() {
 		assertThrows(UnknownDataFormatException.class, () -> {
 			new UserInputs(
 					inputSamplesDirectory.resolve("inputs_invalid_data_format.json"),

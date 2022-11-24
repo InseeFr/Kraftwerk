@@ -1,26 +1,32 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static fr.insee.vtl.model.Dataset.Role;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class VtlBindingsTest {
+class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
+	private List<ErrorVtlTransformation> errors;
+
+	VtlExecute vtlExecute = new VtlExecute();
 
 	Dataset ds1 = new InMemoryDataset(
 			List.of(
@@ -41,34 +47,35 @@ public class VtlBindingsTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
+		errors = new ArrayList<>();
 	}
 
 	@Test
-	public void removeNonExistingDataset() {
-		Assertions.assertDoesNotThrow(() -> vtlBindings.getBindings().remove("NOT_IN_BINDINGS"));
+	void removeNonExistingDataset() {
+		Assertions.assertDoesNotThrow(() -> vtlBindings.remove("NOT_IN_BINDINGS"));
 	}
 
 	@Test
-	public void constructorsAndDataModeTest() {
+	void constructorsAndDataModeTest() {
 		SurveyRawData surveyRawData = SurveyRawDataTest.createFakePapiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyRawData, "SRD1");
+		vtlExecute.convertToVtlDataset(surveyRawData, "SRD1", vtlBindings);
 		Dataset dataset = vtlBindings.getDataset("SRD1");
 		assertEquals("Simpson in PAPI", dataset.getDataPoints().get(0).get("LAST_NAME"));
 		assertEquals(8, dataset.getDataPoints().size());
 	}
 
 	@Test
-	public void convertToVtlDatasetTest() {
+	void convertToVtlDatasetTest() {
 		SurveyRawData surveyRawDataPapi = SurveyRawDataTest.createFakePapiSurveyRawData();
 		SurveyRawData surveyRawDataCapi = SurveyRawDataTest.createFakeCapiSurveyRawData();
 		SurveyRawData surveyRawDataCawi = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		vtlBindings.convertToVtlDataset(surveyRawDataPapi, "Papi");
-		vtlBindings.convertToVtlDataset(surveyRawDataCapi, "Capi avec espace");
-		vtlBindings.convertToVtlDataset(surveyRawDataCawi, "Cawi avec accent é");
-		assertEquals(3, vtlBindings.getBindings().size());
-		assertTrue(vtlBindings.getBindings().containsKey("Papi"));
-		assertTrue(vtlBindings.getBindings().containsKey("Capi avec espace"));
-		assertTrue(vtlBindings.getBindings().containsKey("Cawi avec accent é"));
+		vtlExecute.convertToVtlDataset(surveyRawDataPapi, "Papi", vtlBindings);
+		vtlExecute.convertToVtlDataset(surveyRawDataCapi, "Capi avec espace", vtlBindings);
+		vtlExecute.convertToVtlDataset(surveyRawDataCawi, "Cawi avec accent é", vtlBindings);
+		assertEquals(3, vtlBindings.size());
+		assertTrue(vtlBindings.containsKey("Papi"));
+		assertTrue(vtlBindings.containsKey("Capi avec espace"));
+		assertTrue(vtlBindings.containsKey("Cawi avec accent é"));
 
 		Dataset capi = vtlBindings.getDataset("Capi avec espace");
 		assertEquals(4, capi.getDataPoints().size());
@@ -76,9 +83,10 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void evalVtlScriptTest_uniqueString() {
+	void evalVtlScriptTest_uniqueString() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		//
-		vtlBindings.getBindings().put("TEST", ds1);
+		vtlBindings.put("TEST", ds1);
 		//
 		StringBuilder vtlScript = new StringBuilder("\n");
 		vtlScript.append("TEST := TEST [calc CODE_POSTAL := \n");
@@ -87,7 +95,7 @@ public class VtlBindingsTest {
 		vtlScript.append("    \"\" ))];");
 		log.info("Test VTL script:");
 		log.info(vtlScript.toString());
-		vtlBindings.evalVtlScript(vtlScript.toString());
+		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings,errors);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -100,23 +108,29 @@ public class VtlBindingsTest {
 	}
 
 	@Test
-	public void evalEmptyVtlString() {
-		vtlBindings.evalVtlScript((String) null);
-		vtlBindings.evalVtlScript((VtlScript) null);
-		vtlBindings.evalVtlScript("");
-		vtlBindings.evalVtlScript(new VtlScript());
+	void evalEmptyVtlString() {
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
+		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
+		vtlExecute.evalVtlScript("", vtlBindings, errors);
+	}
+	
+
+	@Test
+	void evalEmptyVtlScriptObject() {
+		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings,errors);
 	}
 
 	@Test
-	public void evalVtlScriptTest_scriptObject() {
+	void evalVtlScriptTest_scriptObject() {
 		//
-		vtlBindings.getBindings().put("TEST", ds1);
+		vtlBindings.put("TEST", ds1);
 		//
 		VtlScript vtlScript = new VtlScript();
 		vtlScript.add("TEST := TEST [calc new1 := \"new\"];");
 		vtlScript.add("nOt VtL cOdE "); // should write a warning in the log but not throw an exception
 		vtlScript.add("TEST := TEST [calc new2 := 2];");
-		vtlBindings.evalVtlScript(vtlScript);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings,errors);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -125,18 +139,14 @@ public class VtlBindingsTest {
 		assertTrue(ds.getDataStructure().containsKey("new2"));
 	}
 
-	@Test
-	public void evalEmptyVtlScriptObject() {
-		vtlBindings.evalVtlScript(new VtlScript());
-	}
 
 	@Test
-	public void testGetDatasetVariablesMap(){
-		VtlBindings vtlBindings = new VtlBindings();
-		vtlBindings.getBindings().put("TEST", ds1);
+	void testGetDatasetVariablesMap(){
+		vtlBindings = new VtlBindings();
+		vtlBindings.put("TEST", ds1);
 		VariablesMap variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
 		//
-		assertEquals(2, variablesMap.getGroups().size());
+		assertEquals(2, variablesMap.getGroupsCount());
 		assertTrue(variablesMap.hasGroup(Constants.ROOT_GROUP_NAME));
 		assertTrue(variablesMap.hasGroup("INDIVIDU"));
 		// Variable objects = measures in VTL dataset => 3 variables expected

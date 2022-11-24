@@ -1,12 +1,11 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import lombok.Getter;
 
 /**
  * Map to store specific information concerning the calculated variables.
@@ -15,7 +14,9 @@ import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVar
  * */
 public class CalculatedVariables extends LinkedHashMap<String, CalculatedVariable> {
 
-    /** Register a calculated variable in the map.
+    private static final long serialVersionUID = -2884154114234943033L;
+
+	/** Register a calculated variable in the map.
      * The object name attribute is the key of the entry in the map. */
     public void putVariable(CalculatedVariable calculatedVariable) {
         this.put(calculatedVariable.getName(), calculatedVariable);

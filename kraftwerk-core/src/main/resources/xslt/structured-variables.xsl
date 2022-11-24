@@ -91,9 +91,9 @@
                 <xsl:if test="l:VariableRepresentation/r:DateTimeRepresentationReference">23</xsl:if>
             </Size>
             
-            <!-- MCQ variables -->
+            <!-- QuestionGrid variables -->
             <xsl:if test="$root//d:QuestionScheme/d:QuestionGrid[r:OutParameter/r:ParameterName/r:String=$variable-name]">
-                <MCQ><xsl:value-of select="$root//d:QuestionScheme/d:QuestionGrid[r:OutParameter/r:ParameterName/r:String=$variable-name]/d:QuestionGridName/r:String"/></MCQ>
+                <QGrid><xsl:value-of select="$root//d:QuestionScheme/d:QuestionGrid[r:OutParameter/r:ParameterName/r:String=$variable-name]/d:QuestionGridName/r:String"/></QGrid>
                 <Label><xsl:value-of select="r:Label/r:Content"/></Label>
             </xsl:if>
             

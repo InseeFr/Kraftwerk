@@ -1,19 +1,19 @@
 package fr.insee.kraftwerk.core;
 
-import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.JSONParser;
-
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
 import org.json.simple.parser.JSONParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.simple.parser.ParseException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class contains paths and fixed parameters used in the application.
@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 public final class Constants {
 
 	private Constants() {}
-	
-	  private static final Logger log = LoggerFactory.getLogger(Constants.class);
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
@@ -37,15 +35,15 @@ public final class Constants {
 	// ----- XSL scripts
 	public static final String XSLT_STRUCTURED_VARIABLES = "xslt/structured-variables.xsl";
 
-	// ----- Batch parameters from properties
+	// ----- Parameters from properties
 	public static final String METADATA_SEPARATOR = ".";
 	public static final String PAPER_IDENTIFIER_SEPARATOR = "_"; //TODO: get it from properties
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
-	public static final char CSV_OUTPUTS_QUOTE_CHAR = '"'; //TODO: get it from properties
+	public static char csvOutputQuoteChar = '"'; 
 
-	// ----- Batch fixed parameters
+	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
 
@@ -155,8 +153,10 @@ public final class Constants {
 	// ---------- Parse a file
 	/** Parse JSON from fileName
 	 * @param filename
+	 * @throws ParseException 
+	 * @throws IOException 
 	 */
-	public static Object readJsonSimple(Path filename) throws Exception {
+	public static Object readJsonSimple(Path filename) throws IOException, ParseException {
 		FileReader reader = new FileReader(filename.toString());
 		JSONParser jsonParser = new JSONParser();
 		return jsonParser.parse(reader);
@@ -166,7 +166,7 @@ public final class Constants {
 	/** Convert a long into a text value standardized
 	 * @param datelong
 	 */
-	public static String convertToDateFormat(long datelong) throws Exception {
+	public static String convertToDateFormat(long datelong) {
 		return String.format("%2d jours, %02d:%02d:%02d", TimeUnit.MILLISECONDS.toDays(datelong),
 				TimeUnit.MILLISECONDS.toHours(datelong) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(datelong)),
 				TimeUnit.MILLISECONDS.toMinutes(datelong)
@@ -207,6 +207,11 @@ public final class Constants {
 	 * */
 	public static URL convertToUrl(Path filePath) throws MalformedURLException {
 		return filePath.toFile().toURI().toURL();
+	}
+
+
+	public static void setCsvOutputQuoteChar(char csvOutputQuoteChar) {
+		Constants.csvOutputQuoteChar = csvOutputQuoteChar;
 	}
 		
 }

@@ -1,64 +1,32 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = {"timestamp", "idParadataObject"})
+@ToString
 public class Event {
-  private String idSurveyUnit;
-  
-  private String idParadataObject;
-  
-  private String idSession;
-  
-  private Object value;
-  
-  private long timestamp;
-  
-  public Event() {}
-  
-  public Event(String idSurveyUnit) {
-    this.idSurveyUnit = idSurveyUnit;
-  }
-  
-  public Event(String idSurveyUnit, String idSession) {
-    this.idSurveyUnit = idSurveyUnit;
-    this.idSession = idSession;
-  }
-  
-  public String getIdSurveyUnit() {
-    return this.idSurveyUnit;
-  }
-  
-  public void setIdSurveyUnit(String idSurveyUnit) {
-    this.idSurveyUnit = idSurveyUnit;
-  }
-  
-  public String getIdParadataObject() {
-    return this.idParadataObject;
-  }
-  
-  public void setIdParadataObject(String idParadataObject) {
-    this.idParadataObject = idParadataObject;
-  }
-  
-  public String getIdSession() {
-    return this.idSession;
-  }
-  
-  public void setIdSession(String idSession) {
-    this.idSession = idSession;
-  }
-  
-  public Object getValue() {
-    return this.value;
-  }
-  
-  public void setValue(Object value) {
-    this.value = value;
-  }
-  
-  public long getTimestamp() {
-    return this.timestamp;
-  }
-  
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
-  }
+	protected String idSurveyUnit;
+	private String idParadataObject;
+	protected String idSession;
+	protected Object value;
+	protected long timestamp;
+
+	public Event(String idSurveyUnit) {
+		this.idSurveyUnit = idSurveyUnit;
+	}
+
+	public Event(String idSurveyUnit, String idSession) {
+		this.idSurveyUnit = idSurveyUnit;
+		this.idSession = idSession;
+	}
+
 }

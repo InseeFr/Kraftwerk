@@ -1,23 +1,31 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlScript;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CalculatedProcessing extends DataProcessing {
 
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
-    public static int MAXIMAL_RESOLVING_ITERATIONS = 100;
+    public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
+    private CalculatedVariables calculatedVariables;
+    private  VariablesMap variablesMap;
 
-    public CalculatedProcessing(VtlBindings vtlBindings) {
+    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, VariablesMap variablesMap) {
         super(vtlBindings);
+        this.calculatedVariables = calculatedVariables;
+        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -35,11 +43,7 @@ public class CalculatedProcessing extends DataProcessing {
      * @return a VtlScript with one instruction for each "calculated" variable.
      */
     @Override
-    protected VtlScript generateVtlInstructions(String bindingName, Object... objects) {
-
-        CalculatedVariables calculatedVariables = (CalculatedVariables) objects[0];
-
-        VariablesMap variablesMap = (VariablesMap) objects[1];
+    protected VtlScript generateVtlInstructions(String bindingName) {
 
         List<String> orderedCalculatedNames = resolveCalculated(calculatedVariables);
 
@@ -55,7 +59,7 @@ public class CalculatedProcessing extends DataProcessing {
             */
 
             if (!variablesMap.hasVariable(calculatedName)) {
-                if (calculatedName.startsWith("FILTER_RESULT")) {
+                if (calculatedName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
                     addFilterResult(calculatedName, variablesMap);
                 } else {
                     log.warn(String.format("Unknown CALCULATED variable \"%s\".", calculatedName));
@@ -84,12 +88,8 @@ public class CalculatedProcessing extends DataProcessing {
             group = variablesMap.getMcqGroup(correspondingVariableName);
         } else { //TODO : FIXME ?????
             group = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
-         //   log.warn(String.format(
-          //          "No information from the DDI about question or variable named \"%s\".",
-          //          correspondingVariableName));
-          //  log.warn(String.format(
-         //           "\"%s\" has been arbitrarily associated with group \"%s\".",
-         //           filterResultName, group.getName()));
+            // No information from the DDI about question or variable
+            // It has been arbitrarily associated with the group above
         }
         variablesMap.putVariable(new Variable(filterResultName, group, VariableType.BOOLEAN));
     }

@@ -10,21 +10,30 @@ import lombok.Setter;
 public class Variable {
 
 	/** Variable name. */
+	@Getter
 	protected String name;
 
 	/** Group reference */
+	@Getter
 	protected Group group;
 
 	/** Variable type from the enum class (STRING, INTEGER, DATE, ...) */
+	@Getter
 	protected VariableType type;
 
 	/** Variable length. */
+	@Getter
 	protected String length;
 
 	/** Name of the item used to collect the answer. */
 	@Getter
 	@Setter
 	protected String questionItemName;
+
+	/** Identifies if the variable is part a question grid */
+	@Getter
+	@Setter
+	protected boolean isInQuestionGrid;
 
 	public Variable(String name, Group group, VariableType type) {
 		this.name = name;
@@ -39,21 +48,9 @@ public class Variable {
 		this.length = length;
 	}
 
-	public String getName() {
-		return name;
-	}
-	
 	public String getGroupName() {
 		return group.getName();
 	}
-	public Group getGroup() {
-		return group;
-	}
-	public VariableType getType() {
-		return type;
-	}
-	public String getLength() {
-		return length;
-	}
+
 
 }

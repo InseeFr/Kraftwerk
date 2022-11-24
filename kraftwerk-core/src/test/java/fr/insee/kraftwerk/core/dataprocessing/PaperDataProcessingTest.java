@@ -1,22 +1,24 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+import org.junit.jupiter.api.Test;
+
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-
-public class PaperDataProcessingTest {
+class PaperDataProcessingTest {
 
 	Dataset paperDataset = new InMemoryDataset(
 			List.of(
@@ -59,26 +61,25 @@ public class PaperDataProcessingTest {
 	}
 
 	@Test
-	public void testPaperDataProcessing() {
+	void testPaperDataProcessing() {
 		//
+		List<ErrorVtlTransformation> errors =new ArrayList<ErrorVtlTransformation>();
 		VariablesMap variablesMap = new VariablesMap();
 		Group rootGroup = variablesMap.getRootGroup();
 		variablesMap.putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
-		//addPaperUcq(variablesMap, rootGroup, "GENDER", 2);
-		//addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
+		addPaperUcq(variablesMap, rootGroup, "GENDER", 2);
+		addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
-		vtlBindings.getBindings().put("TEST", paperDataset);
+		vtlBindings.put("TEST", paperDataset);
 		//
-		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings);
-		paperDataProcessing.applyAutomatedVtlInstructions("TEST", variablesMap);
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
+		paperDataProcessing.applyAutomatedVtlInstructions("TEST", errors);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 
 		//
 		assertNotNull(paperDsModified);
-		//
-		assertEquals(1, 1);
-		// TODO: UPDATE THIS TEST CLASS
+		
 	}
 }
