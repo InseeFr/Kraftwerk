@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.kraftwerk.core.dataprocessing.*;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -45,6 +54,7 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,13 +82,14 @@ public class LauncherService {
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
+
 	}
 
 	@PutMapping(value = "/main")
-	@Operation(operationId = "main", summary = "Main service : call all steps")
+	@Operation(operationId = "main", summary = "${main.summary}")
 	public ResponseEntity<String> main(
-			@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "True if want to archive, default = false", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+			@Parameter(description = "${param.inDirectory}", required = true) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
 		/* Step 1 : Init */
 		Path inDirectory;
