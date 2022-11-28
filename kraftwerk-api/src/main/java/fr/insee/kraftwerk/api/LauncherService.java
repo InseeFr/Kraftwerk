@@ -211,21 +211,6 @@ public class LauncherService {
 
 	}
 
-	private String getMethodName() throws KraftwerkException {
-		String methodName = "";
-		try {
-			StackWalker walker = StackWalker.getInstance();
-			Optional<String> methodNameOptional = walker.walk(frames -> frames
-			  .skip(1)
-		      .findFirst()
-		      .map(StackWalker.StackFrame::getMethodName));
-		    if (methodNameOptional.isPresent()) methodName =methodNameOptional.get();
-		} catch (Exception e) {
-			throw new KraftwerkException(500, "Can't get method name : "  +e.getClass()+ " - "+ e.getMessage());
-		}
-		return methodName;
-	}
-	
 	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step) throws KraftwerkException {
 		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+".json");
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
