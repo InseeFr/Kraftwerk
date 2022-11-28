@@ -127,7 +127,7 @@ public class LauncherService {
 		}
 
 		//Write errors file
-		if (errors.size()>0) {
+		if (!errors.isEmpty()) {
 			try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
 				for (ErrorVtlTransformation error : errors){
 					myWriter.write(error.toString());
@@ -137,7 +137,7 @@ public class LauncherService {
 				log.warn(String.format("Error occurred when trying to write text file: %s", tempOutputPath), e);
 			}
 		} else {
-			log.debug(String.format("No error found during VTL transformations"));
+			log.debug("No error found during VTL transformations");
 		}
 	}
 
