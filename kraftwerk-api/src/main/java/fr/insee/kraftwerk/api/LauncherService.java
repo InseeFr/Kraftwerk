@@ -57,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class LauncherService {
 
+	private static final String JSON = ".json";
 	VtlExecute vtlExecute = new VtlExecute();
 	List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
@@ -212,7 +213,7 @@ public class LauncherService {
 	}
 
 	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step) throws KraftwerkException {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+".json");
+		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
 	
@@ -444,7 +445,7 @@ public class LauncherService {
 		// Read all bindings necessary to produce output
 		String path = FileUtils.transformToTemp(inDirectory).toString();
 		List<String> fileNames = FileUtils.listFiles(path);
-		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+".json")).collect(Collectors.toList());
+		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).collect(Collectors.toList());
 		for (String name : fileNames){
 			String pathBindings = path + "/" + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
@@ -523,7 +524,7 @@ public class LauncherService {
 	}
 
 	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
-		String pathBinding = path + "/" + bindingName + "_" + previousStep.getStepLabel() +".json";
+		String pathBinding = path + "/" + bindingName + "_" + previousStep.getStepLabel() +JSON;
 		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
 	}
 
