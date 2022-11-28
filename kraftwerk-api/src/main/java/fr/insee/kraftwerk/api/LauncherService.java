@@ -164,12 +164,7 @@ public class LauncherService {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			//Write data in JSON file
-			try {
-				writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
-			} catch (KraftwerkException e) {
-				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-			}
+			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -201,18 +196,14 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
-		//Write data in JSON file
-		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
 	}
 
-	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step) throws KraftwerkException {
+
+	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step)  {
 		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
@@ -261,12 +252,7 @@ public class LauncherService {
 		//Process
 		unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		
-		//Write data in JSON file
-		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
 
 		writeErrorsFile(inDirectory);
 		
@@ -376,13 +362,8 @@ public class LauncherService {
 		multimodalProcessing(userInputs, vtlBindings, errors);
 
 
-		//Write data in JSON file
-		try {
-			for (String datasetName : vtlBindings.getDatasetNames()) {
-				writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
-			}
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
 
 		writeErrorsFile(inDirectory);
