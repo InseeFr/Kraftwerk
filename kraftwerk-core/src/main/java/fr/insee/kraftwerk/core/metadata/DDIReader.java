@@ -37,7 +37,7 @@ public class DDIReader {
 
 			//
 			transformDDI(ddiUrl, variablesTempFilePath);
-			return getVariablesFromTransformed(variablesTempFilePath);
+			return readVariables(variablesTempFilePath);
 		}
 
 		catch (MalformedURLException e) {
@@ -47,16 +47,6 @@ public class DDIReader {
 			log.error("Unable to write temp file.", e);
 			return null;
 		}
-	}
-
-	/**
-	 * Parse the file and read its variables.
-	 * 
-	 * @param variablesFilePath Path of the transformed xml file.
-	 * @return The variables described in the file.
-	 */
-	public static VariablesMap getVariablesFromTransformed(Path variablesFilePath) {
-		return readVariables(variablesFilePath);
 	}
 
 	/**
