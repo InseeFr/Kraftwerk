@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 
@@ -39,6 +42,21 @@ public class LunaticReader {
             });
 
             return calculatedVariables;
+
+        } catch (IOException e) {
+            log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+            return null;
+        }
+    }
+
+    public static List<String> getMissingVariablesFromLunatic(Path lunaticFile){
+        try {
+            JsonNode rootNode = JsonFileReader.read(lunaticFile);
+            List<String> variables = new ArrayList<>();
+
+            JsonNode variablesNode = rootNode.get("variables");
+            variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
+            return variables.stream().filter(var-> var.endsWith("_MISSING")).collect(Collectors.toList());
 
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);

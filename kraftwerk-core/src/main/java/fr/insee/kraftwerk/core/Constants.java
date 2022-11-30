@@ -50,6 +50,7 @@ public final class Constants {
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
+	public static final String MISSING_SUFFIX = "_MISSING";
 
 
 	// ----- Paradata Variables Names
