@@ -2,7 +2,7 @@
 
 # Kraftwerk
 
-Kraftwerk is a Java Spring Batch application designed to validate and process data from multimode surveys, to generate data tables ready-to-use for statistical purposes.
+Kraftwerk is a Java Spring application designed to validate and process data from multimode surveys, to generate data tables ready-to-use for statistical purposes.
 It heavily relies on metadata described using the [DDI](http://ddialliance.org) standard.
 The batch automated processes can be enriched with specification written in [VTL](https://sdmx.org/?page_id=5096), thanks to [Trevas](https://github.com/InseeFr/Trevas) implementation.
 
