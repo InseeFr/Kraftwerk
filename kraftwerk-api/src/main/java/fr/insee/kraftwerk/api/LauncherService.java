@@ -439,7 +439,7 @@ public class LauncherService {
 		List<String> fileNames = FileUtils.listFiles(path);
 		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).collect(Collectors.toList());
 		for (String name : fileNames){
-			String pathBindings = path + "/" + name;
+			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
 			vtlExecute.putVtlDataset(pathBindings, bindingName, vtlBindings);
 		}
@@ -516,7 +516,7 @@ public class LauncherService {
 	}
 
 	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
-		String pathBinding = path + "/" + bindingName + "_" + previousStep.getStepLabel() +JSON;
+		String pathBinding = path + File.separator + bindingName + "_" + previousStep.getStepLabel() +JSON;
 		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
 	}
 
