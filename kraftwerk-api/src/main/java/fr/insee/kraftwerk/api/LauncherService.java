@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,6 +68,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class LauncherService {
 
+	private static final String INDIRECTORY_EXAMPLE = "LOG-2021-x12-web";
 	private static final String JSON = ".json";
 	VtlExecute vtlExecute = new VtlExecute();
 	List<ErrorVtlTransformation> errors = new ArrayList<>();
@@ -86,9 +88,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/main")
-	@Operation(operationId = "main", summary = "${main.summary}")
+	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
 	public ResponseEntity<String> main(
-			@Parameter(description = "${param.inDirectory}", required = true) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
 		/* Step 1 : Init */
@@ -153,9 +155,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/buildVtlBindings")
-	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
+	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -185,10 +187,10 @@ public class LauncherService {
 
 	
 	@PutMapping(value = "/buildVtlBindings/{dataMode}")
-	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
+	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindingsByDataMode(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "Data mode", required = true) @PathVariable String dataMode
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -245,10 +247,10 @@ public class LauncherService {
 
 
 	@PutMapping(value = "/unimodalProcessing")
-	@Operation(operationId = "unimodalProcessing", summary = "Apply transformation on one mode")
+	@Operation(operationId = "unimodalProcessing", summary = "${summary.unimodalProcessing}", description = "${description.unimodalProcessing}")
 	public ResponseEntity<String> unimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam,
-			@Parameter(description = "Data mode", required = true) @RequestParam  String dataMode
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
+			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
 		//Read data in JSON file
 		Path inDirectory;
@@ -350,9 +352,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/multimodalProcessing")
-	@Operation(operationId = "multimodalProcessing", summary = "Write output files in outDirectory")
+	@Operation(operationId = "multimodalProcessing", summary = "${summary.multimodalProcessing}", description = "${description.multimodalProcessing}")
 	public ResponseEntity<String> multimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
 		//Read data in JSON file
 		Path inDirectory;
@@ -423,9 +425,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/writeOutputFiles")
-	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
+	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
-			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) {
 		Path inDirectory;
 		try {
@@ -461,9 +463,9 @@ public class LauncherService {
 	}
 	
 	@PutMapping(value = "/archive")
-	@Operation(operationId = "archive", summary = "Archive files")
+	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
 	public ResponseEntity<String> archive(
-			@Parameter(description = "directory with files", required = true) @RequestBody  String inDirectoryParam) 
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
 			{
 		Path inDirectory;
 		try {
