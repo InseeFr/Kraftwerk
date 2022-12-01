@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
 import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 
 @Slf4j
@@ -56,7 +57,7 @@ public class LunaticReader {
 
             JsonNode variablesNode = rootNode.get("variables");
             variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
-            return variables.stream().filter(var-> var.endsWith("_MISSING")).collect(Collectors.toList());
+            return variables.stream().filter(var-> var.endsWith(MISSING_SUFFIX)).collect(Collectors.toList());
 
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
