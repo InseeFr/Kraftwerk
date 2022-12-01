@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.utils.TextFileReader;

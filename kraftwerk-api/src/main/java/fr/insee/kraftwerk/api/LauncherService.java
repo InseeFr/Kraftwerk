@@ -1,18 +1,23 @@
 package fr.insee.kraftwerk.api;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import fr.insee.kraftwerk.core.dataprocessing.*;
+
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -52,6 +67,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class LauncherService {
 
+	private static final String INDIRECTORY_EXAMPLE = "LOG-2021-x12-web";
+	private static final String JSON = ".json";
 	VtlExecute vtlExecute = new VtlExecute();
 	List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
@@ -66,13 +83,14 @@ public class LauncherService {
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
+
 	}
 
 	@PutMapping(value = "/main")
-	@Operation(operationId = "main", summary = "Main service : call all steps")
+	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
 	public ResponseEntity<String> main(
-			@Parameter(description = "directory with files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "True if want to archive, default = false", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
 		/* Step 1 : Init */
 		Path inDirectory;
@@ -121,7 +139,7 @@ public class LauncherService {
 		}
 
 		//Write errors file
-		if (errors.size()>0) {
+		if (!errors.isEmpty()) {
 			try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
 				for (ErrorVtlTransformation error : errors){
 					myWriter.write(error.toString());
@@ -131,14 +149,14 @@ public class LauncherService {
 				log.warn(String.format("Error occurred when trying to write text file: %s", tempOutputPath), e);
 			}
 		} else {
-			log.debug(String.format("No error found during VTL transformations"));
+			log.debug("No error found during VTL transformations");
 		}
 	}
 
 	@PutMapping(value = "/buildVtlBindings")
-	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
+	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -158,12 +176,7 @@ public class LauncherService {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			//Write data in JSON file
-			try {
-				writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
-			} catch (KraftwerkException e) {
-				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-			}
+			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -173,10 +186,10 @@ public class LauncherService {
 
 	
 	@PutMapping(value = "/buildVtlBindings/{dataMode}")
-	@Operation(operationId = "buildVtlBindings", summary = "Transform data from collect, to data ready to use in Trevas")
+	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindingsByDataMode(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam,
-			@Parameter(description = "Data mode", required = true) @PathVariable String dataMode
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -195,34 +208,15 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
-		//Write data in JSON file
-		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
 	}
 
-	private String getMethodName() throws KraftwerkException {
-		String methodName = "";
-		try {
-			StackWalker walker = StackWalker.getInstance();
-			Optional<String> methodNameOptional = walker.walk(frames -> frames
-			  .skip(1)
-		      .findFirst()
-		      .map(StackWalker.StackFrame::getMethodName));
-		    if (methodNameOptional.isPresent()) methodName =methodNameOptional.get();
-		} catch (Exception e) {
-			throw new KraftwerkException(500, "Can't get method name : "  +e.getClass()+ " - "+ e.getMessage());
-		}
-		return methodName;
-	}
-	
-	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step) throws KraftwerkException {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+".json");
+
+	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step)  {
+		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
 	
@@ -252,10 +246,10 @@ public class LauncherService {
 
 
 	@PutMapping(value = "/unimodalProcessing")
-	@Operation(operationId = "unimodalProcessing", summary = "Apply transformation on one mode")
+	@Operation(operationId = "unimodalProcessing", summary = "${summary.unimodalProcessing}", description = "${description.unimodalProcessing}")
 	public ResponseEntity<String> unimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam,
-			@Parameter(description = "Data mode", required = true) @RequestParam  String dataMode
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
+			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
 		//Read data in JSON file
 		Path inDirectory;
@@ -270,12 +264,7 @@ public class LauncherService {
 		//Process
 		unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		
-		//Write data in JSON file
-		try {
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
 
 		writeErrorsFile(inDirectory);
 		
@@ -380,9 +369,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/multimodalProcessing")
-	@Operation(operationId = "multimodalProcessing", summary = "Write output files in outDirectory")
+	@Operation(operationId = "multimodalProcessing", summary = "${summary.multimodalProcessing}", description = "${description.multimodalProcessing}")
 	public ResponseEntity<String> multimodalProcessing(
-			@Parameter(description = "directory with input files", required = true) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
 		//Read data in JSON file
 		Path inDirectory;
@@ -403,13 +392,8 @@ public class LauncherService {
 		multimodalProcessing(userInputs, vtlBindings, errors);
 
 
-		//Write data in JSON file
-		try {
-			for (String datasetName : vtlBindings.getDatasetNames()) {
-				writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
-			}
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
 
 		writeErrorsFile(inDirectory);
@@ -458,9 +442,9 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/writeOutputFiles")
-	@Operation(operationId = "writeOutputFiles", summary = "Write output files in outDirectory")
+	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
-			@Parameter(description = "directory with input files", required = true) @RequestBody  String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) {
 		Path inDirectory;
 		try {
@@ -472,9 +456,9 @@ public class LauncherService {
 		// Read all bindings necessary to produce output
 		String path = FileUtils.transformToTemp(inDirectory).toString();
 		List<String> fileNames = FileUtils.listFiles(path);
-		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+".json")).collect(Collectors.toList());
+		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).collect(Collectors.toList());
 		for (String name : fileNames){
-			String pathBindings = path + "/" + name;
+			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
 			vtlExecute.putVtlDataset(pathBindings, bindingName, vtlBindings);
 		}
@@ -496,9 +480,9 @@ public class LauncherService {
 	}
 	
 	@PutMapping(value = "/archive")
-	@Operation(operationId = "archive", summary = "Archive files")
+	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
 	public ResponseEntity<String> archive(
-			@Parameter(description = "directory with files", required = true) @RequestBody  String inDirectoryParam) 
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
 			{
 		Path inDirectory;
 		try {
@@ -551,7 +535,7 @@ public class LauncherService {
 	}
 
 	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
-		String pathBinding = path + "/" + bindingName + "_" + previousStep.getStepLabel() +".json";
+		String pathBinding = path + File.separator + bindingName + "_" + previousStep.getStepLabel() +JSON;
 		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
 	}
 
