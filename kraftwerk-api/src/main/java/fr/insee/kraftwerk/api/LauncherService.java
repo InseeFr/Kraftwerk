@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+
+import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,10 +48,6 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.parsers.DataParser;
@@ -55,7 +55,6 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
@@ -226,7 +225,7 @@ public class LauncherService {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
-		/* Step 2.0 : Read the DDI file to get survey variables */
+		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
 		data.setVariablesMap(getMetadata(userInputs, dataMode));
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
@@ -324,7 +323,25 @@ public class LauncherService {
 	}
 	
 	private void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
-		metadataVariables.put(dataMode, DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
+		// Step 1 : we add the variables read in the DDI
+		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+		// Step 2 : we add the "_MISSING" variables from lunatic file if they exist
+		if (modeInputs.getLunaticFile() != null) {
+			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile());
+			for (String missingVar : missingVars) {
+				String correspondingVariableName = missingVar.replace(Constants.MISSING_SUFFIX, "");
+				Group group;
+				if (variables.hasVariable(correspondingVariableName)) {
+					group = variables.getVariable(correspondingVariableName).getGroup();
+				} else {
+					group = variables.getGroup(variables.getGroupNames().get(0));
+					// No information from the DDI about variable
+					// It has been arbitrarily associated with the root group
+				}
+				variables.putVariable(new Variable(missingVar, group, VariableType.STRING));
+			}
+		}
+		metadataVariables.put(dataMode, variables);
 	}
 
 	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
