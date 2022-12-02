@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.vtl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -18,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
@@ -108,13 +108,7 @@ public class VtlExecute {
      * @param jsonOutFile Path to write the output json file.
      * */
     public void writeJsonDataset(String bindingName, Path jsonOutFile, VtlBindings bindings) {
-    	// Create folder if doesn't exist
-    		try {
-    			Files.createDirectories(jsonOutFile.getParent());
-    			log.info(String.format("Created folder: %s", jsonOutFile.getParent().toFile().getAbsolutePath()));
-    		} catch (IOException e) {
-    			log.error("Permission refused to create output folder: " + jsonOutFile.getParent(), e);
-    		}
+    	FileUtils.createDirectoryIfNotExist(jsonOutFile.getParent());
     	
     	//Write file    	
         if (bindings.containsKey(bindingName)) {
@@ -209,8 +203,6 @@ public class VtlExecute {
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");
         }
-        System.out.println("Taille de la liste d'erreurs : "+ errors.size());
-
     }
 
 
