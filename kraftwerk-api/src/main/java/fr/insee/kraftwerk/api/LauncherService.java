@@ -27,14 +27,14 @@ import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.logicalSequence.BuildBindingsSequence;
-import fr.insee.kraftwerk.core.logicalSequence.MultimodalSequence;
-import fr.insee.kraftwerk.core.logicalSequence.UnimodalSequence;
-import fr.insee.kraftwerk.core.logicalSequence.WriterSequence;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +47,6 @@ public class LauncherService {
 
 	private static final String INDIRECTORY_EXAMPLE = "LOG-2021-x12-web";
 	private static final String JSON = ".json";
-	VtlExecute vtlExecute = new VtlExecute();
-	List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
 	@Value("${fr.insee.postcollecte.csv.output.quote}")
 	private String csvOutputsQuoteChar;
@@ -81,9 +79,10 @@ public class LauncherService {
 
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
 		/* Step 2 : unimodal data */
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(vtlExecute);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			try {
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
@@ -101,7 +100,7 @@ public class LauncherService {
 		/* Step 4 : Write output files */
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
-		writeErrorsFile(inDirectory);
+		writeErrorsFile(inDirectory, errors);
 
 		/* Step 4.3- 4.4 : Archive */
 		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
@@ -109,7 +108,7 @@ public class LauncherService {
 		return ResponseEntity.ok(campaignName);
 	}
 
-	private void writeErrorsFile(Path inDirectory) {
+	private void writeErrorsFile(Path inDirectory, List<ErrorVtlTransformation> errors) {
 		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
@@ -143,7 +142,9 @@ public class LauncherService {
 		UserInputs userInputs = getUserInputs(inDirectory);
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(vtlExecute);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+
 
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
@@ -153,7 +154,7 @@ public class LauncherService {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+			vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -179,25 +180,20 @@ public class LauncherService {
 		VtlBindings vtlBindings = new VtlBindings();
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(vtlExecute);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		try {
 			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
-		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
 	}
 
-
-	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step)  {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
-		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
-	}
-	
 
 
 	@PutMapping(value = "/unimodalProcessing")
@@ -215,15 +211,19 @@ public class LauncherService {
 		}
 		UserInputs userInputs = getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
-		readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+
+		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
 		unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		
 		//Write technical outputs
-		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		writeErrorsFile(inDirectory);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
+		writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -244,11 +244,15 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		UserInputs userInputs = getUserInputs(inDirectory);
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+
+
+		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence();
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
+			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
 		//Process
@@ -257,9 +261,9 @@ public class LauncherService {
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
-			writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
+			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		writeErrorsFile(inDirectory);
+		writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -285,7 +289,8 @@ public class LauncherService {
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
-			vtlExecute.putVtlDataset(pathBindings, bindingName, vtlBindings);
+			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
 		UserInputs userInputs = getUserInputs(inDirectory);
@@ -351,9 +356,6 @@ public class LauncherService {
 		return true;
 	}
 
-	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
-		String pathBinding = path + File.separator + bindingName + "_" + previousStep.getStepLabel() +JSON;
-		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
-	}
+
 
 }

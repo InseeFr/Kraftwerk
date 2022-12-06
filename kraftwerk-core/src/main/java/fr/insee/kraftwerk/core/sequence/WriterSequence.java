@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.logicalSequence;
+package fr.insee.kraftwerk.core.sequence;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -9,7 +9,9 @@ import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class WriterSequence {
 
 	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, String multimodeDatasetNames) {

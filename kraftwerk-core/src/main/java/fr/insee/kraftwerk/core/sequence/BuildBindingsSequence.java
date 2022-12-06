@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.logicalSequence;
+package fr.insee.kraftwerk.core.sequence;
 
 import java.nio.file.Path;
 
@@ -21,10 +21,9 @@ public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
 
-	public BuildBindingsSequence(VtlExecute vtlExecute) {
-		this.vtlExecute = vtlExecute;
+	public BuildBindingsSequence() {
+		vtlExecute = new VtlExecute();
 	}
-
 
 	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings) throws NullException {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);

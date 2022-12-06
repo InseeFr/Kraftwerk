@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.logicalSequence;
+package fr.insee.kraftwerk.core.sequence;
 
 import java.util.List;
 
