@@ -56,80 +56,80 @@ public class XformsDataParser extends DataParser {
 
 		Document document = readXmlFile(filePath);
 
-		Element root = document.getRootElement();
+		if(document!=null) {
+			Element root = document.getRootElement();
+			Element questionnairesNode = root.getFirstChildElement("Questionnaires");
+			Elements questionnairesNodeList = questionnairesNode.getChildElements("Questionnaire");
 
-		Element questionnairesNode = root.getFirstChildElement("Questionnaires");
+			for (int i = 0; i < questionnairesNodeList.size(); i++) {
 
-		Elements questionnairesNodeList = questionnairesNode.getChildElements("Questionnaire");
+				QuestionnaireData questionnaireData = new QuestionnaireData();
+				GroupInstance answers = questionnaireData.getAnswers();
 
-		for (int i = 0; i < questionnairesNodeList.size(); i++) {
+				Element questionnaireNode = questionnairesNodeList.get(i);
 
-			QuestionnaireData questionnaireData = new QuestionnaireData();
-			GroupInstance answers = questionnaireData.getAnswers();
+				// Identifier
+				Element identifierNode = questionnaireNode.getFirstChildElement("InformationsGenerales")
+						.getFirstChildElement("UniteEnquetee").getFirstChildElement("Identifiant");
+				String identifier = identifierNode.getValue();
+				questionnaireData.setIdentifier(identifier);
 
-			Element questionnaireNode = questionnairesNodeList.get(i);
+				// Survey answers
 
-			// Identifier
-			Element identifierNode = questionnaireNode.getFirstChildElement("InformationsGenerales")
-					.getFirstChildElement("UniteEnquetee").getFirstChildElement("Identifiant");
-			String identifier = identifierNode.getValue();
-			questionnaireData.setIdentifier(identifier);
-
-			// Survey answers
-
-			// Root variables
-			Elements variableNodeList = questionnaireNode.getFirstChildElement("InformationsPersonnalisees")
-					.getChildElements("Variable");
-			for (int j = 0; j < variableNodeList.size(); j++) {
-				Element variableNode = variableNodeList.get(j);
-				String variableName = variableNode.getAttributeValue("idVariable");
-				if (data.getVariablesMap().hasVariable(variableName)) {
-					String value = getNodeValue(variableNode);
-					answers.putValue(variableName, value);
-				} else {
-					if (i == 0) {
-						log.info(String.format(
-								"Root variable \"%s\" not expected, corresponding values will be ignored.", variableName));
+				// Root variables
+				Elements variableNodeList = questionnaireNode.getFirstChildElement("InformationsPersonnalisees")
+						.getChildElements("Variable");
+				for (int j = 0; j < variableNodeList.size(); j++) {
+					Element variableNode = variableNodeList.get(j);
+					String variableName = variableNode.getAttributeValue("idVariable");
+					if (data.getVariablesMap().hasVariable(variableName)) {
+						String value = getNodeValue(variableNode);
+						answers.putValue(variableName, value);
+					} else {
+						if (i == 0) {
+							log.info(String.format(
+									"Root variable \"%s\" not expected, corresponding values will be ignored.", variableName));
+						}
 					}
+
 				}
 
-			}
+				// Root groups TODO : implement recursions for groups in groups etc.
+				Elements groupNodeList = questionnaireNode.getFirstChildElement("InformationsPersonnalisees")
+						.getChildElements("Groupe");
 
-			// Root groups TODO : implement recursions for groups in groups etc.
-			Elements groupNodeList = questionnaireNode.getFirstChildElement("InformationsPersonnalisees")
-					.getChildElements("Groupe");
+				for (Element groupNode : groupNodeList) {
+					// Get the group instances
+					Elements groupInstanceNodeList = groupNode.getChildElements("Groupe");
+					// Get the group name of the instances
+					String groupName = groupInstanceNodeList.get(0).getAttributeValue("typeGroupe");
 
-			for (Element groupNode : groupNodeList) {
-				// Get the group instances
-				Elements groupInstanceNodeList = groupNode.getChildElements("Groupe");
-				// Get the group name of the instances
-				String groupName = groupInstanceNodeList.get(0).getAttributeValue("typeGroupe");
+					GroupData groupData = answers.getSubGroup(groupName);
 
-				GroupData groupData = answers.getSubGroup(groupName);
+					for (Element groupInstanceNode : groupInstanceNodeList) {
+						String groupInstanceId = groupInstanceNode.getAttributeValue("idGroupe");
+						GroupInstance groupInstance = groupData.getInstance(groupInstanceId);
+						Elements groupVariableNodeList = groupInstanceNode.getChildElements("Variable");
+						for (Element variableNode : groupVariableNodeList) {
+							String variableName = variableNode.getAttributeValue("idVariable");
+							if (data.getVariablesMap().hasVariable(variableName)) {
+								String value = getNodeValue(variableNode);
+								groupInstance.putValue(variableName, value);
+							} else {
+								if (i == 0 && groupInstanceId.endsWith("1")) {
+									log.info(String.format(
+											"Variable \"%s\" not expected in group \"%s\", corresponding values will be ignored.",
+											variableName, groupName));
+								}
 
-				for (Element groupInstanceNode : groupInstanceNodeList) {
-					String groupInstanceId = groupInstanceNode.getAttributeValue("idGroupe");
-					GroupInstance groupInstance = groupData.getInstance(groupInstanceId);
-					Elements groupVariableNodeList = groupInstanceNode.getChildElements("Variable");
-					for (Element variableNode : groupVariableNodeList) {
-						String variableName = variableNode.getAttributeValue("idVariable");
-						if (data.getVariablesMap().hasVariable(variableName)) {
-							String value = getNodeValue(variableNode);
-							groupInstance.putValue(variableName, value);
-						} else {
-							if (i == 0 && groupInstanceId.endsWith("1")) {
-								log.info(String.format(
-										"Variable \"%s\" not expected in group \"%s\", corresponding values will be ignored.",
-										variableName, groupName));
 							}
 
 						}
-
 					}
 				}
-			}
 
-			data.addQuestionnaire(questionnaireData);
+				data.addQuestionnaire(questionnaireData);
+			}
 		}
 	}
 

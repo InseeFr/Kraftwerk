@@ -100,7 +100,7 @@ public class ReconciliationProcessing extends DataProcessing {
 				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
 					vtlScript.add(String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",datasetName, measure));
 				}
-			};
+			}
 		}
 
 		commonMeasures.add(modeVariableIdentifier);
