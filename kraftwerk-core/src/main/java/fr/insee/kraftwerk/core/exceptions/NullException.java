@@ -15,19 +15,5 @@ public class NullException extends KraftwerkException {
     public NullException( String message ) {
         super(500, message );
     }
-
-    
-    // Autres méthodes si nécessaire.
-    //TODO move this method somewhere else
-	/**
-	 * Rename the incorrect input file
-	 */
-	public void renameInputFile(Path inDirectory) {
-		File file = inDirectory.resolve("kraftwerk.json").toFile();
-		File file2 = inDirectory.resolve("kraftwerk-ERROR.json").toFile();
-		if (file2.exists()) {
-			file2.delete();
-		}
-		file.renameTo(file2);
-	}
+	
 }
