@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.util.List;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.UcqModality;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -42,6 +43,9 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
 
         // Write the VTL instructions
         VtlScript vtlScript = new VtlScript();
+
+        // To delete duplicates, to be eventually reviewed with a better VTL solution
+        vtlScript.add(String.format("%1$s := union(%1$s,%1$s);",bindingName));
 
         for (UcqVariable ucqVariable : ucqVariables) {
 
