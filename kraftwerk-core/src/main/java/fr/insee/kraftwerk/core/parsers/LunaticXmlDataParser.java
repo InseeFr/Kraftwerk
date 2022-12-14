@@ -59,25 +59,27 @@ public class LunaticXmlDataParser extends DataParser {
 	void parseDataFile(Path filePath) {
 
 		Document document = readXmlFile(filePath);
-		Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
-				.getChildElements("SurveyUnit");
+		if (document!=null) {
+			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
+					.getChildElements("SurveyUnit");
 
-		for (int i = 0; i < questionnaireNodeList.size(); i++) {
+			for (int i = 0; i < questionnaireNodeList.size(); i++) {
 
-			// Xml questionnaire node
-			Element questionnaireNode = questionnaireNodeList.get(i);
+				// Xml questionnaire node
+				Element questionnaireNode = questionnaireNodeList.get(i);
 
-			// Init the questionnaire data object
-			QuestionnaireData questionnaireData = new QuestionnaireData();
+				// Init the questionnaire data object
+				QuestionnaireData questionnaireData = new QuestionnaireData();
 
-			// Root identifier
-			questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
+				// Root identifier
+				questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
 
-			readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-			readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-			readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
+				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
-			data.addQuestionnaire(questionnaireData);
+				data.addQuestionnaire(questionnaireData);
+			}
 		}
 	}
 
@@ -89,7 +91,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 		// Xml collected variables nodes
 		Elements collectedVariablesNodes = questionnaireNode.getFirstChildElement("Data")
-				.getFirstChildElement("COLLECTED").getChildElements();
+				.getFirstChildElement(Constants.COLLECTED).getChildElements();
 
 		// Data object
 		GroupInstance answers = questionnaireData.getAnswers();
@@ -100,12 +102,12 @@ public class LunaticXmlDataParser extends DataParser {
 			String variableName = variableNode.getLocalName();
 
 			//
-			Element collectedNode = variableNode.getFirstChildElement("COLLECTED");
+			Element collectedNode = variableNode.getFirstChildElement(Constants.COLLECTED);
 
-			// Root variables // TODO: "_MISSING" variables management
+			// Root variables
 			if (collectedNode.getAttribute("type") != null) {
 				if(! collectedNode.getAttribute("type").getValue().equals("null")) {
-					String value = variableNode.getFirstChildElement("COLLECTED").getValue();
+					String value = variableNode.getFirstChildElement(Constants.COLLECTED).getValue();
 					answers.putValue(variableName, value);
 				}
 			}
@@ -113,7 +115,7 @@ public class LunaticXmlDataParser extends DataParser {
 			// Group variables // TODO : recursion etc.
 			else {
 				Elements valueNodes = collectedNode.getChildElements();
-				if(variables.hasVariable(variableName)) { // TODO: "_MISSING" variables management
+				if(variables.hasVariable(variableName)) {
 					String groupName = variables.getVariable(variableName).getGroupName();
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {

@@ -41,7 +41,7 @@ public final class Constants {
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
-	public static char csvOutputQuoteChar = '"'; 
+	private static char csvOutputQuoteChar = '"';
 
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
@@ -51,6 +51,7 @@ public final class Constants {
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 	public static final String MISSING_SUFFIX = "_MISSING";
+	public static final String COLLECTED = "COLLECTED";
 
 
 	// ----- Paradata Variables Names
@@ -214,5 +215,8 @@ public final class Constants {
 	public static void setCsvOutputQuoteChar(char csvOutputQuoteChar) {
 		Constants.csvOutputQuoteChar = csvOutputQuoteChar;
 	}
-		
+
+	public static char getCsvOutputQuoteChar() {
+		return csvOutputQuoteChar;
+	}
 }

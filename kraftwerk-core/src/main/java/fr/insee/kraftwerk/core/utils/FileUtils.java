@@ -64,7 +64,9 @@ public class FileUtils {
 				log.error("Can't delete file {}, IOException : {}", fileWithTime, e.getMessage());
 			}
 		}
-		file.renameTo(file2);
+		if(!file.renameTo(file2)){
+			log.error("Can't rename file {} to {}", file.getName(), file2.getName());
+		}
 	}
 
 	public static void moveInputFiles(UserInputs userInputs) throws KraftwerkException {

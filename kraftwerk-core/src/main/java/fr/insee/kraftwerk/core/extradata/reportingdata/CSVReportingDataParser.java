@@ -73,7 +73,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 		try {
 			parsedDate = dateFormat.parse(rowTimestamp);
 		} catch (ParseException e1) {
-			log.error("Parsinng error : {}", e1.getMessage());
+			log.error("Parsing error : {}", e1.getMessage());
 		}
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}
