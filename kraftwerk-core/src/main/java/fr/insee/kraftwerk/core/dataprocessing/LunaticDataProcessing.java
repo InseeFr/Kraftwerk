@@ -18,7 +18,7 @@ public class LunaticDataProcessing extends UnimodalDataProcessing {
     }
 
     /**
-     * There is no VTL automated data processing for data that comes from Lunatic at the moment.
+     * There is only the removal of duplicates as VTL automated data processing for data that comes from Lunatic at the moment.
      *
      * @param bindingName The name of the dataset in the bindings.
      *
@@ -26,7 +26,12 @@ public class LunaticDataProcessing extends UnimodalDataProcessing {
      */
     @Override
     public VtlScript generateVtlInstructions(String bindingName) {
-        return new VtlScript();
+        // Write the VTL instructions
+        VtlScript vtlScript = new VtlScript();
+
+        // To delete duplicates, to be eventually reviewed with a better VTL solution
+        vtlScript.add(String.format("%1$s := union(%1$s,%1$s);",bindingName));
+        return vtlScript;
     }
 
 }

@@ -36,7 +36,7 @@ public class CsvTableWriter {
 	private static CSVWriter setCSVWriter(Path filePath) throws IOException {
 		File file = filePath.toFile();
 		FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
-		return new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.csvOutputQuoteChar,
+		return new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.getCsvOutputQuoteChar(),
 				ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END);
 	}
 

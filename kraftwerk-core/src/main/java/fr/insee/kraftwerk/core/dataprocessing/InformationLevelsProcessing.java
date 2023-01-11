@@ -64,6 +64,9 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 			vtlScript.add(groupInstructions.toString());
 
+			// To delete duplicates
+			vtlScript.add(String.format("%1$s := union(%1$s,%1$s);",groupName));
+
 			// Then rename fully qualified names into simple names
 			for (int j=0; j< groupVariableNames.size(); j++) {
 				String variableName = groupVariableNames.get(j);

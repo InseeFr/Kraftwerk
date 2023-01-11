@@ -93,7 +93,7 @@ public class UcqVariable extends Variable {
 				.collect(Collectors.toList());
 		if (res.size() == 1) {
 			return res.get(0);
-		} else if (res.size() == 0) {
+		} else if (res.isEmpty()) {
 			log.debug(String.format("Value \"%s\" not registered in UCQ named \"%s\".", value, name));
 			return null;
 		} else {
@@ -118,7 +118,7 @@ public class UcqVariable extends Variable {
 				.filter(ucqModality -> ucqModality.getVariableName().equals(modalityName)).collect(Collectors.toList());
 		if (res.size() == 1) {
 			return res.get(0);
-		} else if (res.size() == 0) {
+		} else if (res.isEmpty()) {
 			log.debug(String.format("Modality name \"%s\" not registered in UCQ named \"%s\".", modalityName, name));
 			return null;
 		} else {

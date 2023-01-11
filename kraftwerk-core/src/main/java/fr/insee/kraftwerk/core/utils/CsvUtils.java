@@ -46,7 +46,7 @@ public class CsvUtils {
     public static CSVWriter getWriter(String filePath) throws IOException {
         return new CSVWriter(new FileWriter(filePath, StandardCharsets.UTF_8),
                 Constants.CSV_OUTPUTS_SEPARATOR,
-                Constants.csvOutputQuoteChar,
+                Constants.getCsvOutputQuoteChar(),
                 ICSVWriter.DEFAULT_ESCAPE_CHARACTER,
                 ICSVWriter.DEFAULT_LINE_END);
     }

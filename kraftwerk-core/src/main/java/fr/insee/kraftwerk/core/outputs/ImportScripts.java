@@ -47,10 +47,10 @@ public class ImportScripts {
 
 			script.append("header=TRUE, ").append(END_LINE);
 			// quote parameter
-			if (Constants.csvOutputQuoteChar == '"') {
-				script.append(String.format("quote='%s')", Constants.csvOutputQuoteChar));
+			if (Constants.getCsvOutputQuoteChar() == '"') {
+				script.append(String.format("quote='%s')", Constants.getCsvOutputQuoteChar()));
 			} else {
-				script.append(String.format("quote=\"%s\")", Constants.csvOutputQuoteChar));
+				script.append(String.format("quote=\"%s\")", Constants.getCsvOutputQuoteChar()));
 			}
 
 			script.append(END_LINE).append(END_LINE);
