@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
+import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 
 class UserInputsTest {
@@ -34,7 +36,7 @@ class UserInputsTest {
 		assertNull(modeInputs.getReportingDataFile());
 		assertNull(modeInputs.getModeVtlFile());
 		//
-		assertEquals(userInputs.getMultimodeDatasetName(), "MULTIMODE");
+		assertEquals( "MULTIMODE", userInputs.getMultimodeDatasetName());
 		assertNull(userInputs.getVtlReconciliationFile());
 		assertNull(userInputs.getVtlTransformationsFile());
 		assertNull(userInputs.getVtlInformationLevelsFile());
@@ -79,7 +81,7 @@ class UserInputsTest {
 	}
 
 	@Test
-	public void testReadInvalidUserInput_wrongFieldNames() {
+	void testReadInvalidUserInput_wrongFieldNames() {
 		assertThrows(MissingMandatoryFieldException.class, () -> {
 			new UserInputs(
 					inputSamplesDirectory.resolve("inputs_invalid_field_names.json"),
@@ -89,7 +91,7 @@ class UserInputsTest {
 
 	@Test
 	@Disabled("Management of malformed user input file not implemented.") // TODO: see UserInputs
-	public void testReadMalformedInput() {
+	void testReadMalformedInput() {
 		new UserInputs(
 				inputSamplesDirectory.resolve("inputs_invalid_malformed.json"),
 				inputSamplesDirectory);

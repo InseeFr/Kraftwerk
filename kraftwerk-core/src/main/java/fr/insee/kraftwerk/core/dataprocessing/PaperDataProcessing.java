@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.util.List;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.UcqModality;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;

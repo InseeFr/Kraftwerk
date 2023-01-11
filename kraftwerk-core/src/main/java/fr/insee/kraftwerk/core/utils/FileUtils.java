@@ -189,4 +189,18 @@ public class FileUtils {
 				.collect(Collectors.toList());
 	}
 	
+	public static Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
+		createDirectoryIfNotExist(FileUtils.transformToTemp(userInputs.getInputDirectory()));
+		return FileUtils.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
+	}
+	
+	public static void createDirectoryIfNotExist(Path path) {
+		try {
+			Files.createDirectories(path);
+			log.info(String.format("Created folder: %s", path.toFile().getAbsolutePath()));
+		} catch (IOException e) {
+			log.error("Permission refused to create folder: " + path.getParent(), e);
+		}
+	}
+	
 }

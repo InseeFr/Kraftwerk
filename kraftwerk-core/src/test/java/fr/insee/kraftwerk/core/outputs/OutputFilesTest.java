@@ -57,7 +57,7 @@ class OutputFilesTest {
 			vtlBindings.put("LOOP", fooDataset);
 			vtlBindings.put("FROM_USER", fooDataset);
 			//
-			outputFiles = new OutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs);
+			outputFiles = new OutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testUserInputs.getMultimodeDatasetName());
 		});
 	}
 

@@ -3,24 +3,15 @@ package fr.insee.kraftwerk.api;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-
-import fr.insee.kraftwerk.core.metadata.*;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,34 +20,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
-import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
-import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
-import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
-import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
-import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.outputs.OutputFiles;
-import fr.insee.kraftwerk.core.parsers.DataFormat;
-import fr.insee.kraftwerk.core.parsers.DataParser;
-import fr.insee.kraftwerk.core.parsers.DataParserManager;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
@@ -69,8 +45,6 @@ public class LauncherService {
 
 	private static final String INDIRECTORY_EXAMPLE = "LOG-2021-x12-web";
 	private static final String JSON = ".json";
-	VtlExecute vtlExecute = new VtlExecute();
-	List<ErrorVtlTransformation> errors = new ArrayList<>();
 	
 	@Value("${fr.insee.postcollecte.csv.output.quote}")
 	private String csvOutputsQuoteChar;
@@ -78,12 +52,14 @@ public class LauncherService {
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
 	
+	private ControlInputSequence controlInputSequence ;
+	
 	@PostConstruct
 	public void initializeWithProperties() {
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
-
+		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
 	@PutMapping(value = "/main")
@@ -95,32 +71,37 @@ public class LauncherService {
 		/* Step 1 : Init */
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
 		/* Step 2 : unimodal data */
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			try {
-				buildVtlBindings(userInputs, dataMode, vtlBindings);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
-			unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
+			UnimodalSequence unimodal = new UnimodalSequence();
+			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
 		}
 
 		/* Step 3 : multimodal VTL data processing */
-		multimodalProcessing(userInputs, vtlBindings, errors);
+		MultimodalSequence multimodalSequence = new MultimodalSequence();
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors);
 
 		/* Step 4 : Write output files */
-		writeOutputFiles(inDirectory, vtlBindings);
-		writeErrorsFile(inDirectory);
+		WriterSequence writerSequence = new WriterSequence();
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
+		writeErrorsFile(inDirectory, errors);
 
 		/* Step 4.3- 4.4 : Archive */
 		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
@@ -128,15 +109,9 @@ public class LauncherService {
 		return ResponseEntity.ok(campaignName);
 	}
 
-	private void writeErrorsFile(Path inDirectory) {
+	private void writeErrorsFile(Path inDirectory, List<ErrorVtlTransformation> errors) {
 		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
-		// Create folder if doesn't exist
-		try {
-			Files.createDirectories(tempOutputPath.getParent());
-			log.info(String.format("Created folder: %s", tempOutputPath.getParent().toFile().getAbsolutePath()));
-		} catch (IOException e) {
-			log.error("Permission refused to create output folder: " + tempOutputPath.getParent(), e);
-		}
+		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
 		if (!errors.isEmpty()) {
@@ -161,22 +136,26 @@ public class LauncherService {
 		//Read data files
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		
 		//Process
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+
+
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
 			try {
-				buildVtlBindings(userInputs, dataMode, vtlBindings);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+			vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -194,55 +173,28 @@ public class LauncherService {
 		//Read data files
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 		
 		//Process
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		try {
-			buildVtlBindings(userInputs, dataMode, vtlBindings);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
-		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
 	}
 
-
-	private void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step)  {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
-		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
-	}
-	
-
-	private void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings) throws NullException {
-		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
-		SurveyRawData data = new SurveyRawData();
-
-		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
-		data.setVariablesMap(getMetadata(userInputs, dataMode));
-
-		/* Step 2.1 : Fill the data object with the survey answers file */
-		data.setDataFilePath(modeInputs.getDataFile());
-		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
-		parser.parseSurveyData(modeInputs.getDataFile());
-
-		/* Step 2.2 : Get paradata for the survey */
-		parseParadata(modeInputs, data);
-
-		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(modeInputs, data);
-
-		/* Step 2.4a : Convert data object to a VTL Dataset */
-		data.setDataMode(dataMode);
-		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
-	}
 
 
 	@PutMapping(value = "/unimodalProcessing")
@@ -254,119 +206,31 @@ public class LauncherService {
 		//Read data in JSON file
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
-		readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
-		//Process
-		unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
-		
-		writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
-		writeErrorsFile(inDirectory);
+		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
+		
+		//Process
+		UnimodalSequence unimodal = new UnimodalSequence();
+		unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
+		
+		//Write technical outputs
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
+		writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
-
 	}
 	
-	private void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, List<ErrorVtlTransformation> errors) {
-		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
-		VariablesMap metadata = getMetadata(userInputs, dataMode);
-		String vtlGenerate;
-		
-		/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
-		if (modeInputs.getLunaticFile() != null) {
-			CalculatedVariables calculatedVariables = LunaticReader
-					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
-			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables,
-					metadata);
-			vtlGenerate = calculatedProcessing.applyVtlTransformations(dataMode, null, errors);
-			TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CalculatedProcessing",dataMode), vtlGenerate);
-
-		} else {
-			log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
-			if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
-					|| modeInputs.getDataFormat() == DataFormat.LUNATIC_JSON) {
-				log.warn(String.format(
-						"Calculated variables for lunatic data of mode \"%s\" will not be evaluated.",
-						dataMode));
-			}
-		}
-
-		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null, errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "GroupProcessing",dataMode), vtlGenerate);
-
-
-		/* Step 2.5 : Apply mode-specific VTL transformations */
-		UnimodalDataProcessing dataProcessing = DataProcessingManager
-				.getProcessingClass(modeInputs.getDataFormat(), vtlBindings, metadata);
-		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, dataProcessing.getStepName(),dataMode), vtlGenerate);
-		
-	}
 	
-	private VariablesMap getMetadata(UserInputs userInputs, String dataMode){
-		Map<String, VariablesMap> metadataVariables = getMetadata(userInputs);
-		return metadataVariables.get(dataMode);
-	}
-
-	
-	private Map<String, VariablesMap> getMetadata(UserInputs userInputs){
-		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
-		userInputs.getModeInputsMap().forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
-		return metadataVariables;
-	}
-	
-	private void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
-		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
-		// Step 2 : we add the "_MISSING" variables from lunatic file if they exist
-		if (modeInputs.getLunaticFile() != null) {
-			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile());
-			for (String missingVar : missingVars) {
-				String correspondingVariableName = missingVar.replace(Constants.MISSING_SUFFIX, "");
-				Group group;
-				if (variables.hasVariable(correspondingVariableName)) {
-					group = variables.getVariable(correspondingVariableName).getGroup();
-				} else {
-					group = variables.getGroup(variables.getGroupNames().get(0));
-					// No information from the DDI about variable
-					// It has been arbitrarily associated with the root group
-				}
-				variables.putVariable(new Variable(missingVar, group, VariableType.STRING));
-			}
-		}
-		metadataVariables.put(dataMode, variables);
-	}
-
-	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
-		Path paraDataFolder = modeInputs.getParadataFolder();
-		if (paraDataFolder != null) {
-			ParadataParser paraDataParser = new ParadataParser();
-			Paradata paraData = new Paradata(paraDataFolder);
-			paraDataParser.parseParadata(paraData, data);
-		}
-	}
-
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
-		Path reportingDataFile = modeInputs.getReportingDataFile();
-		if (reportingDataFile != null) {
-			ReportingData reportingData = new ReportingData(reportingDataFile);
-			if (reportingDataFile.toString().contains(".xml")) {
-				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
-				xMLReportingDataParser.parseReportingData(reportingData, data);
-
-			} else if (reportingDataFile.toString().contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-					cSVReportingDataParser.parseReportingData(reportingData, data);
-			}
-		}
-	}
 
 	@PutMapping(value = "/multimodalProcessing")
 	@Operation(operationId = "multimodalProcessing", summary = "${summary.multimodalProcessing}", description = "${description.multimodalProcessing}")
@@ -376,70 +240,36 @@ public class LauncherService {
 		//Read data in JSON file
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		List<ErrorVtlTransformation> errors = new ArrayList<>();
+
+
+		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence();
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
+			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
 		//Process
-		multimodalProcessing(userInputs, vtlBindings, errors);
+		MultimodalSequence multimodalSequence = new MultimodalSequence();
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors);
 
-
+		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
-			writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
+			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-
-		writeErrorsFile(inDirectory);
+		writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}
 	
-	private void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<ErrorVtlTransformation> errors) {
-		String multimodeDatasetName = userInputs.getMultimodeDatasetName();
-
-		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
-		String vtlGenerate = reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlReconciliationFile(), errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate);
-
-		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, getMetadata(userInputs));
-		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate);
-
-		/* Step 3.2 : treatments on the multimodal dataset */
-		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
-		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlTransformationsFile(), errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
-
-		/* Step 3.3 : Create datasets on each information level (i.e. each group) */
-		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
-		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
-				userInputs.getVtlInformationLevelsFile(), errors);
-		TextFileWriter.writeFile(getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
-
-	}
-
-	private Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
-    	// Create folder if doesn't exist
-		try {
-			Files.createDirectories(FileUtils.transformToTemp(userInputs.getInputDirectory()));
-			log.info(String.format("Created folder: %s", FileUtils.transformToTemp(userInputs.getInputDirectory()).toFile().getAbsolutePath()));
-		} catch (IOException e) {
-			log.error("Permission refused to create output folder: " + FileUtils.transformToTemp(userInputs.getInputDirectory()).getParent(), e);
-		}
-		return FileUtils.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
-	}
 
 	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
@@ -448,7 +278,7 @@ public class LauncherService {
 			) {
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -460,24 +290,17 @@ public class LauncherService {
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
-			vtlExecute.putVtlDataset(pathBindings, bindingName, vtlBindings);
+			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
-
-		writeOutputFiles(inDirectory, vtlBindings);
+		WriterSequence writerSequence = new WriterSequence();
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}
 
-	private void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings) {
-		Path outDirectory = FileUtils.transformToOut(inDirectory);
-		UserInputs userInputs = getUserInputs(inDirectory);
-		/* Step 4.1 : write csv output tables */
-		OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings, userInputs);
-		outputFiles.writeOutputCsvTables();
 
-		/* Step 4.2 : write scripts to import csv tables in several languages */
-		outputFiles.writeImportScripts(getMetadata(userInputs));
-	}
 	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
@@ -486,7 +309,7 @@ public class LauncherService {
 			{
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -496,7 +319,7 @@ public class LauncherService {
 
 		/* Step 4.4 : move differential data to a secondary folder */
 		try {
-			FileUtils.moveInputFiles(getUserInputs(inDirectory));
+			FileUtils.moveInputFiles(controlInputSequence.getUserInputs(inDirectory));
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -512,31 +335,10 @@ public class LauncherService {
 
 	}
 	
-	private UserInputs getUserInputs(Path inDirectory) {
-		return new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
-	}
-	
-	private Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
-		Path inDirectory = Paths.get(inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(HttpStatus.BAD_REQUEST.value(), "Configuration file not found");
-		return inDirectory;
-	}
-	
-	private boolean verifyInDirectory(Path inDirectory) {
-		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-		if (Files.exists(userInputFile)) {
-			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
-		} else {
-			log.info("No configuration file found in campaign folder: " + inDirectory);
-			return false;
-		}
-		return true;
-	}
 
-	private void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
-		String pathBinding = path + File.separator + bindingName + "_" + previousStep.getStepLabel() +JSON;
-		vtlExecute.putVtlDataset(pathBinding, bindingName, vtlBindings);
-	}
+	
+
+
+
 
 }

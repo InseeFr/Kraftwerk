@@ -1,4 +1,6 @@
-package fr.insee.kraftwerk.core.inputs;
+package fr.insee.kraftwerk.core.exceptions;
+
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
 
 public class UnknownDataFormatException extends IllegalArgumentException {
 
