@@ -3,9 +3,7 @@ package fr.insee.kraftwerk.api;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +12,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +25,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
@@ -54,11 +52,14 @@ public class LauncherService {
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
 	
+	private ControlInputSequence controlInputSequence ;
+	
 	@PostConstruct
 	public void initializeWithProperties() {
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
+		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
 	@PutMapping(value = "/main")
@@ -70,14 +71,14 @@ public class LauncherService {
 		/* Step 1 : Init */
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
@@ -135,11 +136,11 @@ public class LauncherService {
 		//Read data files
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
@@ -172,11 +173,11 @@ public class LauncherService {
 		//Read data files
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 		
 		//Process
@@ -205,11 +206,11 @@ public class LauncherService {
 		//Read data in JSON file
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		VtlBindings vtlBindings = new VtlBindings();
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
@@ -239,11 +240,11 @@ public class LauncherService {
 		//Read data in JSON file
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
 
@@ -277,7 +278,7 @@ public class LauncherService {
 			) {
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -293,7 +294,7 @@ public class LauncherService {
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
-		UserInputs userInputs = getUserInputs(inDirectory);
+		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
 		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -308,7 +309,7 @@ public class LauncherService {
 			{
 		Path inDirectory;
 		try {
-			inDirectory = getInDirectory(inDirectoryParam);
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -318,7 +319,7 @@ public class LauncherService {
 
 		/* Step 4.4 : move differential data to a secondary folder */
 		try {
-			FileUtils.moveInputFiles(getUserInputs(inDirectory));
+			FileUtils.moveInputFiles(controlInputSequence.getUserInputs(inDirectory));
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -334,27 +335,9 @@ public class LauncherService {
 
 	}
 	
-	private UserInputs getUserInputs(Path inDirectory) {
-		return new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
-	}
+
 	
-	private Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
-		Path inDirectory = Paths.get(inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(HttpStatus.BAD_REQUEST.value(), "Configuration file not found");
-		return inDirectory;
-	}
-	
-	private boolean verifyInDirectory(Path inDirectory) {
-		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-		if (Files.exists(userInputFile)) {
-			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
-		} else {
-			log.info("No configuration file found in campaign folder: " + inDirectory);
-			return false;
-		}
-		return true;
-	}
+
 
 
 
