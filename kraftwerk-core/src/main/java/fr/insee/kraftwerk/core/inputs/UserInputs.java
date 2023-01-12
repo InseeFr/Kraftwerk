@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.core.inputs;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,20 +60,22 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = readField(fileNode, "data_mode");
-				Path dataFile = convertToPath(readField(fileNode, "data_file"));
+				String dataFolder = readField(fileNode, "data_file");
+				String paradataFolder = readField(fileNode, "paradata_folder");
+				String reportingFolder = readField(fileNode, "reporting_data_file");
+				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : convertToPath(dataFolder);
 				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
 				Path lunaticFile = convertToPath(readField(fileNode, "lunatic_file"));
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataFolder = convertToPath(readField(fileNode, "paradata_folder"));
-				Path reportingDataFile = convertToPath(readField(fileNode, "reporting_data_file"));
+				Path paradataPath = (new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : convertToPath(paradataFolder);
+				Path reportingDataFile = (new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : convertToPath(reportingFolder);
 				Path vtlFile = convertToPath(readField(fileNode, "mode_specifications"));
-				//
 				ModeInputs modeInputs = new ModeInputs();
-				modeInputs.setDataFile(dataFile);
+				modeInputs.setDataFile(dataPath);
 				modeInputs.setDdiUrl(ddiFile);
 				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
-				modeInputs.setParadataFolder(paradataFolder);
+				modeInputs.setParadataFolder(paradataPath);
 				modeInputs.setReportingDataFile(reportingDataFile);
 				modeInputs.setModeVtlFile(vtlFile);
 				modeInputsMap.put(dataMode, modeInputs);
@@ -123,7 +126,14 @@ public class UserInputs {
 		} else {
 			return null;
 		}
+	}
 
+	private Path convertToUserPath(String userField) {
+		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
+			return Paths.get(userField);
+		} else {
+			return null;
+		}
 	}
 
 	private URL convertToUrl(String userField) {
