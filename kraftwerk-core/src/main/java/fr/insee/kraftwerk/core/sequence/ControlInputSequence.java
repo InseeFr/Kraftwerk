@@ -19,7 +19,7 @@ public class ControlInputSequence {
 		this.defaultDirectory = defaultDirectory;
 	}
 
-	public UserInputs getUserInputs(Path inDirectory) {
+	public UserInputs getUserInputs(Path inDirectory) throws KraftwerkException {
 		return new UserInputs(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
 	}
 

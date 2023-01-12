@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
@@ -41,7 +42,7 @@ public class UserInputs {
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
 			"data_format", "multimode_dataset_name");
 
-	public UserInputs(Path userConfigFile, Path inputDirectory) {
+	public UserInputs(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		this.userInputFile = userConfigFile;
 		this.inputDirectory = inputDirectory;
 		readUserInputs();
@@ -51,7 +52,7 @@ public class UserInputs {
 		return modeInputsMap.get(modeName);
 	}
 
-	private void readUserInputs() throws UnknownDataFormatException, MissingMandatoryFieldException {
+	private void readUserInputs() throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
 
 		try {
 			JsonNode userInputs = JsonFileReader.read(userInputFile);
@@ -88,6 +89,8 @@ public class UserInputs {
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
+		} catch (KraftwerkException e) {
+			throw e;
 		}
 	}
 
@@ -120,9 +123,13 @@ public class UserInputs {
 		}
 	}
 
-	private Path convertToPath(String userField) {
+	private Path convertToPath(String userField) throws KraftwerkException {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
-			return inputDirectory.resolve(userField);
+			Path inputPath = inputDirectory.resolve(userField);
+			if (!new File(inputPath.toUri()).exists()) {
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist.", userField));
+			}
+			return inputPath;
 		} else {
 			return null;
 		}
