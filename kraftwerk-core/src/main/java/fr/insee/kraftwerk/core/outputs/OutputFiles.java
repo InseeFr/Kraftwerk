@@ -1,24 +1,21 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to manage the writing of output tables.
  */
-@Slf4j
 public class OutputFiles {
 
 
@@ -39,11 +36,11 @@ public class OutputFiles {
 	 * @param userInputs   Used to get the campaign name and to filter intermediate
 	 *                     datasets that we don't want to output.
 	 */
-	public OutputFiles(Path outDirectory, VtlBindings vtlBindings, UserInputs userInputs) {
+	public OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, String multimodeDatasetNames) {
 		//
 		this.vtlBindings = vtlBindings;
 		//
-		setOutputDatasetNames(userInputs);
+		setOutputDatasetNames(modes, multimodeDatasetNames);
 		//
 		outputFolder = outDirectory;
 		//
@@ -52,22 +49,17 @@ public class OutputFiles {
 
 	/** Create output folder if doesn't exist. */
 	private void createOutputFolder() {
-		try {
-			Files.createDirectories(outputFolder);
-			log.info(String.format("Created output folder: %s", outputFolder.toFile().getAbsolutePath()));
-		} catch (IOException e) {
-			log.error("Permission refused to create output folder: " + outputFolder, e);
-		}
+		FileUtils.createDirectoryIfNotExist(outputFolder);
 	}
 
 	/** See getOutputDatasetNames doc. */
-	private void setOutputDatasetNames(UserInputs userInputs) {
-		Set<String> unwantedDatasets = new HashSet<>(userInputs.getModes());
-		for (String modeName : userInputs.getModes()) { // NOTE: deprecated code since clean up processing class
+	private void setOutputDatasetNames(List<String> modes, String multimodeDatasetNames) {
+		Set<String> unwantedDatasets = new HashSet<>(modes);
+		for (String modeName : modes) { // NOTE: deprecated code since clean up processing class
 			unwantedDatasets.add(modeName);
 			unwantedDatasets.add(modeName + "_keep"); // datasets created during Reconciliation step
 		}
-		unwantedDatasets.add(userInputs.getMultimodeDatasetName());
+		unwantedDatasets.add(multimodeDatasetNames);
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			if (!unwantedDatasets.contains(datasetName)) {
 				datasetToCreate.add(datasetName);

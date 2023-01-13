@@ -12,6 +12,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
+import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -81,8 +83,8 @@ public class UserInputs {
 			vtlTransformationsFile = convertToPath(readField(userInputs, "transformation_specifications"));
 			vtlInformationLevelsFile = convertToPath(readField(userInputs, "information_levels_specifications"));
 
-		} catch (IOException e) { // TODO: split file reading and json parsing to throw IllegalArgumentException if the json file is malformed
-			log.error("Unable to read user input file: " + userInputFile, e);
+		} catch (IOException e) {
+			log.error("Unable to read user input file: {} , {}", userInputFile, e);
 		}
 	}
 
