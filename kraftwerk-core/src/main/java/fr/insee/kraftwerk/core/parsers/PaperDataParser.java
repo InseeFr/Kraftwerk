@@ -8,26 +8,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.rawdata.GroupInstance;
-import fr.insee.kraftwerk.core.metadata.PaperUcq;
-import fr.insee.kraftwerk.core.metadata.UcqVariable;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.rawdata.GroupInstance;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of DataParser to read data collected in paper format.
  * Variables which are not in the DDI are ignored.
+ * Parser identify QCU variables
  */
 
 @Slf4j

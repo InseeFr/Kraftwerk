@@ -18,6 +18,10 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 
+/**
+ * Parser add FILTER_RESULT to variablesMap
+ *
+ */
 @Slf4j
 public class LunaticXmlDataParser extends DataParser {
 
