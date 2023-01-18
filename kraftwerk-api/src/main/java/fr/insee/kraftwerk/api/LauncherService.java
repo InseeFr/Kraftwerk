@@ -35,12 +35,18 @@ import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 
 
 
 @Slf4j
 @RestController
+@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Success"),
+		@ApiResponse(responseCode = "400", description = "Bad Request"),
+		@ApiResponse(responseCode = "500", description = "Internal server error") })
 public class LauncherService {
 
 	private static final String INDIRECTORY_EXAMPLE = "LOG-2021-x12-web";
@@ -78,7 +84,12 @@ public class LauncherService {
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		VtlBindings vtlBindings = new VtlBindings();
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
@@ -140,7 +151,12 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
@@ -177,7 +193,12 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		VtlBindings vtlBindings = new VtlBindings();
 		
 		//Process
@@ -210,7 +231,12 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		VtlBindings vtlBindings = new VtlBindings();
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
@@ -244,7 +270,12 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 
 
@@ -294,7 +325,12 @@ public class LauncherService {
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
-		UserInputs userInputs = controlInputSequence.getUserInputs(inDirectory);
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
 		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
 		return ResponseEntity.ok(inDirectoryParam);
 

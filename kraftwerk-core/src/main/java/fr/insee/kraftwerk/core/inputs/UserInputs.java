@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.core.inputs;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
@@ -40,7 +42,7 @@ public class UserInputs {
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
 			"data_format", "multimode_dataset_name");
 
-	public UserInputs(Path userConfigFile, Path inputDirectory) {
+	public UserInputs(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		this.userInputFile = userConfigFile;
 		this.inputDirectory = inputDirectory;
 		readUserInputs();
@@ -50,7 +52,7 @@ public class UserInputs {
 		return modeInputsMap.get(modeName);
 	}
 
-	private void readUserInputs() throws UnknownDataFormatException, MissingMandatoryFieldException {
+	private void readUserInputs() throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
 
 		try {
 			JsonNode userInputs = JsonFileReader.read(userInputFile);
@@ -59,20 +61,22 @@ public class UserInputs {
 			for (JsonNode fileNode : filesNode) {
 				//
 				String dataMode = readField(fileNode, "data_mode");
-				Path dataFile = convertToPath(readField(fileNode, "data_file"));
+				String dataFolder = readField(fileNode, "data_file");
+				String paradataFolder = readField(fileNode, "paradata_folder");
+				String reportingFolder = readField(fileNode, "reporting_data_file");
+				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : convertToPath(dataFolder);
 				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
 				Path lunaticFile = convertToPath(readField(fileNode, "lunatic_file"));
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataFolder = convertToPath(readField(fileNode, "paradata_folder"));
-				Path reportingDataFile = convertToPath(readField(fileNode, "reporting_data_file"));
+				Path paradataPath = (new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : convertToPath(paradataFolder);
+				Path reportingDataFile = (new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : convertToPath(reportingFolder);
 				Path vtlFile = convertToPath(readField(fileNode, "mode_specifications"));
-				//
 				ModeInputs modeInputs = new ModeInputs();
-				modeInputs.setDataFile(dataFile);
+				modeInputs.setDataFile(dataPath);
 				modeInputs.setDdiUrl(ddiFile);
 				modeInputs.setLunaticFile(lunaticFile);
 				modeInputs.setDataFormat(dataFormat);
-				modeInputs.setParadataFolder(paradataFolder);
+				modeInputs.setParadataFolder(paradataPath);
 				modeInputs.setReportingDataFile(reportingDataFile);
 				modeInputs.setModeVtlFile(vtlFile);
 				modeInputsMap.put(dataMode, modeInputs);
@@ -85,6 +89,8 @@ public class UserInputs {
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
+		} catch (KraftwerkException e) {
+			throw e;
 		}
 	}
 
@@ -117,13 +123,24 @@ public class UserInputs {
 		}
 	}
 
-	private Path convertToPath(String userField) {
+	private Path convertToPath(String userField) throws KraftwerkException {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
-			return inputDirectory.resolve(userField);
+			Path inputPath = inputDirectory.resolve(userField);
+			if (!new File(inputPath.toUri()).exists()) {
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist.", userField));
+			}
+			return inputPath;
 		} else {
 			return null;
 		}
+	}
 
+	private Path convertToUserPath(String userField) {
+		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
+			return Paths.get(userField);
+		} else {
+			return null;
+		}
 	}
 
 	private URL convertToUrl(String userField) {
