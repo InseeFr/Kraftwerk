@@ -12,8 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fr.insee.kraftwerk.core.Constants.ENO_VARIABLES;
-import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
+import static fr.insee.kraftwerk.core.Constants.*;
 import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 
 @Slf4j
@@ -35,7 +34,7 @@ public class LunaticReader {
                 if (variableNode.get("variableType").asText().equals("CALCULATED")) {
                     CalculatedVariable calculatedVariable = new CalculatedVariable(
                             variableNode.get("name").asText(),
-                            variableNode.get("expression").asText());
+                            variableNode.get("expression").get("value").asText());
                     JsonNode dependantVariablesNode = variableNode.get("bindingDependencies");
                     if (dependantVariablesNode != null) {
                         dependantVariablesNode.forEach(name ->
@@ -68,6 +67,27 @@ public class LunaticReader {
             JsonNode variablesNode = rootNode.get("variables");
             variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
             return variables.stream().filter(var-> var.endsWith(MISSING_SUFFIX) || varsEno.contains(var)).collect(Collectors.toList());
+
+        } catch (IOException e) {
+            log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Read the lunatic file to get the names of the FILTER_RESULT variables which are not present in the DDI
+     *
+     * @param lunaticFile Path to a lunatic questionnaire file.
+     * @return A List of String.
+     */
+    public static List<String> getFilterResultFromLunatic(Path lunaticFile){
+        try {
+            JsonNode rootNode = JsonFileReader.read(lunaticFile);
+            List<String> variables = new ArrayList<>();
+
+            JsonNode variablesNode = rootNode.get("variables");
+            variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
+            return variables.stream().filter(var-> var.startsWith(FILTER_RESULT_PREFIX)).collect(Collectors.toList());
 
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);

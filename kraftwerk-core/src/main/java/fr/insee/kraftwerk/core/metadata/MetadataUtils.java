@@ -7,7 +7,10 @@ import java.util.Map;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.bcel.classfile.Constant;
 
+@Slf4j
 public class MetadataUtils {
 
 	
@@ -22,28 +25,42 @@ public class MetadataUtils {
 		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
 		return metadataVariables;
 	}
-	
-	
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
 		// Step 1 : we add the variables read in the DDI
 		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
-		// Step 2 : we add the "_MISSING" variables from lunatic file if they exist
+		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
+			// First we add the collected _MISSING variables
 			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile());
 			for (String missingVar : missingVars) {
-				String correspondingVariableName = missingVar.replace(Constants.MISSING_SUFFIX, "");
-				Group group;
-				if (variables.hasVariable(correspondingVariableName)) {
-					group = variables.getVariable(correspondingVariableName).getGroup();
-				} else {
-					group = variables.getGroup(variables.getGroupNames().get(0));
-					// No information from the DDI about variable
-					// It has been arbitrarily associated with the root group
-				}
-				variables.putVariable(new Variable(missingVar, group, VariableType.STRING));
+				addLunaticVariable(variables, missingVar, Constants.MISSING_SUFFIX, VariableType.STRING);
+			}
+			// Then we add calculated FILTER_RESULT_ variables
+			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputs.getLunaticFile());
+			for (String filterResult : filterResults) {
+				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
 		}
 		metadataVariables.put(dataMode, variables);
+	}
+
+	private static void addLunaticVariable(VariablesMap variables, String missingVar, String prefixOrSuffix, VariableType varType) {
+		String correspondingVariableName = missingVar.replace(prefixOrSuffix, "");
+		Group group;
+		if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
+			group = variables.getVariable(correspondingVariableName).getGroup();
+		} else if (variables.isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
+			group = variables.getQuestionGridGroup(correspondingVariableName);
+		} else {
+			group = variables.getGroup(variables.getGroupNames().get(0));
+			log.warn(String.format(
+					"No information from the DDI about question named \"%s\".",
+					correspondingVariableName));
+			log.warn(String.format(
+					"\"%s\" has been arbitrarily associated with group \"%s\".",
+					missingVar, group.getName()));
+		}
+		variables.putVariable(new Variable(missingVar, group, varType));
 	}
 }
