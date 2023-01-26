@@ -18,7 +18,6 @@ public class MetadataUtils {
 		Map<String, VariablesMap> metadataVariables = getMetadata(userInputs.getModeInputsMap());
 		return metadataVariables.get(dataMode);
 	}
-
 	
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
@@ -45,7 +44,7 @@ public class MetadataUtils {
 		metadataVariables.put(dataMode, variables);
 	}
 
-	private static void addLunaticVariable(VariablesMap variables, String missingVar, String prefixOrSuffix, VariableType varType) {
+	public static void addLunaticVariable(VariablesMap variables, String missingVar, String prefixOrSuffix, VariableType varType) {
 		String correspondingVariableName = missingVar.replace(prefixOrSuffix, "");
 		Group group;
 		if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
