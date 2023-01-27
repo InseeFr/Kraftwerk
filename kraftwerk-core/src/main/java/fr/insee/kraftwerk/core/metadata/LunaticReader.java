@@ -27,14 +27,18 @@ public class LunaticReader {
         try {
             JsonNode rootNode = JsonFileReader.read(lunaticFile);
 
+            String lunaticModelVersion = rootNode.get("lunaticModelVersion").toString();
+            boolean isLunaticV2 = JsonFileReader.compareVersions(lunaticModelVersion.replace("\"",""),"2.3.0") > 0 ;
+
             CalculatedVariables calculatedVariables = new CalculatedVariables();
 
             JsonNode variablesNode = rootNode.get("variables");
             variablesNode.forEach(variableNode -> {
                 if (variableNode.get("variableType").asText().equals("CALCULATED")) {
+                    String formula =  isLunaticV2 ? variableNode.get("expression").get("value").asText(): variableNode.get("expression").asText();
                     CalculatedVariable calculatedVariable = new CalculatedVariable(
                             variableNode.get("name").asText(),
-                            variableNode.get("expression").get("value").asText());
+                            formula);
                     JsonNode dependantVariablesNode = variableNode.get("bindingDependencies");
                     if (dependantVariablesNode != null) {
                         dependantVariablesNode.forEach(name ->
