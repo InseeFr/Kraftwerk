@@ -17,7 +17,7 @@
 	  "data_file": "sample_files_to_get/data.xml",
 	  "DDI_file": "sample_files_to_get/ddi_web.xml",
 	  "data_format": "LUNATIC_XML",
-	  "paradata_folder": "sample_files_to_get/paradata",
+	  "paradata_folder": "sample_files_to_get/paradata.json",
 	  "reporting_data_file": "sample_files_to_get/moog_data.csv",
 	  "mode_specifications": "sample_files_to_get/web.vtl"
   	},
