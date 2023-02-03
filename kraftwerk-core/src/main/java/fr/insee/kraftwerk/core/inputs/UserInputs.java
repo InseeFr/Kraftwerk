@@ -68,8 +68,8 @@ public class UserInputs {
 				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
 				Path lunaticFile = convertToPath(readField(fileNode, "lunatic_file"));
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataPath = (new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : convertToPath(paradataFolder);
-				Path reportingDataFile = (new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : convertToPath(reportingFolder);
+				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : convertToPath(paradataFolder);
+				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : convertToPath(reportingFolder);
 				Path vtlFile = convertToPath(readField(fileNode, "mode_specifications"));
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataPath);

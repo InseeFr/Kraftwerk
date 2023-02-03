@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Path;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class UserInputsTest {
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 
 	@Test
-	void testReadValidUserInput_singleMode() {
+	void testReadValidUserInput_singleMode() throws KraftwerkException {
 		UserInputs userInputs = new UserInputs(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory);
@@ -50,7 +51,7 @@ class UserInputsTest {
 	}
 
 	@Test
-	void testReadValidUserInput_severalModes() {
+	void testReadValidUserInput_severalModes() throws KraftwerkException {
 		UserInputs userInputs = new UserInputs(
 				inputSamplesDirectory.resolve("inputs_valid_several_modes.json"),
 				inputSamplesDirectory);
@@ -91,7 +92,7 @@ class UserInputsTest {
 
 	@Test
 	@Disabled("Management of malformed user input file not implemented.") // TODO: see UserInputs
-	void testReadMalformedInput() {
+	void testReadMalformedInput() throws KraftwerkException {
 		new UserInputs(
 				inputSamplesDirectory.resolve("inputs_invalid_malformed.json"),
 				inputSamplesDirectory);

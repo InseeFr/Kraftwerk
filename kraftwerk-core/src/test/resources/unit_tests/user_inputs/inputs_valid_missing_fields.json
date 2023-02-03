@@ -5,14 +5,14 @@
   "survey_data": [
     {
       "data_mode": "CAPI",
-	  "data_file": "data.xml",
-	  "DDI_file": "ddi.xml",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi.xml",
 	  "data_format": "LUNATIC_XML"
   	}
   ],
   
   "multimode_dataset_name": "MULTIMODE",
   
-  "transformation_specifications": "test.vtl"
+  "transformation_specifications": "sample_files_to_get/test2.vtl"
 
 }
