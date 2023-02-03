@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 
 	public long convertToTimestamp(String rowTimestamp) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
 		Date parsedDate = null;
 		try {
 			parsedDate = dateFormat.parse(rowTimestamp);
