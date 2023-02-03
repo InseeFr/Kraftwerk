@@ -154,33 +154,22 @@ public class VtlExecute {
                 bindings = (VtlBindings) engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE);
 
             } catch (ScriptException e) {
-                log.warn("The following VTL instruction given is invalid and has been skipped:\n" + vtlScript);
-                log.warn(e.getMessage());
+                log.warn("ScriptException - Some VTL instruction given is invalid and has been skipped");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
-            } catch (NumberFormatException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
-                log.warn("NumberFormatException caused by following VTL instruction:\n" + vtlScript);
-                log.warn(e.getMessage());
-                log.warn("Corresponding variable could not be calculated.");
+            } catch (NumberFormatException e) { 
+                log.warn("NumberFormatException - Corresponding variable could not be calculated.");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
-            } catch (UnsupportedOperationException e) { // TODO: send issue to Trevas
-                log.warn("UnsupportedOperationException caused by following VTL instruction:\n" + vtlScript);
-                log.warn(e.getMessage());
-                log.warn("Corresponding variable could not be calculated.");
+            } catch (UnsupportedOperationException e) { 
+                log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
-            } catch (NullPointerException e) { // NOTE: issue sent to Trevas // TODO: see what's changed since 0.4.0
-                log.debug("NullPointerException thrown when trying to evaluate following expression:\n" + vtlScript);
-                log.debug(e.getMessage());
-                log.debug("Probable cause: one of the operator used not yet supported by Trevas java library.");
+            } catch (NullPointerException e) {
+                log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
-            } catch (Error e) { // TODO: send issue to Trevas
-                log.debug("Error thrown when trying to evaluate following expression:\n" + vtlScript);
-                log.error(e.getMessage());
-                log.error("Probable cause: Syntax error.");
+            } catch (Error e) { 
+                log.debug("Error - Probable cause: Syntax error.");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             } catch (Exception e) {
-                log.warn("Exception thrown when trying to evaluate following expression:\n" + vtlScript);
-                log.warn(e.getMessage());
-                log.warn("UNKNOWN EXCEPTION PLEASE REPORT IT!");
+                log.warn("Exception - UNKNOWN EXCEPTION PLEASE REPORT IT!");
                 errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
             }
         } else {
