@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class DateUtils {
 	
 	public static long convertToTimestamp(String rowTimestamp) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
 		Date parsedDate = null;
 		try {
 			parsedDate = dateFormat.parse(rowTimestamp);
