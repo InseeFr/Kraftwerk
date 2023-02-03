@@ -64,10 +64,15 @@ public class LogRequestFilter extends OncePerRequestFilter {
         		resp.getStatus(),
    //     		resp.getContentType(), 
    //     		headers.toString(),
-                new String(resp.getContentAsByteArray(), StandardCharsets.UTF_8)); //Body
+                getResponseBody(req, resp)); //Body
         
         // Finally remember to respond to the client with the cached data.
         resp.copyBodyToResponse();
     }
+
+	private String getResponseBody(ContentCachingRequestWrapper req, ContentCachingResponseWrapper resp) {
+		if (req.getRequestURI().contains("swagger-ui")) return "Hidden Swagger response";
+		return new String(resp.getContentAsByteArray(), StandardCharsets.UTF_8);
+	}
     
 }
