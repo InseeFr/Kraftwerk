@@ -1,13 +1,12 @@
 {
   
-  "campaign": "sample_files_to_get",
-  
   "survey_data": [
     {
       "data_mode": "CAPI",
-	  "data_file": "data.xml",
-	  "DDI_file": "ddi.xml",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi.xml",
 	  "data_format": "LUNATIC_XML",
+      "lunatic_file": "sample_files_to_get/lunatic.json",
 	  "paradata_folder": "",
 	  "reporting_data_file": "",
 	  "mode_specifications": ""

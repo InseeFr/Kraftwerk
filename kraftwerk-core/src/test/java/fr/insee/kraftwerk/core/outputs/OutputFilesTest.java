@@ -46,7 +46,7 @@ class OutputFilesTest {
 			//
 			testUserInputs = new UserInputs(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-					Path.of(TestConstants.UNIT_TESTS_DIRECTORY));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
