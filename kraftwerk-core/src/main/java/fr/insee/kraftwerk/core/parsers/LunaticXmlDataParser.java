@@ -18,6 +18,10 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 
+/**
+ * Parser add FILTER_RESULT to variablesMap
+ *
+ */
 @Slf4j
 public class LunaticXmlDataParser extends DataParser {
 
@@ -42,9 +46,7 @@ public class LunaticXmlDataParser extends DataParser {
 	private Document readXmlFile(Path filePath) {
 		XmlFileReader xmlFileReader = new XmlFileReader();
 		Document document = xmlFileReader.readXmlFile(filePath);
-		if (document != null) {
-			log.info("Successfully parsed Lunatic answers file: " + filePath);
-		} else {
+		if (document == null) {
 			log.warn("Failed to parse Lunatic answers file: " + filePath);
 		}
 		return document;
@@ -59,6 +61,7 @@ public class LunaticXmlDataParser extends DataParser {
 	void parseDataFile(Path filePath) {
 
 		Document document = readXmlFile(filePath);
+		log.debug("Begin to parse {} ", filePath);
 		if (document!=null) {
 			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
 					.getChildElements("SurveyUnit");
@@ -80,6 +83,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 				data.addQuestionnaire(questionnaireData);
 			}
+			log.info("Successfully parsed Lunatic answers file: {}",filePath );
 		}
 	}
 
