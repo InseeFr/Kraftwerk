@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 1.1.7 [2023-02-06]
+## 1.1.7 - Not released yet
 ### Added
    -  Add possibility to specify a path for data, paradater and reporting data outside in folder
    
@@ -11,5 +11,5 @@
 	
 ### Fixed
 
-## 1.1.6 - JAN23
+## 1.1.6 - [2023-01-06]
 - Initialize API
