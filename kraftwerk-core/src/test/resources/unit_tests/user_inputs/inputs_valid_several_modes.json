@@ -5,29 +5,29 @@
   "survey_data": [
     {
       "data_mode": "CAPI",
-	  "data_file": "data.xml",
-	  "DDI_file": "ddi.xml",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi.xml",
 	  "data_format": "LUNATIC_XML",
 	  "paradata_folder": "",
-	  "reporting_data_file": "sabiane_data.json",
+	  "reporting_data_file": "sample_files_to_get/sabiane_data.json",
 	  "mode_specifications": ""
   	},
 	{
       "data_mode": "CAWI",
-	  "data_file": "data.xml",
-	  "DDI_file": "ddi_web.xml",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi_web.xml",
 	  "data_format": "LUNATIC_XML",
-	  "paradata_folder": "paradata",
-	  "reporting_data_file": "moog_data.csv",
-	  "mode_specifications": "web.vtl"
+	  "paradata_folder": "sample_files_to_get/paradata.json",
+	  "reporting_data_file": "sample_files_to_get/moog_data.csv",
+	  "mode_specifications": "sample_files_to_get/web.vtl"
   	},
 	{
       "data_mode": "PAPI",
-	  "data_file": "data.csv",
-	  "DDI_file": "ddi_paper.xml",
+	  "data_file": "sample_files_to_get/data.csv",
+	  "DDI_file": "sample_files_to_get/ddi_paper.xml",
 	  "data_format": "PAPER",
-	  "reporting_data_file": "moog_data.csv",
-	  "mode_specifications": "specific_ucq.vtl"
+	  "reporting_data_file": "sample_files_to_get/moog_data.csv",
+	  "mode_specifications": "sample_files_to_get/web.vtl"
   	}
   ],
   
@@ -35,7 +35,7 @@
   
   "reconciliation_specifications": "",
   
-  "transformation_specifications": "test2.vtl",
+  "transformation_specifications": "sample_files_to_get/test2.vtl",
   
   "information_levels_specifications": ""
 
