@@ -79,7 +79,6 @@ public class LunaticXmlDataParser extends DataParser {
 
 				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 				data.addQuestionnaire(questionnaireData);
 			}
