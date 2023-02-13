@@ -79,6 +79,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+				// Remove this method when all questionnaires will use Lunatic V2 format
 				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 				data.addQuestionnaire(questionnaireData);
@@ -88,7 +89,7 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	/**
-	 * Read data in the COLLECTED elements.
+	 * Read data in the COLLECTED elements. To bo be removed when all questionnaires will use Lunatic V2.
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData,
 											VariablesMap variables) {
