@@ -71,7 +71,7 @@ public class LogRequestFilter extends OncePerRequestFilter {
     }
 
 	private String getResponseBody(ContentCachingRequestWrapper req, ContentCachingResponseWrapper resp) {
-		if (req.getRequestURI().contains("swagger-ui")) return "Hidden Swagger response";
+		if (req.getRequestURI().contains("swagger-ui") ||req.getRequestURI().contains("api-docs")) return "Hidden Swagger response";
 		return new String(resp.getContentAsByteArray(), StandardCharsets.UTF_8);
 	}
     
