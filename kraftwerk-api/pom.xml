@@ -3,10 +3,10 @@
   <parent>
     <groupId>fr.insee.kraftwerk</groupId>
     <artifactId>kraftwerk</artifactId>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
   </parent>
   <artifactId>kraftwerk-api</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   
   
   
@@ -16,7 +16,7 @@
 		<dependency>
 		    <groupId>fr.insee.kraftwerk</groupId>
 		    <artifactId>kraftwerk-core</artifactId>
-		    <version>1.1.6</version>
+		    <version>1.1.7</version>
 	    </dependency>
 
 		<!-- Spring -->
@@ -26,11 +26,11 @@
 		</dependency>
 		
 		<!-- SWAGGER -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.6</version>
-		</dependency>
+		 <dependency>
+		      <groupId>org.springdoc</groupId>
+		      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		      <version>2.0.2</version>
+		 </dependency>
 
 	</dependencies>
 
