@@ -1,10 +1,14 @@
 # Changelog
 
-
-## 1.1.7 - Not released yet
+## 1.2.0 - Not released yet
 
 ### Added
-   -  Add possibility to specify a path for data, paradater and reporting data outside in folder
+-  Lunatic V2 input data (Lunatic-Model v2.3+) are now supported
+
+## 1.1.7 
+
+### Added
+-  Add possibility to specify a path for data, paradater and reporting data outside in folder
    
 ### Changed
 	- Change to Java 17 and Spring boot 3

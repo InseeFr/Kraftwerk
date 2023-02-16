@@ -79,6 +79,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+				// Remove this method when all questionnaires will use Lunatic V2 format
 				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 				data.addQuestionnaire(questionnaireData);
@@ -88,7 +89,7 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	/**
-	 * Read data in the COLLECTED elements.
+	 * Read data in the COLLECTED elements. To bo be removed when all questionnaires will use Lunatic V2.
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData,
 											VariablesMap variables) {
@@ -149,16 +150,18 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements externalVariableNodes = externalNode.getChildElements();
 
 			for (Element externalVariableNode : externalVariableNodes) {
-				if(! externalVariableNode.getAttribute("type").getValue().equals("null")) {
-					String variableName = externalVariableNode.getLocalName();
-					String value = externalVariableNode.getValue();
-					questionnaireData.putValue(value, variableName);
-					if (! variables.hasVariable(variableName)) {
-						variables.putVariable(
-								new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
-						log.warn(String.format(
-								"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
-								variableName));
+				if (externalVariableNode.getAttribute("type") != null) {
+					if (!externalVariableNode.getAttribute("type").getValue().equals("null")) {
+						String variableName = externalVariableNode.getLocalName();
+						String value = externalVariableNode.getValue();
+						questionnaireData.putValue(value, variableName);
+						if (!variables.hasVariable(variableName)) {
+							variables.putVariable(
+									new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+							log.warn(String.format(
+									"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
+									variableName));
+						}
 					}
 				}
 			}
