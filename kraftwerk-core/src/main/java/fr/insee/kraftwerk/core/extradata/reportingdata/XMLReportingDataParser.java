@@ -45,14 +45,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
       String organizationalUnitIdentifier = organizationalUnitIdentifierElement.getValue();
       reportingDataUE.setOrganizationUnitId(organizationalUnitIdentifier);
       Element adressElement = surveyUnitElement.getFirstChildElement("InseeSampleIdentiers");
-      reportingDataUE.setInseeSampleIdentiers(new InseeSampleIdentiers());
-      reportingDataUE.getInseeSampleIdentiers().setRges(adressElement.getFirstChildElement("Rges").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setNumfa(adressElement.getFirstChildElement("Numfa").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setSsech(adressElement.getFirstChildElement("Ssech").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setLe(adressElement.getFirstChildElement("Le").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setEc(adressElement.getFirstChildElement("Ec").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setBs(adressElement.getFirstChildElement("Bs").getValue());
-      reportingDataUE.getInseeSampleIdentiers().setNoi(adressElement.getFirstChildElement("Noi").getValue());
+      reportingDataUE.setInseeSampleIdentifier(new InseeSampleIdentifier());
+      reportingDataUE.getInseeSampleIdentifier().setRges(adressElement.getFirstChildElement("Rges").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setNumfa(adressElement.getFirstChildElement("Numfa").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setSsech(adressElement.getFirstChildElement("Ssech").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setLe(adressElement.getFirstChildElement("Le").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setEc(adressElement.getFirstChildElement("Ec").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setBs(adressElement.getFirstChildElement("Bs").getValue());
+      reportingDataUE.getInseeSampleIdentifier().setNoi(adressElement.getFirstChildElement("Noi").getValue());
       Elements stateNodeList = surveyUnitElement.getFirstChildElement("States").getChildElements("State");
       for (int j = 0; j < stateNodeList.size(); j++) {
         Element stateElement = stateNodeList.get(j);

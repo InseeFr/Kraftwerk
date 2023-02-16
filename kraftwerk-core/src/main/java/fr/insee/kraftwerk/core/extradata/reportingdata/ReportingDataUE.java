@@ -16,13 +16,13 @@ public class ReportingDataUE {
   private List<State> states;
   
   @Getter@Setter
-  private String OrganizationUnitId;
+  private String organizationUnitId;
   
   @Getter@Setter
-  private String InterviewerId;
+  private String interviewerId;
   
   @Getter@Setter
-  private InseeSampleIdentiers inseeSampleIdentiers;
+  private InseeSampleIdentifier inseeSampleIdentifier;
   
   @Getter@Setter
   private ContactOutcome contactOutcome;
