@@ -1,15 +1,12 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
+import fr.insee.kraftwerk.core.Constants;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class MetadataUtilsTest {
+class MetadataUtilsTest {
 
     @Test
     void addLunaticVariableTest() {
