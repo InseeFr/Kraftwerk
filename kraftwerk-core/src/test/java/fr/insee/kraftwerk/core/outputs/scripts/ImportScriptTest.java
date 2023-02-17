@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.outputs;
+package fr.insee.kraftwerk.core.outputs.scripts;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +26,7 @@ import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.DataStructure;
 
-class TableScriptInfoTest {
+class ImportScriptTest {
 	
 	VtlBindings vtlBindings = new VtlBindings();
 
@@ -69,7 +69,7 @@ class TableScriptInfoTest {
 	@Test
 	void getAllLengthTest() {
 		instantiateMap();
-		Map<String, Variable> listVariables = tableScriptInfo.getAllLength(dataStructure, metadataVariables);
+		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadataVariables);
 		assertEquals("50", listVariables.get("LAST_NAME").getLength());
 		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
 		assertEquals("50", listVariables.get("AGE").getLength());
@@ -91,9 +91,7 @@ class TableScriptInfoTest {
 				new Structured.Component("FOO", Double.class, Dataset.Role.MEASURE)
 		));
 		//
-		TableScriptInfo testTableScriptInfo = new TableScriptInfo(
-				"TEST", "test.csv", testDataStructure, metadataVariables);
-		assertDoesNotThrow(() -> testTableScriptInfo.getAllLength(testDataStructure, metadataVariables));
+		assertDoesNotThrow(() -> ImportScript.getAllLength(testDataStructure, metadataVariables));
 	}
 
 	@Test
