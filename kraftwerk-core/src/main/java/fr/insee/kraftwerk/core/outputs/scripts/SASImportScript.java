@@ -42,6 +42,9 @@ public class SASImportScript extends ImportScript {
             Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
             Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
 
+            // SAS restriction: variables cannot be more than 32 bytes long
+            longNameWarnings(listVariables, script);
+
             script.append(scriptSASPart1(listVariables));
 
             script.append(scriptSASPart2(listVariables));
@@ -55,6 +58,36 @@ public class SASImportScript extends ImportScript {
         }
 
         return script.toString();
+    }
+
+    /**
+     * Add warning comments in script for variable names that are longer than 32 bytes (assuming UTF-8 encoding).
+     * This method could have been implemented to do automatic truncation, but seems to be a bad idea:
+     * cases where truncation would be needed would frequently be on variables with same prefix or suffix.
+     * @param listVariable Map to be modified.
+     */
+    private void longNameWarnings(Map<String, Variable> listVariable, StringBuilder script) {
+        List<String> longNames = listVariable.entrySet().stream().
+                map(entry -> {
+                    // getAllLength method is too complex
+                    // Asserts here to make sure it work as expected
+                    String name = entry.getKey();
+                    Variable variable = entry.getValue();
+                    assert name != null;
+                    assert name.equals(variable.getName());
+                    //
+                    return name;
+                })
+                .filter(name -> name.length() > 32)
+                .toList();
+        if (! longNames.isEmpty()) {
+            script.append(END_LINE);
+            script.append("    /* WARNING: Following variable names are more than 32 characters long:");
+            script.append(END_LINE);
+            longNames.forEach(name -> script.append("        ").append(name).append(END_LINE));
+            script.append("       These variables have to be shorten, otherwise SAS import will fail. */");
+            script.append(END_LINE).append(END_LINE);
+        }
     }
 
     /**
