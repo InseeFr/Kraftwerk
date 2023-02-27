@@ -2,12 +2,13 @@ package fr.insee.kraftwerk.core.outputs;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.outputs.scripts.ImportScript;
+import fr.insee.kraftwerk.core.outputs.scripts.RDataTableImportScript;
+import fr.insee.kraftwerk.core.outputs.scripts.SASImportScript;
+import fr.insee.kraftwerk.core.outputs.scripts.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -84,21 +85,18 @@ public class OutputFiles {
 	}
 
 	public void writeImportScripts(Map<String, VariablesMap> metadataVariables) {
-		//
-		ImportScripts importScripts = new ImportScripts();
-		//
+		// Assemble required info to write scripts
+		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : datasetToCreate) {
 			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
 					vtlBindings.getDataset(datasetName).getDataStructure(), metadataVariables);
-			importScripts.registerTable(tableScriptInfo);
+			tableScriptInfoList.add(tableScriptInfo);
 		}
-		// NOTE: commented unimplemented scripts
-		// TextFileWriter.writeFile(outputFolder.resolve("import_base.R"),
-		// importScripts.scriptR_base());
-		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"), importScripts.scriptRdataTable());
-		// TextFileWriter.writeFile(outputFolder.resolve("import_with_pandas.py"),
-		// importScripts.scriptPython_pandas());
-		TextFileWriter.writeFile(outputFolder.resolve("import.sas"), importScripts.scriptSAS());
+		// Write scripts
+		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"),
+				new RDataTableImportScript(tableScriptInfoList).generateScript());
+		TextFileWriter.writeFile(outputFolder.resolve("import.sas"),
+				new SASImportScript(tableScriptInfoList).generateScript());
 	}
 
 	/**
@@ -107,9 +105,5 @@ public class OutputFiles {
 	public String outputFileName(String datasetName) {
 		return outputFolder.getFileName() + "_" + datasetName + ".csv";
 	}
-
-	
-
-
 
 }
