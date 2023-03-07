@@ -5,8 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -89,27 +94,29 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		VtlBindings vtlBindings = new VtlBindings();
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
+
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 
 		/* Step 2 : unimodal data */
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
+			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors,metadataVariables);
 		}
 
 		/* Step 3 : multimodal VTL data processing */
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
 
 		/* Step 4 : Write output files */
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName(),metadataVariables);
 		writeErrorsFile(inDirectory, errors);
 
 		/* Step 4.3- 4.4 : Archive */
@@ -118,14 +125,14 @@ public class LauncherService {
 		return ResponseEntity.ok(campaignName);
 	}
 
-	private void writeErrorsFile(Path inDirectory, List<ErrorVtlTransformation> errors) {
+	private void writeErrorsFile(Path inDirectory, List<KraftwerkError> errors) {
 		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
 		if (!errors.isEmpty()) {
 			try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
-				for (ErrorVtlTransformation error : errors){
+				for (KraftwerkError error : errors){
 					myWriter.write(error.toString());
 				}
 				log.info(String.format("Text file: %s successfully written", tempOutputPath));
@@ -155,16 +162,17 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
+
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
-
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -198,11 +206,13 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		VtlBindings vtlBindings = new VtlBindings();
+
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		try {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -236,14 +246,16 @@ public class LauncherService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		VtlBindings vtlBindings = new VtlBindings();
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 
 		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
 		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
+
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
-		unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors);
+		unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
@@ -274,7 +286,7 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 
 
 		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence();
@@ -285,9 +297,11 @@ public class LauncherService {
 			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+
 		//Process
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
@@ -329,7 +343,8 @@ public class LauncherService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName());
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName(), metadataVariables);
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}

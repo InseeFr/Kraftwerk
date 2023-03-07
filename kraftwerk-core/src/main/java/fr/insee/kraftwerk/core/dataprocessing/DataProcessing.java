@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import java.nio.file.Path;
 import java.util.List;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -32,7 +33,7 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<ErrorVtlTransformation> errors){
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<KraftwerkError> errors){
         // First step
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
         // Second step
@@ -56,7 +57,7 @@ public abstract class DataProcessing {
      */
     protected abstract VtlScript generateVtlInstructions(String bindingName);
 
-    protected String applyAutomatedVtlInstructions(String bindingName, List<ErrorVtlTransformation> errors){
+    protected String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName);
         log.debug(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
                 automatedInstructions));
@@ -66,7 +67,7 @@ public abstract class DataProcessing {
         return automatedInstructions.toString();
     }
 
-    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, List<ErrorVtlTransformation> errors){
+    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, List<KraftwerkError> errors){
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
         log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));

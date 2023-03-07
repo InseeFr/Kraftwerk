@@ -12,12 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MetadataUtils {
 
-	
-	public static VariablesMap getMetadata(UserInputs userInputs, String dataMode){
-		Map<String, VariablesMap> metadataVariables = getMetadata(userInputs.getModeInputsMap());
-		return metadataVariables.get(dataMode);
-	}
-	
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));

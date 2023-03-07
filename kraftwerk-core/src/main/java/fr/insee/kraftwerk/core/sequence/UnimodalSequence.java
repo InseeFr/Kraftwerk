@@ -1,7 +1,9 @@
 package fr.insee.kraftwerk.core.sequence;
 
 import java.util.List;
+import java.util.Map;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
@@ -9,10 +11,7 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
@@ -26,10 +25,20 @@ import lombok.extern.slf4j.Slf4j;
 public class UnimodalSequence {
 
 	public void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
-			List<ErrorVtlTransformation> errors) {
+								   List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
-		VariablesMap metadata = MetadataUtils.getMetadata(userInputs, dataMode);
+		VariablesMap metadata = metadataVariables.get(dataMode);
 		String vtlGenerate;
+
+		/* Step 2.4a : Check incoherence between expected variables' length and actual length received */
+		VariablesMap variablesMap = metadataVariables.get(dataMode);
+		for (String variableName : variablesMap.getVariableNames()){
+			Variable variable = variablesMap.getVariable(variableName);
+			if (!(variable.getLength() == null) && Integer.parseInt(variable.getLength())<variable.getMaxLengthData()){
+				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getLength(), variable.getMaxLengthData()));
+				errors.add(new ErrorVariableLength(variable, dataMode));
+			}
+		}
 
 		/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 		if (modeInputs.getLunaticFile() != null) {

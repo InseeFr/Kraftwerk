@@ -21,9 +21,14 @@ public class Variable {
 	@Getter
 	protected VariableType type;
 
-	/** Variable length. */
+	/** Variable length expected. */
 	@Getter
 	protected String length;
+
+	/** Maximum length received in input for the variable. */
+	@Getter
+	@Setter
+	protected int maxLengthData;
 
 	/** Name of the item used to collect the answer. */
 	@Getter

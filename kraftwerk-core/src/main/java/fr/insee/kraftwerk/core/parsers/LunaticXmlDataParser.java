@@ -113,6 +113,9 @@ public class LunaticXmlDataParser extends DataParser {
 			if (collectedNode.getAttribute("type") != null) {
 				if(! collectedNode.getAttribute("type").getValue().equals("null")) {
 					String value = variableNode.getFirstChildElement(Constants.COLLECTED).getValue();
+					if (value.length()>variables.getVariable(variableName).getMaxLengthData()){
+						variables.getVariable(variableName).setMaxLengthData(value.length());
+					}
 					answers.putValue(variableName, value);
 				}
 			}
@@ -127,6 +130,9 @@ public class LunaticXmlDataParser extends DataParser {
 						Element valueNode = valueNodes.get(j);
 						if(! valueNode.getAttribute("type").getValue().equals("null")) {
 							String value = valueNodes.get(j).getValue();
+							if (value.length()>variables.getVariable(variableName).getMaxLengthData()){
+								variables.getVariable(variableName).setMaxLengthData(value.length());
+							}
 							groupData.putValue(value, variableName, j);
 						}
 					}

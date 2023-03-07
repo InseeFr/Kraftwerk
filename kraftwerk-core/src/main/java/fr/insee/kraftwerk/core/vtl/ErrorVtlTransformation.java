@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ErrorVtlTransformation {
+public class ErrorVtlTransformation extends KraftwerkError {
 
     @Getter @Setter
     private String vtlScript;
