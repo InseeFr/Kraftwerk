@@ -170,7 +170,6 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Read data in the CALCULATED elements.
-	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
@@ -194,11 +193,6 @@ public class LunaticXmlDataParser extends DataParser {
 				// Root variables
 				if (variableNode.getAttribute("type") != null) {
 					if (!variableNode.getAttribute("type").getValue().equals("null")) {
-						//
-						if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
-						}
-						//
 						String value = variableNode.getValue();
 						if(isNotVtlExpression(value)) {
 							answers.putValue(variableName, value);
@@ -206,40 +200,17 @@ public class LunaticXmlDataParser extends DataParser {
 					}
 				}
 
-				// Group variables // TODO : recursion etc.
+				// Group variables
 				else {
 					Elements valueNodes = variableNode.getChildElements();
-					//
 					String groupName;
-					if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-						String correspondingVariableName = variableName.replace(Constants.FILTER_RESULT_PREFIX, "");
-						if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
-							Group group = variables.getVariable(correspondingVariableName).getGroup();
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else if (variables.isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
-							Group group = variables.getQuestionGridGroup(correspondingVariableName);
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else {
-							Group group = variables.getGroup(variables.getGroupNames().get(0));
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-							//TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
-							log.warn(String.format(
-									"No information from the DDI about question named \"%s\".",
-									correspondingVariableName));
-							log.warn(String.format(
-									"\"%s\" has been arbitrarily associated with group \"%s\".",
-									variableName, groupName));
-						}
+
+					if (variables.getVariable(variableName) != null) {
+					groupName = variables.getVariable(variableName).getGroupName();
 					} else {
-						if (variables.getVariable(variableName) != null) {
-						groupName = variables.getVariable(variableName).getGroupName();
-						} else {
-							groupName = Constants.ROOT_GROUP_NAME;
-						}
+						groupName = Constants.ROOT_GROUP_NAME;
 					}
+
 					//
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {
