@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class CalculatedProcessingTest {
     private static CalculatedVariables fooCalculated;
     private static VariablesMap fooVariables;
     private static VtlBindings vtlBindings;
-    private static List<ErrorVtlTransformation> errors;
+    private static List<KraftwerkError> errors;
 
     @BeforeAll
     static void setFooCalculated() {

@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class ImportScriptTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
 		groupProcessing.applyVtlTransformations("CAWI", null, errors);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
@@ -96,7 +97,7 @@ class ImportScriptTest {
 
 	@Test
 	void numberTypeInDatasets() {
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
