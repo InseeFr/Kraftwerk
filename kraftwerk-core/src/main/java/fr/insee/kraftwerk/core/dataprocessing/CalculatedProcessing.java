@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +15,10 @@ public class CalculatedProcessing extends DataProcessing {
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
     private CalculatedVariables calculatedVariables;
-    private  VariablesMap variablesMap;
 
-    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, VariablesMap variablesMap) {
+    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables) {
         super(vtlBindings);
         this.calculatedVariables = calculatedVariables;
-        this.variablesMap = variablesMap;
     }
 
     @Override
