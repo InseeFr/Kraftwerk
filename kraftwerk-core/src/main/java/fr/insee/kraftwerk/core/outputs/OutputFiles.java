@@ -2,10 +2,13 @@ package fr.insee.kraftwerk.core.outputs;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.scripts.ImportScript;
 import fr.insee.kraftwerk.core.outputs.scripts.RDataTableImportScript;
 import fr.insee.kraftwerk.core.outputs.scripts.SASImportScript;
 import fr.insee.kraftwerk.core.outputs.scripts.TableScriptInfo;

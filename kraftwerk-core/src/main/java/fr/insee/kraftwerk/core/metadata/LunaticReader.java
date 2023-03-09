@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.kraftwerk.core.utils.JsonFileReader;
-import lombok.extern.slf4j.Slf4j;
+import static fr.insee.kraftwerk.core.Constants.ENO_VARIABLES;
+import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
+import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,8 +12,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fr.insee.kraftwerk.core.Constants.*;
-import static fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import fr.insee.kraftwerk.core.utils.JsonFileReader;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LunaticReader {
@@ -91,7 +94,7 @@ public class LunaticReader {
 
             JsonNode variablesNode = rootNode.get("variables");
             variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
-            return variables.stream().filter(var-> var.startsWith(FILTER_RESULT_PREFIX)).collect(Collectors.toList());
+            return variables.stream().filter(variable-> variable.startsWith(FILTER_RESULT_PREFIX)).toList();
 
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
