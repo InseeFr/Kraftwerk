@@ -1,16 +1,20 @@
 # Changelog
 
-## 1.2.1 - Not released yet
+## 1.2.1 - [2023-03-10]
 
 ### Added
-- Statistical identifier concatenates some other variables
+- Statistical identifier concatenates some other variables, first version
 
-## 1.2.0 - Not released yet
+### Changed
+- Variables are added only if they are present in the specification
+- Improve script classes
+
+## 1.2.0 - Never released
 
 ### Added
 -  Lunatic V2 input data (Lunatic-Model v2.3+) are now supported
 
-## 1.1.7 - Never released
+## 1.1.7 - [2023-02-27]
 
 ### Added
 -  Add possibility to specify a path for data, paradater and reporting data outside in folder
