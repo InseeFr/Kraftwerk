@@ -149,18 +149,17 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements externalVariableNodes = externalNode.getChildElements();
 
 			for (Element externalVariableNode : externalVariableNodes) {
-				if (externalVariableNode.getAttribute("type") != null) {
-					if (!externalVariableNode.getAttribute("type").getValue().equals("null")) {
-						String variableName = externalVariableNode.getLocalName();
-						String value = externalVariableNode.getValue();
-						questionnaireData.putValue(value, variableName);
-						if (!variables.hasVariable(variableName)) {
-							variables.putVariable(
-									new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
-							log.warn(String.format(
-									"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
-									variableName));
-						}
+				if (externalVariableNode.getAttribute("type") != null
+						&& !externalVariableNode.getAttribute("type").getValue().equals("null")) {
+					String variableName = externalVariableNode.getLocalName();
+					String value = externalVariableNode.getValue();
+					questionnaireData.putValue(value, variableName);
+					if (!variables.hasVariable(variableName)) {
+						variables
+								.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+						log.warn(String.format(
+								"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
+								variableName));
 					}
 				}
 			}
