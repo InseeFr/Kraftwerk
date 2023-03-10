@@ -47,6 +47,8 @@ public abstract class ReportingDataParser {
 				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "1"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_NOI_NAME,
 				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "2"));
+		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_ID_STAT_INSEE,
+				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "15"));
 		for (int k = 1; k <= this.maxStates; k++) {
 			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k,
 					surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
@@ -85,28 +87,22 @@ public abstract class ReportingDataParser {
 				questionnaire = new QuestionnaireData();
 				questionnaire.setIdentifier(reportingDataUE.getIdentifier());
 				surveyRawData.addQuestionnaire(questionnaire);
-				log.info("Missing questionnaire for reporting data: {}.",	reportingDataUE.getIdentifier() );
+				log.info("Missing questionnaire for reporting data: {}.", reportingDataUE.getIdentifier() );
 			}
 			if (reportingDataUE.getInterviewerId() != null)
 				questionnaire.getAnswers().putValue(Constants.INTERVIEWER_ID_NAME, reportingDataUE.getInterviewerId());
 			if (reportingDataUE.getOrganizationUnitId() != null)
 				questionnaire.getAnswers().putValue(Constants.ORGANIZATION_UNIT_ID_NAME,
 						reportingDataUE.getOrganizationUnitId());
-			if (reportingDataUE.getInseeSampleIdentiers() != null) {
-				questionnaire.getAnswers().putValue(Constants.ADRESS_RGES_NAME, String.format("%02d", new Object[] {
-						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getRges())) }));
-				questionnaire.getAnswers().putValue(Constants.ADRESS_NUMFA_NAME, String.format("%06d", new Object[] {
-						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getNumfa())) }));
-				questionnaire.getAnswers().putValue(Constants.ADRESS_SSECH_NAME, String.format("%02d", new Object[] {
-						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getSsech())) }));
-				questionnaire.getAnswers().putValue(Constants.ADRESS_LE_NAME,
-						reportingDataUE.getInseeSampleIdentiers().getLe());
-				questionnaire.getAnswers().putValue(Constants.ADRESS_EC_NAME,
-						reportingDataUE.getInseeSampleIdentiers().getEc());
-				questionnaire.getAnswers().putValue(Constants.ADRESS_BS_NAME,
-						reportingDataUE.getInseeSampleIdentiers().getBs());
-				questionnaire.getAnswers().putValue(Constants.ADRESS_NOI_NAME, String.format("%02d", new Object[] {
-						Integer.valueOf(Integer.parseInt(reportingDataUE.getInseeSampleIdentiers().getNoi())) }));
+			if (reportingDataUE.getInseeSampleIdentifier() != null) {
+				questionnaire.getAnswers().putValue(Constants.ADRESS_RGES_NAME, reportingDataUE.getInseeSampleIdentifier().getRges());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_NUMFA_NAME, reportingDataUE.getInseeSampleIdentifier().getNumfa());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_SSECH_NAME, reportingDataUE.getInseeSampleIdentifier().getSsech());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_LE_NAME, reportingDataUE.getInseeSampleIdentifier().getLe());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_EC_NAME, reportingDataUE.getInseeSampleIdentifier().getEc());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_BS_NAME, reportingDataUE.getInseeSampleIdentifier().getBs());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_NOI_NAME, reportingDataUE.getInseeSampleIdentifier().getNoi());
+				questionnaire.getAnswers().putValue(Constants.ADRESS_ID_STAT_INSEE, reportingDataUE.getInseeSampleIdentifier().getIdStatInsee());
 			}
 			if (!reportingDataUE.getStates().isEmpty()) {
 				for (int k = 1; k <= reportingDataUE.size(); k++) {
@@ -133,8 +129,7 @@ public abstract class ReportingDataParser {
 					questionnaire.getAnswers().putValue(Constants.SURVEY_DATE_YEAR_NAME,
 							Integer.toString(calendar.get(1)));
 				}
-				if (reportingDataUE.getContactOutcome() != null)
-					questionnaire.getAnswers().putValue(Constants.NUMBER_ATTEMPTS_NAME,
+				questionnaire.getAnswers().putValue(Constants.NUMBER_ATTEMPTS_NAME,
 							Integer.toString(reportingDataUE.getContactOutcome().getTotalNumberOfContactAttempts()));
 			}
 			if (!reportingDataUE.getContactAttempts().isEmpty())
