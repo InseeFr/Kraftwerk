@@ -146,7 +146,8 @@ public class CsvTableWriter {
 				}
 				writer.writeNext(csvRow);
 			}
-	
+			log.debug("Nb variables in table : {}", dataset.getDataStructure().size());
+			log.debug("Nb lines in table : {}", dataset.getDataPoints().size());
 			log.info(String.format("Output CSV file: %s successfully written.", filePath));
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to write CSV table: %s", filePath));

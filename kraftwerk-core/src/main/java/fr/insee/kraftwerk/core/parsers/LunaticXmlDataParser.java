@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -79,6 +78,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+				// Remove this method when all questionnaires will use Lunatic V2 format
 				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
 
 				data.addQuestionnaire(questionnaireData);
@@ -88,7 +88,7 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	/**
-	 * Read data in the COLLECTED elements.
+	 * Read data in the COLLECTED elements. To bo be removed when all questionnaires will use Lunatic V2.
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData,
 											VariablesMap variables) {
@@ -149,16 +149,18 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements externalVariableNodes = externalNode.getChildElements();
 
 			for (Element externalVariableNode : externalVariableNodes) {
-				if(! externalVariableNode.getAttribute("type").getValue().equals("null")) {
-					String variableName = externalVariableNode.getLocalName();
-					String value = externalVariableNode.getValue();
-					questionnaireData.putValue(value, variableName);
-					if (! variables.hasVariable(variableName)) {
-						variables.putVariable(
-								new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
-						log.warn(String.format(
-								"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
-								variableName));
+				if (externalVariableNode.getAttribute("type") != null) {
+					if (!externalVariableNode.getAttribute("type").getValue().equals("null")) {
+						String variableName = externalVariableNode.getLocalName();
+						String value = externalVariableNode.getValue();
+						questionnaireData.putValue(value, variableName);
+						if (!variables.hasVariable(variableName)) {
+							variables.putVariable(
+									new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+							log.warn(String.format(
+									"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
+									variableName));
+						}
 					}
 				}
 			}
@@ -167,7 +169,6 @@ public class LunaticXmlDataParser extends DataParser {
 
 	/**
 	 * Read data in the CALCULATED elements.
-	 * "FILTER_RESULT" variables are added to the variables map.
 	 * Values that are a vtl expression are filtered.
 	 */
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
@@ -191,11 +192,6 @@ public class LunaticXmlDataParser extends DataParser {
 				// Root variables
 				if (variableNode.getAttribute("type") != null) {
 					if (!variableNode.getAttribute("type").getValue().equals("null")) {
-						//
-						if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-							variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.BOOLEAN, "5"));
-						}
-						//
 						String value = variableNode.getValue();
 						if(isNotVtlExpression(value)) {
 							answers.putValue(variableName, value);
@@ -203,40 +199,17 @@ public class LunaticXmlDataParser extends DataParser {
 					}
 				}
 
-				// Group variables // TODO : recursion etc.
+				// Group variables
 				else {
 					Elements valueNodes = variableNode.getChildElements();
-					//
 					String groupName;
-					if (variableName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-						String correspondingVariableName = variableName.replace(Constants.FILTER_RESULT_PREFIX, "");
-						if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
-							Group group = variables.getVariable(correspondingVariableName).getGroup();
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else if (variables.isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
-							Group group = variables.getQuestionGridGroup(correspondingVariableName);
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-						} else {
-							Group group = variables.getGroup(variables.getGroupNames().get(0));
-							groupName = group.getName();
-							variables.putVariable(new Variable(variableName, group, VariableType.BOOLEAN, "1"));
-							//TODO : make the log appear only one time per variable (not at each questionnaire occurrence).
-							log.warn(String.format(
-									"No information from the DDI about question named \"%s\".",
-									correspondingVariableName));
-							log.warn(String.format(
-									"\"%s\" has been arbitrarily associated with group \"%s\".",
-									variableName, groupName));
-						}
+
+					if (variables.getVariable(variableName) != null) {
+					groupName = variables.getVariable(variableName).getGroupName();
 					} else {
-						if (variables.getVariable(variableName) != null) {
-						groupName = variables.getVariable(variableName).getGroupName();
-						} else {
-							groupName = Constants.ROOT_GROUP_NAME;
-						}
+						groupName = Constants.ROOT_GROUP_NAME;
 					}
+
 					//
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {
