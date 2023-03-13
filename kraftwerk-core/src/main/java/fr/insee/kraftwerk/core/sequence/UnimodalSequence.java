@@ -44,7 +44,7 @@ public class UnimodalSequence {
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
-			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, metadata);
+			DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables);
 			vtlGenerate = calculatedProcessing.applyVtlTransformations(dataMode, null, errors);
 			TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "CalculatedProcessing", dataMode),
 					vtlGenerate);

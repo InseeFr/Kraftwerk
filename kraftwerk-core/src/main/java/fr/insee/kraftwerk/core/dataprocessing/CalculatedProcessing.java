@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +15,10 @@ public class CalculatedProcessing extends DataProcessing {
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
     private CalculatedVariables calculatedVariables;
-    private  VariablesMap variablesMap;
 
-    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, VariablesMap variablesMap) {
+    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables) {
         super(vtlBindings);
         this.calculatedVariables = calculatedVariables;
-        this.variablesMap = variablesMap;
     }
 
     @Override
@@ -51,21 +44,6 @@ public class CalculatedProcessing extends DataProcessing {
 
         for (String calculatedName : orderedCalculatedNames) {
 
-            /*
-            If the variable is not registered in the variables map (DDI variables),
-            it can be a FILTER_RESULT variable created by Lunatic.
-            In this case,
-            Otherwise, the variable is not created and a warning pops in the log.
-            */
-
-            if (!variablesMap.hasVariable(calculatedName)) {
-                if (calculatedName.startsWith(Constants.FILTER_RESULT_PREFIX)) {
-                    addFilterResult(calculatedName, variablesMap);
-                } else {
-                    log.warn(String.format("Unknown CALCULATED variable \"%s\".", calculatedName));
-                }
-            }
-
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
             if (vtlExpression != null && !vtlExpression.equals("")) {
                 vtlScript.add(String.format("%s := %s [calc %s := %s];",
@@ -75,23 +53,6 @@ public class CalculatedProcessing extends DataProcessing {
         }
 
         return vtlScript;
-    }
-
-    /** If the variable name after "FILTER_RESULT_" is recognized in the variables map,
-     * a variable corresponding to the given filter result is added in the map with the right group. */
-    private void addFilterResult(String filterResultName, VariablesMap variablesMap) {
-        String correspondingVariableName = filterResultName.replace(Constants.FILTER_RESULT_PREFIX, "");
-        Group group;
-        if (variablesMap.hasVariable(correspondingVariableName)) { // the variable is directly found
-            group = variablesMap.getVariable(correspondingVariableName).getGroup();
-        } else if (variablesMap.hasMcq(correspondingVariableName)) { // otherwise, it should be from a MCQ
-            group = variablesMap.getMcqGroup(correspondingVariableName);
-        } else { //TODO : FIXME ?????
-            group = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
-            // No information from the DDI about question or variable
-            // It has been arbitrarily associated with the group above
-        }
-        variablesMap.putVariable(new Variable(filterResultName, group, VariableType.BOOLEAN));
     }
 
     /** Return a list of calculated variable names, in such an order that the evaluation of VTL expressions

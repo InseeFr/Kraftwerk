@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +17,7 @@ import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
@@ -56,7 +56,7 @@ public class CalculatedProcessingTest {
     @Test
     public void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
         VtlScript vtlScript = processing.generateVtlInstructions("TEST");
 
         //
@@ -82,7 +82,7 @@ public class CalculatedProcessingTest {
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", fooDataset);
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fooVariables);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
         processing.applyAutomatedVtlInstructions("TEST", errors);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");

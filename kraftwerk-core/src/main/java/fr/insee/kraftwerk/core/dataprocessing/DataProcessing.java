@@ -59,7 +59,7 @@ public abstract class DataProcessing {
 
     protected String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName);
-        log.debug(String.format("Automated VTL instructions generated for step %s:%n%s", getStepName(),
+        log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName(),
                 automatedInstructions));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, errors);
