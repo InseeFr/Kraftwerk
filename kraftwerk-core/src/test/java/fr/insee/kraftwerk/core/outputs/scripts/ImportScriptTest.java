@@ -71,10 +71,10 @@ class ImportScriptTest {
 	void getAllLengthTest() {
 		instantiateMap();
 		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadataVariables);
-		assertEquals("50", listVariables.get("LAST_NAME").getLength());
-		assertEquals("50", listVariables.get("FIRST_NAME").getLength());
-		assertEquals("50", listVariables.get("AGE").getLength());
-		assertEquals("500", listVariables.get("CAR_COLOR").getLength());
+		assertEquals("50", listVariables.get("LAST_NAME").getSasFormat());
+		assertEquals("50", listVariables.get("FIRST_NAME").getSasFormat());
+		assertEquals("50", listVariables.get("AGE").getSasFormat());
+		assertEquals("500", listVariables.get("CAR_COLOR").getSasFormat());
 	}
 
 	@Test

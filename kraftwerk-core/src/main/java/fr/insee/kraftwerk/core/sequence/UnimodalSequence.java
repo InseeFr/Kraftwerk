@@ -27,15 +27,14 @@ public class UnimodalSequence {
 	public void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
 								   List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
-		VariablesMap metadata = metadataVariables.get(dataMode);
 		String vtlGenerate;
 
 		/* Step 2.4a : Check incoherence between expected variables' length and actual length received */
 		VariablesMap variablesMap = metadataVariables.get(dataMode);
 		for (String variableName : variablesMap.getVariableNames()){
 			Variable variable = variablesMap.getVariable(variableName);
-			if (!(variable.getLength() == null) && Integer.parseInt(variable.getLength())<variable.getMaxLengthData()){
-				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getLength(), variable.getMaxLengthData()));
+			if (!(variable.getSasFormat() == null) && variable.getExpectedLength()<variable.getMaxLengthData()){
+				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getExpectedLength(), variable.getMaxLengthData()));
 				errors.add(new ErrorVariableLength(variable, dataMode));
 			}
 		}
@@ -59,12 +58,12 @@ public class UnimodalSequence {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, metadata).applyVtlTransformations(dataMode, null, errors);
+		vtlGenerate = new GroupProcessing(vtlBindings, variablesMap).applyVtlTransformations(dataMode, null, errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate);
 
 		/* Step 2.5 : Apply mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
-				vtlBindings, metadata);
+				vtlBindings, variablesMap);
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
 				vtlGenerate);

@@ -91,26 +91,6 @@ public class SASImportScript extends ImportScript {
     }
 
     /**
-     * Get the length in SAS standards.
-     *
-     * @param length a value of the dataset variable
-     * @return the length corrected according to the SAS rules
-     */
-    private static String getSASNumericLength(String length) {
-        String result = length;
-        // SAS doesn't allow decimal lengths
-        if (length.contains(".")) {
-            String[] lengths = length.split("\\.");
-            result = String.valueOf(Integer.parseInt(lengths[0]) + Integer.parseInt(lengths[1]));
-        }
-        // SAS's minimum length for a numeric variable is 3
-        if (length.contentEquals("0") || length.contentEquals("1") || length.contentEquals("2")) {
-            result = "3";
-        }
-        return result;
-    }
-
-    /**
      * Put informats for the first step.
      * Example: Put informats informat MAA2AT $1. ; informat ANNEENQ best32. ;
      *
@@ -121,17 +101,17 @@ public class SASImportScript extends ImportScript {
         StringBuilder script = new StringBuilder();
         for (Map.Entry<String, Variable> varEntry : listVariables.entrySet()) {
             Variable variable = varEntry.getValue();
-            String length = variable.getLength();
-            if (!length.contentEquals("0")) {
+            String sasFormat = variable.getSasFormat();
+            if (!sasFormat.contentEquals("0")) {
                 // We write the format instructions if we have information on variables length
                 if (variable.getType().equals(VariableType.BOOLEAN)) {
                     script.append(String.format("informat %s $1. ;", varEntry.getKey())).append(END_LINE);
                 } else if (variable.getType().equals(VariableType.STRING)
                         || variable.getType().equals(VariableType.DATE)) {
-                    script.append(String.format("informat %s $%s. ;", varEntry.getKey(), length)).append(END_LINE);
+                    script.append(String.format("informat %s $%s. ;", varEntry.getKey(), sasFormat)).append(END_LINE);
                 } else if (variable.getType().equals(VariableType.INTEGER)
                         || variable.getType().equals(VariableType.NUMBER)) {
-                    script.append(String.format("informat %s %s. ;", varEntry.getKey(), getSASNumericLength(length))).append(END_LINE);
+                    script.append(String.format("informat %s %s ;", varEntry.getKey(), sasFormat)).append(END_LINE);
                 }
             } else {
                 script.append(String.format("informat %s $32. ;", varEntry.getKey())).append(END_LINE);
@@ -152,15 +132,15 @@ public class SASImportScript extends ImportScript {
         StringBuilder script = new StringBuilder();
         for (Map.Entry<String, Variable> varEntry : listVariables.entrySet()) {
             Variable variable = varEntry.getValue();
-            String length = variable.getLength();
-            if (!length.contentEquals("0")) {
+            String sasFormat = variable.getSasFormat();
+            if (!sasFormat.contentEquals("0")) {
                 // We write the format instructions if we have information on variables length
                 if (variable.getType().equals(VariableType.BOOLEAN) || variable.getType().equals(VariableType.STRING)
                         || variable.getType().equals(VariableType.DATE)) {
-                    script.append(String.format("format %s $%s. ;", varEntry.getKey(), length)).append(END_LINE);
+                    script.append(String.format("format %s $%s. ;", varEntry.getKey(), sasFormat)).append(END_LINE);
                 } else if (variable.getType().equals(VariableType.INTEGER)
                         || variable.getType().equals(VariableType.NUMBER)) {
-                    script.append(String.format("format %s %s. ;", varEntry.getKey(), getSASNumericLength(length))).append(END_LINE);
+                    script.append(String.format("format %s %s ;", varEntry.getKey(), sasFormat)).append(END_LINE);
                 }
             } else {
                 script.append(String.format("format %s $32. ;", varEntry.getKey())).append(END_LINE);
