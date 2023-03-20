@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -7,6 +8,7 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,9 @@ class SASImportScriptTest {
         metadataVariables.put("FOO", variablesMap);
 
         // When
+        List<KraftwerkError> errors = new ArrayList<>();
         TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
-        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo));
+        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then
         String result = sasImportScript.generateScript();
@@ -73,8 +76,9 @@ class SASImportScriptTest {
         metadataVariables.put("FOO", variablesMap);
 
         // When
+        List<KraftwerkError> errors = new ArrayList<>();
         TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
-        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo));
+        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then
         String result = sasImportScript.generateScript();
@@ -107,8 +111,9 @@ class SASImportScriptTest {
         metadataVariables.put("FOO", variablesMap);
 
         // When
+        List<KraftwerkError> errors = new ArrayList<>();
         TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
-        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo));
+        SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then
         String result = sasImportScript.generateScript();

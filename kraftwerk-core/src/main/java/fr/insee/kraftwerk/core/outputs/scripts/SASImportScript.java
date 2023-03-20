@@ -1,6 +1,8 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.metadata.ErrorVariableLength;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -10,8 +12,11 @@ import java.util.Map;
 
 public class SASImportScript extends ImportScript {
 
-    public SASImportScript(List<TableScriptInfo> tableScriptInfoList) {
+    private List<KraftwerkError> errors;
+
+    public SASImportScript(List<TableScriptInfo> tableScriptInfoList, List<KraftwerkError> errors) {
         super(tableScriptInfoList);
+        this.errors = errors;
     }
 
     @Override
@@ -36,11 +41,20 @@ public class SASImportScript extends ImportScript {
             script.append(String.format("data %s; ", tableName)).append(END_LINE);
             script.append("%let _EFIERR_ = 0; /* set the ERROR detection macro variable */ ").append(END_LINE);
             script.append(String.format("infile %s delimiter=\"%s\" MISSOVER DSD lrecl=13106 firstobs=2;",
-                    shortenTableName, Constants.CSV_OUTPUTS_SEPARATOR)).append(END_LINE);
+                    shortenTableName, Constants.CSV_OUTPUTS_SEPARATOR)).append(END_LINE).append(END_LINE);
 
             // Special treatment to display the length of the variables
             Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
             Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+
+            // Warning about possible problem with format of variables from suggester
+            script.append("    /* Warning : the actual length of these variables may be superior than the format specified in this script").append(END_LINE);
+            for (KraftwerkError error : errors){
+                if (error instanceof ErrorVariableLength){
+                    script.append("        ").append(((ErrorVariableLength) error).getVariable().getName()).append(END_LINE);
+                }
+            }
+            script.append("       These variables may be truncated at import in SAS*/").append(END_LINE).append(END_LINE);
 
             // SAS restriction: variables cannot be more than 32 bytes long
             longNameWarnings(listVariables, script);
