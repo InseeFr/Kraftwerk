@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.*;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +73,7 @@ public class CleanUpProcessingTest {
         // Metadata variables object
         Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
         // Errors list
-        List<ErrorVtlTransformation> errors = new ArrayList<>();
+        List<KraftwerkError> errors = new ArrayList<>();
         //
         VariablesMap cawiVariables = new VariablesMap();
         cawiVariables.putVariable(new Variable("FOO", cawiVariables.getRootGroup(), VariableType.STRING));

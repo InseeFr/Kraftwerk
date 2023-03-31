@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import javax.script.Bindings;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
@@ -26,7 +27,7 @@ public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	public Bindings bindings = vtlBindings;
 	public String tempDatasetPath = "";
-	public List<ErrorVtlTransformation> errors = new ArrayList<>();
+	public List<KraftwerkError> errors = new ArrayList<>();
 	
 	VtlExecute vtlExecute = new VtlExecute();
 

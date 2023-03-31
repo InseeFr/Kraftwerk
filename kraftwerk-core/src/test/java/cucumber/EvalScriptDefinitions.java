@@ -2,6 +2,7 @@ package cucumber;
 
 import static org.junit.Assert.assertEquals;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
@@ -32,7 +33,7 @@ public class EvalScriptDefinitions {
 	
 	@When("I try to apply some VTL instruction : {string}")
 	public void exportDataset(String vtlScript) throws Exception {
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 		vtlExecute.evalVtlScript(vtlScript, vtlBindings, errors);
 	}
 

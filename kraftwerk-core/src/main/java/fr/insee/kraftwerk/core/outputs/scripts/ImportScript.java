@@ -49,7 +49,7 @@ public abstract class ImportScript {
 					variableName = getRootName(variableName);
 					Variable variable = variablesMap.getVariable(variableName);
 
-					String newLengthString = variable.getLength();
+					String newLengthString = variable.getSasFormat();
 
 					// We already got the variable, so we check to see if the lengths are different -> take the maximum one then
 					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
@@ -62,7 +62,7 @@ public abstract class ImportScript {
 						}
 					} else {
 						if (result.containsKey(variableName)) {
-							String existingLengthString = result.get(variableName).getLength();
+							String existingLengthString = result.get(variableName).getSasFormat();
 							if (newLengthString!=null && !newLengthString.contains(".") && !existingLengthString.contains(".")) {
 								// Variable already put in result, and not a float (if float exists, we do nothing)
 								int newLength = Integer.parseInt(newLengthString);
@@ -81,7 +81,7 @@ public abstract class ImportScript {
 							} else {
 								// new Variable, we keep it like that
 								result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
-										variable.getLength()));
+										variable.getSasFormat()));
 							}
 
 						}

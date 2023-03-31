@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,9 +22,14 @@ public class Variable {
 	@Getter
 	protected VariableType type;
 
-	/** Variable length. */
+	/** Format for SAS script import */
 	@Getter
-	protected String length;
+	protected String sasFormat;
+
+	/** Maximum length received in input for the variable. */
+	@Getter
+	@Setter
+	protected int maxLengthData;
 
 	/** Name of the item used to collect the answer. */
 	@Getter
@@ -41,16 +47,27 @@ public class Variable {
 		this.type = type;
 	}
 
-	public Variable(String name, Group group, VariableType type, String length) {
+	public Variable(String name, Group group, VariableType type, String sasFormat) {
 		this.name = name;
 		this.group = group;
 		this.type = type;
-		this.length = length;
+		this.sasFormat = sasFormat;
 	}
 
 	public String getGroupName() {
 		return group.getName();
 	}
 
+	public int getExpectedLength(){
+		if (this.sasFormat != null && this.sasFormat.contains(".")){
+			String[] SasFormatPart = this.sasFormat.split("\\.");
+			return Integer.parseInt(SasFormatPart[0]);
+		}
+		if (this.sasFormat != null){
+			return Integer.parseInt(this.sasFormat);
+		}
+		// Not sure about that return
+		return 1;
+	}
 
 }

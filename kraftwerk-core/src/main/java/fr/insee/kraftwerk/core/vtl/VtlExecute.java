@@ -11,6 +11,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -142,7 +143,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
+    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
         if(vtlScript != null && !vtlScript.equals("")) {
             try {
                 // set script context
@@ -184,7 +185,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
+    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
         if(vtlScript != null && !vtlScript.isEmpty()) {
             for(String vtlInstruction : vtlScript) {
                 evalVtlScript(vtlInstruction, bindings, errors);
