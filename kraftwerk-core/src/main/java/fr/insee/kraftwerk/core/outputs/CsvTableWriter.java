@@ -64,33 +64,35 @@ public class CsvTableWriter {
 			// We check if the header has the same variables as the dataset
 			boolean sameVariables = Arrays.equals(headers, convertWithStream(variablesList));
 
-				for (int i = 0; i < dataset.getDataPoints().size(); i++) {
-					DataPoint dataPoint = dataset.getDataPoints().get(i);
-					String[] csvRow = new String[rowSize];
-					List<String> variablesListToUse = variablesList;
-					for (String variableName : headers) {
-						// Verifying that the dataset contains the variable from existing CSV File
-						if (columnsMap.containsKey(variableName)) {
-							int csvColumn = columnsMap.get(variableName);
-							String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
-							csvRow[csvColumn] = value;
-						}
-						variablesListToUse.remove(variableName);
+			for (int i = 0; i < dataset.getDataPoints().size(); i++) {
+				DataPoint dataPoint = dataset.getDataPoints().get(i);
+				String[] csvRow = new String[rowSize];
+				List<String> variablesListToUse = variablesList;
+				for (String variableName : headers) {
+					// Verifying that the dataset contains the variable from existing CSV File
+					if (columnsMap.containsKey(variableName)) {
+						int csvColumn = columnsMap.get(variableName);
+						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
+						csvRow[csvColumn] = value;
 					}
-					if (!sameVariables) {
-						// In this case we have different variables between CSV header and dataset,
-						// so we first get every variable from the CSV file and supply the values,
-						// So we add the remaining variables
-						for (String variableName : variablesListToUse) {
-	
-							int csvColumn = columnsMap.get(variableName);
-							String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
-							csvRow[csvColumn] = value;
-						}
-					}
-					writer.writeNext(csvRow);
-					
+					variablesListToUse.remove(variableName);
 				}
+				if (!sameVariables) {
+					// In this case we have different variables between CSV header and dataset,
+					// so we first get every variable from the CSV file and supply the values,
+					// So we add the remaining variables
+					for (String variableName : variablesListToUse) {
+						if (variableName.equals("NUMTH_COLL_MISSING")){
+							System.out.println(variableName);
+						}
+						int csvColumn = columnsMap.get(variableName);
+						String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
+						csvRow[csvColumn] = value;
+					}
+				}
+				writer.writeNext(csvRow);
+
+			}
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to update CSV table: %s", filePath));
 		}
