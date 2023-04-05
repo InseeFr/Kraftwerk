@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +90,7 @@ public class UserInputs {
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
+			throw new UnknownDataFormatException(e.getMessage());
 		} catch (KraftwerkException e) {
 			throw e;
 		}

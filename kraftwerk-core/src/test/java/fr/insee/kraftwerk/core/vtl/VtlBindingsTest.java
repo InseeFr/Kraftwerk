@@ -109,10 +109,13 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlString() {
+		VtlBindings vtlBindingsInitial = vtlBindings;
 		List<ErrorVtlTransformation> errors = new ArrayList<>();
 		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
 		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
 		vtlExecute.evalVtlScript("", vtlBindings, errors);
+		assertEquals(vtlBindingsInitial, vtlBindings);
+		assertEquals(0, errors.size());
 	}
 	
 
