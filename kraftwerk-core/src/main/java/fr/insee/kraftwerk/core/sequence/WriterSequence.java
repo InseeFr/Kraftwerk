@@ -20,7 +20,7 @@ public class WriterSequence {
 		Path outDirectory = FileUtils.transformToOut(inDirectory);
 		/* Step 4.1 : write csv output tables */
 		OutputFiles outputFiles = new OutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), multimodeDatasetNames);
-		outputFiles.writeOutputCsvTables();
+		outputFiles.writeOutputCsvTables(metadataVariables);
 
 		/* Step 4.2 : write scripts to import csv tables in several languages */
 		outputFiles.writeImportScripts(metadataVariables, errors);

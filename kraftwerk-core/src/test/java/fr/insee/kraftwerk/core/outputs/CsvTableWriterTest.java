@@ -8,8 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.jupiter.api.Test;
 
 import com.opencsv.CSVReader;
@@ -60,8 +67,16 @@ class CsvTableWriterTest {
 	void writeCsvFromDatasetTest() throws IOException, CsvException {
 		// Clean the existing file
 		Files.deleteIfExists(outTestFilePath);
-		
-		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath);
+		Map<String, VariablesMap> metaVariables = new HashMap<>();
+		VariablesMap varMap = new VariablesMap();
+		Group group = new Group("test","RACINE");
+		varMap.putVariable(new Variable("ID",group, VariableType.STRING));
+		varMap.putVariable(new Variable("ID2",group, VariableType.STRING));
+		varMap.putVariable(new Variable("FOO_STR",group, VariableType.STRING));
+		varMap.putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
+		metaVariables.put("test",varMap);
+
+		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaVariables, "test");
 		//
 		CSVReader reader = CsvUtils.getReader(outTestFilePath);
 		List<String[]> rows = reader.readAll();

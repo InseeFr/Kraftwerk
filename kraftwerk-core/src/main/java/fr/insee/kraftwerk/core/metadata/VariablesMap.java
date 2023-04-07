@@ -168,6 +168,12 @@ public class VariablesMap {
                 .collect(Collectors.toSet());
     }
 
+    public List<String> getGroupVariableNamesAsList(String groupName) {
+        return variables.keySet()
+                .stream().filter(name -> variables.get(name).getGroupName().equals(groupName))
+                .toList();
+    }
+
     /** Return true if there is a McqVariable that has the given question name in its mcqName attribute. */
     public boolean hasMcq(String questionName) {
         return variables.values().stream()

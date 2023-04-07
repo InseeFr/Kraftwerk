@@ -75,15 +75,15 @@ public class OutputFiles {
 	/**
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
-	public void writeOutputCsvTables() {
+	public void writeOutputCsvTables(Map<String,VariablesMap> metadataVariables) {
 		for (String datasetName : datasetToCreate) {
 			File outputFile = outputFolder.resolve(outputFileName(datasetName)).toFile();
 			if (outputFile.exists()) {
 				CsvTableWriter.updateCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder.resolve(outputFileName(datasetName)));
+						outputFolder.resolve(outputFileName(datasetName)),metadataVariables,datasetName);
 			} else {
 				CsvTableWriter.writeCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder.resolve(outputFileName(datasetName)));
+						outputFolder.resolve(outputFileName(datasetName)),metadataVariables,datasetName);
 			}
 		}
 	}
