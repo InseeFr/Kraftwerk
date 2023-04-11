@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 import lombok.Setter;
 

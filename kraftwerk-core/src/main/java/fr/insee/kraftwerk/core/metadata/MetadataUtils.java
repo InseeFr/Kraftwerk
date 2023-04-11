@@ -6,7 +6,6 @@ import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

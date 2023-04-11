@@ -5,7 +5,6 @@ import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -59,8 +58,7 @@ public abstract class DataProcessing {
 
     protected String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName);
-        log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName(),
-                automatedInstructions));
+        log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName()));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, errors);
         }
