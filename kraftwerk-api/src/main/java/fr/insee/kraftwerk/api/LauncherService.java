@@ -127,7 +127,7 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/main/file-by-file")
-	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
+	@Operation(operationId = "main", summary = "${summary.fileByfile}", description = "${description.fileByfile}")
 	public ResponseEntity<String> mainFileByFile(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
