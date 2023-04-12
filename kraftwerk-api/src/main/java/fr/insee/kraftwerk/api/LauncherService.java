@@ -151,10 +151,10 @@ public class LauncherService {
 
 		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputsSource.getModeInputsMap());
 		List<UserInputs> userInputsList = getUserInputs(userInputsSource);
+		List<KraftwerkError> errors = new ArrayList<>();
 
 		for (UserInputs userInputs : userInputsList){
 			VtlBindings vtlBindings = new VtlBindings();
-			List<KraftwerkError> errors = new ArrayList<>();
 			/* Step 2 : unimodal data */
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
@@ -174,11 +174,11 @@ public class LauncherService {
 			/* Step 4 : Write output files */
 			WriterSequence writerSequence = new WriterSequence();
 			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName(), metadataVariables, errors);
-			writeErrorsFile(inDirectory, errors);
 
 			/* Step 4.3- 4.4 : Archive */
 			if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
 		}
+		writeErrorsFile(inDirectory, errors);
 
 		return ResponseEntity.ok(campaignName);
 	}

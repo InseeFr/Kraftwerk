@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 public class ErrorVariableLength extends KraftwerkError {
 
@@ -22,4 +24,16 @@ public class ErrorVariableLength extends KraftwerkError {
                 String.format("Expected: %s but received: %d",variable.getExpectedLength(),variable.getMaxLengthData()) + "\n";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ErrorVariableLength that = (ErrorVariableLength) o;
+        return Objects.equals(variable.getName(), that.variable.getName()) && Objects.equals(dataMode, that.dataMode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(variable, dataMode);
+    }
 }

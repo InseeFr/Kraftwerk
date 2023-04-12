@@ -166,25 +166,32 @@ public class VtlExecute {
 
             } catch (ScriptException e) {
                 log.warn("ScriptException - Some VTL instruction given is invalid and has been skipped");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (NumberFormatException e) { 
                 log.warn("NumberFormatException - Corresponding variable could not be calculated.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (UnsupportedOperationException e) { 
                 log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (NullPointerException e) {
                 log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (Error e) { 
                 log.debug("Error - Probable cause: Syntax error.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (Exception e) {
                 log.warn("Exception - UNKNOWN EXCEPTION PLEASE REPORT IT!");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
+        }
+    }
+
+    private static void addError(String vtlScript, List<KraftwerkError> errors, Throwable e) {
+        ErrorVtlTransformation error = new ErrorVtlTransformation(vtlScript, e.getMessage());
+        if (!errors.contains(error)){
+            errors.add(error);
         }
     }
 
