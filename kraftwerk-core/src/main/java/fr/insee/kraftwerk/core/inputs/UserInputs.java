@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ public class UserInputs {
 
 	@Getter
 	@Setter
-	private final Map<String, ModeInputs> modeInputsMap = new HashMap<>();
+	private Map<String, ModeInputs> modeInputsMap = new HashMap<>();
 	@Getter
 	@Setter
 	private String multimodeDatasetName;

@@ -6,14 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +20,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
@@ -454,7 +454,7 @@ public class LauncherService {
 			}
 			else if (Files.isDirectory(dataPath)) {
 				try (Stream<Path> stream = Files.list(dataPath)){
-					stream.forEach(t -> files.add(t));
+					stream.forEach(files::add);
 				} catch (IOException e) {
 					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
 				}

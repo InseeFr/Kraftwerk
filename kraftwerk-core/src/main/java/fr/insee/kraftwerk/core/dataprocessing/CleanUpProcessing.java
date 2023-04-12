@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;

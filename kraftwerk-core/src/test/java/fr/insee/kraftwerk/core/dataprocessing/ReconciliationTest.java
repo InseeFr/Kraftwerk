@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;

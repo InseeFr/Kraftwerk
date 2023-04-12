@@ -12,17 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.jupiter.api.Test;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
