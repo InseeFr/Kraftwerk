@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.script.ScriptContext;
@@ -62,6 +64,14 @@ public class VtlExecute {
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName, bindings);
+        // Delete temp file
+        Path tempDataset = Paths.get(tempDatasetPath);
+        File fileTempDataset = tempDataset.toFile();
+        if (fileTempDataset.delete()){
+            log.debug("File {} deleted",tempDatasetPath);
+        } else {
+            log.debug("Impossible to delete file {}",tempDatasetPath);
+        }
     }
 
 
