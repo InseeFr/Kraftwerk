@@ -9,6 +9,9 @@
 ### Changed
 - Remove XOM to read DDI. DOM is used
 
+### Fixed
+- Read external variables in subgroups
+
 ## 1.2.1 - [2023-03-10]
 
 ### Added
@@ -32,7 +35,5 @@
 	- Change to Java 17 and Spring boot 3
 	- Packaging as JAR instead of WAR
 	
-### Fixed
-
 ## 1.1.6 - [2023-01-06]
 - Initialize API
