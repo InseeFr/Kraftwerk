@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,7 +37,7 @@ public class DDIReader {
 	 * @param ddiUrl : Path to the DDI file.
 	 *
 	 * @return The variables found in the DDI.
-	 * @throws KraftwerkException 
+	 * @throws KraftwerkException
 	 */
 	public static VariablesMap getVariablesFromDDI(URL ddiUrl) throws KraftwerkException {
 
@@ -47,8 +48,8 @@ public class DDIReader {
 			Path variablesTempFilePath = variablesFile.toPath();
 			//
 			transformDDI(ddiUrl, variablesTempFilePath);
-				return readVariables(variablesTempFilePath);
-			
+			return readVariables(variablesTempFilePath);
+
 		}
 
 		catch (MalformedURLException e) {
@@ -57,7 +58,7 @@ public class DDIReader {
 		} catch (IOException e) {
 			log.error("Unable to write temp file.", e);
 			return null;
-		} catch ( SAXException | ParserConfigurationException e) {
+		} catch (SAXException | ParserConfigurationException e) {
 			log.error("Unable to read Variables in DDI file.", e);
 			return null;
 		}
@@ -80,16 +81,17 @@ public class DDIReader {
 	 * 
 	 * @param variablesFilePath Path to the transformed xml file.
 	 * @return The variables described in the file.
-	 * @throws KraftwerkException 
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
+	 * @throws KraftwerkException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
-	private static VariablesMap readVariables(Path variablesFilePath) throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
+	private static VariablesMap readVariables(Path variablesFilePath)
+			throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
 		VariablesMap variablesMap = new VariablesMap();
 
 		// Parse
-        Element root = readXmlFile(variablesFilePath);
+		Element root = readXmlFile(variablesFilePath);
 
 		// Get XML groups
 		NodeList groupElements = root.getChildNodes();
@@ -101,32 +103,32 @@ public class DDIReader {
 
 			try {
 				Node groupNode = groupElements.item(i);
-				if ("Group".equals(groupNode.getLocalName())) {
+				if ("Group".equals(groupNode.getNodeName())) {
 
 					if (groupNode.getNodeType() == Node.ELEMENT_NODE) {
-					// Get the group name
+						// Get the group name
 						Element groupElement = (Element) groupNode;
-						
+
 						String groupName = groupElement.getAttribute("name");
 						String parentGroupName = groupElement.getAttribute("parent");
-	
+
 						// Store the group
 						Group group;
-						if (parentGroupName == null) {
+						if (parentGroupName == null || StringUtils.isEmpty(parentGroupName)) {
 							rootGroupName = groupName;
 							group = variablesMap.getRootGroup();
 						} else {
 							group = new Group(groupName, parentGroupName);
 							variablesMap.putGroup(group);
 						}
-	
+
 						// Variables in the group
 						getVariablesInGroup(variablesMap, groupNode, group);
 					}
 				}
 			} catch (NullPointerException e) {
 				log.error(String.format("Missing field in mandatory information for variable %s",
-						((Element)groupElements.item(i)).getAttribute("name")));
+						((Element) groupElements.item(i)).getAttribute("name")));
 			}
 
 			for (String groupName : variablesMap.getSubGroupNames()) {
@@ -148,13 +150,13 @@ public class DDIReader {
 		NodeList variableNodes = groupNode.getChildNodes();
 		for (int j = 0; j < variableNodes.getLength(); j++) {
 			Node variableNode = variableNodes.item(j);
-			if ("Variable".equals(variableNode.getLocalName())) {//Add only Variable
+			if ("Variable".equals(variableNode.getNodeName()) && // Add only Variable
+					variableNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element variableElement = (Element) variableNode;
 
 				// Variable name, type and size
 				String variableName = getFirstChildValue(variableElement, "Name");
-				VariableType variableType = VariableType
-						.valueOf(getFirstChildValue(variableElement, "Format"));
+				VariableType variableType = VariableType.valueOf(getFirstChildValue(variableElement, "Format"));
 				String variableLength = getFirstChildValue(variableElement, "Size");
 
 				Node questionItemName = getFirstChildNode(variableElement, "QuestionItemName");
@@ -164,8 +166,7 @@ public class DDIReader {
 				Node mcqElement = getFirstChildNode(variableElement, "QGrid");
 				//
 				if (valuesElement != null) {
-					UcqVariable variable = new UcqVariable(variableName, group, variableType,
-							variableLength);
+					UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
 					if (questionItemName != null) {
 						variable.setQuestionItemName(questionItemName.getTextContent());
 					} else if (mcqElement != null) {
@@ -175,23 +176,24 @@ public class DDIReader {
 					NodeList valueElements = valuesElement.getChildNodes();
 					for (int k = 0; k < valueElements.getLength(); k++) {
 						Node valueElement = valueElements.item(k);
-						if (valueElement.getLocalName().equals("Value")) {
+						if (valueElement.getNodeType() == Node.ELEMENT_NODE
+								&& "Value".equals(valueElement.getNodeName())) {
 							variable.addModality(valueElement.getTextContent(),
 									((Element) valueElement).getAttribute("label"));
+
 						}
 					}
 					variablesMap.putVariable(variable);
 				} else if (mcqElement != null) {
-					McqVariable variable = new McqVariable(variableName, group, variableType,
-							variableLength);
-					variable.setQuestionItemName(mcqElement.getNodeValue());
+					McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
+					variable.setQuestionItemName(mcqElement.getTextContent());
 					variable.setInQuestionGrid(true);
-					variable.setText(getFirstChildValue(variableElement,"Label"));
+					variable.setText(getFirstChildValue(variableElement, "Label"));
 					variablesMap.putVariable(variable);
 				} else {
 					Variable variable = new Variable(variableName, group, variableType, variableLength);
 					if (questionItemName != null) {
-						variable.setQuestionItemName(questionItemName.getNodeValue());
+						variable.setQuestionItemName(questionItemName.getTextContent());
 					} else {
 						variable.setQuestionItemName(variableName);
 					}
@@ -204,15 +206,17 @@ public class DDIReader {
 	private static Element readXmlFile(Path variablesFilePath)
 			throws ParserConfigurationException, SAXException, IOException, KraftwerkException {
 		File file = variablesFilePath.toFile();
-        System.setProperty("javax.xml.parsers.DocumentBuilderFactory", "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        DocumentBuilder builder= factory.newDocumentBuilder();
-        Document document  = builder.parse(file);
-		if (document == null) throw new KraftwerkException(500,"Can't read DDI - DDI is null");
-        
+		System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
+				"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse(file);
+		if (document == null)
+			throw new KraftwerkException(500, "Can't read DDI - DDI is null");
+
 		return document.getDocumentElement();
 	}
 
@@ -231,4 +235,3 @@ public class DDIReader {
 	}
 
 }
-
