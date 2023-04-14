@@ -155,8 +155,8 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements externalVariableNodes = externalNode.getChildElements();
 
 			for (Element externalVariableNode : externalVariableNodes) {
-				if (externalVariableNode.getAttribute("type") != null) {
-					if (!externalVariableNode.getAttribute("type").getValue().equals("null")) {
+				if (externalVariableNode.getAttribute("type") != null 
+					&& !externalVariableNode.getAttribute("type").getValue().equals("null")) {
 						String variableName = externalVariableNode.getLocalName();
 						String value = externalVariableNode.getValue();
 						questionnaireData.putValue(value, variableName);
@@ -166,6 +166,20 @@ public class LunaticXmlDataParser extends DataParser {
 							log.warn(String.format(
 									"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
 									variableName));
+						}
+				}
+				// Group variables 
+				else {
+					Elements valueNodes = externalVariableNode.getChildElements();
+					String variableName = externalVariableNode.getLocalName();
+					if(variables.hasVariable(variableName)) {
+						String groupName = variables.getVariable(variableName).getGroupName();
+						GroupData groupData = questionnaireData.getAnswers().getSubGroup(groupName);
+						for (int j = 0; j < valueNodes.size(); j++) {
+							Element valueNode = valueNodes.get(j);
+							if(! valueNode.getAttribute("type").getValue().equals("null")) {
+								groupData.putValue(valueNode.getValue(), variableName, j);
+							}
 						}
 					}
 				}
