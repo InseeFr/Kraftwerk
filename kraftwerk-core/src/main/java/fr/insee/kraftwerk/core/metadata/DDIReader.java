@@ -48,8 +48,14 @@ public class DDIReader {
 			Path variablesTempFilePath = variablesFile.toPath();
 			//
 			transformDDI(ddiUrl, variablesTempFilePath);
-			return readVariables(variablesTempFilePath);
 
+			VariablesMap variablesMap = readVariables(variablesTempFilePath);
+			if (variablesFile.delete()){
+				log.debug("File {} deleted",variablesFile.toPath());
+			} else {
+				log.debug("Impossible to delete file {}",variablesFile.toPath());
+			}
+			return variablesMap;
 		}
 
 		catch (MalformedURLException e) {

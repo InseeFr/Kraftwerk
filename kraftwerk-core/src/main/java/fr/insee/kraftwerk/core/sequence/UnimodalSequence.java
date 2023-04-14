@@ -38,7 +38,10 @@ public class UnimodalSequence {
 			Variable variable = variablesMap.getVariable(variableName);
 			if (!(variable.getSasFormat() == null) && variable.getExpectedLength()<variable.getMaxLengthData()){
 				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getExpectedLength(), variable.getMaxLengthData()));
-				errors.add(new ErrorVariableLength(variable, dataMode));
+				ErrorVariableLength error = new ErrorVariableLength(variable, dataMode);
+				if (!errors.contains(error)){
+					errors.add(error);
+				}
 			}
 		}
 
