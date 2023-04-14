@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 1.3.0 - Not released yet
+
+### Added
+- 
+
+### Changed
+- Remove XOM to read DDI. DOM is used
+
 ## 1.2.1 - [2023-03-10]
 
 ### Added
