@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Event;
 import fr.insee.kraftwerk.core.extradata.paradata.ParaDataUE;
@@ -26,7 +27,7 @@ class ParaDataParserTest {
 
 	@Disabled("waiting for some paradata test files")
 	@Test
-	void parseParaDataTest() {
+	void parseParaDataTest() throws KraftwerkException {
 
 		ParadataParser paraDataParser = new ParadataParser();
 
