@@ -75,6 +75,8 @@ public class LunaticXmlDataParser extends DataParser {
 
 				// Root identifier
 				questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
+				data.getIdSurveyUnits().add(questionnaireNode.getFirstChildElement("Id").getValue());
+
 
 				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
 				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());

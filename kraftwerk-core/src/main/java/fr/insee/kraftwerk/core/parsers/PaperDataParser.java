@@ -137,6 +137,7 @@ public class PaperDataParser extends DataParser {
 				String rowIdentifier = nextRecord[0];
 				String[] rowIdentifiers = rowIdentifier.split(Constants.PAPER_IDENTIFIER_SEPARATOR);
 				questionnaireData.setIdentifier(rowIdentifiers[0]);
+				data.getIdSurveyUnits().add(rowIdentifiers[0]);
 
 				if (rowIdentifiers.length >= 1) {
 

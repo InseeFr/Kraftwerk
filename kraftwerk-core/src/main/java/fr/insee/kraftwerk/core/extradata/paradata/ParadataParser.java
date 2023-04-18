@@ -1,12 +1,10 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
@@ -30,14 +28,15 @@ public class ParadataParser {
 
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
-		log.info("Paradata parser being implemented!");
+		log.info("Paradata parser being implemented for Survey Unit : {} !", surveyRawData.getIdSurveyUnits().toString() );
 		Path filePath = paradata.getFilepath();
 		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
 			try (Stream<Path> walk = Files.walk(filePath)) {
 				List<Path> listFilePaths = walk.filter(Files::isRegularFile)
-												.collect(Collectors.toList());
+						.filter(file -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(file)))
+						.toList();
 				// Parse each ParaDataUE
 				List<ParaDataUE> listParaDataUE = new ArrayList<>();
 
@@ -48,21 +47,25 @@ public class ParadataParser {
 					paraDataUE.sortEvents();			
 					if (paraDataUE.getEvents().size() > 2) {
 						paraDataUE.createOrchestratorsAndSessions();
-						try {
-							integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
-						} catch (Exception e) {
-							log.error(e.getMessage());
-						}
+						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
 						listParaDataUE.add(paraDataUE);
 					}
 				}
 				paradata.setListParadataUE(listParaDataUE);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 		}
 
 	}
+
+
+	private String getIdFromFilename(Path file) {
+		String[] splitFilename = file.getFileName().toString().split("\\.");
+		return splitFilename[splitFilename.length-2];
+	}
+	
+
 
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
 		// To convert to a entire folder instead of a single file
@@ -85,7 +88,6 @@ public class ParadataParser {
 		for (int i = 0; i < collectedEvents.size(); i++) {
 
 			JSONArray subParadata = (JSONArray) collectedEvents.get(i);
-
 			for (int j = 0; j < subParadata.size(); j++) {
 				Event event = new Event(identifier);
 				JSONObject collectedEvent = (JSONObject) subParadata.get(j);
@@ -124,13 +126,12 @@ public class ParadataParser {
 					paradataSession.setTimestamp((long) collectedEvent.get(timestamp));
 					paradataUE.addParadataSession(paradataSession);
 
-				} else {
-					if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
+				} else if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
 						paradataVariable.setVariableName(event.getIdParadataObject());
 						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
 						paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
 						paradataUE.addParadataVariable(paradataVariable);
-					}
+					
 				}
 			
 				events.add(event);
@@ -144,8 +145,7 @@ public class ParadataParser {
 			return object;
 		} else if (object instanceof Long) {
 			return object.toString();
-		} else if (object instanceof JSONArray) {
-			JSONArray jsonArray = (JSONArray) object;
+		} else if (object instanceof JSONArray jsonArray) {
 			List<String> values = new ArrayList<>();
 			for (int index = 0; index < jsonArray.size(); index++) {
 				values.add((String) getValue(jsonArray.get(index)));

@@ -41,7 +41,9 @@ public class LunaticJsonDataParser extends DataParser {
 		QuestionnaireData questionnaireData = new QuestionnaireData();
 
 		// Root identifier
+
 		questionnaireData.setIdentifier(identifier);
+		data.getIdSurveyUnits().add(identifier);
 
 		// Survey answers
 		GroupInstance answers = questionnaireData.getAnswers();
