@@ -1,16 +1,19 @@
 # Changelog
 
 
-## 1.3.0 - Not released yet
+## 1.3.0 - [2023-04-19]
 
 ### Added
-- 
+- Warning when variable length is not compatible with associated metadata (error + SAS script)
+- Endpoint to process data file by file
 
 ### Changed
 - Remove XOM to read DDI. DOM is used
 
 ### Fixed
 - Read external variables in subgroups
+- Fix format for numeric variables from paradata
+- Fix memory error with temporary Json files
 
 ## 1.2.1 - [2023-03-10]
 
