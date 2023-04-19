@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,29 +19,40 @@ import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UserInputs {
 
-	private final Path userInputFile;
+	@Getter
+	@Setter
+	private Path userInputFile;
 
 	@Getter
-	private final Path inputDirectory;
+	@Setter
+	private Path inputDirectory;
 
 	@Getter
-	private final Map<String, ModeInputs> modeInputsMap = new HashMap<>();
+	@Setter
+	private Map<String, ModeInputs> modeInputsMap = new HashMap<>();
 	@Getter
+	@Setter
 	private String multimodeDatasetName;
 	@Getter
+	@Setter
 	private Path vtlReconciliationFile;
 	@Getter
+	@Setter
 	private Path vtlTransformationsFile;
 	@Getter
+	@Setter
 	private Path vtlInformationLevelsFile;
 
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
 			"data_format", "multimode_dataset_name");
+
+	public UserInputs(){}
 
 	public UserInputs(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		this.userInputFile = userConfigFile;
@@ -89,6 +101,7 @@ public class UserInputs {
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
+			throw new UnknownDataFormatException(e.getMessage());
 		} catch (KraftwerkException e) {
 			throw e;
 		}

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.scripts.RDataTableImportScript;
 import fr.insee.kraftwerk.core.outputs.scripts.SASImportScript;
@@ -74,20 +75,20 @@ public class OutputFiles {
 	/**
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
-	public void writeOutputCsvTables() {
+	public void writeOutputCsvTables(Map<String,VariablesMap> metadataVariables) {
 		for (String datasetName : datasetToCreate) {
 			File outputFile = outputFolder.resolve(outputFileName(datasetName)).toFile();
 			if (outputFile.exists()) {
 				CsvTableWriter.updateCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder.resolve(outputFileName(datasetName)));
+						outputFolder.resolve(outputFileName(datasetName)),metadataVariables,datasetName);
 			} else {
 				CsvTableWriter.writeCsvTable(vtlBindings.getDataset(datasetName),
-						outputFolder.resolve(outputFileName(datasetName)));
+						outputFolder.resolve(outputFileName(datasetName)),metadataVariables,datasetName);
 			}
 		}
 	}
 
-	public void writeImportScripts(Map<String, VariablesMap> metadataVariables) {
+	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
 		// Assemble required info to write scripts
 		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : datasetToCreate) {
@@ -99,7 +100,7 @@ public class OutputFiles {
 		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"),
 				new RDataTableImportScript(tableScriptInfoList).generateScript());
 		TextFileWriter.writeFile(outputFolder.resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList).generateScript());
+				new SASImportScript(tableScriptInfoList,errors).generateScript());
 	}
 
 	/**

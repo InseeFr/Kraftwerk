@@ -72,10 +72,62 @@
                 </xsl:choose>
             </Format>
             <Size>
-                <xsl:if test="l:VariableRepresentation/r:NumericRepresentation">
-                    <xsl:value-of select="string-length(l:VariableRepresentation/r:NumericRepresentation/r:NumberRange/r:High)"/> <xsl:choose>
-                        <xsl:when test="l:VariableRepresentation/r:NumericRepresentation/@decimalPositions!='0'">.<xsl:value-of select="l:VariableRepresentation/r:NumericRepresentation/@decimalPositions"/></xsl:when>
-                    </xsl:choose>   
+                <xsl:if test="l:VariableRepresentation/r:NumericRepresentation or l:VariableRepresentation/r:NumericRepresentationReference">
+                    <!-- Structured Variable with min, max and decimals, used just afterwards -->
+                    <xsl:variable name="numeric-parameters">
+                        <xsl:element name="Parameters">
+                            <xsl:choose>
+                                <xsl:when test="self::r:NumericRepresentation">
+                                    <xsl:element name="Decimal">
+                                        <xsl:choose>
+                                            <xsl:when test="@decimalPositions">
+                                                <xsl:value-of select="@decimalPositions"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:value-of select="'0'"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:element>
+                                    <xsl:element name="Minimum">
+                                        <xsl:value-of select="r:NumberRange/r:Low"/>
+                                    </xsl:element>
+                                    <xsl:element name="Maximum">
+                                        <xsl:value-of select="r:NumberRange/r:High"/>
+                                    </xsl:element>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:element name="Decimal">
+                                        <xsl:choose>
+                                            <xsl:when test="descendant::*/@decimalPositions">
+                                                <xsl:value-of select="descendant::*[@decimalPositions][1]/@decimalPositions"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:value-of select="'0'"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:element>
+                                    <xsl:element name="Minimum">
+                                        <xsl:value-of select="descendant::r:NumberRange[1]/r:Low"/>
+                                    </xsl:element>
+                                    <xsl:element name="Maximum">
+                                        <xsl:value-of select="descendant::r:NumberRange[1]/r:High"/>
+                                    </xsl:element>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:element>
+                    </xsl:variable>
+                    <xsl:variable name="minimum-wholepart-length" select="string-length(if (contains($numeric-parameters//Minimum,'.')) then substring-before($numeric-parameters//Minimum,'.') else $numeric-parameters//Minimum)"/>
+                    <xsl:variable name="maximum-wholepart-length" select="string-length(if (contains($numeric-parameters//Maximum,'.')) then substring-before($numeric-parameters//Maximum,'.') else $numeric-parameters//Maximum)"/>
+                    <xsl:variable name="wholepart-length" select="if ($minimum-wholepart-length &gt; $maximum-wholepart-length) then $minimum-wholepart-length else $maximum-wholepart-length"/>
+                            <!-- SAS format for decimal numbers : (wholepart + 1 + decimal) "." (decimal) -->
+                            <xsl:choose>
+                        <xsl:when test="$numeric-parameters//Decimal != '0'">
+                            <xsl:value-of select="concat($wholepart-length+number($numeric-parameters//Decimal)+1,'.',$numeric-parameters//Decimal)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="concat($wholepart-length,'.')"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:if>
                 <xsl:if test="l:VariableRepresentation/r:TextRepresentation">
                     <xsl:value-of select="l:VariableRepresentation/r:TextRepresentation/@maxLength"/>
@@ -86,12 +138,12 @@
                     <xsl:otherwise><xsl:if test="l:VariableRepresentation/r:CodeRepresentation"><xsl:variable name="code-id" select="current()/l:VariableRepresentation/r:CodeRepresentation/r:CodeListReference/r:ID"/>
                         <xsl:apply-templates select="$root//l:CodeListScheme/l:CodeList[r:ID=$code-id]" mode="ucqInfoLength"/>
                     </xsl:if></xsl:otherwise>
-                </xsl:choose>   
-               
+                </xsl:choose>
+
                 <xsl:if test="l:VariableRepresentation/r:DateTimeRepresentationReference">23</xsl:if>
             </Size>
-            
-            <!-- QuestionGrid variables -->
+
+    <!-- QuestionGrid variables -->
             <xsl:if test="$root//d:QuestionScheme/d:QuestionGrid[r:OutParameter/r:ParameterName/r:String=$variable-name]">
                 <QGrid><xsl:value-of select="$root//d:QuestionScheme/d:QuestionGrid[r:OutParameter/r:ParameterName/r:String=$variable-name]/d:QuestionGridName/r:String"/></QGrid>
                 <Label><xsl:value-of select="r:Label/r:Content"/></Label>

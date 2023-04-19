@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
@@ -36,8 +35,7 @@ public class ParadataParser {
 
 			// Get all filepaths for each ParadataUE
 			try (Stream<Path> walk = Files.walk(filePath)) {
-				List<Path> listFilePaths = walk.filter(Files::isRegularFile)
-												.collect(Collectors.toList());
+				List<Path> listFilePaths = walk.filter(Files::isRegularFile).toList();
 				// Parse each ParaDataUE
 				List<ParaDataUE> listParaDataUE = new ArrayList<>();
 
@@ -48,11 +46,7 @@ public class ParadataParser {
 					paraDataUE.sortEvents();			
 					if (paraDataUE.getEvents().size() > 2) {
 						paraDataUE.createOrchestratorsAndSessions();
-						try {
-							integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
-						} catch (Exception e) {
-							log.error(e.getMessage());
-						}
+						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
 						listParaDataUE.add(paraDataUE);
 					}
 				}
@@ -144,8 +138,7 @@ public class ParadataParser {
 			return object;
 		} else if (object instanceof Long) {
 			return object.toString();
-		} else if (object instanceof JSONArray) {
-			JSONArray jsonArray = (JSONArray) object;
+		} else if (object instanceof JSONArray jsonArray) {
 			List<String> values = new ArrayList<>();
 			for (int index = 0; index < jsonArray.size(); index++) {
 				values.add((String) getValue(jsonArray.get(index)));
@@ -172,13 +165,13 @@ public class ParadataParser {
 		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
-				variablesMap.getRootGroup(), VariableType.INTEGER, "20");
+				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
 		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
-				VariableType.INTEGER, "20");
+				VariableType.INTEGER, "20.");
 		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, variablesMap.getRootGroup(),
-				VariableType.INTEGER, "20");
+				VariableType.INTEGER, "20.");
 		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
-				VariableType.INTEGER, "3");
+				VariableType.INTEGER, "3.");
 			variablesMap.putVariable(variableDuree);
 			variablesMap.putVariable(variableDureeBrute);
 			variablesMap.putVariable(variableNombre);

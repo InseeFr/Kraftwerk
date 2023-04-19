@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -63,7 +63,7 @@ class PaperDataProcessingTest {
 	@Test
 	void testPaperDataProcessing() {
 		//
-		List<ErrorVtlTransformation> errors =new ArrayList<ErrorVtlTransformation>();
+		List<KraftwerkError> errors =new ArrayList<>();
 		VariablesMap variablesMap = new VariablesMap();
 		Group rootGroup = variablesMap.getRootGroup();
 		variablesMap.putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));

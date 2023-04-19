@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -35,7 +35,7 @@ public class InformationLevelsTest {
 
 	@Test
 	public void applyInformationLevelsProcessing() {
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);

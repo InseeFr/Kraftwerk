@@ -88,7 +88,7 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	/**
-	 * Read data in the COLLECTED elements. To bo be removed when all questionnaires will use Lunatic V2.
+	 * Read data in the COLLECTED elements.
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData,
 											VariablesMap variables) {
@@ -112,6 +112,9 @@ public class LunaticXmlDataParser extends DataParser {
 			if (collectedNode.getAttribute("type") != null) {
 				if(! collectedNode.getAttribute("type").getValue().equals("null")) {
 					String value = variableNode.getFirstChildElement(Constants.COLLECTED).getValue();
+					if ((variables.getVariable(variableName) != null) && value.length()>variables.getVariable(variableName).getMaxLengthData()){
+						variables.getVariable(variableName).setMaxLengthData(value.length());
+					}
 					answers.putValue(variableName, value);
 				}
 			}
@@ -126,6 +129,9 @@ public class LunaticXmlDataParser extends DataParser {
 						Element valueNode = valueNodes.get(j);
 						if(! valueNode.getAttribute("type").getValue().equals("null")) {
 							String value = valueNodes.get(j).getValue();
+							if ((variables.getVariable(variableName) != null) && value.length()>variables.getVariable(variableName).getMaxLengthData()){
+								variables.getVariable(variableName).setMaxLengthData(value.length());
+							}
 							groupData.putValue(value, variableName, j);
 						}
 					}
@@ -149,8 +155,8 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements externalVariableNodes = externalNode.getChildElements();
 
 			for (Element externalVariableNode : externalVariableNodes) {
-				if (externalVariableNode.getAttribute("type") != null) {
-					if (!externalVariableNode.getAttribute("type").getValue().equals("null")) {
+				if (externalVariableNode.getAttribute("type") != null 
+					&& !externalVariableNode.getAttribute("type").getValue().equals("null")) {
 						String variableName = externalVariableNode.getLocalName();
 						String value = externalVariableNode.getValue();
 						questionnaireData.putValue(value, variableName);
@@ -161,6 +167,20 @@ public class LunaticXmlDataParser extends DataParser {
 									"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
 									variableName));
 						}
+				}
+				// Group variables 
+				else {
+					Elements valueNodes = externalVariableNode.getChildElements();
+					String variableName = externalVariableNode.getLocalName();
+					if(variables.hasVariable(variableName)) {
+						String groupName = variables.getVariable(variableName).getGroupName();
+						GroupData groupData = questionnaireData.getAnswers().getSubGroup(groupName);
+						for (int j = 0; j < valueNodes.size(); j++) {
+							Element valueNode = valueNodes.get(j);
+							if(! valueNode.getAttribute("type").getValue().equals("null")) {
+								groupData.putValue(valueNode.getValue(), variableName, j);
+							}
+						}
 					}
 				}
 			}
@@ -170,6 +190,7 @@ public class LunaticXmlDataParser extends DataParser {
 	/**
 	 * Read data in the CALCULATED elements.
 	 * Values that are a vtl expression are filtered.
+	 * To bo be removed when all questionnaires will use Lunatic V2.
 	 */
 	private void readCalculated(Element questionnaireNode, QuestionnaireData questionnaireData,
 											 VariablesMap variables) {

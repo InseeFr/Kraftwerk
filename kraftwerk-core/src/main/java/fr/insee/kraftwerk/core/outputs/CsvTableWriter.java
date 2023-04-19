@@ -6,17 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
@@ -46,55 +42,80 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void updateCsvTable(Dataset dataset, Path filePath) {
+	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
 		File file = filePath.toFile();
 		try (CSVWriter writer = setCSVWriter(filePath)){
 			String[] headers = getHeaders(file);
 
-			// Map column number with variables
-			List<String> variablesList = new ArrayList<>(dataset.getDataStructure().keySet());
-			Map<String, Integer> columnsMap = new HashMap<>();
-			int rowSize = variablesList.size();
-			for (int j = 0; j < rowSize; j++) {
-				columnsMap.put(variablesList.get(j), j);
+			List<String> variablesSpec = new ArrayList<>();
+			for (String key : metadataVariables.keySet()){
+				VariablesMap variablesMap = metadataVariables.get(key);
+				for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
+					if (!variablesSpec.contains(varName)){
+						variablesSpec.add(varName);
+					}
+				}
 			}
 
+			//All the variables of the dataset
+			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
+			variablesDataset.add("New_var_test");
+			ArrayList<String> columns = getColumns(datasetName, variablesSpec, variablesDataset);
+
+			String[] columnsTable = convertWithStream(columns);
+			List<String> variablesNotInHeaders = new ArrayList<>();
+			if(!Arrays.equals(headers, columnsTable)){
+				variablesNotInHeaders = Arrays.stream(columnsTable).filter(element -> !Arrays.asList(headers).contains(element)).toList();
+				if (variablesNotInHeaders.size()>0){
+					variablesNotInHeaders.stream().forEach(var -> log.warn("Variable {} not present in headers of existing CSV output and will not be added in the output file",var));
+				}
+			}
+
+			int rowSize = Arrays.asList(headers).size();
 			log.info("{} rows to write in file {}", dataset.getDataPoints().size(), filePath);
 
 			// We check if the header has the same variables as the dataset
-			boolean sameVariables = Arrays.equals(headers, convertWithStream(variablesList));
 
-				for (int i = 0; i < dataset.getDataPoints().size(); i++) {
-					DataPoint dataPoint = dataset.getDataPoints().get(i);
-					String[] csvRow = new String[rowSize];
-					List<String> variablesListToUse = variablesList;
-					for (String variableName : headers) {
-						// Verifying that the dataset contains the variable from existing CSV File
-						if (columnsMap.containsKey(variableName)) {
-							int csvColumn = columnsMap.get(variableName);
-							String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
-							csvRow[csvColumn] = value;
-						}
-						variablesListToUse.remove(variableName);
+
+			for (int i = 0; i < dataset.getDataPoints().size(); i++) {
+				DataPoint dataPoint = dataset.getDataPoints().get(i);
+				String[] csvRow = new String[rowSize];
+				for (String variableName : variablesDataset) {
+					if(!variablesNotInHeaders.contains(variableName)){
+						int csvColumn = Arrays.asList(headers).indexOf(variableName);
+						Component var = dataset.getDataStructure().get(variableName);
+						String value = getDataPointValue(dataPoint, var);
+						csvRow[csvColumn] = value;
 					}
-					if (!sameVariables) {
-						// In this case we have different variables between CSV header and dataset,
-						// so we first get every variable from the CSV file and supply the values,
-						// So we add the remaining variables
-						for (String variableName : variablesListToUse) {
-	
-							int csvColumn = columnsMap.get(variableName);
-							String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
-							csvRow[csvColumn] = value;
-						}
-					}
-					writer.writeNext(csvRow);
-					
 				}
+				writer.writeNext(csvRow);
+
+			}
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to update CSV table: %s", filePath));
 		}
 
+	}
+
+	private static ArrayList<String> getColumns(String datasetName, List<String> variablesSpec, List<String> variablesDataset) {
+		ArrayList<String> columns = new ArrayList<>();
+		//We add the identifiers prior to the other variables
+		columns.add(Constants.ROOT_IDENTIFIER_NAME);
+		//Columns for loop identifier
+		if (!datasetName.equals(Constants.ROOT_GROUP_NAME)){
+			columns.add(datasetName);
+		}
+		//We add all variables found in specifications
+		for (String var : variablesSpec) {
+			columns.add(var);
+		}
+		//We add additional variables produced in the process
+		for (String var : variablesDataset){
+			if (!columns.contains(var)) {
+				columns.add(var);
+			}
+		}
+		return columns;
 	}
 
 
@@ -103,7 +124,9 @@ public class CsvTableWriter {
 		String[] headers = null;
 		if (scanner.hasNextLine())
 			headers = scanner.nextLine().split(Character.toString(Constants.CSV_OUTPUTS_SEPARATOR));
-
+			for (int i=0;i<headers.length;i++){
+				headers[i] = headers[i].replace("\"","");
+			}
 		scanner.close();
 		return headers;
 	}
@@ -114,7 +137,7 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void writeCsvTable(Dataset dataset, Path filePath) {
+	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
 		// File connection
 		try (CSVWriter writer = setCSVWriter(filePath)){
 						
@@ -122,26 +145,34 @@ public class CsvTableWriter {
 			if (dataset.getDataStructure().size() == 0) {
 				log.warn("The data object has no variables.");
 			}
-	
-			// Map column number with variables
-			List<String> variablesList = new ArrayList<>(dataset.getDataStructure().keySet());
-			Map<String, Integer> columnsMap = new HashMap<>();
-			int rowSize = variablesList.size();
-			for (int j = 0; j < rowSize; j++) {
-				columnsMap.put(variablesList.get(j), j);
+
+			List<String> variablesSpec = new ArrayList<>();
+			for (String key : metadataVariables.keySet()){
+				VariablesMap variablesMap = metadataVariables.get(key);
+				for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
+					if (!variablesSpec.contains(varName)){
+						variablesSpec.add(varName);
+					}
+				}
 			}
-	
+
+			//All the variables of the dataset
+			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
+			ArrayList<String> columns = getColumns(datasetName, variablesSpec, variablesDataset);
+			int rowSize = columns.size();
+
 			// Write header
-			String[] csvHeader = convertWithStream(variablesList);
+			String[] csvHeader = convertWithStream(columns);
 			writer.writeNext(csvHeader);
-	
+
 			// Write rows
 			for (int i = 0; i < dataset.getDataPoints().size(); i++) {
 				DataPoint dataPoint = dataset.getDataPoints().get(i);
 				String[] csvRow = new String[rowSize];
-				for (String variableName : variablesList) {
-					int csvColumn = columnsMap.get(variableName);
-					String value = getDataPointValue(dataPoint, dataset.getDataStructure().get(variableName));
+				for (String variableName : variablesDataset) {
+					int csvColumn = columns.indexOf(variableName);
+					Component var = dataset.getDataStructure().get(variableName);
+					String value = getDataPointValue(dataPoint, var);
 					csvRow[csvColumn] = value;
 				}
 				writer.writeNext(csvRow);

@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.script.ScriptContext;
@@ -11,6 +13,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,6 +64,14 @@ public class VtlExecute {
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName, bindings);
+        // Delete temp file
+        Path tempDataset = Paths.get(tempDatasetPath);
+        File fileTempDataset = tempDataset.toFile();
+        if (fileTempDataset.delete()){
+            log.debug("File {} deleted",tempDatasetPath);
+        } else {
+            log.debug("Impossible to delete file {}",tempDatasetPath);
+        }
     }
 
 
@@ -142,7 +153,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
+    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
         if(vtlScript != null && !vtlScript.equals("")) {
             try {
                 // set script context
@@ -155,25 +166,32 @@ public class VtlExecute {
 
             } catch (ScriptException e) {
                 log.warn("ScriptException - Some VTL instruction given is invalid and has been skipped");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (NumberFormatException e) { 
                 log.warn("NumberFormatException - Corresponding variable could not be calculated.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (UnsupportedOperationException e) { 
                 log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (NullPointerException e) {
                 log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (Error e) { 
                 log.debug("Error - Probable cause: Syntax error.");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             } catch (Exception e) {
                 log.warn("Exception - UNKNOWN EXCEPTION PLEASE REPORT IT!");
-                errors.add(new ErrorVtlTransformation(vtlScript,e.getMessage()));
+                addError(vtlScript, errors, e);
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
+        }
+    }
+
+    private static void addError(String vtlScript, List<KraftwerkError> errors, Throwable e) {
+        ErrorVtlTransformation error = new ErrorVtlTransformation(vtlScript, e.getMessage());
+        if (!errors.contains(error)){
+            errors.add(error);
         }
     }
 
@@ -184,7 +202,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<ErrorVtlTransformation> errors){
+    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
         if(vtlScript != null && !vtlScript.isEmpty()) {
             for(String vtlInstruction : vtlScript) {
                 evalVtlScript(vtlInstruction, bindings, errors);

@@ -1,13 +1,18 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 
 public class VariableTest {
 
@@ -26,7 +31,7 @@ public class VariableTest {
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
 	@Test
-	public void readSimpsonsV1Variables() throws MalformedURLException {
+	public void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -60,7 +65,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readSimpsonsV2Variables() throws MalformedURLException {
+	public void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -98,7 +103,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readVqsWebVariables() throws MalformedURLException {
+	public void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
@@ -139,7 +144,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readVqsPapVariables() throws MalformedURLException {
+	public void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");

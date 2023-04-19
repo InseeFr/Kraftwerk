@@ -1,5 +1,20 @@
 # Changelog
 
+
+## 1.3.0 - [2023-04-19]
+
+### Added
+- Warning when variable length is not compatible with associated metadata (error + SAS script)
+- Endpoint to process data file by file
+
+### Changed
+- Remove XOM to read DDI. DOM is used
+
+### Fixed
+- Read external variables in subgroups
+- Fix format for numeric variables from paradata
+- Fix memory error with temporary Json files
+
 ## 1.2.1 - [2023-03-10]
 
 ### Added
@@ -23,7 +38,5 @@
 	- Change to Java 17 and Spring boot 3
 	- Packaging as JAR instead of WAR
 	
-### Fixed
-
 ## 1.1.6 - [2023-01-06]
 - Initialize API

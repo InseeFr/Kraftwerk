@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
-	private List<ErrorVtlTransformation> errors;
+	private List<KraftwerkError> errors;
 
 	VtlExecute vtlExecute = new VtlExecute();
 
@@ -84,7 +85,7 @@ class VtlBindingsTest {
 
 	@Test
 	void evalVtlScriptTest_uniqueString() {
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		List<KraftwerkError> errors = new ArrayList<>();
 		//
 		vtlBindings.put("TEST", ds1);
 		//
@@ -109,16 +110,21 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlString() {
-		List<ErrorVtlTransformation> errors = new ArrayList<>();
+		VtlBindings vtlBindingsInitial = vtlBindings;
+		List<KraftwerkError> errors = new ArrayList<>();
 		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
 		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
 		vtlExecute.evalVtlScript("", vtlBindings, errors);
+		assertEquals(vtlBindingsInitial, vtlBindings);
+		assertEquals(0, errors.size());
 	}
 	
 
 	@Test
 	void evalEmptyVtlScriptObject() {
 		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings,errors);
+		assertEquals(0, errors.size());
+
 	}
 
 	@Test
