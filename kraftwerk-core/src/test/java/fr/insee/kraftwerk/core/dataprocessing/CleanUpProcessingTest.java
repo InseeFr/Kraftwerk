@@ -3,12 +3,16 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -72,7 +76,7 @@ public class CleanUpProcessingTest {
         // Metadata variables object
         Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
         // Errors list
-        List<ErrorVtlTransformation> errors = new ArrayList<>();
+        List<KraftwerkError> errors = new ArrayList<>();
         //
         VariablesMap cawiVariables = new VariablesMap();
         cawiVariables.putVariable(new Variable("FOO", cawiVariables.getRootGroup(), VariableType.STRING));

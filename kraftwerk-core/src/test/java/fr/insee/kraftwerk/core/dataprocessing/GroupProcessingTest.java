@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.junit.jupiter.api.Test;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -34,7 +34,7 @@ public class GroupProcessingTest {
                         new Structured.Component("FOO2", Long.class, Dataset.Role.MEASURE)
                 )
         );
-        List<ErrorVtlTransformation> errors = new ArrayList<>();
+        List<KraftwerkError> errors = new ArrayList<>();
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
         //

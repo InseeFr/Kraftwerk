@@ -3,30 +3,30 @@ package cucumber;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.script.Bindings;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.util.ArrayList;
-import java.util.List;
-
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	public Bindings bindings = vtlBindings;
 	public String tempDatasetPath = "";
-	public List<ErrorVtlTransformation> errors = new ArrayList<>();
+	public List<KraftwerkError> errors = new ArrayList<>();
 	
 	VtlExecute vtlExecute = new VtlExecute();
 

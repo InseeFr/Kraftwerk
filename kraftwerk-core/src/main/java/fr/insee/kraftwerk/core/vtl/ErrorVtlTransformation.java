@@ -1,9 +1,12 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ErrorVtlTransformation {
+import java.util.Objects;
+
+public class ErrorVtlTransformation extends KraftwerkError {
 
     @Getter @Setter
     private String vtlScript;
@@ -24,5 +27,18 @@ public class ErrorVtlTransformation {
         return "VTL Transformation error detected on :" + "\n" +
                 "Script='" + vtlScript + '\'' + "\n" +
                 "Message='" + message + '\'' + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ErrorVtlTransformation that = (ErrorVtlTransformation) o;
+        return Objects.equals(vtlScript, that.vtlScript) && Objects.equals(message, that.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vtlScript, message);
     }
 }

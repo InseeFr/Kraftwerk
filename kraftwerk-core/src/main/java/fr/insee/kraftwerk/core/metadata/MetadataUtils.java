@@ -5,19 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MetadataUtils {
 
-	
-	public static VariablesMap getMetadata(UserInputs userInputs, String dataMode){
-		Map<String, VariablesMap> metadataVariables = getMetadata(userInputs.getModeInputsMap());
-		return metadataVariables.get(dataMode);
-	}
-	
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
@@ -26,7 +20,12 @@ public class MetadataUtils {
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+		VariablesMap variables= new VariablesMap();
+		try {
+			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+		} catch (KraftwerkException e) {
+			log.error(e.getMessage());
+		}
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
 			// First we add the collected _MISSING variables
