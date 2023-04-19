@@ -22,11 +22,11 @@ public abstract class ReportingDataParser {
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData) {
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
-		createReportingVariables(surveyRawData, reportingData);
+		createReportingVariables(surveyRawData);
 		addReportingValues(surveyRawData, reportingData);
 	}
 
-	private void createReportingVariables(SurveyRawData surveyRawData, ReportingData reportingData) {
+	private void createReportingVariables(SurveyRawData surveyRawData) {
 		Variable variableInterviewer = new Variable(Constants.INTERVIEWER_ID_NAME,
 				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "20");
 		surveyRawData.getVariablesMap().putVariable(variableInterviewer);

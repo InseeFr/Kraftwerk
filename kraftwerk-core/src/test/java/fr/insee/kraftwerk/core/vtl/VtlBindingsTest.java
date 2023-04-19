@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
@@ -110,16 +110,21 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlString() {
+		VtlBindings vtlBindingsInitial = vtlBindings;
 		List<KraftwerkError> errors = new ArrayList<>();
 		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
 		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
 		vtlExecute.evalVtlScript("", vtlBindings, errors);
+		assertEquals(vtlBindingsInitial, vtlBindings);
+		assertEquals(0, errors.size());
 	}
 	
 
 	@Test
 	void evalEmptyVtlScriptObject() {
 		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings,errors);
+		assertEquals(0, errors.size());
+
 	}
 
 	@Test

@@ -67,7 +67,7 @@ public class SaxonTransformer {
 		try {
 			xmlInput.close();
 			xslInput.close();
-		} catch (IOException e) {
+		} catch (IOException | NullPointerException e ) {
 			log.error("IOException occurred when trying to close the streams after XSL transformation.", e);
 		}
 	}
