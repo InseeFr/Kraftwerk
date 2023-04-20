@@ -20,6 +20,8 @@ public class SurveyRawData {
 	private Path paraDataFolder;
 	private VariablesMap variablesMap;
 	private final List<QuestionnaireData> questionnaires = new ArrayList<>();
+    private List<String> idSurveyUnits = new ArrayList<>();//Used for file by file operations
+
 
 	public SurveyRawData() {}
 	public SurveyRawData(String dataMode) {

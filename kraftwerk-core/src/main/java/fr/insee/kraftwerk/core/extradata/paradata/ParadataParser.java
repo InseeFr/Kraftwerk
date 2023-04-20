@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,13 +28,15 @@ public class ParadataParser {
 
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
-		log.info("Paradata parser being implemented!");
+		log.info("Paradata parser being implemented for Survey Unit : {} !", surveyRawData.getIdSurveyUnits().toString() );
 		Path filePath = paradata.getFilepath();
 		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
 			try (Stream<Path> walk = Files.walk(filePath)) {
-				List<Path> listFilePaths = walk.filter(Files::isRegularFile).toList();
+				List<Path> listFilePaths = walk.filter(Files::isRegularFile)
+						.filter(file -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(file)))
+						.toList();
 				// Parse each ParaDataUE
 				List<ParaDataUE> listParaDataUE = new ArrayList<>();
 
@@ -51,12 +52,20 @@ public class ParadataParser {
 					}
 				}
 				paradata.setListParadataUE(listParaDataUE);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 		}
 
 	}
+
+
+	private String getIdFromFilename(Path file) {
+		String[] splitFilename = file.getFileName().toString().split("\\.");
+		return splitFilename[splitFilename.length-2];
+	}
+	
+
 
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
 		// To convert to a entire folder instead of a single file
@@ -79,7 +88,6 @@ public class ParadataParser {
 		for (int i = 0; i < collectedEvents.size(); i++) {
 
 			JSONArray subParadata = (JSONArray) collectedEvents.get(i);
-
 			for (int j = 0; j < subParadata.size(); j++) {
 				Event event = new Event(identifier);
 				JSONObject collectedEvent = (JSONObject) subParadata.get(j);
@@ -118,13 +126,12 @@ public class ParadataParser {
 					paradataSession.setTimestamp((long) collectedEvent.get(timestamp));
 					paradataUE.addParadataSession(paradataSession);
 
-				} else {
-					if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
+				} else if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
 						paradataVariable.setVariableName(event.getIdParadataObject());
 						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
 						paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
 						paradataUE.addParadataVariable(paradataVariable);
-					}
+					
 				}
 			
 				events.add(event);
