@@ -1,5 +1,8 @@
 # Changelog
 
+### Changed
+- Remove SLF4J and use Log4j2 instead
+
 
 ## 1.3.0 - [2023-04-19]
 
