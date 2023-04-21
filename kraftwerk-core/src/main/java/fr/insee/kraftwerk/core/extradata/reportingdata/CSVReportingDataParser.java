@@ -10,9 +10,6 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -21,9 +18,10 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class CSVReportingDataParser extends ReportingDataParser {
-	private static final Logger log = LoggerFactory.getLogger(CSVReportingDataParser.class);
 
 	private CSVReader csvReader;
 

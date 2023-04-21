@@ -16,9 +16,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class LunaticReader {
 
     /**

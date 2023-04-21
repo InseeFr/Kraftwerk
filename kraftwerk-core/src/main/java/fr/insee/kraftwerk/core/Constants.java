@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This class contains paths and fixed parameters used in the application.
  */
-@Slf4j
+@Log4j2
 public final class Constants {
 
 	private Constants() {}

@@ -22,13 +22,13 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Class to write temporary VTL datasets. These datasets are JSON files that has
  * the format expected by VTL modules.
  */
-@Slf4j
+@Log4j2
 public class VtlJsonDatasetWriter {
 
 	private final SurveyRawData surveyData;

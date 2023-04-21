@@ -19,9 +19,9 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;

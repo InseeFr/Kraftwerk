@@ -6,7 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
@@ -16,12 +20,12 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * To write in memory data into CSV files.
  */
-@Slf4j
+@Log4j2
 public class CsvTableWriter {
 	
 	private CsvTableWriter() {

@@ -14,13 +14,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 
 @Component
 @WebFilter(urlPatterns = "/*")
 @Order(-999)
-@Slf4j
+@Log4j2
 public class LogRequestFilter extends OncePerRequestFilter {
 	
 	private static final String REQUEST_MESSAGE_FORMAT = 

@@ -21,9 +21,9 @@ import org.xml.sax.SAXException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class DDIReader {
 
 	// DDI should stay in KW and use DOM (not Jaxb)

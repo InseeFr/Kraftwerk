@@ -14,7 +14,7 @@ User documentation and functional tests are still in an [inhouse project](https:
 
 ## Requirements
 
-* JDK 11 +
+* JDK 17 +
 * Maven 3.6 +
 
 Kraftwerk uses [Lombok](https://projectlombok.org/).
@@ -31,7 +31,7 @@ La documentation utilisateur et les tests fonctionnels sont encore dans un [proj
 
 ## Configuration requise
 
-* JDK 11 +
+* JDK 17 +
 * Maven 3.6 +
   
 Kraftwerk utilise [Lombok](https://projectlombok.org/).

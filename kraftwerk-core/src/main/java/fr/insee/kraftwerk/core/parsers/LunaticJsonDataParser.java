@@ -9,9 +9,9 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class LunaticJsonDataParser extends DataParser {
 
 	/**

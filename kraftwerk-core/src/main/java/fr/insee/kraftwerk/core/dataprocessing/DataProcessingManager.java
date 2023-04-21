@@ -3,11 +3,11 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 
 
-@Slf4j
+@Log4j2
 public class DataProcessingManager {
 
 	/**

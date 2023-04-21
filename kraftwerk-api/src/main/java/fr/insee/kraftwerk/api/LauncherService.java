@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api;
 
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,11 +42,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 
 
-@Slf4j
+@Log4j2
 @RestController
 @ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Success"),

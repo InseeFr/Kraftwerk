@@ -21,10 +21,10 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 @NoArgsConstructor
-@Slf4j
+@Log4j2
 public class UnimodalSequence {
 
 	public void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
