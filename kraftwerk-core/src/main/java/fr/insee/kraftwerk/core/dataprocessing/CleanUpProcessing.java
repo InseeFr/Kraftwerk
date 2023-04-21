@@ -13,12 +13,13 @@ import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
+
 
 /**
  * Clean up step to be called after the reconciliation step.
  */
-@Slf4j
+@Log4j2
 public class CleanUpProcessing extends DataProcessing {
 
     private Map<String, VariablesMap> metadataVariables;

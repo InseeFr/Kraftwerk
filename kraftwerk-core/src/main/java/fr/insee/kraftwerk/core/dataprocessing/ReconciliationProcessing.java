@@ -13,9 +13,9 @@ import fr.insee.kraftwerk.core.vtl.VtlMacros;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.Structured;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class ReconciliationProcessing extends DataProcessing {
 
 	private final String modeVariableIdentifier;

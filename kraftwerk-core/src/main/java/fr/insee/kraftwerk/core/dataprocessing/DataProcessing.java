@@ -8,7 +8,8 @@ import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
+
 
 /**
  * Interface to apply VTL instructions.
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  * Second is a process describes by the user VTL instructions file.
  * If the user has not given a VTL file for this brick, the second step is omitted.
  */
-@Slf4j
+@Log4j2
 public abstract class DataProcessing {
 
     protected final VtlBindings vtlBindings;

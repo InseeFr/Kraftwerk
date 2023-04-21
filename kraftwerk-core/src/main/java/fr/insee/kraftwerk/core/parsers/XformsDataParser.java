@@ -7,7 +7,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -15,7 +15,7 @@ import nu.xom.Elements;
 /**
  * Implementation of DataParser to read Xforms data files.
  */
-@Slf4j
+@Log4j2
 public class XformsDataParser extends DataParser {
 
 	/**

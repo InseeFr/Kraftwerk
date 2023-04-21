@@ -19,12 +19,6 @@
 
 	<dependencies>
 
-		<!-- Logging API -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-
 		<!-- XML libraries -->
 		<!-- XML-XSLT with Saxon -->
 		<dependency>
@@ -87,7 +81,6 @@
 			<artifactId>vtl-jackson</artifactId>
 			<version>${trevas.version}</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

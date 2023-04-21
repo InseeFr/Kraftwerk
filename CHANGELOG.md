@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## Not released yet
 
 
@@ -8,10 +9,9 @@
 
 ### Changed
 - Read paradata file by file (survey unit by surveyunit based on filename)
+- Remove SLF4J and use Log4j2 instead
 
 ### Fixed
-
-
 
 
 ## 1.3.0 - [2023-04-19]

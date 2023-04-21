@@ -3,13 +3,13 @@ package fr.insee.kraftwerk.core.metadata;
 import java.util.Date;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Enum class for variable types.
  *
  *  */
-@Slf4j
+@Log4j2
 @Getter
 public enum VariableType {
 	STRING ("character","character", "STRING"),
