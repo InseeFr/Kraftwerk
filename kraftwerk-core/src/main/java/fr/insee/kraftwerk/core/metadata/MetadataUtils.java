@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,5 +55,16 @@ public class MetadataUtils {
 					missingVar, group.getName()));
 		}
 		variables.putVariable(new Variable(missingVar, group, varType));
+	}
+
+	public static Map<String, VariablesMap> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap) {
+		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataVariables));
+		return metadataVariables;
+	}
+
+	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
+		VariablesMap variables = LunaticReader.getVariablesFromLunatic(modeInputs.getLunaticFile());
+		metadataVariables.put(dataMode, variables);
 	}
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import fr.insee.kraftwerk.core.vtl.ErrorVtlTransformation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,7 @@ public class LauncherService {
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
 	
-	private ControlInputSequence controlInputSequence ;
+	private ControlInputSequence controlInputSequence;
 	
 	@PostConstruct
 	public void initializeWithProperties() {
@@ -78,6 +79,7 @@ public class LauncherService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
+		boolean withDDI = true;
 		/* Step 1 : Init */
 		Path inDirectory;
 		try {
@@ -103,7 +105,7 @@ public class LauncherService {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -127,11 +129,12 @@ public class LauncherService {
 	}
 
 	@PutMapping(value = "/main/file-by-file")
-	@Operation(operationId = "main", summary = "${summary.fileByFile}", description = "${description.fileByFile}")
+	@Operation(operationId = "mainFileByFile", summary = "${summary.fileByFile}", description = "${description.fileByFile}")
 	public ResponseEntity<String> mainFileByFile(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 	) {
+		boolean withDDI = true;
 		/* Step 1 : Init */
 		Path inDirectory;
 		try {
@@ -159,7 +162,7 @@ public class LauncherService {
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				try {
-					buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+					buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
 				} catch (NullException e) {
 					return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 				}
@@ -179,6 +182,62 @@ public class LauncherService {
 			if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
 		}
 		writeErrorsFile(inDirectory, errors);
+
+		return ResponseEntity.ok(campaignName);
+	}
+
+	@PutMapping(value = "/main/lunatic-only")
+	@Operation(operationId = "mainLunaticOnly", summary = "${summary.mainLunaticOnly}", description = "${description.mainLunaticOnly}")
+	public ResponseEntity<String> mainLunaticOnly(
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+	) {
+		boolean withDDI = false;
+		/* Step 1 : Init */
+		Path inDirectory;
+		try {
+			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+		String campaignName = inDirectory.getFileName().toString();
+		log.info("Kraftwerk main service started for campaign: " + campaignName);
+
+		UserInputs userInputs;
+		try {
+			userInputs = controlInputSequence.getUserInputs(inDirectory);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+
+		VtlBindings vtlBindings = new VtlBindings();
+		List<KraftwerkError> errors = new ArrayList<>();
+;
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputs.getModeInputsMap());
+
+		/* Step 2 : unimodal data */
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+			try {
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables,withDDI);
+			} catch (NullException e) {
+				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+			}
+			UnimodalSequence unimodal = new UnimodalSequence();
+			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors,metadataVariables);
+		}
+
+		/* Step 3 : multimodal VTL data processing */
+		MultimodalSequence multimodalSequence = new MultimodalSequence();
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
+
+		/* Step 4 : Write output files */
+		WriterSequence writerSequence = new WriterSequence();
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName(),metadataVariables, errors);
+		writeErrorsFile(inDirectory, errors);
+
+		/* Step 4.3- 4.4 : Archive */
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
 
 		return ResponseEntity.ok(campaignName);
 	}
@@ -207,6 +266,7 @@ public class LauncherService {
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
+		boolean withDDI = true;
 		//Read data files
 		Path inDirectory;
 		try {
@@ -230,7 +290,7 @@ public class LauncherService {
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables,withDDI);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -250,6 +310,7 @@ public class LauncherService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode
 			)  {
+		boolean withDDI = true;
 		//Read data files
 		Path inDirectory;
 		try {
@@ -270,7 +331,7 @@ public class LauncherService {
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		try {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables,withDDI);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}

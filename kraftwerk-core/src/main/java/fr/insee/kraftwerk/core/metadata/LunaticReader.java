@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,68 @@ public class LunaticReader {
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * This method extracts return the variables of a questionnaire without
+     * reading a DDI file. It should be used only when the DDI is not available.
+     *
+     * @param lunaticFile : Path to a Lunatic specification file.
+     * @return The variables found in the Lunatic specification.
+     */
+    public static VariablesMap getVariablesFromLunatic(Path lunaticFile) {
+        JsonNode rootNode;
+        try {
+            rootNode = JsonFileReader.read(lunaticFile);
+            List<String> variables = new ArrayList<>();
+            JsonNode variablesNode = rootNode.get("variables");
+            variablesNode.forEach(var->variables.add(var.get("name").asText()));
+            JsonNode componentsNode = rootNode.get("components");
+            List<JsonNode> loops = new ArrayList<>();
+            // Root group is created in VariablesMap constructor
+            VariablesMap variablesMap = new VariablesMap();
+            if (componentsNode.isArray()){
+                int i = 1;
+                for(JsonNode component : componentsNode){
+                    if(component.get("componentType").asText().equals("Loop")){
+                        // No imbricated loops so the parent is the root group
+                        Group group = new Group(String.format("BOUCLE%d",i), Constants.ROOT_GROUP_NAME);
+                        i++;
+                        variablesMap.putGroup(group);
+                        JsonNode loopVariables = component.get("bindingDependencies");
+                        loopVariables.forEach(variable -> {
+                            variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
+                            variables.remove(variable.asText());
+                        });
+                        System.out.println("Stop");
+                    }
+                }
+            }
+            //We get the root group
+            Group rootGroup = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
+            variables.forEach(var->variablesMap.putVariable(new Variable(var, rootGroup, VariableType.STRING)));
+            return variablesMap;
+        } catch (IOException e) {
+            log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+            return null;
+        }
+    }
+
+    /**
+     * Read the lunatic file and returns a String containing the questionnaire model id
+     *
+     * @param lunaticFile : Path to a Lunatic specification file.
+     * @return the questionnaire model id
+     */
+    public static String getQuestionnaireModelId(Path lunaticFile){
+        JsonNode rootNode;
+        try {
+            rootNode = JsonFileReader.read(lunaticFile);
+            return rootNode.get("id").asText();
+        } catch (IOException e) {
+            log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+            return null;
         }
     }
 

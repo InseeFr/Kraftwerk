@@ -42,6 +42,7 @@ public class VariablesMap {
     public void putVariable(Variable variable) {
         variables.put(variable.getName(), variable);
     }
+
     /** Remove the variable with given name from the map. */
     public void removeVariable(String name){
         if (variables.get(name) != null) {
@@ -50,6 +51,7 @@ public class VariablesMap {
             log.debug(String.format("Variable named \"%s\" is not in the variables map", name));
         }
     }
+
     /** Return the variable with given name. */
     public Variable getVariable(String variableName){
         Variable variable = variables.get(variableName);
