@@ -1,5 +1,13 @@
 # Changelog
 
+## Not released yet
+
+### Added
+
+### Changed
+
+### Fixed
+
 
 ## 1.3.1 - [2023-05-02]
 
