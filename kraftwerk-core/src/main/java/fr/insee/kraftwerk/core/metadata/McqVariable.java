@@ -3,12 +3,12 @@ package fr.insee.kraftwerk.core.metadata;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * One multiple choice question with K modalities = K MCQ Variables.
  */
-@Slf4j
+@Log4j2
 public class McqVariable extends Variable {
 
 	/** Text associated with the modality. */

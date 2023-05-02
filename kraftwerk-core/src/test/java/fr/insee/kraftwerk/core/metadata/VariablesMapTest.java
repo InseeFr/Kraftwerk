@@ -1,16 +1,21 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import fr.insee.kraftwerk.core.Constants;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Slf4j
+import fr.insee.kraftwerk.core.Constants;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class VariablesMapTest {
 
     private VariablesMap variablesMap;

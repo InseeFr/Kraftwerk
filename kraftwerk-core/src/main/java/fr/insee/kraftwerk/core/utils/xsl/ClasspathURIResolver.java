@@ -5,7 +5,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Use for controlling the resolution of includes
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  * i.e. import statements href are equal to <code>/path/to/resources/directory</code>
  * */
 
-@Slf4j
+@Log4j2
 public class ClasspathURIResolver implements URIResolver {
 
 	@Override

@@ -13,12 +13,12 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Class that provide method to use the Trevas library.
  */
-@Slf4j
+@Log4j2
 public class VtlBindings extends SimpleBindings {
 
     public VtlBindings(){

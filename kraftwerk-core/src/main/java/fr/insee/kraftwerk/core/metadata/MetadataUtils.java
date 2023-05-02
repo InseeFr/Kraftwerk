@@ -7,9 +7,9 @@ import java.util.Map;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class MetadataUtils {
 
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){

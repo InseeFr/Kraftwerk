@@ -1,19 +1,18 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+
 import java.sql.Date;
 import java.util.Calendar;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public abstract class ReportingDataParser {
-	private static final Logger log = LoggerFactory.getLogger(ReportingDataParser.class);
 
 	public int maxStates = 0;
 
