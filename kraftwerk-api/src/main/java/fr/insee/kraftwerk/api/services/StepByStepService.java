@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.api;
+package fr.insee.kraftwerk.api.services;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -26,6 +26,7 @@ import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -153,7 +154,7 @@ public class StepByStepService extends KraftwerkService {
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -200,7 +201,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 

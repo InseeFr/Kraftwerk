@@ -3,7 +3,9 @@ package fr.insee.kraftwerk.core.utils;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.extern.log4j.Log4j2;
 
 
@@ -30,4 +32,23 @@ public class TextFileWriter {
             log.warn(String.format("Error occurred when trying to write text file: %s", filePath), e);
         }
     }
+    
+	public static void writeErrorsFile(Path inDirectory, List<KraftwerkError> errors) {
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
+		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+
+		//Write errors file
+		if (!errors.isEmpty()) {
+			try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
+				for (KraftwerkError error : errors){
+					myWriter.write(error.toString());
+				}
+				log.info(String.format("Text file: %s successfully written", tempOutputPath));
+			} catch (IOException e) {
+				log.warn(String.format("Error occurred when trying to write text file: %s", tempOutputPath), e);
+			}
+		} else {
+			log.debug("No error found during VTL transformations");
+		}
+	}
 }
