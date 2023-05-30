@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class ParaDataUE {
+	private static final String INITIALIZATION_ONGOING = "Initialization ongoing";
 	@Getter
 	@Setter
 	private Path filepath;
@@ -61,95 +62,113 @@ public class ParaDataUE {
 	public void addOrchestrator(Orchestrator orchestrator) {
 		this.orchestrators.add(orchestrator);
 	}
-	
+
 	public void sortEvents() {
-		this.setEvents(
-				this.getEvents()
-				.stream()
-				.distinct()
+		this.setEvents(this.getEvents().stream().distinct()
 				.sorted(Comparator.comparingLong(Event::getTimestamp).thenComparing(Event::getIdParadataObject))
-				.collect(Collectors.toList())
-		);
+				.collect(Collectors.toList()));
 	}
 
 	public long createLengthOrchestratorsVariable() {
-		long result = 0L;
-		for (Orchestrator orchestrator : getOrchestrators())
-			result += orchestrator.getValidation() - orchestrator.getInitialization();
-		return result;
+		return getOrchestrators().stream().mapToLong(orchestrator -> orchestrator.getDuration()).sum();
+	}
+	
+
+	public String getVariableStart() {
+		return Long.toString(getSessions().get(0).getInitialization());
+	}
+	
+	public String getVariableEnd() {
+		return Long.toString(getLastSession().getTermination());
+	}
+
+	private Session getLastSession() {
+		return getSessions().get(getSessions().size()-1);
 	}
 
 	public void createOrchestratorsAndSessions() {
 		List<Event> listParadataEvents = getEvents();
 
 		// initialize
-		Session session = new Session("Initialization ongoing", 0L, 0L);
-		Orchestrator orchestrator = new Orchestrator(identifier, 0L, 0L);
+		Session session = new Session(INITIALIZATION_ONGOING);
+		Orchestrator orchestrator = new Orchestrator(identifier);
 
-		// iterate on paradata events in reverse order
-		if (!listParadataEvents.isEmpty()) {
-			for (int j = 0; j < listParadataEvents.size() - 1; j++) {
-				Event event1 = listParadataEvents.get(j);
-				Event previousEvent;
-				if (session.getIdentifier().contentEquals("Initialization ongoing")) {//idSession was never set
-					session.setIdentifier(event1.getIdSession());
+		if (listParadataEvents.isEmpty()) 	return;
+		Event previousEvent = null ;
+		
+		// iterate on paradata events
+		for (int j = 0; j < listParadataEvents.size(); j++) {
+			Event currentEvent = listParadataEvents.get(j);
+
+			if (session.getIdentifier().contentEquals(INITIALIZATION_ONGOING)) {// idSession was never set
+				session.setIdentifier(currentEvent.getIdSession());
+			}
+			String idParadataObject = currentEvent.getIdParadataObject();
+			
+			switch (idParadataObject) {
+			case "init-session":
+				if (session.getInitialization() == 0L) {
+					session.setInitialization(currentEvent.getTimestamp());
+				} else {
+					session = changeCurrentSession(session, currentEvent, previousEvent);
+					if (orchestrator.getInitialization() != 0L	&& orchestrator.getInitialization() < previousEvent.getTimestamp()) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
+					}
 				}
-				if (event1.getIdParadataObject().contentEquals("init-session")) {
-					if (session.getInitialization() == 0L) {
-						session.setInitialization(event1.getTimestamp());
+				break;
+			
+			case "init-orchestrator-collect" :
+				if (orchestrator.getInitialization() != 0L) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
+				}
+				orchestrator.setInitialization(currentEvent.getTimestamp());
+				break;
+			//"agree-sending-modal-button" => when click on confirm in popup
+			case "validate-button-orchestrator-collect" :
+				if (orchestrator.getInitialization() == 0L) {
+					if (getSessions().isEmpty()) {
+						orchestrator.setInitialization(session.getInitialization());
 					} else {
-						previousEvent = listParadataEvents.get(j - 1);
-						session.setTermination(previousEvent.getTimestamp());
-						addSession(session);
-						session = new Session(event1.getIdSession(), event1.getTimestamp(), 0L);
-						if (orchestrator.getInitialization() != 0L
-								&& orchestrator.getInitialization() < previousEvent.getTimestamp()) {
-							orchestrator.setValidation(previousEvent.getTimestamp());
-							addOrchestrator(orchestrator);
-							orchestrator = new Orchestrator(identifier, 0L, 0L);
-						}
+						orchestrator.setInitialization(getLastSession().getInitialization());
 					}
 				}
-				if (orchestrator.getInitialization() == 0L
-						&& event1.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
-					orchestrator.setInitialization(event1.getTimestamp());
-				} else if (orchestrator.getInitialization() != 0L
-						&& event1.getIdParadataObject().contentEquals("init-orchestrator-collect")) {
-					Session previousSession = getSessions().get(getSessions().size() - 1);
-					if (previousSession.getTermination() != orchestrator.getInitialization()
-							&& orchestrator.getInitialization() != 0L) {
-						previousEvent = listParadataEvents.get(j - 1);
-						addOrchestrator(new Orchestrator(identifier, orchestrator.getInitialization(),
-								previousEvent.getTimestamp()));
-						orchestrator.setInitialization(event1.getTimestamp());
-					}
-				} else if (event1.getIdParadataObject().contentEquals("validate-button-orchestrator-collect")) {
-					previousEvent = listParadataEvents.get(j - 1);
-					if (orchestrator.getInitialization() == 0L) {
-						if (getSessions().isEmpty()) {
-							orchestrator.setInitialization(session.getInitialization());
-						} else {
-							orchestrator.setInitialization(
-									(getSessions().get(getSessions().size() - 1)).getInitialization());
-						}
-					}
-					if (orchestrator.getInitialization() < previousEvent.getTimestamp()) {
-						orchestrator.setValidation(event1.getTimestamp());
-						addOrchestrator(orchestrator);
-					}
-					orchestrator = new Orchestrator(identifier, 0L, 0L);
+				if (orchestrator.getInitialization() < previousEvent.getTimestamp()) {
+					orchestrator.setValidation(currentEvent.getTimestamp());
+					addOrchestrator(orchestrator);
 				}
+				orchestrator = new Orchestrator(identifier);
+				break;
+				
+			default:
+				break;
 			}
-			Event event = listParadataEvents.get(listParadataEvents.size() - 1);
-			if (session.getInitialization() != 0L && session.getTermination() == 0L) {
-				session.setTermination(event.getTimestamp());
-				addSession(session);
-			}
-			if (orchestrator.getInitialization() != 0L && orchestrator.getValidation() == 0L
-					&& orchestrator.getInitialization() < event.getTimestamp()) {
-				orchestrator.setValidation(event.getTimestamp());
-				addOrchestrator(orchestrator);
-			}
+			
+			previousEvent = currentEvent;
 		}
+		Event event = listParadataEvents.get(listParadataEvents.size() - 1);
+		if (session.getInitialization() != 0L && session.getTermination() == 0L) { //close last session
+			session.setTermination(event.getTimestamp());
+			addSession(session);
+		}
+		if (orchestrator.getInitialization() != 0L && orchestrator.getValidation() == 0L
+				&& orchestrator.getInitialization() < event.getTimestamp()) { //close last orchestrator
+			orchestrator.setValidation(event.getTimestamp());
+			addOrchestrator(orchestrator);
+		}
+
+	}
+
+	private Orchestrator changeCurrentOrchestrator(Orchestrator orchestrator, Event previousEvent) {
+		orchestrator.setValidation(previousEvent.getTimestamp());
+		addOrchestrator(orchestrator);
+		orchestrator = new Orchestrator(identifier);
+		return orchestrator;
+	}
+
+	private Session changeCurrentSession(Session session, Event currentEvent, Event previousEvent) {
+		session.setTermination(previousEvent.getTimestamp());
+		addSession(session);
+		session = new Session(currentEvent.getIdSession(), currentEvent.getTimestamp(), 0L);
+		return session;
 	}
 }
