@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 1.3.2 - [2023-05-30]
+
+### Fixed
+- Security issue by updating Springboot
+
 ## 1.3.1 - [2023-05-02]
 
 ### Changed
