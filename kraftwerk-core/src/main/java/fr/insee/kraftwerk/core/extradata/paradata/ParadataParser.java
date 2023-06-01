@@ -66,16 +66,8 @@ public class ParadataParser {
 
 	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
 		// To convert to a entire folder instead of a single file
-		Path filePath = paradataUE.getFilepath();
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
-		JSONObject jsonObject = null;
-		try {
-			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
-		} catch (Exception e) {
-			throw new NullException("Can't read JSON file - " + e.getClass() + " " + e.getMessage());
-		}
-		if (jsonObject == null)
-			throw new NullException("Error reading file - NullPointer");
+		JSONObject jsonObject = getParadataFromJson(paradataUE);
 		// Get Identifier
 		String identifier = (String) jsonObject.get("idSu");
 		paradataUE.setIdentifier(identifier);
@@ -143,6 +135,19 @@ public class ParadataParser {
 		paradataUE.setEvents(events);
 	}
 
+	private JSONObject getParadataFromJson(ParaDataUE paradataUE) throws NullException {
+		Path filePath = paradataUE.getFilepath();
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
+		} catch (Exception e) {
+			throw new NullException("Can't read JSON file - " + e.getClass() + " " + e.getMessage());
+		}
+		if (jsonObject == null)
+			throw new NullException("Error reading file - NullPointer");
+		return jsonObject;
+	}
+
 	public Object getValue(Object object) {
 		if (object instanceof String) {
 			return object;
@@ -175,15 +180,23 @@ public class ParadataParser {
 				VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
 				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
+		Variable variableDureeSession = new Variable(Constants.LENGTH_SESSIONS_NAME, variablesMap.getRootGroup(),
+				VariableType.STRING, "30");
+		Variable variableDureeSessionBrute = new Variable(Constants.LENGTH_SESSIONS_NAME + "_LONG",
+				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
 		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "20.");
 		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "20.");
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+		Variable variableNbOrch = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3.");
-		variablesMap.putVariable(variableDuree);
-		variablesMap.putVariable(variableDureeBrute);
-		variablesMap.putVariable(variableNombre);
+		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, variablesMap.getRootGroup(),
+				VariableType.INTEGER, "3.");
+		
+	//	Add variables to map : some variables are calculated but not used (variableDuree,variableDureeBrute, variableNbOrch)
+		variablesMap.putVariable(variableDureeSession);
+		variablesMap.putVariable(variableDureeSessionBrute);
+		variablesMap.putVariable(variableNbSessions);
 		variablesMap.putVariable(variableStart);
 		variablesMap.putVariable(variableEnd);
 		for (String variableName : paradataVariables) {
@@ -196,18 +209,21 @@ public class ParadataParser {
 
 		if (!paraDataUE.getOrchestrators().isEmpty()) {
 			long lengthOrchestrators = paraDataUE.createLengthOrchestratorsVariable();
+			long lengthSessions = paraDataUE.createLengthSessionsVariable();
+
 			QuestionnaireData questionnaire = surveyRawData.getQuestionnaires().stream()
 					.filter(questionnaireToSearch -> paraDataUE.getOrchestrators().get(0).getIdentifier()
 							.equals(questionnaireToSearch.getIdentifier()))
 					.findAny().orElse(null);
 			if (questionnaire != null) {
-				questionnaire.getAnswers().putValue(variableDuree.getName(),
-						Constants.convertToDateFormat(lengthOrchestrators));
+				questionnaire.getAnswers().putValue(variableDuree.getName(),Constants.convertToDateFormat(lengthOrchestrators));
 				questionnaire.getAnswers().putValue(variableDureeBrute.getName(), Long.toString(lengthOrchestrators));
+				questionnaire.getAnswers().putValue(variableDureeSession.getName(),Constants.convertToDateFormat(lengthSessions));
+				questionnaire.getAnswers().putValue(variableDureeSessionBrute.getName(), Long.toString(lengthSessions));
 				questionnaire.getAnswers().putValue(variableStart.getName(), paraDataUE.getVariableStart());
 				questionnaire.getAnswers().putValue(variableEnd.getName(), paraDataUE.getVariableEnd());
-				questionnaire.getAnswers().putValue(variableNombre.getName(),
-						Long.toString(paraDataUE.getOrchestrators().size()));
+				questionnaire.getAnswers().putValue(variableNbOrch.getName(), Long.toString(paraDataUE.getOrchestrators().size()));
+				questionnaire.getAnswers().putValue(variableNbSessions.getName(), Long.toString(paraDataUE.getSessions().size()));
 				for (String variableName : paradataVariables) {
 					if (variableName.contentEquals("PRENOM")) {
 						questionnaire.getAnswers().putValue(Constants.PARADATA_VARIABLES_PREFIX + variableName,

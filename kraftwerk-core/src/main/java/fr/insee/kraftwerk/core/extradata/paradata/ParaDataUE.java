@@ -74,6 +74,10 @@ public class ParaDataUE {
 	}
 	
 
+	public long createLengthSessionsVariable() {
+		return getSessions().stream().mapToLong(session -> session.getDuration()).sum();
+	}
+
 	public String getVariableStart() {
 		return Long.toString(getSessions().get(0).getInitialization());
 	}
@@ -93,7 +97,7 @@ public class ParaDataUE {
 		Session session = new Session(INITIALIZATION_ONGOING);
 		Orchestrator orchestrator = new Orchestrator(identifier);
 
-		if (listParadataEvents.isEmpty()) 	return;
+		if (listParadataEvents.isEmpty() || listParadataEvents.size()==1) 	return;
 		Event previousEvent = null ;
 		
 		// iterate on paradata events
@@ -118,27 +122,30 @@ public class ParaDataUE {
 				break;
 			
 			case "init-orchestrator-collect" :
-				if (orchestrator.getInitialization() != 0L) {
+				if (orchestrator.getInitialization() != 0L	&& orchestrator.getInitialization() < previousEvent.getTimestamp()) {
 						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
 				}
 				orchestrator.setInitialization(currentEvent.getTimestamp());
 				break;
-			//"agree-sending-modal-button" => when click on confirm in popup
-			case "validate-button-orchestrator-collect" :
+			case "agree-sending-modal-button-orchestrator-collect" : 
+			//validate the modal popup 
 				if (orchestrator.getInitialization() == 0L) {
-					if (getSessions().isEmpty()) {
 						orchestrator.setInitialization(session.getInitialization());
-					} else {
-						orchestrator.setInitialization(getLastSession().getInitialization());
-					}
 				}
-				if (orchestrator.getInitialization() < previousEvent.getTimestamp()) {
-					orchestrator.setValidation(currentEvent.getTimestamp());
-					addOrchestrator(orchestrator);
+				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+					orchestrator.setInitialization(currentEvent.getTimestamp());
 				}
-				orchestrator = new Orchestrator(identifier);
 				break;
-				
+			case  "logout-close-button-orchestrator-collect"  : 
+			//close page
+				if (orchestrator.getInitialization() == 0L) {
+					orchestrator.setInitialization(session.getInitialization());
+				}
+				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+				}
+				break;	
 			default:
 				break;
 			}
@@ -171,4 +178,5 @@ public class ParaDataUE {
 		session = new Session(currentEvent.getIdSession(), currentEvent.getTimestamp(), 0L);
 		return session;
 	}
+
 }
