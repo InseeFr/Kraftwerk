@@ -24,10 +24,6 @@ public class ParaDataUE {
 	private List<Event> events = new ArrayList<>();
 	@Getter
 	private Map<String, List<ParadataVariable>> paraDataVariables = new LinkedHashMap<>();
-
-	private List<ParadataOrchestrator> paraDataOrchestrators = new ArrayList<>();
-
-	private List<Event> paraDataSessions = new ArrayList<>();
 	@Getter
 	private List<Session> sessions = new ArrayList<>();
 	@Getter
@@ -45,14 +41,6 @@ public class ParaDataUE {
 			this.paraDataVariables.put(variableName, new ArrayList<>());
 			this.paraDataVariables.get(variableName).add(paraDataVariable);
 		}
-	}
-
-	public void addParadataOrchestrator(ParadataOrchestrator paraDataOrchestrator) {
-		this.paraDataOrchestrators.add(paraDataOrchestrator);
-	}
-
-	public void addParadataSession(Event paraDataSession) {
-		this.paraDataSessions.add(paraDataSession);
 	}
 
 	public void addSession(Session session) {

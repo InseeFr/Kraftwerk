@@ -1,0 +1,159 @@
+{
+  "idSu": "PL1100000101",
+  "events": [
+    [
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "validationPage",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "validate-button-orchestrator-collect",
+        "timestamp": 1645807734894
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "validationPage",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "agree-sending-modal-button-orchestrator-collect",
+        "timestamp": 1645807741929
+      }
+    ],
+    [
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "session",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "session-started",
+        "idParadataObject": "init-session",
+        "timestamp": 1645807624027
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "orchestrator-create",
+        "idParadataObject": "init-orchestrator-collect",
+        "timestamp": 1645807624458
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "welcomePage",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "next-button-orchestrator-collect",
+        "timestamp": 1645807637176
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "1",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "next-button-orchestrator-collect",
+        "timestamp": 1645807674779
+      }
+    ],
+    [
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "lunatic-input",
+        "idOrchestrator": "orchestrator-collect",
+        "responseName": "CADR",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "1",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "selection",
+        "value": "3",
+        "idParadataObject": "radio-kb9hlpdc-3",
+        "timestamp": 1645807679901
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "2",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "next-button-orchestrator-collect",
+        "timestamp": 1645807684715
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "lunatic-input",
+        "idOrchestrator": "orchestrator-collect",
+        "responseName": "INDNVOCC",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "2",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "selection",
+        "value": "2",
+        "idParadataObject": "radio-kqweh61i-2",
+        "timestamp": 1645807690025
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "4",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "next-button-orchestrator-collect",
+        "timestamp": 1645807691450
+      },
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "184",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "next-button-orchestrator-collect",
+        "timestamp": 1645807730751
+      }
+    ],
+    [
+      {
+        "idSurveyUnit": "PL1100000101",
+        "typeParadataObject": "orchestrator",
+        "idOrchestrator": "orchestrator-collect",
+        "idQuestionnaire": "LOG2022X01",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+        "page": "endPage",
+        "idSession": "593d88e6-3f11-49a2-9727-92a8e13fb39f",
+        "type": "click",
+        "idParadataObject": "logout-close-button-orchestrator-collect",
+        "timestamp": 1645807759129
+      }
+    ]
+  ]
+}
