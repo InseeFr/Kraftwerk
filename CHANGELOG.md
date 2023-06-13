@@ -7,6 +7,11 @@
 ### Changed
 
 ### Fixed
+
+## 1.3.3 - [2023-06-13]
+
+### Fixed
+
 - Paradata : fix the method for calculating sessions time
 - Exclude boolean variables from length errors
 
