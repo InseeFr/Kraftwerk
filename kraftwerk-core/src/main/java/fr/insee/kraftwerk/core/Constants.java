@@ -56,10 +56,12 @@ public final class Constants {
 
 
 	// ----- Paradata Variables Names
-	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_SESSION";
+	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_ORCHESTRATORS";
+	public static final String LENGTH_SESSIONS_NAME = "DURATION_ACTIVE_SESSIONS";
 	public static final String START_SESSION_NAME = "DEBUT_SESSION";
 	public static final String FINISH_SESSION_NAME = "FIN_SESSION";
 	public static final String NUMBER_ORCHESTRATORS_NAME = "NB_ORCHESTRATORS";
+	public static final String NUMBER_SESSIONS_NAME = "NB_SESSIONS";
 	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
 
 

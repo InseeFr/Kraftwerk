@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -25,12 +26,17 @@ public class ParadataParser {
 	private String timestamp = "timestamp";
 
 	private static final String NEW_VALUE = "newValue";
+	
+	private List<String> inputFields = Arrays.asList("RADIO", "CHECKBOX", "INPUT", "DATEPICKER");
+
 
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
 		log.info("Paradata parser being implemented for Survey Unit : {} !",
 				surveyRawData.getIdSurveyUnits().toString());
 		Path filePath = paradata.getFilepath();
+		if (filePath == null) 	throw new NullException("JSONFile not defined");
+
 		if (!filePath.toString().contentEquals("")) {
 
 			// Get all filepaths for each ParadataUE
@@ -64,18 +70,10 @@ public class ParadataParser {
 		return splitFilename[splitFilename.length - 2];
 	}
 
-	public void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
+	private void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
 		// To convert to a entire folder instead of a single file
-		Path filePath = paradataUE.getFilepath();
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
-		JSONObject jsonObject = null;
-		try {
-			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
-		} catch (Exception e) {
-			throw new NullException("Can't read JSON file - " + e.getClass() + " " + e.getMessage());
-		}
-		if (jsonObject == null)
-			throw new NullException("Error reading file - NullPointer");
+		JSONObject jsonObject = getParadataFromJson(paradataUE);
 		// Get Identifier
 		String identifier = (String) jsonObject.get("idSu");
 		paradataUE.setIdentifier(identifier);
@@ -95,47 +93,28 @@ public class ParadataParser {
 					event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
 					event.setIdSession((String) collectedEvent.get("idSession"));
 					event.setTimestamp((long) collectedEvent.get(timestamp));
+					
 					ParadataVariable paradataVariable = new ParadataVariable(identifier);
-					ParadataOrchestrator paradataOrchestrator = new ParadataOrchestrator(identifier,
-							event.getIdSession());
-					Event paradataSession = new Event(identifier, event.getIdSession());
-
+					paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
+					paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
+					
 					if (variablesMap.getVariableNames().contains(event.getIdParadataObject())) {
 						paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());
-						JSONObject jsonObj = new JSONObject(collectedEvent);
 						// Change value -> not String dependant
-
-						event.setValue(getValue(jsonObj.get(NEW_VALUE)));
-						paradataVariable.setValue(event.getValue());
-						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
-						paradataUE.addParadataVariable(paradataVariable);
-
-					} else if (event.getIdParadataObject().toUpperCase().contains("RADIO")
-							|| event.getIdParadataObject().toUpperCase().contains("CHECKBOX")
-							|| event.getIdParadataObject().toUpperCase().contains("INPUT")
-							|| event.getIdParadataObject().toUpperCase().contains("DATEPICKER")) {
-						paradataVariable.setVariableName((String) collectedEvent.get("responseName"));
-						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
-						paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
-						paradataUE.addParadataVariable(paradataVariable);
-
-					} else if (event.getIdParadataObject().toUpperCase().contains("ORCHESTRATOR")) {
-						paradataOrchestrator.setTimestamp((long) collectedEvent.get(timestamp));
-						paradataOrchestrator.setObjectName((String) collectedEvent.get("idParadataObject"));
-						paradataUE.addParadataOrchestrator(paradataOrchestrator);
-
-					} else if (event.getIdParadataObject().toUpperCase().contains("SESSION")) {
-						paradataSession.setTimestamp((long) collectedEvent.get(timestamp));
-						paradataUE.addParadataSession(paradataSession);
-
-					} else if (event.getIdParadataObject().contains(Constants.FILTER_RESULT_PREFIX)) {
-						paradataVariable.setVariableName(event.getIdParadataObject());
-						paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
-						paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
+						Object newValue = getValue(new JSONObject(collectedEvent).get(NEW_VALUE));
+						event.setValue(newValue);
+						paradataVariable.setValue(newValue);
 						paradataUE.addParadataVariable(paradataVariable);
 
 					}
-
+					if (inputFields.stream().anyMatch(event.getIdParadataObject().toUpperCase()::contains)) {
+						paradataVariable.setVariableName((String) collectedEvent.get("responseName"));
+						paradataUE.addParadataVariable(paradataVariable);
+					} 
+					if (event.getIdParadataObject().toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+						paradataVariable.setVariableName(event.getIdParadataObject());
+						paradataUE.addParadataVariable(paradataVariable);
+					}
 					events.add(event);
 				}
 			}
@@ -143,7 +122,20 @@ public class ParadataParser {
 		paradataUE.setEvents(events);
 	}
 
-	public Object getValue(Object object) {
+	private JSONObject getParadataFromJson(ParaDataUE paradataUE) throws NullException {
+		Path filePath = paradataUE.getFilepath();
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
+		} catch (Exception e) {
+			throw new NullException("Can't read JSON file - " + e.getClass() + " " + e.getMessage());
+		}
+		if (jsonObject == null)
+			throw new NullException("Error reading file - NullPointer");
+		return jsonObject;
+	}
+
+	private Object getValue(Object object) {
 		if (object instanceof String) {
 			return object;
 		} else if (object instanceof Long) {
@@ -168,22 +160,30 @@ public class ParadataParser {
 	 * @param paradataUE    the paradata
 	 * @param surveyRawData dataset where the paradata will be saved
 	 */
-	public void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) {
+	private void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) {
 		VariablesMap variablesMap = surveyRawData.getVariablesMap();
 		Set<String> paradataVariables = paraDataUE.getParaDataVariables().keySet();
 		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
 				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
+		Variable variableDureeSession = new Variable(Constants.LENGTH_SESSIONS_NAME, variablesMap.getRootGroup(),
+				VariableType.STRING, "30");
+		Variable variableDureeSessionBrute = new Variable(Constants.LENGTH_SESSIONS_NAME + "_LONG",
+				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
 		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "20.");
 		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "20.");
-		Variable variableNombre = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+		Variable variableNbOrch = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3.");
-		variablesMap.putVariable(variableDuree);
-		variablesMap.putVariable(variableDureeBrute);
-		variablesMap.putVariable(variableNombre);
+		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, variablesMap.getRootGroup(),
+				VariableType.INTEGER, "3.");
+		
+	//	Add variables to map : some variables are calculated but not used (variableDuree,variableDureeBrute, variableNbOrch)
+		variablesMap.putVariable(variableDureeSession);
+		variablesMap.putVariable(variableDureeSessionBrute);
+		variablesMap.putVariable(variableNbSessions);
 		variablesMap.putVariable(variableStart);
 		variablesMap.putVariable(variableEnd);
 		for (String variableName : paradataVariables) {
@@ -196,18 +196,21 @@ public class ParadataParser {
 
 		if (!paraDataUE.getOrchestrators().isEmpty()) {
 			long lengthOrchestrators = paraDataUE.createLengthOrchestratorsVariable();
+			long lengthSessions = paraDataUE.createLengthSessionsVariable();
+
 			QuestionnaireData questionnaire = surveyRawData.getQuestionnaires().stream()
 					.filter(questionnaireToSearch -> paraDataUE.getOrchestrators().get(0).getIdentifier()
 							.equals(questionnaireToSearch.getIdentifier()))
 					.findAny().orElse(null);
 			if (questionnaire != null) {
-				questionnaire.getAnswers().putValue(variableDuree.getName(),
-						Constants.convertToDateFormat(lengthOrchestrators));
+				questionnaire.getAnswers().putValue(variableDuree.getName(),Constants.convertToDateFormat(lengthOrchestrators));
 				questionnaire.getAnswers().putValue(variableDureeBrute.getName(), Long.toString(lengthOrchestrators));
+				questionnaire.getAnswers().putValue(variableDureeSession.getName(),Constants.convertToDateFormat(lengthSessions));
+				questionnaire.getAnswers().putValue(variableDureeSessionBrute.getName(), Long.toString(lengthSessions));
 				questionnaire.getAnswers().putValue(variableStart.getName(), paraDataUE.getVariableStart());
 				questionnaire.getAnswers().putValue(variableEnd.getName(), paraDataUE.getVariableEnd());
-				questionnaire.getAnswers().putValue(variableNombre.getName(),
-						Long.toString(paraDataUE.getOrchestrators().size()));
+				questionnaire.getAnswers().putValue(variableNbOrch.getName(), Long.toString(paraDataUE.getOrchestrators().size()));
+				questionnaire.getAnswers().putValue(variableNbSessions.getName(), Long.toString(paraDataUE.getSessions().size()));
 				for (String variableName : paradataVariables) {
 					if (variableName.contentEquals("PRENOM")) {
 						questionnaire.getAnswers().putValue(Constants.PARADATA_VARIABLES_PREFIX + variableName,

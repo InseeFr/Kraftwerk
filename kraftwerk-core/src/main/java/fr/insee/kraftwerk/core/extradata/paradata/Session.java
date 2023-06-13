@@ -20,4 +20,9 @@ public class Session {
 		this.initialization = 0L;
 		this.termination = 0L;
 	}
+
+
+	public long getDuration() {
+		return getTermination() - getInitialization();
+	}
 }

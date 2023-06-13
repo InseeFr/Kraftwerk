@@ -7,6 +7,7 @@
 ### Changed
 
 ### Fixed
+- Paradata : fix the method for calculating sessions time
 
 
 ## 1.3.2 - [2023-05-30]
