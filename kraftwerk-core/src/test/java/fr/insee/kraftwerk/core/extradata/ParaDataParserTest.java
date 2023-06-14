@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -56,7 +57,8 @@ class ParaDataParserTest {
 
 		expectedMessage = "JSONFile not defined";
 		actualMessage = exception.getMessage();
-
+		int actualStatus = ((KraftwerkException) exception).getStatus();
+		assertEquals(500, actualStatus);
 		assertTrue(actualMessage.contains(expectedMessage));
 		
 		//assert that do nothng without file

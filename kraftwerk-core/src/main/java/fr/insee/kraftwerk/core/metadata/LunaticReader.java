@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static fr.insee.kraftwerk.core.Constants.ENO_VARIABLES;
 import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
 import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
 
@@ -10,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +20,15 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class LunaticReader {
 
-    /**
+    private static final String VARIABLES = "variables";
+    
+    private LunaticReader() {
+        throw new IllegalStateException("Utility class");
+      }
+
+
+
+	/**
      * Read the lunatic questionnaire given to get VTL expression of calculated variables.
      * @param lunaticFile Path to a lunatic questionnaire file.
      * @return A CalculatedVariables map.
@@ -35,7 +42,7 @@ public class LunaticReader {
 
             CalculatedVariables calculatedVariables = new CalculatedVariables();
 
-            JsonNode variablesNode = rootNode.get("variables");
+            JsonNode variablesNode = rootNode.get(VARIABLES);
             variablesNode.forEach(variableNode -> {
                 if (variableNode.get("variableType").asText().equals("CALCULATED")) {
                     String formula =  isLunaticV2 ? variableNode.get("expression").get("value").asText(): variableNode.get("expression").asText();
@@ -54,8 +61,8 @@ public class LunaticReader {
             return calculatedVariables;
 
         } catch (IOException e) {
-            log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
-            return null;
+            log.error("Unable to read Lunatic questionnaire file: {}", lunaticFile);
+            return new CalculatedVariables();
         }
     }
 
@@ -69,11 +76,11 @@ public class LunaticReader {
         try {
             JsonNode rootNode = JsonFileReader.read(lunaticFile);
             List<String> variables = new ArrayList<>();
-            List<String> varsEno = Arrays.asList(ENO_VARIABLES);
+            List<String> varsEno = Arrays.asList(Constants.getEnoVariables());
 
-            JsonNode variablesNode = rootNode.get("variables");
+            JsonNode variablesNode = rootNode.get(VARIABLES);
             variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
-            return variables.stream().filter(var-> var.endsWith(MISSING_SUFFIX) || varsEno.contains(var)).collect(Collectors.toList());
+            return variables.stream().filter(varToRead-> varToRead.endsWith(MISSING_SUFFIX) || varsEno.contains(varToRead)).toList();
 
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
@@ -92,7 +99,7 @@ public class LunaticReader {
             JsonNode rootNode = JsonFileReader.read(lunaticFile);
             List<String> variables = new ArrayList<>();
 
-            JsonNode variablesNode = rootNode.get("variables");
+            JsonNode variablesNode = rootNode.get(VARIABLES);
             variablesNode.forEach(variableNode -> variables.add(variableNode.get("name").asText()));
             return variables.stream().filter(variable-> variable.startsWith(FILTER_RESULT_PREFIX)).toList();
 

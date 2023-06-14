@@ -52,7 +52,7 @@ public final class Constants {
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 	public static final String MISSING_SUFFIX = "_MISSING";
 	public static final String COLLECTED = "COLLECTED";
-	public static final String[] ENO_VARIABLES = {"COMMENT_QE","COMMENT_UE","HEURE_REMPL","MIN_REMPL"};
+	private static final String[] ENO_VARIABLES = {"COMMENT_QE","COMMENT_UE","HEURE_REMPL","MIN_REMPL"};
 
 
 	// ----- Paradata Variables Names
@@ -222,5 +222,10 @@ public final class Constants {
 
 	public static char getCsvOutputQuoteChar() {
 		return csvOutputQuoteChar;
+	}
+
+
+	public static String[] getEnoVariables() {
+		return ENO_VARIABLES;
 	}
 }

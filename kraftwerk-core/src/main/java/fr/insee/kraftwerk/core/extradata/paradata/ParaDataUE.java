@@ -85,51 +85,36 @@ public class ParaDataUE {
 		Session session = new Session(INITIALIZATION_ONGOING);
 		Orchestrator orchestrator = new Orchestrator(identifier);
 
-		if (listParadataEvents.isEmpty() || listParadataEvents.size()==1) 	return;
+		if (checkNoSessionToCreate(listParadataEvents)) 	return;
 		Event previousEvent = null ;
 		
 		// iterate on paradata events
 		for (int j = 0; j < listParadataEvents.size(); j++) {
 			Event currentEvent = listParadataEvents.get(j);
-
-			if (session.getIdentifier().contentEquals(INITIALIZATION_ONGOING)) {// idSession was never set
-				session.setIdentifier(currentEvent.getIdSession());
-			}
+			initializeSessionIdentifier(session, currentEvent);
 			String idParadataObject = currentEvent.getIdParadataObject();
 			
 			switch (idParadataObject) {
 			case "init-session":
-				if (session.getInitialization() == 0L) {
-					session.setInitialization(currentEvent.getTimestamp());
-				} else {
-					session = changeCurrentSession(session, currentEvent, previousEvent);
-					if (orchestrator.getInitialization() != 0L	&& orchestrator.getInitialization() < previousEvent.getTimestamp()) {
-						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
-					}
+				session = initializeOrChangeSession(session, previousEvent, currentEvent);
+				if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
+					orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
 				}
 				break;
 			
 			case "init-orchestrator-collect" :
-				if (orchestrator.getInitialization() != 0L	&& orchestrator.getInitialization() < previousEvent.getTimestamp()) {
-						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
-				}
-				orchestrator.setInitialization(currentEvent.getTimestamp());
+				orchestrator = initializeOrChangeOrchestrator(orchestrator, previousEvent, currentEvent);
 				break;
 			case "agree-sending-modal-button-orchestrator-collect" : 
 			//validate the modal popup 
-				if (orchestrator.getInitialization() == 0L) {
-						orchestrator.setInitialization(session.getInitialization());
-				}
+				initOrchestratorWithSessionIfNeeded(session, orchestrator);
 				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
 					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
 					orchestrator.setInitialization(currentEvent.getTimestamp());
 				}
 				break;
 			case  "logout-close-button-orchestrator-collect"  : 
-			//close page
-				if (orchestrator.getInitialization() == 0L) {
-					orchestrator.setInitialization(session.getInitialization());
-				}
+				initOrchestratorWithSessionIfNeeded(session, orchestrator);
 				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
 					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
 				}
@@ -141,16 +126,70 @@ public class ParaDataUE {
 			previousEvent = currentEvent;
 		}
 		Event event = listParadataEvents.get(listParadataEvents.size() - 1);
-		if (session.getInitialization() != 0L && session.getTermination() == 0L) { //close last session
-			session.setTermination(event.getTimestamp());
-			addSession(session);
+		closeLastSession(session, event);
+		closeLastOrchestrator(orchestrator, event);
+
+	}
+
+	private Orchestrator initializeOrChangeOrchestrator(Orchestrator orchestrator, Event previousEvent,
+			Event currentEvent) {
+		if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
+				orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
 		}
-		if (orchestrator.getInitialization() != 0L && orchestrator.getValidation() == 0L
-				&& orchestrator.getInitialization() < event.getTimestamp()) { //close last orchestrator
+		orchestrator.setInitialization(currentEvent.getTimestamp());
+		return orchestrator;
+	}
+
+	private Session initializeOrChangeSession(Session session, Event previousEvent, Event currentEvent) {
+		if (session.getInitialization() == 0L) {
+			session.setInitialization(currentEvent.getTimestamp());
+		} else {
+			session = changeCurrentSession(session, currentEvent, previousEvent);
+		}
+		return session;
+	}
+
+	private boolean checkNoSessionToCreate(List<Event> listParadataEvents) {
+		return listParadataEvents.isEmpty() || listParadataEvents.size()==1;
+	}
+
+	private void initializeSessionIdentifier(Session session, Event currentEvent) {
+		if (session.getIdentifier().contentEquals(INITIALIZATION_ONGOING)) {// idSession was never set
+			session.setIdentifier(currentEvent.getIdSession());
+		}
+	}
+
+	private void closeLastOrchestrator(Orchestrator orchestrator, Event event) {
+		if (isOrchestratorStartButNotFinish(orchestrator)&& orchestrator.getInitialization() < event.getTimestamp()) { //close last orchestrator
 			orchestrator.setValidation(event.getTimestamp());
 			addOrchestrator(orchestrator);
 		}
+	}
 
+	private void closeLastSession(Session session, Event event) {
+		if (isSessionStartButNotFinish(session)) { //close last session
+			session.setTermination(event.getTimestamp());
+			addSession(session);
+		}
+	}
+
+	private void initOrchestratorWithSessionIfNeeded(Session session, Orchestrator orchestrator) {
+		if (orchestrator.getInitialization() == 0L) {
+				orchestrator.setInitialization(session.getInitialization());
+		}
+	}
+
+	private boolean isOrchestratorStartBeforePreviousEvent(Orchestrator orchestrator, Event previousEvent) {
+		if (previousEvent == null) return false;
+		return orchestrator.getInitialization() != 0L	&& orchestrator.getInitialization() < previousEvent.getTimestamp();
+	}
+
+	private boolean isOrchestratorStartButNotFinish(Orchestrator orchestrator) {
+		return orchestrator.getInitialization() != 0L && orchestrator.getValidation() == 0L;
+	}
+
+	private boolean isSessionStartButNotFinish(Session session) {
+		return session.getInitialization() != 0L && session.getTermination() == 0L;
 	}
 
 	private Orchestrator changeCurrentOrchestrator(Orchestrator orchestrator, Event previousEvent) {
@@ -161,6 +200,7 @@ public class ParaDataUE {
 	}
 
 	private Session changeCurrentSession(Session session, Event currentEvent, Event previousEvent) {
+		if (previousEvent == null) return session;
 		session.setTermination(previousEvent.getTimestamp());
 		addSession(session);
 		session = new Session(currentEvent.getIdSession(), currentEvent.getTimestamp(), 0L);
