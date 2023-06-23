@@ -12,7 +12,7 @@
   <packaging>jar</packaging> 
   
 	<properties>
-		<kraftwerk.version>1.3.1</kraftwerk.version>
+		<kraftwerk.version>1.3.3</kraftwerk.version>
 	</properties>
 	
 	<dependencies>
