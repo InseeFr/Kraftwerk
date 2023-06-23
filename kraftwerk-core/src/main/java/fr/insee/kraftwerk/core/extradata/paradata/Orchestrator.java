@@ -1,20 +1,27 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class Orchestrator {
-	@Getter	@Setter
-  private String identifier;
-	@Getter	@Setter
-  private long initialization;
-	@Getter	@Setter
-  private long validation;
-    
-  
-  public Orchestrator(String identifier, long initialization, long validation) {
-    this.identifier = identifier;
-    this.initialization = initialization;
-    this.validation = validation;
-  }
+
+	private String identifier;
+	private long initialization;
+	private long validation;
+	
+	public long getDuration() {
+		return getValidation() - getInitialization();
+	}
+
+	public Orchestrator(String identifier) {
+		super();
+		this.identifier = identifier;
+		this.initialization = 0L;
+		this.validation = 0L;
+	}
+
 }

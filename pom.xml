@@ -3,43 +3,38 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>1.3.1</version>
+	<version>1.3.3</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.6</version>
+		<version>3.1.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<log4j2.version>2.17.2</log4j2.version> <!-- Log4j security vulnerabilities mitigation -->
 		<cucumber.version>7.11.1</cucumber.version>
-
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.8</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
-
 		<skipSurefireReport>true</skipSurefireReport>
+		<!-- Pi Test-->
+		<pitest.version>1.14.1</pitest.version>
+		<pitest.junit.version>1.2.0</pitest.junit.version>
 	</properties>
-	
 	<modules>
-	    <module>kraftwerk-core</module>
+		<module>kraftwerk-core</module>
 		<module>kraftwerk-api</module>
 	</modules>
-
 	<dependencies>
-
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -52,8 +47,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-log4j2</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -71,7 +66,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<!-- Tests -->
 		<!-- Unit testing with JUnit -->
 		<!-- (imported with Spring) -->
@@ -109,11 +103,9 @@
 			<scope>test</scope>
 			<!-- version from parent pom -->
 		</dependency>
-
 		<!-- Logging -->
 		<!-- Logback -->
 		<!-- (imported with Spring) -->
-
 		<!-- Lombok to write less boilerplate code -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -121,9 +113,7 @@
 			<scope>provided</scope>
 			<!-- version from parent pom -->
 		</dependency>
-
 	</dependencies>
-
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -132,7 +122,6 @@
 					<artifactId>sonar-maven-plugin</artifactId>
 					<version>3.9.1.2184</version>
 				</plugin>
-
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
@@ -156,8 +145,6 @@
 
 			</plugins>
 		</pluginManagement>
-
-
 		<plugins>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -178,14 +165,33 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
 			</plugin>
-
+			<plugin>
+			    <groupId>org.pitest</groupId>
+			    <artifactId>pitest-maven</artifactId>
+			    <version>${pitest.version}</version>
+			    <configuration>
+			        <targetClasses>
+			            <param>fr.insee.kraftwerk.*</param>
+			        </targetClasses>
+			        <targetTests>
+			            <param>fr.insee.kraftwerk.*</param>
+					</targetTests>
+					<mutators>
+					  <mutator>STRONGER</mutator>
+					</mutators>
+			     </configuration>			     
+			     <dependencies>
+	                <dependency>
+	                    <groupId>org.pitest</groupId>
+	                    <artifactId>pitest-junit5-plugin</artifactId>
+	                    <version>${pitest.junit.version}</version>
+	                </dependency>
+            	</dependencies>
+			</plugin>
 		</plugins>
-
 	</build>
-
 </project>

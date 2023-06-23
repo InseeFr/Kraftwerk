@@ -4,17 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 @AllArgsConstructor
 public class Session {
 
-	@Getter@Setter
 	private String identifier;
-
-	@Getter@Setter
 	private long initialization;
-
-	@Getter@Setter
 	private long termination;
 
+	
+	public Session(String identifier) {
+		super();
+		this.identifier = identifier;
+		this.initialization = 0L;
+		this.termination = 0L;
+	}
 
+
+	public long getDuration() {
+		return getTermination() - getInitialization();
+	}
 }

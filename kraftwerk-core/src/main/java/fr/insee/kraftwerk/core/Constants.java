@@ -52,14 +52,16 @@ public final class Constants {
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 	public static final String MISSING_SUFFIX = "_MISSING";
 	public static final String COLLECTED = "COLLECTED";
-	public static final String[] ENO_VARIABLES = {"COMMENT_QE","COMMENT_UE","HEURE_REMPL","MIN_REMPL"};
+	private static final String[] ENO_VARIABLES = {"COMMENT_QE","COMMENT_UE","HEURE_REMPL","MIN_REMPL"};
 
 
 	// ----- Paradata Variables Names
-	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_SESSION";
+	public static final String LENGTH_ORCHESTRATORS_NAME = "DURATION_ACTIVE_ORCHESTRATORS";
+	public static final String LENGTH_SESSIONS_NAME = "DURATION_ACTIVE_SESSIONS";
 	public static final String START_SESSION_NAME = "DEBUT_SESSION";
 	public static final String FINISH_SESSION_NAME = "FIN_SESSION";
 	public static final String NUMBER_ORCHESTRATORS_NAME = "NB_ORCHESTRATORS";
+	public static final String NUMBER_SESSIONS_NAME = "NB_SESSIONS";
 	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
 
 
@@ -220,5 +222,10 @@ public final class Constants {
 
 	public static char getCsvOutputQuoteChar() {
 		return csvOutputQuoteChar;
+	}
+
+
+	public static String[] getEnoVariables() {
+		return ENO_VARIABLES;
 	}
 }
