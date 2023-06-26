@@ -49,8 +49,7 @@ public class UserInputs {
 	@Setter
 	private Path vtlInformationLevelsFile;
 
-	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
-			"data_format", "multimode_dataset_name");
+	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", 			"data_format", "multimode_dataset_name");
 
 	public UserInputs(){}
 
