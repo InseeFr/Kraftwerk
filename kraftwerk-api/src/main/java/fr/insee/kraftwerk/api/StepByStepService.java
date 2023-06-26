@@ -44,6 +44,7 @@ public class StepByStepService extends KraftwerkService {
 			)  {
 		//Read data files
 		Path inDirectory;
+		boolean withDdi = true;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
@@ -65,7 +66,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			VtlBindings vtlBindings = new VtlBindings();
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables, withDdi );
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -87,6 +88,8 @@ public class StepByStepService extends KraftwerkService {
 			)  {
 		//Read data files
 		Path inDirectory;
+		boolean withDdi = true;
+
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 		} catch (KraftwerkException e) {
@@ -105,7 +108,7 @@ public class StepByStepService extends KraftwerkService {
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		try {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDdi);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}

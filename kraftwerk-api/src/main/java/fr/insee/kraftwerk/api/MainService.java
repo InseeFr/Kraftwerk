@@ -53,7 +53,7 @@ public class MainService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
-		log.info("Kraftwerk main service started for campaign: " + campaignName);
+		log.info("Kraftwerk main service started for campaign: {}" , campaignName);
 
 		UserInputs userInputs;
 		try {
@@ -70,7 +70,7 @@ public class MainService extends KraftwerkService {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, true);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -107,7 +107,7 @@ public class MainService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
-		log.info("Kraftwerk main service started for campaign: " + campaignName);
+		log.info("Kraftwerk main file by file service started for campaign: {}", campaignName);
 
 		UserInputs userInputsSource;
 		try {
@@ -126,7 +126,7 @@ public class MainService extends KraftwerkService {
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				try {
-					buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+					buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, true);
 				} catch (NullException e) {
 					return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 				}
@@ -166,7 +166,7 @@ public class MainService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		String campaignName = inDirectory.getFileName().toString();
-		log.info("Kraftwerk main service started for campaign: " + campaignName);
+		log.info("Kraftwerk main Lunatic only service started for campaign: {}", campaignName);
 
 		UserInputs userInputs;
 		try {
