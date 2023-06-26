@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 
 import fr.insee.kraftwerk.core.Constants;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Object class to represent a set of variables.
  * Contains a flat map and its structured equivalent.
  */
-@Slf4j
+@Log4j2
 public class VariablesMap {
 
     /** Map containing the variables.

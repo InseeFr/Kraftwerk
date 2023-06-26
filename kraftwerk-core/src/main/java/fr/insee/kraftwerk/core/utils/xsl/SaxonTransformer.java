@@ -13,9 +13,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class SaxonTransformer {
 
 	/**
@@ -67,7 +67,7 @@ public class SaxonTransformer {
 		try {
 			xmlInput.close();
 			xslInput.close();
-		} catch (IOException e) {
+		} catch (IOException | NullPointerException e ) {
 			log.error("IOException occurred when trying to close the streams after XSL transformation.", e);
 		}
 	}

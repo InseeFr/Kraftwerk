@@ -1,11 +1,11 @@
 package fr.insee.kraftwerk.core.rawdata;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-@Slf4j
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class GroupData {
 
     /** A group name. */

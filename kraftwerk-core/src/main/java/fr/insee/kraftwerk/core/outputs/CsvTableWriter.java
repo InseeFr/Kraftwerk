@@ -6,7 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Scanner;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
@@ -16,12 +21,12 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * To write in memory data into CSV files.
  */
-@Slf4j
+@Log4j2
 public class CsvTableWriter {
 	
 	private CsvTableWriter() {
@@ -47,15 +52,7 @@ public class CsvTableWriter {
 		try (CSVWriter writer = setCSVWriter(filePath)){
 			String[] headers = getHeaders(file);
 
-			List<String> variablesSpec = new ArrayList<>();
-			for (String key : metadataVariables.keySet()){
-				VariablesMap variablesMap = metadataVariables.get(key);
-				for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
-					if (!variablesSpec.contains(varName)){
-						variablesSpec.add(varName);
-					}
-				}
-			}
+			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -66,8 +63,8 @@ public class CsvTableWriter {
 			List<String> variablesNotInHeaders = new ArrayList<>();
 			if(!Arrays.equals(headers, columnsTable)){
 				variablesNotInHeaders = Arrays.stream(columnsTable).filter(element -> !Arrays.asList(headers).contains(element)).toList();
-				if (variablesNotInHeaders.size()>0){
-					variablesNotInHeaders.stream().forEach(var -> log.warn("Variable {} not present in headers of existing CSV output and will not be added in the output file",var));
+				if (!variablesNotInHeaders.isEmpty()){
+					variablesNotInHeaders.stream().forEach(varNotFound -> log.warn("Variable {} not present in headers of existing CSV output and will not be added in the output file",varNotFound));
 				}
 			}
 
@@ -83,8 +80,8 @@ public class CsvTableWriter {
 				for (String variableName : variablesDataset) {
 					if(!variablesNotInHeaders.contains(variableName)){
 						int csvColumn = Arrays.asList(headers).indexOf(variableName);
-						Component var = dataset.getDataStructure().get(variableName);
-						String value = getDataPointValue(dataPoint, var);
+						Component vtlVar = dataset.getDataStructure().get(variableName);
+						String value = getDataPointValue(dataPoint, vtlVar);
 						csvRow[csvColumn] = value;
 					}
 				}
@@ -106,13 +103,13 @@ public class CsvTableWriter {
 			columns.add(datasetName);
 		}
 		//We add all variables found in specifications
-		for (String var : variablesSpec) {
-			columns.add(var);
+		for (String varSpec : variablesSpec) {
+			columns.add(varSpec);
 		}
 		//We add additional variables produced in the process
-		for (String var : variablesDataset){
-			if (!columns.contains(var)) {
-				columns.add(var);
+		for (String varDataset : variablesDataset){
+			if (!columns.contains(varDataset)) {
+				columns.add(varDataset);
 			}
 		}
 		return columns;
@@ -122,11 +119,12 @@ public class CsvTableWriter {
 	private static String[] getHeaders(File file) throws FileNotFoundException {
 		Scanner scanner = new Scanner(file);
 		String[] headers = null;
-		if (scanner.hasNextLine())
-			headers = scanner.nextLine().split(Character.toString(Constants.CSV_OUTPUTS_SEPARATOR));
+		if (scanner.hasNextLine()) headers = scanner.nextLine().split(Character.toString(Constants.CSV_OUTPUTS_SEPARATOR));
+		if (headers != null) {
 			for (int i=0;i<headers.length;i++){
 				headers[i] = headers[i].replace("\"","");
 			}
+		}
 		scanner.close();
 		return headers;
 	}
@@ -146,15 +144,7 @@ public class CsvTableWriter {
 				log.warn("The data object has no variables.");
 			}
 
-			List<String> variablesSpec = new ArrayList<>();
-			for (String key : metadataVariables.keySet()){
-				VariablesMap variablesMap = metadataVariables.get(key);
-				for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
-					if (!variablesSpec.contains(varName)){
-						variablesSpec.add(varName);
-					}
-				}
-			}
+			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -171,8 +161,8 @@ public class CsvTableWriter {
 				String[] csvRow = new String[rowSize];
 				for (String variableName : variablesDataset) {
 					int csvColumn = columns.indexOf(variableName);
-					Component var = dataset.getDataStructure().get(variableName);
-					String value = getDataPointValue(dataPoint, var);
+					Component varVtl = dataset.getDataStructure().get(variableName);
+					String value = getDataPointValue(dataPoint, varVtl);
 					csvRow[csvColumn] = value;
 				}
 				writer.writeNext(csvRow);
@@ -183,6 +173,21 @@ public class CsvTableWriter {
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to write CSV table: %s", filePath));
 		}
+	}
+
+
+	private static List<String> initializeVariablesSpec(Map<String, VariablesMap> metadataVariables,
+			String datasetName) {
+		List<String> variablesSpec = new ArrayList<>();
+		for (Entry<String, VariablesMap> entry :  metadataVariables.entrySet()){
+			VariablesMap variablesMap = entry.getValue();
+			for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
+				if (!variablesSpec.contains(varName)){
+					variablesSpec.add(varName);
+				}
+			}
+		}
+		return variablesSpec;
 	}
 
 	/**

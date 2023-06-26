@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
@@ -14,7 +14,7 @@ import nu.xom.ValidityException;
  * Class providing method to parse an XML document using the nu.xom library.
  * TODO: (if it seems necessary) replace XOM by something else.
  */
-@Slf4j
+@Log4j2
 public class XmlFileReader {
 
     private boolean xsdValidation = false;

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>1.2.1</version>
+		<version>1.3.3</version>
 	</parent>
 	
 	<artifactId>kraftwerk-core</artifactId>
@@ -13,17 +13,11 @@
 	<name>kraftwerk-core</name>
 	
 	<properties>
-		<trevas.version>0.4.4</trevas.version>
+		<trevas.version>0.4.8</trevas.version>
 	</properties>
 	
 
 	<dependencies>
-
-		<!-- Logging API -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
 
 		<!-- XML libraries -->
 		<!-- XML-XSLT with Saxon -->
@@ -87,7 +81,6 @@
 			<artifactId>vtl-jackson</artifactId>
 			<version>${trevas.version}</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

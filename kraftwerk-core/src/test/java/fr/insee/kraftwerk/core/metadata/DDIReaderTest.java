@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 
 class DDIReaderTest {
 
@@ -30,7 +31,7 @@ class DDIReaderTest {
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
 	@Test
-	void readSimpsonsV1Variables() throws MalformedURLException {
+	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -64,7 +65,7 @@ class DDIReaderTest {
 	}
 
 	@Test
-	void readSimpsonsV2Variables() throws MalformedURLException {
+	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -102,7 +103,7 @@ class DDIReaderTest {
 	}
 
 	@Test
-	void readVqsWebVariables() throws MalformedURLException {
+	void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
@@ -143,7 +144,7 @@ class DDIReaderTest {
 	}
 
 	@Test
-	void readVqsPapVariables() throws MalformedURLException {
+	void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");

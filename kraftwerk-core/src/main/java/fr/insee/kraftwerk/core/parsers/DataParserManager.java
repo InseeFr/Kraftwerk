@@ -1,12 +1,12 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Factory class for data parsers.
  */
-@Slf4j
+@Log4j2
 public class DataParserManager {
 	
 	/**

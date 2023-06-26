@@ -10,11 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Path;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
@@ -74,28 +73,26 @@ class UserInputsTest {
 
 	@Test
 	void testReadInvalidUserInput_wrongDataFormat() {
+		Path path = inputSamplesDirectory.resolve("inputs_invalid_data_format.json");
 		assertThrows(UnknownDataFormatException.class, () -> {
-			new UserInputs(
-					inputSamplesDirectory.resolve("inputs_invalid_data_format.json"),
-					inputSamplesDirectory);
+			new UserInputs(path,inputSamplesDirectory);
 		});
 	}
 
 	@Test
 	void testReadInvalidUserInput_wrongFieldNames() {
+		Path path = inputSamplesDirectory.resolve("inputs_invalid_field_names.json");
 		assertThrows(MissingMandatoryFieldException.class, () -> {
-			new UserInputs(
-					inputSamplesDirectory.resolve("inputs_invalid_field_names.json"),
-					inputSamplesDirectory);
+			new UserInputs(	path,inputSamplesDirectory);
 		});
 	}
 
 	@Test
-	@Disabled("Management of malformed user input file not implemented.") // TODO: see UserInputs
 	void testReadMalformedInput() throws KraftwerkException {
-		new UserInputs(
-				inputSamplesDirectory.resolve("inputs_invalid_malformed.json"),
-				inputSamplesDirectory);
+		Path path = inputSamplesDirectory.resolve("inputs_invalid_malformed.json");
+		assertThrows(UnknownDataFormatException.class, () -> {
+			new UserInputs(path,inputSamplesDirectory);
+		});
 	}
 
 }

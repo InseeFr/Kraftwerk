@@ -10,21 +10,18 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.ICSVParser;
 import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class CSVReportingDataParser extends ReportingDataParser {
-	private static final Logger log = LoggerFactory.getLogger(CSVReportingDataParser.class);
 
 	private CSVReader csvReader;
 
@@ -49,8 +46,10 @@ public class CSVReportingDataParser extends ReportingDataParser {
 						ReportingDataUE reportingDataUE1 = reportingData.getListReportingDataUE().stream().filter(
 								reportingDataUEToSearch -> rowIdentifier.equals(reportingDataUEToSearch.getIdentifier()))
 								.findAny().orElse(null);
-						reportingDataUE1.addState(state);
-						reportingDataUE1.sortStates();
+						if (reportingDataUE1 != null) {
+							reportingDataUE1.addState(state);
+							reportingDataUE1.sortStates();
+						}
 						continue;
 					}
 					ReportingDataUE reportingDataUE = new ReportingDataUE(rowIdentifier);
@@ -59,12 +58,12 @@ public class CSVReportingDataParser extends ReportingDataParser {
 				}
 				integrateReportingDataIntoUE(data, reportingData);
 			} else {
-				log.error(String.format("Following CSV file is malformed : %s", new Object[] { filePath }), "");
+				log.error("Following CSV file is malformed : {}", filePath);
 			}
 		} catch (CsvValidationException e) {
-			log.error(String.format("Following CSV file is malformed : %s", new Object[] { filePath }), (Throwable) e);
+			log.error("Following CSV file is malformed : {}, CsvValidationException {} ", filePath, e.getMessage());
 		} catch (IOException e) {
-			log.error(String.format("Could not connect to data file %s", new Object[] { filePath }), e);
+			log.error("Could not connect to data file {} because IOException {}", filePath, e.getMessage());
 		}
 	}
 
@@ -76,6 +75,10 @@ public class CSVReportingDataParser extends ReportingDataParser {
 			parsedDate = dateFormat.parse(rowTimestamp);
 		} catch (ParseException e1) {
 			log.error("Parsing error : {}", e1.getMessage());
+		}
+		if (parsedDate == null) {
+			log.error("Parsing error : the parsed date is null");
+			return 0L;
 		}
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}
@@ -92,11 +95,9 @@ public class CSVReportingDataParser extends ReportingDataParser {
 			FileReader filereader = new FileReader(filePath.toString());
 			this.csvReader = new CSVReader(filereader);
 			CSVParser parser = (new CSVParserBuilder()).withSeparator(',').build();
-			this.csvReader = (new CSVReaderBuilder(filereader))
-
-					.withCSVParser((ICSVParser) parser).build();
+			this.csvReader = (new CSVReaderBuilder(filereader)).withCSVParser(parser).build();
 		} catch (FileNotFoundException e) {
-			log.error(String.format("Unable to find the file %s", new Object[] { filePath }), e);
+			log.error("Unable to find the file {}, FileNotFoundException {}", filePath, e);
 		}
 	}
 }

@@ -4,12 +4,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
+
 
 /**
  * Utils class to write text files.
  */
-@Slf4j
+@Log4j2
 public class TextFileWriter {
 	
 	private TextFileWriter() {

@@ -5,12 +5,12 @@ import java.nio.file.Path;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 
-@Slf4j
+@Log4j2
 public class XMLReportingDataParser extends ReportingDataParser {
  
   private Document document;

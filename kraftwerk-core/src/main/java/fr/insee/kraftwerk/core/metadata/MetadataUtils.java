@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class MetadataUtils {
 
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
@@ -21,7 +22,12 @@ public class MetadataUtils {
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+		VariablesMap variables= new VariablesMap();
+		try {
+			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+		} catch (KraftwerkException e) {
+			log.error(e.getMessage());
+		}
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
 			// First we add the collected _MISSING variables

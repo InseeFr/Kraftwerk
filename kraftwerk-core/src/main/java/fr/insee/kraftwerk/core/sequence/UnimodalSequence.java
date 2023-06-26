@@ -11,20 +11,16 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.ErrorVariableLength;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 @NoArgsConstructor
-@Slf4j
+@Log4j2
 public class UnimodalSequence {
 
 	public void unimodalProcessing(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
@@ -36,7 +32,7 @@ public class UnimodalSequence {
 		VariablesMap variablesMap = metadataVariables.get(dataMode);
 		for (String variableName : variablesMap.getVariableNames()){
 			Variable variable = variablesMap.getVariable(variableName);
-			if (!(variable.getSasFormat() == null) && variable.getExpectedLength()<variable.getMaxLengthData()){
+			if (!(variable.getSasFormat() == null) && variable.getExpectedLength()<variable.getMaxLengthData() && !(variable.getType() == VariableType.BOOLEAN)){
 				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getExpectedLength(), variable.getMaxLengthData()));
 				ErrorVariableLength error = new ErrorVariableLength(variable, dataMode);
 				if (!errors.contains(error)){

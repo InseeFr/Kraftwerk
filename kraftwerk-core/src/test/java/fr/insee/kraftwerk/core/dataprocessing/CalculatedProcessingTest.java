@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -24,7 +24,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
-public class CalculatedProcessingTest {
+class CalculatedProcessingTest {
 
     private static CalculatedVariables fooCalculated;
     private static VariablesMap fooVariables;
@@ -53,7 +53,7 @@ public class CalculatedProcessingTest {
     }
 
     @Test
-    public void testIfCalculatedAreCorrectlyResolved() {
+    void testIfCalculatedAreCorrectlyResolved() {
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
         VtlScript vtlScript = processing.generateVtlInstructions("TEST");
@@ -67,7 +67,7 @@ public class CalculatedProcessingTest {
     }
 
     @Test
-    public void testIfCalculatedAreProcessed() {
+    void testIfCalculatedAreProcessed() {
         //
         Dataset fooDataset = new InMemoryDataset(
                 List.of(

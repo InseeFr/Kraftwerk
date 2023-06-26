@@ -3,12 +3,12 @@ package fr.insee.kraftwerk.core.metadata;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Object class to represent a group of variables.
  */
-@Slf4j
+@Log4j2
 @Getter
 @Setter
 public class Group {

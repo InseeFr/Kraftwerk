@@ -22,7 +22,7 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Implementation of DataParser to read data collected in paper format.
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * Parser identify QCU variables
  */
 
-@Slf4j
+@Log4j2
 public class PaperDataParser extends DataParser {
 
 	/** File reader */
@@ -137,6 +137,7 @@ public class PaperDataParser extends DataParser {
 				String rowIdentifier = nextRecord[0];
 				String[] rowIdentifiers = rowIdentifier.split(Constants.PAPER_IDENTIFIER_SEPARATOR);
 				questionnaireData.setIdentifier(rowIdentifiers[0]);
+				data.getIdSurveyUnits().add(rowIdentifiers[0]);
 
 				if (rowIdentifiers.length >= 1) {
 

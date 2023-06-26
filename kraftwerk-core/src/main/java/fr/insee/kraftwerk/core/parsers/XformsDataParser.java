@@ -1,14 +1,13 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import fr.insee.kraftwerk.core.utils.XmlFileReader;
-
 import java.nio.file.Path;
 
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.slf4j.Slf4j;
+import fr.insee.kraftwerk.core.utils.XmlFileReader;
+import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -16,7 +15,7 @@ import nu.xom.Elements;
 /**
  * Implementation of DataParser to read Xforms data files.
  */
-@Slf4j
+@Log4j2
 public class XformsDataParser extends DataParser {
 
 	/**
@@ -73,6 +72,7 @@ public class XformsDataParser extends DataParser {
 						.getFirstChildElement("UniteEnquetee").getFirstChildElement("Identifiant");
 				String identifier = identifierNode.getValue();
 				questionnaireData.setIdentifier(identifier);
+				data.getIdSurveyUnits().add(identifier);
 
 				// Survey answers
 
