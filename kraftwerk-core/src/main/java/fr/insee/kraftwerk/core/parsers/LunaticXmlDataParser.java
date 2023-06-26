@@ -152,25 +152,23 @@ public class LunaticXmlDataParser extends DataParser {
 			Element collectedNode = variableNode.getFirstChildElement(Constants.COLLECTED);
 
 			// Root variables
-			if (collectedNode.getAttribute("type") != null) {
-				if (!collectedNode.getAttribute("type").getValue().equals("null")) {
+			if (nodeExistsWithCompleteAttribute(collectedNode)) {
 					String value = variableNode.getFirstChildElement(Constants.COLLECTED).getValue();
 					if ((variables.getVariable(variableName) != null) && value.length() > variables.getVariable(variableName).getMaxLengthData()) {
 						variables.getVariable(variableName).setMaxLengthData(value.length());
 					}
 					answers.putValue(variableName, value);
-				}
 			}
 
 			// Group variables // TODO : recursion etc.
-			else {
+			else if (collectedNode != null){
 				Elements valueNodes = collectedNode.getChildElements();
 				if (variables.hasVariable(variableName)) {
 					String groupName = variables.getVariable(variableName).getGroupName();
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {
 						Element valueNode = valueNodes.get(j);
-						if (!valueNode.getAttribute("type").getValue().equals("null")) {
+						if (nodeExistsWithCompleteAttribute(valueNode)) {
 							String value = valueNodes.get(j).getValue();
 							if ((variables.getVariable(variableName) != null) && value.length() > variables.getVariable(variableName).getMaxLengthData()) {
 								variables.getVariable(variableName).setMaxLengthData(value.length());
@@ -182,6 +180,10 @@ public class LunaticXmlDataParser extends DataParser {
 			}
 		}
 
+	}
+
+	private boolean nodeExistsWithCompleteAttribute(Element collectedNode) {
+		return collectedNode != null && collectedNode.getAttribute("type") != null && !collectedNode.getAttribute("type").getValue().equals("null");
 	}
 
 	/**
