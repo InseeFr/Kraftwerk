@@ -136,12 +136,29 @@ public class LunaticReader {
                         variablesMap.putGroup(group);
                         JsonNode loopVariables = component.get("bindingDependencies");
                         loopVariables.forEach(variable -> {
-                            variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
-                            variables.remove(variable.asText());
+                        	if (variables.contains(variable.asText())) {
+                        		variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
+                        		variables.remove(variable.asText());
+                        	}
                         });
+                        JsonNode loopComponentsNode = rootNode.get("components");
+                        if (componentsNode.isArray()){	
+                        	 for(JsonNode componentInLoop : loopComponentsNode){
+                        		 if (componentInLoop.has("bindingDependencies")) {
+                        			 JsonNode compoInLoopVariables = componentInLoop.get("bindingDependencies");
+                        			 compoInLoopVariables.forEach(variable -> {
+                                     	if (variables.contains(variable.asText())) {
+                                    		variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
+                                    		variables.remove(variable.asText());
+                                    	}
+                                     });
+                        		 }
+                        	 }
+                        }
                     }
                 }
             }
+            
             //We get the root group
             Group rootGroup = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
             variables.forEach(varName->variablesMap.putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
