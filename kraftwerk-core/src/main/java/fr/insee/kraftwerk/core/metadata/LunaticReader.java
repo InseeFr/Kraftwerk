@@ -121,10 +121,9 @@ public class LunaticReader {
         try {
             rootNode = JsonFileReader.read(lunaticFile);
             List<String> variables = new ArrayList<>();
-            JsonNode variablesNode = rootNode.get("variables");
-            variablesNode.forEach(var->variables.add(var.get("name").asText()));
+            JsonNode variablesNode = rootNode.get(VARIABLES);
+            variablesNode.forEach(newVar->variables.add(newVar.get("name").asText()));
             JsonNode componentsNode = rootNode.get("components");
-            List<JsonNode> loops = new ArrayList<>();
             // Root group is created in VariablesMap constructor
             VariablesMap variablesMap = new VariablesMap();
             if (componentsNode.isArray()){
@@ -140,13 +139,12 @@ public class LunaticReader {
                             variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
                             variables.remove(variable.asText());
                         });
-                        System.out.println("Stop");
                     }
                 }
             }
             //We get the root group
             Group rootGroup = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
-            variables.forEach(var->variablesMap.putVariable(new Variable(var, rootGroup, VariableType.STRING)));
+            variables.forEach(varName->variablesMap.putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
             return variablesMap;
         } catch (IOException e) {
             log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
