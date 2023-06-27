@@ -142,7 +142,7 @@ public class LunaticReader {
                         	}
                         });
                         JsonNode loopComponentsNode = rootNode.get("components");
-                        if (componentsNode.isArray()){	
+                        if (loopComponentsNode.isArray()){	
                         	 for(JsonNode componentInLoop : loopComponentsNode){
                         		 if (componentInLoop.has("bindingDependencies")) {
                         			 JsonNode compoInLoopVariables = componentInLoop.get("bindingDependencies");
