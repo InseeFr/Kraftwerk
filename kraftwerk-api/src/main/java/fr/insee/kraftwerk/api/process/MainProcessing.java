@@ -94,7 +94,7 @@ public class MainProcessing {
 	private void unimodalProcess() throws NullException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, true);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		}
