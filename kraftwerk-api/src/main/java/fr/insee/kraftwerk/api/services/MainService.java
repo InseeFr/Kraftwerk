@@ -24,9 +24,11 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
 	public ResponseEntity<String> main(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			) {
-		MainProcessing mp = new MainProcessing(inDirectoryParam, false);
+		boolean fileByFile = false;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData, defaultDirectory);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -45,7 +47,9 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 	) {
-		MainProcessing mp = new MainProcessing(inDirectoryParam, true);
+		boolean fileByFile = true;
+		boolean withAllReportingData = false;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData, defaultDirectory);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {

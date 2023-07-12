@@ -41,7 +41,8 @@ public class StepByStepService extends KraftwerkService {
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
-			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -60,7 +61,7 @@ public class StepByStepService extends KraftwerkService {
 		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
@@ -84,7 +85,8 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindingsByDataMode(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode
+			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
 		Path inDirectory;
@@ -104,7 +106,7 @@ public class StepByStepService extends KraftwerkService {
 		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
 			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
 		} catch (NullException e) {
@@ -248,7 +250,7 @@ public class StepByStepService extends KraftwerkService {
 	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
-	public ResponseEntity<String> archive(
+	public ResponseEntity<String> archiveService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
 			{
 		return archive(inDirectoryParam);

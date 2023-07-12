@@ -27,7 +27,7 @@ public class XMLReportingDataParserTest {
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
 		try {
-			xMLReportingDataParser.parseReportingData(reportingData, data);
+			xMLReportingDataParser.parseReportingData(reportingData, data, true);
 		} catch (NullException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

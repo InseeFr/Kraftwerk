@@ -129,6 +129,9 @@ public class LunaticXmlDataParser extends DataParser {
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {
 						Element valueNode = valueNodes.get(j);
+						if (valueNode.getAttribute("type")== null) {
+							log.info("No type for {}",  valueNode);
+						}
 						if(! valueNode.getAttribute("type").getValue().equals("null")) {
 							String value = valueNodes.get(j).getValue();
 							if ((variables.getVariable(variableName) != null) && value.length()>variables.getVariable(variableName).getMaxLengthData()){

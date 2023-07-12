@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
@@ -24,17 +22,14 @@ import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class MainProcessing {
 
-	@Value("${fr.insee.postcollecte.files}")
-	private String defaultDirectory;
-
 	private ControlInputSequence controlInputSequence;
 	private boolean fileByFile;
+	private boolean withAllReportingData;
 
 	/* SPECIFIC VARIABLES */
 	private String inDirectoryParam;
@@ -45,17 +40,22 @@ public class MainProcessing {
 	private List<KraftwerkError> errors = new ArrayList<>();
 	private Map<String, VariablesMap> metadataVariables;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData, String defaultDirectory) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
+		this.withAllReportingData = withAllReportingData;
+		controlInputSequence = new ControlInputSequence(defaultDirectory);
+	}
+	
+	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory) {
+		super();
+		this.inDirectoryParam = inDirectoryParam;
+		this.fileByFile = fileByFile;
+		this.withAllReportingData = !fileByFile;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
-	@PostConstruct
-	public void initializeWithProperties() {
-		controlInputSequence = new ControlInputSequence(defaultDirectory);
-	}
 
 	public void runMain() throws KraftwerkException {
 		init();
@@ -92,7 +92,7 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws NullException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
 			UnimodalSequence unimodal = new UnimodalSequence();

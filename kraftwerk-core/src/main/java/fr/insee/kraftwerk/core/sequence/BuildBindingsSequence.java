@@ -21,9 +21,11 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
+	private boolean withAllReportingData;
 
-	public BuildBindingsSequence() {
+	public BuildBindingsSequence(boolean withAllReportingData) {
 		vtlExecute = new VtlExecute();
+		this.withAllReportingData = withAllReportingData;
 	}
 
 	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables) throws NullException {
@@ -66,11 +68,11 @@ public class BuildBindingsSequence {
 			ReportingData reportingData = new ReportingData(reportingDataFile);
 			if (reportingDataFile.toString().contains(".xml")) {
 				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
-				xMLReportingDataParser.parseReportingData(reportingData, data);
+				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
 
 			} else if (reportingDataFile.toString().contains(".csv")) {
 					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-					cSVReportingDataParser.parseReportingData(reportingData, data);
+					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
 			}
 		}
 	}

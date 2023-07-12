@@ -32,7 +32,7 @@ public class KraftwerkService {
 	private String csvOutputsQuoteChar;
 	
 	@Value("${fr.insee.postcollecte.files}")
-	private String defaultDirectory;
+	protected String defaultDirectory;
 	
 	protected ControlInputSequence controlInputSequence ;
 	

@@ -18,11 +18,11 @@ public abstract class ReportingDataParser {
 
 	public int maxAttempts = 0;
 
-	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData) {
+	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
 		createReportingVariables(surveyRawData);
-		addReportingValues(surveyRawData, reportingData);
+		addReportingValues(surveyRawData, reportingData, withAllReportingData);
 	}
 
 	private void createReportingVariables(SurveyRawData surveyRawData) {
@@ -76,12 +76,15 @@ public abstract class ReportingDataParser {
 		}
 	}
 
-	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData) {
+	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
 		for (int i = 0; i < reportingData.getListReportingDataUE().size(); i++) {
 			ReportingDataUE reportingDataUE = reportingData.getListReportingDataUE().get(i);
 			QuestionnaireData questionnaire = null;
 			questionnaire = surveyRawData.getQuestionnaires().stream().filter(questionnaireToSearch -> reportingDataUE
 					.getIdentifier().equals(questionnaireToSearch.getIdentifier())).findAny().orElse(null);
+			if (questionnaire == null && !withAllReportingData) {
+				return ;
+			}
 			if (questionnaire == null) {
 				questionnaire = new QuestionnaireData();
 				questionnaire.setIdentifier(reportingDataUE.getIdentifier());

@@ -15,7 +15,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
  
   private Document document;
   
-  public void parseReportingData(ReportingData reportingData, SurveyRawData data) throws NullException {
+  public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
     Path filePath = reportingData.getFilepath();
     readFile(filePath);
 	Element root = null;
@@ -83,7 +83,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
         }  
       reportingData.addReportingDataUE(reportingDataUE);
     } 
-    integrateReportingDataIntoUE(data, reportingData);
+    integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
     this.document = null;
   }
   
