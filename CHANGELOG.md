@@ -3,6 +3,7 @@
 ## Not released yet
 
 ### Added
+- Service to read metadata from Lunatic in case no DDI is available
 
 ### Changed
 

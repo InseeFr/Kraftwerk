@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.LunaticReader;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -90,6 +91,47 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	/**
+	 * Parse a Lunatic xml data file.
+	 * Only "COLLECTED" and "EXTERNAL" variables are read.
+	 * @param filePath Path to a Lunatic xml data file.
+	 */
+	@Override
+	void parseDataFileWithoutDDI(Path filePath,Path lunaticFile) {
+
+		Document document = readXmlFile(filePath);
+		log.debug("Begin to parse {} ", filePath);
+		if (document!=null) {
+			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
+					.getChildElements("SurveyUnit");
+
+			String questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile);
+
+			for (int i = 0; i < questionnaireNodeList.size(); i++) {
+
+				// Xml questionnaire node
+				Element questionnaireNode = questionnaireNodeList.get(i);
+
+				if(questionnaireNode.getFirstChildElement("QuestionnaireModelId").getValue().equals(questionnaireModelId)) {
+
+					// Init the questionnaire data object
+					QuestionnaireData questionnaireData = new QuestionnaireData();
+
+					// Root identifier
+					questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
+
+					readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
+					readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+					// Remove this method when all questionnaires will use Lunatic V2 format
+					readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+
+					data.addQuestionnaire(questionnaireData);
+				}
+			}
+			log.info("Successfully parsed Lunatic answers file: {}",filePath );
+		}
+	}
+
+	/**
 	 * Read data in the COLLECTED elements.
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData,
@@ -107,34 +149,29 @@ public class LunaticXmlDataParser extends DataParser {
 			// Variable name
 			String variableName = variableNode.getLocalName();
 
-			//
 			Element collectedNode = variableNode.getFirstChildElement(Constants.COLLECTED);
 
 			// Root variables
-			if (collectedNode.getAttribute("type") != null) {
-				if(! collectedNode.getAttribute("type").getValue().equals("null")) {
+			if (nodeExistsWithCompleteAttribute(collectedNode)) {
 					String value = variableNode.getFirstChildElement(Constants.COLLECTED).getValue();
-					if ((variables.getVariable(variableName) != null) && value.length()>variables.getVariable(variableName).getMaxLengthData()){
+					if ((variables.getVariable(variableName) != null) && value.length() > variables.getVariable(variableName).getMaxLengthData()) {
 						variables.getVariable(variableName).setMaxLengthData(value.length());
 					}
 					answers.putValue(variableName, value);
-				}
 			}
 
 			// Group variables // TODO : recursion etc.
-			else {
+			else if (collectedNode != null){
 				Elements valueNodes = collectedNode.getChildElements();
-				if(variables.hasVariable(variableName)) {
+				if (variables.hasVariable(variableName)) {
 					String groupName = variables.getVariable(variableName).getGroupName();
 					GroupData groupData = answers.getSubGroup(groupName);
 					for (int j = 0; j < valueNodes.size(); j++) {
 						Element valueNode = valueNodes.get(j);
-						if (valueNode.getAttribute("type")== null) {
-							log.info("No type for {}",  valueNode);
-						}
-						if(! valueNode.getAttribute("type").getValue().equals("null")) {
+						if (nodeExistsWithCompleteAttribute(valueNode)) {
+
 							String value = valueNodes.get(j).getValue();
-							if ((variables.getVariable(variableName) != null) && value.length()>variables.getVariable(variableName).getMaxLengthData()){
+							if ((variables.getVariable(variableName) != null) && value.length() > variables.getVariable(variableName).getMaxLengthData()) {
 								variables.getVariable(variableName).setMaxLengthData(value.length());
 							}
 							groupData.putValue(value, variableName, j);
@@ -143,6 +180,11 @@ public class LunaticXmlDataParser extends DataParser {
 				}
 			}
 		}
+
+	}
+
+	private boolean nodeExistsWithCompleteAttribute(Element collectedNode) {
+		return collectedNode != null && collectedNode.getAttribute("type") != null && !collectedNode.getAttribute("type").getValue().equals("null");
 	}
 
 	/**

@@ -31,8 +31,8 @@ public class DDIReader {
 	/**
 	 * This method apply the XSLT_STRUCTURED_VARIABLES transformation to the DDI,
 	 * then reads the output xml to return the variables. The XML file generated is
-	 * written in the system temporary folder with the name 'variables.xml', and is
-	 * deleted when the virtual machine terminates.
+	 * written in the system temporary folder with the name 'variables.xml'. This file is
+	 * deleted after being used or when the virtual machine terminates.
 	 *
 	 * @param ddiUrl : Path to the DDI file.
 	 *
@@ -46,7 +46,7 @@ public class DDIReader {
 			File variablesFile = File.createTempFile("variables", ".xml");
 			variablesFile.deleteOnExit();
 			Path variablesTempFilePath = variablesFile.toPath();
-			//
+
 			transformDDI(ddiUrl, variablesTempFilePath);
 
 			VariablesMap variablesMap = readVariables(variablesTempFilePath);

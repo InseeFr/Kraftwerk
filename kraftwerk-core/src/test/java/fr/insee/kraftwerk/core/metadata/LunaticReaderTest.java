@@ -1,19 +1,22 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import fr.insee.kraftwerk.core.TestConstants;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class LunaticReaderTest {
+import fr.insee.kraftwerk.core.TestConstants;
+
+class LunaticReaderTest {
 
     static final Path lunaticSamplesPath = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "lunatic");
 
     @Test
-    public void readLogX21TelLunaticFile() {
+    void readLogX21TelLunaticFile() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 lunaticSamplesPath.resolve("log2021x21_tel.json"));
@@ -38,7 +41,7 @@ public class LunaticReaderTest {
     }
     
     @Test
-    public void readLogX22WebLunaticFile() {
+    void readLogX22WebLunaticFile() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 lunaticSamplesPath.resolve("log2021x22_web.json"));
@@ -50,4 +53,17 @@ public class LunaticReaderTest {
     }
 
 
+    @Test
+  //Same test  with DDI [2 groups, 463 variables]
+    void readVariablesFromLogX21WebLunaticFile() {
+        //
+        VariablesMap variables = LunaticReader.getVariablesFromLunatic(
+                lunaticSamplesPath.resolve("log2021x21_web.json"));
+
+        //
+        assertNotNull(variables);
+        assertEquals(11,variables.getGroupsCount());
+        assertEquals(683, variables.getVariables().size());
+       
+    }
 }

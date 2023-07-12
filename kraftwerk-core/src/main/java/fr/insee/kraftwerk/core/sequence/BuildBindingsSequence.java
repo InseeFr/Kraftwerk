@@ -28,7 +28,7 @@ public class BuildBindingsSequence {
 		this.withAllReportingData = withAllReportingData;
 	}
 
-	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables) throws NullException {
+	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, boolean withDDI) throws NullException {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
@@ -38,8 +38,11 @@ public class BuildBindingsSequence {
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		data.setDataFilePath(modeInputs.getDataFile());
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
-		parser.parseSurveyData(modeInputs.getDataFile());
-
+		if (withDDI) {
+			parser.parseSurveyData(modeInputs.getDataFile());
+		} else {
+			parser.parseSurveyDataWithoutDDI(modeInputs.getDataFile(),modeInputs.getLunaticFile());
+		}
 
 		/* Step 2.2 : Get paradata for the survey */
 		parseParadata(modeInputs, data);
@@ -51,7 +54,6 @@ public class BuildBindingsSequence {
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
-	
 
 	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
 		Path paraDataFolder = modeInputs.getParadataFolder();
