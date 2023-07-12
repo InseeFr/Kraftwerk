@@ -7,6 +7,7 @@
 ### Changed
 
 ### Fixed
+- In case of file by file execution, reportingData without questionnaires were duplicated. Fix with skipping these reportingData
 
 ## 1.3.3 - [2023-06-13]
 
