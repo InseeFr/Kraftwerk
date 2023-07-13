@@ -22,6 +22,7 @@ import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -35,11 +36,16 @@ public class MainProcessing {
 
 	/* SPECIFIC VARIABLES */
 	private String inDirectoryParam;
+	@Getter
 	private Path inDirectory;
+	
+	@Getter
 	private UserInputs userInputs; // if main is called on all files
 	List<UserInputs> userInputsList; // for file by file process
+	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
 	private List<KraftwerkError> errors = new ArrayList<>();
+	@Getter
 	private Map<String, VariablesMap> metadataVariables;
 
 	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory) {
@@ -80,7 +86,7 @@ public class MainProcessing {
 	}
 
 	/* Step 1 : Init */
-	private void init() throws KraftwerkException {
+	public void init() throws KraftwerkException {
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
@@ -90,8 +96,7 @@ public class MainProcessing {
 		if (withDDI) metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		if (!withDDI) metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputs.getModeInputsMap());
 	
-		if (Boolean.TRUE.equals(fileByFile))
-			userInputsList = getUserInputs(userInputs);
+		if (Boolean.TRUE.equals(fileByFile)) userInputsList = getUserInputs(userInputs);
 
 	}
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -45,35 +46,27 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
-		Path inDirectory;
-		boolean withDdi = true;
+		boolean fileByFile = false;
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
-		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
-
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-		
+				
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			VtlBindings vtlBindings = new VtlBindings();
+		for (String dataMode : mp.getUserInputs().getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables, withDdi );
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+			vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -90,34 +83,25 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
-		Path inDirectory;
-		boolean withDdi = true;
-
+		boolean fileByFile = false;
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
-		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
-		VtlBindings vtlBindings = new VtlBindings();
-
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDdi);
+			buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
-		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
