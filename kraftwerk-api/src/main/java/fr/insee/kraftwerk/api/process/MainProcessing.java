@@ -30,6 +30,8 @@ public class MainProcessing {
 	private ControlInputSequence controlInputSequence;
 	private boolean fileByFile;
 	private boolean withAllReportingData;
+	private boolean withDDI;
+
 
 	/* SPECIFIC VARIABLES */
 	private String inDirectoryParam;
@@ -40,11 +42,12 @@ public class MainProcessing {
 	private List<KraftwerkError> errors = new ArrayList<>();
 	private Map<String, VariablesMap> metadataVariables;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData, String defaultDirectory) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = withAllReportingData;
+		this.withDDI=withDDI;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 	
@@ -53,6 +56,7 @@ public class MainProcessing {
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = !fileByFile;
+		this.withDDI=true;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
@@ -83,8 +87,9 @@ public class MainProcessing {
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
 		userInputs = controlInputSequence.getUserInputs(inDirectory);
-		metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-
+		if (withDDI) metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		if (!withDDI) metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputs.getModeInputsMap());
+	
 		if (Boolean.TRUE.equals(fileByFile))
 			userInputsList = getUserInputs(userInputs);
 
@@ -94,7 +99,7 @@ public class MainProcessing {
 	private void unimodalProcess() throws NullException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, true);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		}

@@ -28,7 +28,8 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			) {
 		boolean fileByFile = false;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData, defaultDirectory);
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -49,7 +50,8 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData, defaultDirectory);
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -61,6 +63,26 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
+	@PutMapping(value = "/main/lunatic-only")
+	@Operation(operationId = "mainLunaticOnly", summary = "${summary.mainLunaticOnly}", description = "${description.mainLunaticOnly}")
+	public ResponseEntity<String> mainLunaticOnly(
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+	) {
+		boolean withDDI = false;
+		boolean fileByFile = true;
+		boolean withAllReportingData = false;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		try {
+			mp.runMain();
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		}
+			/* Step 4.3- 4.4 : Archive */
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
+
+		return ResponseEntity.ok(inDirectoryParam);
+	}
 
 
 
