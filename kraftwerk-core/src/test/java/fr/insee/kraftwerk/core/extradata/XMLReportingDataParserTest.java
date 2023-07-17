@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -16,11 +15,10 @@ import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
-public class XMLReportingDataParserTest {
+class XMLReportingDataParserTest {
 
-	@Disabled("waiting test reporting data file")
 	@Test
-	public void parseReportingDataTest() {
+	void parseReportingDataTest() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -34,9 +32,9 @@ public class XMLReportingDataParserTest {
 		}
 
 		// Check the reporting data is well captured
-		assertEquals(4, reportingData.getListReportingDataUE().size());
+		assertEquals(10, reportingData.getListReportingDataUE().size());
 		QuestionnaireData questionnaire = data.getQuestionnaires().stream()
-				.filter(questionnaireToSearch -> "L0000005".equals(questionnaireToSearch.getIdentifier())).findAny()
+				.filter(questionnaireToSearch -> "TNL1102000275".equals(questionnaireToSearch.getIdentifier())).findAny()
 				.orElse(null);
 
 		// Check the reporting data's values are well captured
@@ -44,11 +42,11 @@ public class XMLReportingDataParserTest {
 		assertEquals("ANV", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
 		// Check the reporting data is correctly translated in the output
 		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getValue("STATE_2"));
-		assertEquals("Questionnaire démarré", questionnaire.getAnswers().getValue(Constants.LAST_STATE_NAME));
+		assertEquals("UE finalisée", questionnaire.getAnswers().getValue(Constants.LAST_STATE_NAME));
 	}
 
 	@Test
-	public void maxTest() {
+	void maxTest() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
 		ReportingData reportingData = new ReportingData();
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());

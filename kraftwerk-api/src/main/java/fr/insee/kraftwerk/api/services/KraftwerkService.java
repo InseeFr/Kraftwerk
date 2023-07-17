@@ -57,7 +57,7 @@ public class KraftwerkService {
 
 		/* Step 4.4 : move differential data to a secondary folder */
 		try {
-			FileUtils.moveInputFiles(controlInputSequence.getUserInputs(inDirectory));
+			FileUtils.archiveInputFiles(controlInputSequence.getUserInputs(inDirectory));
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}

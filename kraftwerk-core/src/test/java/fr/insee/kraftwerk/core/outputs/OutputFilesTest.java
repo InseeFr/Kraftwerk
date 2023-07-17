@@ -5,15 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,10 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -75,57 +68,7 @@ class OutputFilesTest {
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
 	}
 
-	@Test
-	@Order(3)
-	@Disabled
-	void moveFiles() throws KraftwerkException {
-		String campaignName = "move_files";
-		//
-		testUserInputs = new UserInputs(
-				Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName, "move_files.json"),
-				Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName));
-		Path inputFolder = testUserInputs.getInputDirectory();
 
-		Map<String, ModeInputs> modeInputsMap = testUserInputs.getModeInputsMap();
-
-		for (String mode : modeInputsMap.keySet()) {
-			// We create the mode files
-			ModeInputs modeInputs = testUserInputs.getModeInputs(mode);
-
-			String nameNewFile = modeInputs.getDataFile().toString();
-			try {
-				new File(nameNewFile).createNewFile();
-				// Now the paradata
-				if (modeInputs.getParadataFolder() != null && !modeInputs.getParadataFolder().toString().contentEquals("")) {
-					Files.createDirectories(Paths.get(inputFolder + "/paradata"));
-					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000003.json")).createNewFile();
-					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000004.json")).createNewFile();
-					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000009.json")).createNewFile();
-					new File(Constants.getResourceAbsolutePath(inputFolder + "/paradata/L0000010.json")).createNewFile();
-				}
-				if (modeInputs.getReportingDataFile() != null && !modeInputs.getReportingDataFile().toString().contentEquals("")) {
-					Files.createDirectories(Paths.get(inputFolder + "/suivi"));
-					new File(Constants.getResourceAbsolutePath(inputFolder + "/suivi/reportingdata.xml")).createNewFile();
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		FileUtils.moveInputFiles(testUserInputs);
-		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/papier").exists());
-		assertTrue(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/web").exists());
-		assertTrue(
-				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/paradata/L0000010.json").exists());
-		assertTrue(
-				new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive/suivi/reportingdata.xml").exists());
-
-		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/Archive"));
-		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/paradata"));
-		deleteDirectory(new File(TestConstants.UNIT_TESTS_DIRECTORY + "/" + campaignName + "/suivi"));
-	}
-	
 	
 	boolean deleteDirectory(File directoryToBeDeleted) {
 	    File[] allContents = directoryToBeDeleted.listFiles();

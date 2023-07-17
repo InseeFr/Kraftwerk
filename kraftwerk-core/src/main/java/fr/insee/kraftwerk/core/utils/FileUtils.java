@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.util.FileSystemUtils;
@@ -69,65 +68,77 @@ public class FileUtils {
 		}
 	}
 
-	public static void moveInputFiles(UserInputs userInputs) throws KraftwerkException {
+	public static void archiveInputFiles(UserInputs userInputs) throws KraftwerkException {
 		//
 		Path inputFolder = userInputs.getInputDirectory();
 		String[] directories = inputFolder.toString().split(Pattern.quote(File.separator));
 		String campaignName = directories[directories.length - 1];
 
-		// First we create an archive directory in case it doesn't exist
-		if (!Files.exists(inputFolder.resolve(ARCHIVE))) {
-			inputFolder.resolve(ARCHIVE).toFile().mkdir();
-		}
+		createArchiveDirectoryIfNotExists(inputFolder);
 
 		//
 		for (String mode : userInputs.getModes()) {
 			ModeInputs modeInputs = userInputs.getModeInputs(mode);
-
-			// Move data file or folder in the archive
-			// MANAGE DATA
-			Path dataPath = modeInputs.getDataFile();
-			Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
-
-			if (!Files.exists(newDataPath)) {
-				new File(newDataPath.getParent().toString()).mkdirs();
-			}
-			if (Files.isRegularFile(dataPath)) {
-				moveFile(dataPath, newDataPath);
-			} else if (Files.isDirectory(dataPath)) {
-				moveDirectory(dataPath.toFile(),
-						inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName)).toFile());
-			} else {
-				log.debug(String.format("No file or directory at path: %s", dataPath));
-			}
-
-			// MANAGE PARADATA
-			// If paradata, we move the paradata folder
-			if (modeInputs.getParadataFolder() != null) {
-				moveDirectory(modeInputs.getParadataFolder().toFile(), inputFolder.resolve(ARCHIVE)
-						.resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toFile());
-			}
-
-			// MANAGE REPORTINGDATA
-			// If reporting data, we move reporting data files
-			if (modeInputs.getReportingDataFile() != null) {
-				if (!Files
-						.exists(inputFolder.resolve(ARCHIVE).resolve(modeInputs.getReportingDataFile()).getParent())) {
-					new File(getRoot(modeInputs.getReportingDataFile(), campaignName)).mkdirs();
-				}
-				moveDirectory(modeInputs.getReportingDataFile().getParent().toFile(), inputFolder.resolve(ARCHIVE)
-						.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
-				try {
-					Files.delete(modeInputs.getReportingDataFile());
-				} catch (IOException e) {
-					throw new KraftwerkException(500, "Can't delete file " + modeInputs.getReportingDataFile());
-
-				}
-			}
+			archiveData(inputFolder, campaignName, modeInputs);
+			archiveParadata(inputFolder, campaignName, modeInputs);
+			archiveReportingData(inputFolder, campaignName, modeInputs);
 		}
 	}
 
-	public static void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
+	/**
+	 *  If reporting data, we move reporting data files
+	 * @param inputFolder
+	 * @param campaignName
+	 * @param modeInputs
+	 * @throws KraftwerkException
+	 */
+	private static void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs)
+			throws KraftwerkException {
+		if (modeInputs.getReportingDataFile() != null) {
+			moveDirectory(modeInputs.getReportingDataFile().toFile(), inputFolder.resolve(ARCHIVE)
+					.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
+		}
+	}
+
+	/**
+	 * If paradata, we move the paradata folder
+	 * @param inputFolder
+	 * @param campaignName
+	 * @param modeInputs
+	 * @throws KraftwerkException
+	 */
+	private static void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs)
+			throws KraftwerkException {
+		if (modeInputs.getParadataFolder() != null) {
+			moveDirectory(modeInputs.getParadataFolder().toFile(), inputFolder.resolve(ARCHIVE)
+					.resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toFile());
+		}
+	}
+
+	private static void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs)
+			throws KraftwerkException {
+		Path dataPath = modeInputs.getDataFile();
+		Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
+
+		if (!Files.exists(newDataPath)) {
+			new File(newDataPath.getParent().toString()).mkdirs();
+		}
+		if (Files.isRegularFile(dataPath)) {
+			moveFile(dataPath, newDataPath);
+		} else if (Files.isDirectory(dataPath)) {
+			moveDirectory(dataPath.toFile(),newDataPath.toFile());
+		} else {
+			log.debug(String.format("No file or directory at path: %s", dataPath));
+		}
+	}
+
+	private static void createArchiveDirectoryIfNotExists(Path inputFolder) {
+		if (!Files.exists(inputFolder.resolve(ARCHIVE))) {
+			inputFolder.resolve(ARCHIVE).toFile().mkdir();
+		}
+	}
+
+	private static void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
 		try {
 			Files.move(dataPath, newDataPath);
 		} catch (IOException e) {
@@ -186,7 +197,7 @@ public class FileUtils {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
 				.map(File::getName)
-				.collect(Collectors.toList());
+				.toList();
 	}
 	
 	public static Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
