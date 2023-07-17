@@ -193,8 +193,12 @@ public class LunaticXmlDataParser extends DataParser {
 		if (externalNode == null) return;
 
 		Elements externalVariableNodes = externalNode.getChildElements();
+		if (externalVariableNodes == null) return;
+
 
 		for (Element externalVariableNode : externalVariableNodes) {
+			if (externalVariableNode == null) return;
+
 			if (nodeExistsWithCompleteAttribute(externalVariableNode)) {
 				String variableName = externalVariableNode.getLocalName();
 				String value = externalVariableNode.getValue();
