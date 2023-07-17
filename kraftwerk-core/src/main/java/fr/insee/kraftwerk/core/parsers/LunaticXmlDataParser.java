@@ -55,39 +55,39 @@ public class LunaticXmlDataParser extends DataParser {
 		return document;
 	}
 
-	/**
-	 * Parse a Lunatic xml data file. Only "COLLECTED" and "EXTERNAL" variables are
-	 * read.
-	 * 
-	 * @param filePath Path to a Lunatic xml data file.
-	 */
-	@Override
-	void parseDataFile(Path filePath) {
+	private void parseDataFile(Path filePath, Path lunaticFile) {
 
 		Document document = readXmlFile(filePath);
 		log.debug("Begin to parse {} ", filePath);
 		if (document != null) {
 			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
 					.getChildElements("SurveyUnit");
+			String questionnaireModelId = null;
+			if (lunaticFile!= null) {
+				questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile);
+			}
 
 			for (int i = 0; i < questionnaireNodeList.size(); i++) {
 
 				// Xml questionnaire node
 				Element questionnaireNode = questionnaireNodeList.get(i);
 
-				// Init the questionnaire data object
-				QuestionnaireData questionnaireData = new QuestionnaireData();
+				if (lunaticFile == null || checkLunaticQuestionnaire(questionnaireModelId, questionnaireNode)) {
 
-				// Root identifier
-				questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
-				data.getIdSurveyUnits().add(questionnaireNode.getFirstChildElement("Id").getValue());
+					// Init the questionnaire data object
+					QuestionnaireData questionnaireData = new QuestionnaireData();
 
-				readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-				readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-				// Remove this method when all questionnaires will use Lunatic V2 format
-				readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+					// Root identifier
+					questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
+					data.getIdSurveyUnits().add(questionnaireNode.getFirstChildElement("Id").getValue());
 
-				data.addQuestionnaire(questionnaireData);
+					readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
+					readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+					// Remove this method when all questionnaires will use Lunatic V2 format
+					readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+
+					data.addQuestionnaire(questionnaireData);
+				}
 			}
 			log.info("Successfully parsed Lunatic answers file: {}", filePath);
 		}
@@ -100,40 +100,23 @@ public class LunaticXmlDataParser extends DataParser {
 	 * @param filePath Path to a Lunatic xml data file.
 	 */
 	@Override
+	void parseDataFile(Path filePath) {
+		parseDataFile(filePath,null);
+	}
+
+	/**
+	 * Parse a Lunatic xml data file. Only "COLLECTED" and "EXTERNAL" variables are
+	 * read.
+	 * 
+	 * @param filePath Path to a Lunatic xml data file.
+	 */
+	@Override
 	void parseDataFileWithoutDDI(Path filePath, Path lunaticFile) {
+		parseDataFile(filePath,lunaticFile);
+	}
 
-		Document document = readXmlFile(filePath);
-		log.debug("Begin to parse {} ", filePath);
-		if (document != null) {
-			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
-					.getChildElements("SurveyUnit");
-
-			String questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile);
-
-			for (int i = 0; i < questionnaireNodeList.size(); i++) {
-
-				// Xml questionnaire node
-				Element questionnaireNode = questionnaireNodeList.get(i);
-
-				if (questionnaireNode.getFirstChildElement("QuestionnaireModelId").getValue()
-						.equals(questionnaireModelId)) {
-
-					// Init the questionnaire data object
-					QuestionnaireData questionnaireData = new QuestionnaireData();
-
-					// Root identifier
-					questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
-
-					readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-					readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
-					// Remove this method when all questionnaires will use Lunatic V2 format
-					readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
-
-					data.addQuestionnaire(questionnaireData);
-				}
-			}
-			log.info("Successfully parsed Lunatic answers file: {}", filePath);
-		}
+	private boolean checkLunaticQuestionnaire(String questionnaireModelId, Element questionnaireNode) {
+		return questionnaireNode.getFirstChildElement("QuestionnaireModelId").getValue().equals(questionnaireModelId);
 	}
 
 	/**
@@ -163,13 +146,11 @@ public class LunaticXmlDataParser extends DataParser {
 
 			// Group variables // TODO : recursion etc.
 			else if (collectedNode != null) {
-				addGroupVariables(variables,variableName, answers, collectedNode, true);
+				addGroupVariables(variables, variableName, answers, collectedNode, true);
 			}
 		}
 
 	}
-
-
 
 	private void updateMaxLength(VariablesMap variables, String variableName, String value) {
 		if ((variables.getVariable(variableName) != null)
@@ -190,14 +171,16 @@ public class LunaticXmlDataParser extends DataParser {
 	private void readExternal(Element questionnaireNode, QuestionnaireData questionnaireData, VariablesMap variables) {
 
 		Element externalNode = questionnaireNode.getFirstChildElement("Data").getFirstChildElement("EXTERNAL");
-		if (externalNode == null) return;
+		if (externalNode == null)
+			return;
 
 		Elements externalVariableNodes = externalNode.getChildElements();
-		if (externalVariableNodes == null) return;
-
+		if (externalVariableNodes == null)
+			return;
 
 		for (Element externalVariableNode : externalVariableNodes) {
-			if (externalVariableNode == null) return;
+			if (externalVariableNode == null)
+				return;
 
 			if (nodeExistsWithCompleteAttribute(externalVariableNode)) {
 				String variableName = externalVariableNode.getLocalName();
@@ -212,13 +195,15 @@ public class LunaticXmlDataParser extends DataParser {
 			}
 			// Group variables
 			else {
-				addGroupVariables(variables,externalVariableNode.getLocalName(),questionnaireData.getAnswers(),externalVariableNode, false);
+				addGroupVariables(variables, externalVariableNode.getLocalName(), questionnaireData.getAnswers(),
+						externalVariableNode, false);
 			}
 		}
 
 	}
-	
-	private void addGroupVariables(VariablesMap variables, String variableName, GroupInstance answers, Element node, boolean collected) {
+
+	private void addGroupVariables(VariablesMap variables, String variableName, GroupInstance answers, Element node,
+			boolean collected) {
 		Elements valueNodes = node.getChildElements();
 
 		if (variables.hasVariable(variableName)) {
@@ -228,7 +213,8 @@ public class LunaticXmlDataParser extends DataParser {
 				Element valueNode = valueNodes.get(j);
 				if (nodeExistsWithCompleteAttribute(valueNode)) {
 					String value = valueNodes.get(j).getValue();
-					if (collected) updateMaxLength(variables, variableName, value);
+					if (collected)
+						updateMaxLength(variables, variableName, value);
 					groupData.putValue(value, variableName, j);
 				}
 			}
@@ -244,7 +230,8 @@ public class LunaticXmlDataParser extends DataParser {
 
 		// Xml collected variables nodes
 		Elements calculatedVariablesNodes = getCalculatedElements(questionnaireNode);
-		if (calculatedVariablesNodes == null) return;
+		if (calculatedVariablesNodes == null)
+			return;
 
 		// Data object
 		GroupInstance answers = questionnaireData.getAnswers();
