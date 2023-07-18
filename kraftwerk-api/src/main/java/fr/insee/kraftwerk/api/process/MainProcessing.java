@@ -133,7 +133,7 @@ public class MainProcessing {
 		for (String dataMode : source.getModeInputsMap().keySet()) {
 			List<Path> dataFiles = getFilesToProcess(source, dataMode);
 			for (Path dataFile : dataFiles) {
-				UserInputs currentFileInputs = new UserInputs(source.getUserInputFile(),source.getUserInputFile());
+				UserInputs currentFileInputs = new UserInputs(source.getUserInputFile(),source.getUserInputFile().getParent());
 				currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
 				currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
 				currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());

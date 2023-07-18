@@ -137,7 +137,7 @@ public class UserInputs {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist.", userField));
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
 			}
 			return inputPath;
 		} else {
