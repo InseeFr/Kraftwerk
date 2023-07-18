@@ -94,5 +94,22 @@ class UserInputsTest {
 			new UserInputs(path,inputSamplesDirectory);
 		});
 	}
+	
+	@Test
+	void testReadInputMissingFile() throws KraftwerkException {
+		Path path = inputSamplesDirectory.resolve("inputs_invalid_several_modes_fileNotExist.json");
+		assertThrows(KraftwerkException.class, () -> {
+			new UserInputs(path,inputSamplesDirectory);
+		});
+	}
+	
+	@Test
+	void testReadInputCompletePath() throws KraftwerkException {
+		Path path = inputSamplesDirectory.resolve("inputs_valid_several_modes_completePath.json");
+		assertDoesNotThrow(() -> {
+			new UserInputs(path,inputSamplesDirectory);
+		});
+	}
+	
 
 }

@@ -51,8 +51,6 @@ public class UserInputs {
 
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", 			"data_format", "multimode_dataset_name");
 
-	public UserInputs(){}
-
 	public UserInputs(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		this.userInputFile = userConfigFile;
 		this.inputDirectory = inputDirectory;

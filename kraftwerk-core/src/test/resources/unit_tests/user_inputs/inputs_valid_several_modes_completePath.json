@@ -1,0 +1,42 @@
+{
+  
+  "campaign": "TEST2",
+  
+  "survey_data": [
+    {
+      "data_mode": "CAPI",
+	  "data_file": "src/test/resources/unit_tests/user_inputs/sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi.xml",
+	  "data_format": "LUNATIC_XML",
+	  "paradata_folder": "",
+	  "reporting_data_file": "sample_files_to_get/sabiane_data.json",
+	  "mode_specifications": ""
+  	},
+	{
+      "data_mode": "CAWI",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi_web.xml",
+	  "data_format": "LUNATIC_XML",
+	  "paradata_folder": "sample_files_to_get/paradata.json",
+	  "reporting_data_file": "sample_files_to_get/moog_data.csv",
+	  "mode_specifications": "sample_files_to_get/web.vtl"
+  	},
+	{
+      "data_mode": "PAPI",
+	  "data_file": "sample_files_to_get/data.csv",
+	  "DDI_file": "sample_files_to_get/ddi_paper.xml",
+	  "data_format": "PAPER",
+	  "reporting_data_file": "sample_files_to_get/moog_data.csv",
+	  "mode_specifications": "sample_files_to_get/web.vtl"
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": "null"
+
+}

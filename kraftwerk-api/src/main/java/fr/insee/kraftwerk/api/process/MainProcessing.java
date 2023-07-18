@@ -128,14 +128,12 @@ public class MainProcessing {
 		TextFileWriter.writeErrorsFile(inDirectory, errors);
 	}
 
-	private static List<UserInputs> getUserInputs(UserInputs source) {
+	private static List<UserInputs> getUserInputs(UserInputs source) throws KraftwerkException {
 		List<UserInputs> userInputsList = new ArrayList<>();
 		for (String dataMode : source.getModeInputsMap().keySet()) {
 			List<Path> dataFiles = getFilesToProcess(source, dataMode);
 			for (Path dataFile : dataFiles) {
-				UserInputs currentFileInputs = new UserInputs();
-				currentFileInputs.setUserInputFile(source.getUserInputFile());
-				currentFileInputs.setInputDirectory(source.getInputDirectory());
+				UserInputs currentFileInputs = new UserInputs(source.getUserInputFile(),source.getUserInputFile());
 				currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
 				currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
 				currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
