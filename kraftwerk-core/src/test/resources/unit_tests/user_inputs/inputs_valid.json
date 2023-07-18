@@ -8,7 +8,7 @@
 	  "data_format": "LUNATIC_XML",
       "lunatic_file": "sample_files_to_get/lunatic.json",
 	  "paradata_folder": "",
-	  "reporting_data_file": "",
+	  "reporting_data_file": "sample_files_to_get/reportingdata.xml",
 	  "mode_specifications": ""
   	}
   ],

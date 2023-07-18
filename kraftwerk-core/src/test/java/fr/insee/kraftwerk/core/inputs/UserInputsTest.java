@@ -33,7 +33,7 @@ class UserInputsTest {
 		assertNotNull(modeInputs.getDdiUrl());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNull(modeInputs.getParadataFolder());
-		assertNull(modeInputs.getReportingDataFile());
+		assertNotNull(modeInputs.getReportingDataFile());
 		assertNull(modeInputs.getModeVtlFile());
 		//
 		assertEquals( "MULTIMODE", userInputs.getMultimodeDatasetName());

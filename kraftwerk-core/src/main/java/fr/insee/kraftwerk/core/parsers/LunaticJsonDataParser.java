@@ -34,7 +34,6 @@ public class LunaticJsonDataParser extends DataParser {
 		} catch (Exception e) {
 			throw new NullException("Can't read JSON file - "+e.getClass()+" "+ e.getMessage());
 		}
-		//JSONObject stateData = (JSONObject) jsonObject.get("stateData");
 		JSONObject jsonData = (JSONObject) jsonObject.get("data");
 		String identifier = (String) jsonObject.get("id");
 
@@ -48,32 +47,27 @@ public class LunaticJsonDataParser extends DataParser {
 		// Survey answers
 		GroupInstance answers = questionnaireData.getAnswers();
 
-		// Now we get each variable calculated during the survey
-		// TODO
-
 		// Now we get each variable collected during the survey
-		JSONObject collected_variables = (JSONObject) jsonData.get("COLLECTED");
+		JSONObject collectedVariables = (JSONObject) jsonData.get(Constants.COLLECTED);
 
-		for (Object variable : collected_variables.keySet()) {
+		for (Object variable : collectedVariables.keySet()) {
 			String variableName = (String) variable;
-			JSONObject variable_data = (JSONObject) collected_variables.get(variableName);
+			JSONObject variableData = (JSONObject) collectedVariables.get(variableName);
 			if (data.getVariablesMap().hasVariable(variableName)) {
 				String value = "";
-				if (variable_data.get("COLLECTED") != null){
-					value = (String) variable_data.get("COLLECTED").toString();
+				if (variableData.get(Constants.COLLECTED) != null){
+					value = variableData.get(Constants.COLLECTED).toString();
 				} 
 				answers.putValue(variableName, value);
 			} else {
-				//TODO fix log, lots of useless lines
 				log.warn(String.format("WARNING: Variable %s not expected!", variableName));
 			}
 			
 		}
 
-		// Now we get each variable external to the survey
-		// TODO
-		
-		//
+
+		// TODO Get each variable calculated and external 
+
 		data.addQuestionnaire(questionnaireData);
 	}
 

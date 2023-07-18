@@ -1,7 +1,57 @@
-<Campagne idPeriode="X00" idSource="TEST" millesime="9999">
-    <Traitement>
-        <Type>ExtractionReponses</Type>
-    </Traitement>
-    <Questionnaires>
-    </Questionnaires>
-</Campagne>
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+	<Id>UTS_1</Id>
+	<Label>Unit Test Survey</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>ID0001</Id>
+			<QuestionnaireModelId>UTS_1_model</QuestionnaireModelId>
+			<Data>
+				<COLLECTED>
+					<VAR1>
+						<COLLECTED type="null" />
+						<EDITED type="null" />
+						<INPUTED type="null" />
+						<FORCED type="null" />
+						<PREVIOUS type="null" />
+					</VAR1>
+					<PAYSNAIS>
+						<COLLECTED>
+							<COLLECTED type="null" />
+						</COLLECTED>
+						<EDITED>
+							<EDITED type="null" />
+						</EDITED>
+						<INPUTED>
+							<INPUTED type="null" />
+						</INPUTED>
+						<FORCED>
+							<FORCED type="null" />
+						</FORCED>
+						<PREVIOUS>
+							<PREVIOUS type="null" />
+						</PREVIOUS>
+					</PAYSNAIS>
+				</COLLECTED>
+				<EXTERNAL>
+					<PRENOM type="string">TOTO</PRENOM>
+				</EXTERNAL>
+			</Data>
+			<Personalization>
+				<Variable>
+					<Name>whoAnswers1</Name>
+					<Value>Un adulte du ménage</Value>
+				</Variable>
+				<Variable>
+					<Name>whoAnswers2</Name>
+					<Value />
+				</Variable>
+				<Variable>
+					<Name>whoAnswers3</Name>
+					<Value />
+				</Variable>
+			</Personalization>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>
+    
