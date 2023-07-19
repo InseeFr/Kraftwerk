@@ -70,7 +70,7 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 	) {
 		boolean withDDI = false;
-		boolean fileByFile = true;
+		boolean fileByFile = false;
 		boolean withAllReportingData = false;
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
