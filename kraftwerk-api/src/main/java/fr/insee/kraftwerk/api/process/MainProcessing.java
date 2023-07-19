@@ -96,7 +96,7 @@ public class MainProcessing {
 		if (withDDI) metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		if (!withDDI) metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputs.getModeInputsMap());
 	
-		if (Boolean.TRUE.equals(fileByFile)) userInputsList = getUserInputs(userInputs);
+		if (fileByFile) userInputsList = getUserInputs(userInputs);
 
 	}
 
