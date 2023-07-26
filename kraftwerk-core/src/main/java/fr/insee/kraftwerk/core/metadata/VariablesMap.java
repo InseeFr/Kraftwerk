@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.insee.kraftwerk.core.Constants;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -40,6 +42,7 @@ public class VariablesMap {
 
     /** Register a variable in the map. */
     public void putVariable(Variable variable) {
+    	if (StringUtils.isEmpty(variable.getName())){return;}
         variables.put(variable.getName(), variable);
     }
 
@@ -137,7 +140,7 @@ public class VariablesMap {
      *
      * In the second case, the separator use is defined by Constants.METADATA_SEPARATOR. */
     public String getFullyQualifiedName(String variableName) {
-        if (this.hasVariable(variableName)) {
+        if (this.hasVariable(variableName) && StringUtils.isNotEmpty(variableName)) {
 
             /* done using StringBuilder, maybe concatenate a list of strings is better
             https://stackoverflow.com/a/523913/13425151 */

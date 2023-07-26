@@ -6,6 +6,7 @@
 - Service to read metadata from Lunatic in case no DDI is available
 
 ### Changed
+- Add date for contact-outcome and last attempt from reporting Data, instead of current day, month, year
 
 ### Fixed
 - In case of file by file execution, reportingData without questionnaires were duplicated. Fix with skipping these reportingData
