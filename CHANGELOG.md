@@ -1,5 +1,14 @@
 # Changelog
 
+## Not released yet
+
+### Added
+
+### Changed
+
+### Fixed
+
+
 ## 1.4.0 - [2023-08-22]
 
 ### Added
