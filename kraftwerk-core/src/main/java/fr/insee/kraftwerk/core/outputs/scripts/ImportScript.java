@@ -45,52 +45,57 @@ public abstract class ImportScript {
 					result.put(variableName, new Variable(variableName, variablesMap.getGroup(variableName),VariableType.STRING, "32"));
 				}
 				if (variablesMap.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
-
-					variableName = getRootName(variableName);
-					Variable variable = variablesMap.getVariable(variableName);
-
-					String newLengthString = variable.getSasFormat();
-
-					// We already got the variable, so we check to see if the lengths are different -> take the maximum one then
-					if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-						if (result.containsKey(variableName)) {
-							result.replace(variableName, new Variable(variableName,
-									result.get(variableName).getGroup(), VariableType.STRING, "255"));
-						} else {
-							result.put(variableName, new Variable(variableName,
-									variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
-						}
-					} else {
-						if (result.containsKey(variableName)) {
-							String existingLengthString = result.get(variableName).getSasFormat();
-							if (newLengthString!=null && isNotFloat(newLengthString) && isNotFloat(existingLengthString) && Integer.parseInt(existingLengthString) < Integer.parseInt(newLengthString)) {
-								// Variable already put in result, and not a float (if float exists, we do nothing)
-									result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
-													result.get(variableName).getType(), newLengthString));
-							}
-						} else {
-							// Filter results are boolean, value "true" or "false"
-							if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-								result.put(variableName, new Variable(variableName,
-										variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "1"));
-							} else {
-								// new Variable, we keep it like that
-								result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
-										variable.getSasFormat()));
-							}
-
-						}
-					}
-				} else {
-					if (!result.containsKey(variableName)) {
+					variableName = addOrReplaceLength(result, variableName, variablesMap);
+				} else if (!result.containsKey(variableName)) {
 						result.put(variableName, new Variable(variableName,
 								variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
-					}
+					
 				}
 			}
 
 		}
 		return result;
+	}
+
+	private static String addOrReplaceLength(Map<String, Variable> result, String variableName,
+			VariablesMap variablesMap) {
+		variableName = getRootName(variableName);
+		Variable variable = variablesMap.getVariable(variableName);
+
+		String newLengthString = variable.getSasFormat();
+
+		// We already got the variable, so we check to see if the lengths are different -> take the maximum one then
+		if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+			if (result.containsKey(variableName)) {
+				result.replace(variableName, new Variable(variableName,
+						result.get(variableName).getGroup(), VariableType.STRING, "255"));
+			} else {
+				result.put(variableName, new Variable(variableName,
+						variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
+			}
+		} else {
+			if (result.containsKey(variableName) && isNewLengthUpperThanExisting(newLengthString, result.get(variableName).getSasFormat())) {
+					// Variable already put in result, and not a float (if float exists, we do nothing)
+						result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
+										result.get(variableName).getType(), newLengthString));
+			} else {
+				// Filter results are boolean, value "true" or "false"
+				if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+					result.put(variableName, new Variable(variableName,
+							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "1"));
+				} else {
+					// new Variable, we keep it like that
+					result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
+							variable.getSasFormat()));
+				}
+
+			}
+		}
+		return variableName;
+	}
+
+	private static boolean isNewLengthUpperThanExisting(String newLengthString, String existingLengthString) {
+		return newLengthString!=null && isNotFloat(newLengthString) && isNotFloat(existingLengthString) && Integer.parseInt(existingLengthString) < Integer.parseInt(newLengthString);
 	}
 
 	private static boolean isNotFloat(String length) {
