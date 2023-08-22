@@ -1,6 +1,6 @@
 # Changelog
 
-## Not released yet
+## 1.4.0 - [2023-08-22]
 
 ### Added
 - Service to read metadata from Lunatic in case no DDI is available
