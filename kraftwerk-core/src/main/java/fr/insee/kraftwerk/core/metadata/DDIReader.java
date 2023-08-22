@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.xml.XMLConstants;
@@ -25,14 +26,18 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class DDIReader {
+	
+	private DDIReader() {
+		//Utility class
+	}
 
 	// DDI should stay in KW and use DOM (not Jaxb)
 
 	/**
 	 * This method apply the XSLT_STRUCTURED_VARIABLES transformation to the DDI,
 	 * then reads the output xml to return the variables. The XML file generated is
-	 * written in the system temporary folder with the name 'variables.xml', and is
-	 * deleted when the virtual machine terminates.
+	 * written in the system temporary folder with the name 'variables.xml'. This file is
+	 * deleted after being used or when the virtual machine terminates.
 	 *
 	 * @param ddiUrl : Path to the DDI file.
 	 *
@@ -46,15 +51,11 @@ public class DDIReader {
 			File variablesFile = File.createTempFile("variables", ".xml");
 			variablesFile.deleteOnExit();
 			Path variablesTempFilePath = variablesFile.toPath();
-			//
+
 			transformDDI(ddiUrl, variablesTempFilePath);
 
 			VariablesMap variablesMap = readVariables(variablesTempFilePath);
-			if (variablesFile.delete()){
-				log.debug("File {} deleted",variablesFile.toPath());
-			} else {
-				log.debug("Impossible to delete file {}",variablesFile.toPath());
-			}
+			Files.delete(variablesFile.toPath());
 			return variablesMap;
 		}
 
@@ -106,12 +107,9 @@ public class DDIReader {
 		String rootGroupName = null;
 
 		for (int i = 0; i < groupElements.getLength(); i++) {
-
 			try {
 				Node groupNode = groupElements.item(i);
-				if ("Group".equals(groupNode.getNodeName())) {
-
-					if (groupNode.getNodeType() == Node.ELEMENT_NODE) {
+				if (nodeIsElementWithName(groupNode, "Group")) {
 						// Get the group name
 						Element groupElement = (Element) groupNode;
 
@@ -120,7 +118,7 @@ public class DDIReader {
 
 						// Store the group
 						Group group;
-						if (parentGroupName == null || StringUtils.isEmpty(parentGroupName)) {
+						if (StringUtils.isEmpty(parentGroupName)) {
 							rootGroupName = groupName;
 							group = variablesMap.getRootGroup();
 						} else {
@@ -130,7 +128,7 @@ public class DDIReader {
 
 						// Variables in the group
 						getVariablesInGroup(variablesMap, groupNode, group);
-					}
+					
 				}
 			} catch (NullPointerException e) {
 				log.error(String.format("Missing field in mandatory information for variable %s",
@@ -152,61 +150,71 @@ public class DDIReader {
 		return variablesMap;
 	}
 
+
+
 	private static void getVariablesInGroup(VariablesMap variablesMap, Node groupNode, Group group) {
 		NodeList variableNodes = groupNode.getChildNodes();
 		for (int j = 0; j < variableNodes.getLength(); j++) {
 			Node variableNode = variableNodes.item(j);
-			if ("Variable".equals(variableNode.getNodeName()) && // Add only Variable
-					variableNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element variableElement = (Element) variableNode;
-
-				// Variable name, type and size
-				String variableName = getFirstChildValue(variableElement, "Name");
-				VariableType variableType = VariableType.valueOf(getFirstChildValue(variableElement, "Format"));
-				String variableLength = getFirstChildValue(variableElement, "Size");
-
-				Node questionItemName = getFirstChildNode(variableElement, "QuestionItemName");
-				//
-				Node valuesElement = getFirstChildNode(variableElement, "Values");
-				//
-				Node mcqElement = getFirstChildNode(variableElement, "QGrid");
-				//
-				if (valuesElement != null) {
-					UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
-					if (questionItemName != null) {
-						variable.setQuestionItemName(questionItemName.getTextContent());
-					} else if (mcqElement != null) {
-						variable.setQuestionItemName(mcqElement.getTextContent());
-						variable.setInQuestionGrid(true);
-					}
-					NodeList valueElements = valuesElement.getChildNodes();
-					for (int k = 0; k < valueElements.getLength(); k++) {
-						Node valueElement = valueElements.item(k);
-						if (valueElement.getNodeType() == Node.ELEMENT_NODE
-								&& "Value".equals(valueElement.getNodeName())) {
-							variable.addModality(valueElement.getTextContent(),
-									((Element) valueElement).getAttribute("label"));
-
-						}
-					}
-					variablesMap.putVariable(variable);
-				} else if (mcqElement != null) {
-					McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
-					variable.setQuestionItemName(mcqElement.getTextContent());
-					variable.setInQuestionGrid(true);
-					variable.setText(getFirstChildValue(variableElement, "Label"));
-					variablesMap.putVariable(variable);
-				} else {
-					Variable variable = new Variable(variableName, group, variableType, variableLength);
-					if (questionItemName != null) {
-						variable.setQuestionItemName(questionItemName.getTextContent());
-					} else {
-						variable.setQuestionItemName(variableName);
-					}
-					variablesMap.putVariable(variable);
-				}
+			if (nodeIsElementWithName(variableNode, "Variable")) {
+				addVariableToVariablesMap(variablesMap, group, variableNode);
 			}
 		}
+	}
+
+	private static void addVariableToVariablesMap(VariablesMap variablesMap, Group group, Node variableNode) {
+		Element variableElement = (Element) variableNode;
+
+		// Variable name, type and size
+		String variableName = getFirstChildValue(variableElement, "Name");
+		VariableType variableType = VariableType.valueOf(getFirstChildValue(variableElement, "Format"));
+		String variableLength = getFirstChildValue(variableElement, "Size");
+
+		Node questionItemName = getFirstChildNode(variableElement, "QuestionItemName");
+		Node valuesElement = getFirstChildNode(variableElement, "Values");
+		Node mcqElement = getFirstChildNode(variableElement, "QGrid");
+		
+		if (valuesElement != null) {
+			UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
+			if (questionItemName != null) {
+				variable.setQuestionItemName(questionItemName.getTextContent());
+			} else if (mcqElement != null) {
+				variable.setQuestionItemName(mcqElement.getTextContent());
+				variable.setInQuestionGrid(true);
+			}
+			NodeList valueElements = valuesElement.getChildNodes();
+			addValues(variable, valueElements);
+			variablesMap.putVariable(variable);
+		} else if (mcqElement != null) {
+			McqVariable variable = new McqVariable(variableName, group, variableType, variableLength);
+			variable.setQuestionItemName(mcqElement.getTextContent());
+			variable.setInQuestionGrid(true);
+			variable.setText(getFirstChildValue(variableElement, "Label"));
+			variablesMap.putVariable(variable);
+		} else {
+			Variable variable = new Variable(variableName, group, variableType, variableLength);
+			if (questionItemName != null) {
+				variable.setQuestionItemName(questionItemName.getTextContent());
+			} else {
+				variable.setQuestionItemName(variableName);
+			}
+			variablesMap.putVariable(variable);
+		}
+	}
+
+	private static void addValues(UcqVariable variable, NodeList valueElements) {
+		for (int k = 0; k < valueElements.getLength(); k++) {
+			Node valueElement = valueElements.item(k);
+			if (nodeIsElementWithName(valueElement, "Value")) {
+				variable.addModality(valueElement.getTextContent(),
+						((Element) valueElement).getAttribute("label"));
+
+			}
+		}
+	}
+	
+	private static boolean nodeIsElementWithName(Node groupNode, String name) {
+		return name.equals(groupNode.getNodeName()) && groupNode.getNodeType() == Node.ELEMENT_NODE;
 	}
 
 	private static Element readXmlFile(Path variablesFilePath)

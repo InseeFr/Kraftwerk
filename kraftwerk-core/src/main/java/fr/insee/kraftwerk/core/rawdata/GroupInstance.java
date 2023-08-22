@@ -1,6 +1,9 @@
 package fr.insee.kraftwerk.core.rawdata;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import fr.insee.kraftwerk.core.Constants;
 
@@ -24,12 +27,12 @@ public class GroupInstance {
 	 * A map containing group's variables' data. Keys: a variable name. Values: the
 	 * String value of a variable in data file.
 	 */
-	LinkedHashMap<String, String> values = new LinkedHashMap<>();
+	Map<String, String> values = new LinkedHashMap<>();
 	/**
 	 * A map containing sub groups' data. Keys: a group name. Values: a GroupData
 	 * (which is a subgroup of the current group).
 	 */
-	LinkedHashMap<String, GroupData> subGroups = new LinkedHashMap<>();
+	Map<String, GroupData> subGroups = new LinkedHashMap<>();
 
 	public GroupInstance(String groupName, String groupId) {
 		this.groupName = groupName;
@@ -51,11 +54,6 @@ public class GroupInstance {
 
 	public Set<String> getVariableNames() {
 		return values.keySet();
-	}
-
-	@Deprecated // use getVariableNames
-	public LinkedHashMap<String, String> getValues() {
-		return values;
 	}
 
 	public void putValue(String variableName, String value) {
@@ -80,16 +78,6 @@ public class GroupInstance {
 
 	public Set<String> getSubGroupNames() {
 		return new LinkedHashSet<>(subGroups.keySet());
-	}
-
-	@Deprecated // use getSubGroupNames instead
-	public LinkedHashMap<String, GroupData> getSubGroups() {
-		return subGroups;
-	}
-
-	@Deprecated // use getSubGroupInstead
-	public void putSubGroup(String groupName, GroupData subGroup) {
-		subGroups.put(groupName, subGroup);
 	}
 
 }

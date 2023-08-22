@@ -19,14 +19,14 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 public class CSVReportingDataParserTest {
 
 	@Test
-	public void parseReportingDataTest() {
+	 void parseReportingDataTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
 		try {
-			csvReportingDataParser.parseReportingData(reportingData, data);
+			csvReportingDataParser.parseReportingData(reportingData, data, true);
 		} catch (NullException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

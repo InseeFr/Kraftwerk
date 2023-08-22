@@ -25,7 +25,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 
 	private CSVReader csvReader;
 
-	public void parseReportingData(ReportingData reportingData, SurveyRawData data) throws NullException {
+	public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
 		Path filePath = reportingData.getFilepath();
 	    try{
 	    	readFile(filePath);
@@ -56,7 +56,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 					reportingDataUE.addState(state);
 					reportingData.addReportingDataUE(reportingDataUE);
 				}
-				integrateReportingDataIntoUE(data, reportingData);
+				integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
 			} else {
 				log.error("Following CSV file is malformed : {}", filePath);
 			}

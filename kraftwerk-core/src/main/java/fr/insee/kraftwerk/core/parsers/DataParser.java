@@ -64,10 +64,53 @@ public abstract class DataParser {
 	}
 
 	/**
+	 * Fill the data object with the content of the file or folder given.
+	 *
+	 * @param dataPath A data file, or a folder only containing data files.
+	 * @throws NullException
+	 */
+	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile) throws NullException {
+		if (dataPath == null) log.error("Datapath is null");
+		else {
+			if (Files.isRegularFile(dataPath)) {
+				parseDataFileWithoutDDI(dataPath,lunaticFile);
+			}
+
+			else if (Files.isDirectory(dataPath)) {
+				try (Stream<Path> stream = Files.list(dataPath)){
+					stream.forEach(t -> {
+						try {
+							parseDataFileWithoutDDI(t,lunaticFile);
+						} catch (NullException e) {
+							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+						}
+					});
+				} catch (IOException e) {
+					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
+				}
+			}
+
+			else {
+				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+				log.warn("No data was parsed.");
+			}
+		}
+	}
+
+	/**
 	 * Fill the data object with the content of the given file.
 	 * @param dataFilePath Path to a data file.
 	 * @throws NullException 
 	 */
 	abstract void parseDataFile(Path dataFilePath) throws NullException;
+
+	/**
+	 * Fill the data object with the content of the given file for treatment without DDI specification
+	 * @param dataFilePath Path to a data file.
+	 * @throws NullException
+	 */
+	void parseDataFileWithoutDDI(Path dataFilePath,Path lunaticFile) throws NullException {
+		log.info("Parsing without DDI not implemented for this data format");
+	}
 
 }

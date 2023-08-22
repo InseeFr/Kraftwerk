@@ -85,6 +85,8 @@ public final class Constants {
 	  public static final String NUMBER_ATTEMPTS_NAME = "NUMBER_CONTACT_ATTEMPTS";
 	  public static final String OUTCOME_ATTEMPT_SUFFIX_NAME = "ATTEMPT";
 	  public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
+	public static final String LAST_ATTEMPT_DATE = "LAST_ATTEMPT_DATE";
+	public static final String OUTCOME_DATE = "OUTCOME_DATE";
 	
 	// ---------- Functions
 	// ---------- Get a file

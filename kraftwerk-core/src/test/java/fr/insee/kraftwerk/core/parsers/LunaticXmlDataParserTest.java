@@ -1,10 +1,12 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,17 @@ class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
 
+	@Test
+	void readXmlFile_null() {
+		SurveyRawData data = new SurveyRawData("TEST");
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		
+		assertThrows(NullPointerException.class,() ->parser.parseDataFile(null));
+		parser.parseDataFile(Path.of("notfound.xml"));
+		assertEquals(new ArrayList<QuestionnaireData>(),data.getQuestionnaires());
+
+	}
+	
 	@Test
 	void parseLunaticDataFolder() throws NullException {
 		//

@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.api;
+package fr.insee.kraftwerk.api.services;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -26,6 +27,7 @@ import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,37 +42,31 @@ public class StepByStepService extends KraftwerkService {
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
-			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
-		Path inDirectory;
+		boolean fileByFile = false;
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
-		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
-
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-		
+				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			VtlBindings vtlBindings = new VtlBindings();
+		for (String dataMode : mp.getUserInputs().getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,metadataVariables);
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 			
-			vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+			vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		}
 		
 		return ResponseEntity.ok(inDirectoryParam);
@@ -83,35 +79,29 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindingsByDataMode(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode
+			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
 			)  {
 		//Read data files
-		Path inDirectory;
+		boolean fileByFile = false;
+		boolean withDDI = true;
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
-		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
-		VtlBindings vtlBindings = new VtlBindings();
-
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables);
+			buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
-		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.BUILD_BINDINGS);
+		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -153,7 +143,7 @@ public class StepByStepService extends KraftwerkService {
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -200,7 +190,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, errors);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -247,7 +237,7 @@ public class StepByStepService extends KraftwerkService {
 	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
-	public ResponseEntity<String> archive(
+	public ResponseEntity<String> archiveService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
 			{
 		return archive(inDirectoryParam);

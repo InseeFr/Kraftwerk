@@ -1,5 +1,11 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.util.Date;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter@Setter
 public class ContactAttempt {
   private String status;
   
@@ -16,19 +22,9 @@ public class ContactAttempt {
     this.timestamp = timestamp;
   }
   
-  public String getStatus() {
-    return this.status;
+  public Date getDate() {
+	  return new Date(timestamp);
   }
   
-  public void setStatus(String status) {
-    this.status = status;
-  }
   
-  public long getTimestamp() {
-    return this.timestamp;
-  }
-  
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
-  }
 }

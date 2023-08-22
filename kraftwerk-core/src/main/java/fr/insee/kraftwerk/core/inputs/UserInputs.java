@@ -49,10 +49,7 @@ public class UserInputs {
 	@Setter
 	private Path vtlInformationLevelsFile;
 
-	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "DDI_file",
-			"data_format", "multimode_dataset_name");
-
-	public UserInputs(){}
+	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", 			"data_format", "multimode_dataset_name");
 
 	public UserInputs(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		this.userInputFile = userConfigFile;
@@ -140,7 +137,7 @@ public class UserInputs {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist.", userField));
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
 			}
 			return inputPath;
 		} else {

@@ -23,6 +23,7 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -66,6 +67,8 @@ class CsvTableWriterTest {
 	void writeCsvFromDatasetTest() throws IOException, CsvException {
 		// Clean the existing file
 		Files.deleteIfExists(outTestFilePath);
+		FileUtils.createDirectoryIfNotExist(outTestFilePath.getParent());
+
 		Map<String, VariablesMap> metaVariables = new HashMap<>();
 		VariablesMap varMap = new VariablesMap();
 		Group group = new Group("test","RACINE");

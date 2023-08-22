@@ -31,6 +31,11 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class VtlJsonDatasetWriter {
 
+	private static final String ROLE = "role";
+	private static final String TYPE = "type";
+	private static final String NAME = "name";
+	private static final String IDENTIFIER = "IDENTIFIER";
+	private static final String STRING = "STRING";
 	private final SurveyRawData surveyData;
 	private final VariablesMap variablesMap;
 	private final String datasetName;
@@ -91,9 +96,9 @@ public class VtlJsonDatasetWriter {
 
 		// Root level identifier
 		JSONObject jsonVtlIdentifier = new JSONObject();
-		jsonVtlIdentifier.put("name", Constants.ROOT_IDENTIFIER_NAME);
-		jsonVtlIdentifier.put("type", "STRING");
-		jsonVtlIdentifier.put("role", "IDENTIFIER");
+		jsonVtlIdentifier.put(NAME, Constants.ROOT_IDENTIFIER_NAME);
+		jsonVtlIdentifier.put(TYPE, STRING);
+		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
 		dataStructure.add(jsonVtlIdentifier);
 		columnsMapping.put(Constants.ROOT_IDENTIFIER_NAME, variableNumber);
 		variableNumber++;
@@ -101,9 +106,9 @@ public class VtlJsonDatasetWriter {
 		for (String groupName : variablesMap.getSubGroupNames()) {
 			// The group name is the identifier variable for the group
 			JSONObject jsonVtlGroupIdentifier = new JSONObject();
-			jsonVtlGroupIdentifier.put("name", groupName);
-			jsonVtlGroupIdentifier.put("type", "STRING");
-			jsonVtlGroupIdentifier.put("role", "IDENTIFIER");
+			jsonVtlGroupIdentifier.put(NAME, groupName);
+			jsonVtlGroupIdentifier.put(TYPE, STRING);
+			jsonVtlGroupIdentifier.put(ROLE, IDENTIFIER);
 			dataStructure.add(jsonVtlGroupIdentifier);
 			columnsMapping.put(groupName, variableNumber);
 			variableNumber++;
@@ -113,10 +118,9 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : variablesMap.getVariableNames()) {
 			Variable variable = variablesMap.getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
-			//jsonVtlVariable.put("name", variablesMap.getFullyQualifiedName(variableName));
-			jsonVtlVariable.put("name", variableName); // recent change (see GroupProcessing class)
-			jsonVtlVariable.put("type", convertToVtlType(variable.getType()));
-			jsonVtlVariable.put("role", "MEASURE");
+			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
+			jsonVtlVariable.put(TYPE, convertToVtlType(variable.getType()));
+			jsonVtlVariable.put(ROLE, "MEASURE");
 			dataStructure.add(jsonVtlVariable);
 			columnsMapping.put(variableName, variableNumber);
 			variableNumber++;
@@ -141,17 +145,7 @@ public class VtlJsonDatasetWriter {
 			rowValues[0] = questionnaireData.getIdentifier();
 			
 			// Root variables values
-			for (String variableName : rootInstance.getVariableNames()) {
-				if (columnsMapping.get(variableName) != null) {
-					String value = rootInstance.getValue(variableName);
-					if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
-						value = convertBooleanValue(value);
-					}
-					rowValues[columnsMapping.get(variableName)] = value;
-				} else {
-					log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
-				}
-			}
+			addValuesToRow(rootInstance, rowValues);
 
 			// TODO: only works with at most one level of subgroups. Implement recursion or
 
@@ -173,17 +167,7 @@ public class VtlJsonDatasetWriter {
 						String [] groupRowValues = rowValues.clone();
 						GroupInstance groupInstance = groupData.getInstance(groupId);
 						groupRowValues[columnsMapping.get(groupName)] = groupInstance.getId();
-						for (String variableName : groupInstance.getVariableNames()) {
-							if (columnsMapping.get(variableName) != null) {
-								String value = groupInstance.getValue(variableName);
-								if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { // TODO: document me
-									value = convertBooleanValue(value);
-								}
-								groupRowValues[columnsMapping.get(variableName)] = value;
-							} else {
-								log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
-							}
-						}
+						addValuesToRow(groupInstance, groupRowValues);
 
 						JSONArray array = new JSONArray();
 						array.addAll(Arrays.asList(groupRowValues));
@@ -204,10 +188,24 @@ public class VtlJsonDatasetWriter {
 		return dataPoints;
 	}
 
+	private void addValuesToRow(GroupInstance groupInstance, String[] rowValues) {
+		for (String variableName : groupInstance.getVariableNames()) {
+			if (columnsMapping.get(variableName) != null) {
+				String value = groupInstance.getValue(variableName);
+				if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { 
+					value = convertBooleanValue(value);
+				}
+				rowValues[columnsMapping.get(variableName)] = value;
+			} else {
+				log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
+			}
+		}
+	}
+
 	public static String convertToVtlType(VariableType variableType) {
 		if (variableType == null) {
 			log.debug("null variable type given to convertToVtlType method, this should NEVER happen!");
-			return "STRING";
+			return STRING;
 		}
 		return variableType.getVtlType();
 	}

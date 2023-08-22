@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.api;
+package fr.insee.kraftwerk.api.configuration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

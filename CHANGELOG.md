@@ -1,12 +1,15 @@
 # Changelog
 
-## Not released yet
+## 1.4.0 - [2023-08-22]
 
 ### Added
+- Service to read metadata from Lunatic in case no DDI is available
 
 ### Changed
+- Add date for contact-outcome and last attempt from reporting Data, instead of current day, month, year
 
 ### Fixed
+- In case of file by file execution, reportingData without questionnaires were duplicated. Fix with skipping these reportingData
 
 ## 1.3.3 - [2023-06-13]
 
