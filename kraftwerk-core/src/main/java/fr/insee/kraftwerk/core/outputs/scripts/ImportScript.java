@@ -1,18 +1,18 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Structured;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 /**
- * Class to generate import scripts for the csv output tables.
+ * Class to generate import scripts for the output tables.
  * Some methods that could be implemented later: R base script and Python with pandas script.
  */
 public abstract class ImportScript {
@@ -63,15 +63,10 @@ public abstract class ImportScript {
 					} else {
 						if (result.containsKey(variableName)) {
 							String existingLengthString = result.get(variableName).getSasFormat();
-							if (newLengthString!=null && !newLengthString.contains(".") && !existingLengthString.contains(".")) {
+							if (newLengthString!=null && isNotFloat(newLengthString) && isNotFloat(existingLengthString) && Integer.parseInt(existingLengthString) < Integer.parseInt(newLengthString)) {
 								// Variable already put in result, and not a float (if float exists, we do nothing)
-								int newLength = Integer.parseInt(newLengthString);
-								if (Integer.parseInt(existingLengthString) < newLength) {
-									// name, Group group, VariableType type, int length
-									result.replace(variableName,
-											new Variable(variableName, result.get(variableName).getGroup(),
+									result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
 													result.get(variableName).getType(), newLengthString));
-								}
 							}
 						} else {
 							// Filter results are boolean, value "true" or "false"
@@ -96,6 +91,10 @@ public abstract class ImportScript {
 
 		}
 		return result;
+	}
+
+	private static boolean isNotFloat(String length) {
+		return !length.contains(".");
 	}
 
 	/** Return the variable name without the group in the prefixes. */
