@@ -46,14 +46,14 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void testRootGroup() {
+    void testRootGroup() {
         assertTrue(variablesMap.hasGroup(Constants.ROOT_GROUP_NAME));
         assertEquals(Constants.ROOT_GROUP_NAME, variablesMap.getRootGroup().getName());
         assertNull(variablesMap.getRootGroup().getParentName());
     }
 
     @Test
-    public void testGetVariableByName() {
+    void testGetVariableByName() {
 
         // Get
         Variable rootVariable = variablesMap.getVariable("HOUSEHOLD_INCOME");
@@ -73,7 +73,7 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void testRemoveAndHasVariable() {
+    void testRemoveAndHasVariable() {
 
         // Remove
         variablesMap.removeVariable("HOUSEHOLD_INCOME");
@@ -91,7 +91,7 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void getIdentifierNamesTest() {
+    void getIdentifierNamesTest() {
         assertEquals(
                 List.of(Constants.ROOT_IDENTIFIER_NAME, "INDIVIDUALS_LOOP", "CARS_LOOP"),
                 variablesMap.getIdentifierNames()
@@ -99,7 +99,7 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void getFullyQualifiedNameTest() {
+    void getFullyQualifiedNameTest() {
         assertEquals("HOUSEHOLD_INCOME",
                 variablesMap.getFullyQualifiedName("HOUSEHOLD_INCOME"));
         assertEquals("INDIVIDUALS_LOOP.FIRST_NAME",
@@ -109,7 +109,7 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void testGetGroupVariableNames() {
+    void testGetGroupVariableNames() {
         assertTrue(variablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME)
                 .containsAll(Set.of("ADDRESS", "HOUSEHOLD_INCOME")));
         assertTrue(variablesMap.getGroupVariableNames("INDIVIDUALS_LOOP")
@@ -119,7 +119,7 @@ public class VariablesMapTest {
     }
 
     @Test
-    public void testMcqMethods() {
+    void testMcqMethods() {
         //
         Group group = variablesMap.getGroup("INDIVIDUALS_LOOP");
         variablesMap.putVariable(McqVariable.builder()
@@ -146,7 +146,7 @@ public class VariablesMapTest {
     }
     
     @Test
-    public void testGetVariablesNames() {
+    void testGetVariablesNames() {
     	variablesMap = createCompleteFakeVariablesMap();
     	// KSE et KGA à trouver, une par liste
     	List<String> ucqMcqVariablesNames = variablesMap.getUcqVariablesNames();

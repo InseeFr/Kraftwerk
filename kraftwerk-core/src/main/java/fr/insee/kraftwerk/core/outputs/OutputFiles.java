@@ -86,7 +86,7 @@ public abstract class OutputFiles {
 	 */
 	public String outputFileName(String datasetName) {
 		// implemented in subclasses
-		return null;
+		return datasetName;
 	}
 
 	/**
