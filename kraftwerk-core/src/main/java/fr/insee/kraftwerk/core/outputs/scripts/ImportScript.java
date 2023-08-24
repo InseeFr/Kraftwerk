@@ -12,8 +12,8 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.vtl.model.Structured;
 
 /**
- * Class to generate import scripts for the output tables.
- * Some methods that could be implemented later: R base script and Python with pandas script.
+ * Class to generate import scripts for the output tables. Some methods that
+ * could be implemented later: R base script and Python with pandas script.
  */
 public abstract class ImportScript {
 
@@ -28,7 +28,7 @@ public abstract class ImportScript {
 	public abstract String generateScript();
 
 	static Map<String, Variable> getAllLength(Structured.DataStructure dataStructure,
-											  Map<String, VariablesMap> metadataVariables) {
+			Map<String, VariablesMap> metadataVariables) {
 		Map<String, Variable> result = new LinkedHashMap<>();
 		// datastructure : noms complets
 		// metadata : suffixe du nom
@@ -42,14 +42,15 @@ public abstract class ImportScript {
 
 				// We treat the identifiers
 				if (variablesMap.getIdentifierNames().contains(variableName) && !result.containsKey(variableName)) {
-					result.put(variableName, new Variable(variableName, variablesMap.getGroup(variableName),VariableType.STRING, "32"));
+					result.put(variableName,
+							new Variable(variableName, variablesMap.getGroup(variableName), VariableType.STRING, "32"));
 				}
 				if (variablesMap.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
 					variableName = addOrReplaceLength(result, variableName, variablesMap);
 				} else if (!result.containsKey(variableName)) {
-						result.put(variableName, new Variable(variableName,
-								variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
-					
+					result.put(variableName, new Variable(variableName,
+							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
+
 				}
 			}
 
@@ -62,40 +63,40 @@ public abstract class ImportScript {
 		variableName = getRootName(variableName);
 		Variable variable = variablesMap.getVariable(variableName);
 
-		String newLengthString = variable.getSasFormat();
-
-		// We already got the variable, so we check to see if the lengths are different -> take the maximum one then
-		if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-			if (result.containsKey(variableName)) {
-				result.replace(variableName, new Variable(variableName,
-						result.get(variableName).getGroup(), VariableType.STRING, "255"));
-			} else {
-				result.put(variableName, new Variable(variableName,
-						variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
-			}
-		} else {
-			if (result.containsKey(variableName) && isNewLengthUpperThanExisting(newLengthString, result.get(variableName).getSasFormat())) {
-					// Variable already put in result, and not a float (if float exists, we do nothing)
-						result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
-										result.get(variableName).getType(), newLengthString));
-			} else {
-				// Filter results are boolean, value "true" or "false"
-				if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-					result.put(variableName, new Variable(variableName,
-							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.BOOLEAN, "1"));
-				} else {
-					// new Variable, we keep it like that
-					result.put(variableName, new Variable(variableName, variable.getGroup(), variable.getType(),
-							variable.getSasFormat()));
-				}
-
-			}
+		final String newLengthString =getNewLength(variable, variableName);
+		if (result.containsKey(variableName)
+				&& isNewLengthUpperThanExisting(newLengthString, result.get(variableName).getSasFormat())) {
+			// Variable already put in result, and not a float (if float exists, we do
+			// nothing)
+			result.replace(variableName, new Variable(variableName, result.get(variableName).getGroup(),
+					result.get(variableName).getType(), newLengthString));
 		}
+		// Filter results are boolean, value "true" or "false"
+		if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+			result.put(variableName, new Variable(variableName, variablesMap.getGroup(Constants.ROOT_GROUP_NAME),
+					VariableType.BOOLEAN, "1"));
+		}
+
+		result.computeIfAbsent(variableName,
+				v -> new Variable(v, variable.getGroup(), variable.getType(), newLengthString));
+
 		return variableName;
 	}
 
+	private static String getNewLength(Variable variable, String variableName) {
+		 String newLengthString = variable.getSasFormat();
+
+			// We already got the variable, so we check to see if the lengths are different
+			// -> take the maximum one then
+			if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+				newLengthString = "255";
+			}
+			return newLengthString;
+	}
+	
 	private static boolean isNewLengthUpperThanExisting(String newLengthString, String existingLengthString) {
-		return newLengthString!=null && isNotFloat(newLengthString) && isNotFloat(existingLengthString) && Integer.parseInt(existingLengthString) < Integer.parseInt(newLengthString);
+		return newLengthString != null && isNotFloat(newLengthString) && isNotFloat(existingLengthString)
+				&& Integer.parseInt(existingLengthString) < Integer.parseInt(newLengthString);
 	}
 
 	private static boolean isNotFloat(String length) {
