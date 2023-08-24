@@ -115,7 +115,7 @@ public class GroupData {
 
     /** This method so that we don't duplicate code in GroupData and in GroupInstance. */
     public static String getInstanceId(String groupName, Integer instanceNumber) {
-        if (instanceNumber <= 10) {
+        if (instanceNumber < 9) {
             return String.format("%s-0%d", groupName, instanceNumber + 1);
         } else {
             return String.format("%s-%d", groupName, instanceNumber + 1);
