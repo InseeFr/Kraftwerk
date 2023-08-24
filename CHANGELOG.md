@@ -7,7 +7,7 @@
 ### Changed
 
 ### Fixed
-
+- Fix issue with rank in loop names
 
 ## 1.4.0 - [2023-08-22]
 
