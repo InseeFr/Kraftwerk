@@ -106,7 +106,7 @@ public class MainProcessing {
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		}
 	}
 
