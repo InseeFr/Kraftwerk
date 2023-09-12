@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
-import com.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -34,11 +34,16 @@ public class CsvTableWriter {
 	}
 
 
-	private static CSVWriter setCSVWriter(Path filePath) throws IOException {
+	private static ICSVWriter setCSVWriter(Path filePath) throws IOException {
 		File file = filePath.toFile();
 		FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
-		return new CSVWriter(outputFile, Constants.CSV_OUTPUTS_SEPARATOR, Constants.getCsvOutputQuoteChar(),
-				ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END);
+		
+		return new CSVWriterBuilder(outputFile)
+			    .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+			    .withQuoteChar(Constants.getCsvOutputQuoteChar())
+			    .withEscapeChar(ICSVWriter.DEFAULT_ESCAPE_CHARACTER)
+			    .withLineEnd(ICSVWriter.DEFAULT_LINE_END)
+			    .build(); 
 	}
 
 	/**
@@ -49,14 +54,13 @@ public class CsvTableWriter {
 	 */
 	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
 		File file = filePath.toFile();
-		try (CSVWriter writer = setCSVWriter(filePath)){
+		try (ICSVWriter writer = setCSVWriter(filePath)){
 			String[] headers = getHeaders(file);
 
 			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
-			variablesDataset.add("New_var_test");
 			ArrayList<String> columns = getColumns(datasetName, variablesSpec, variablesDataset);
 
 			String[] columnsTable = convertWithStream(columns);
@@ -77,6 +81,7 @@ public class CsvTableWriter {
 			for (int i = 0; i < dataset.getDataPoints().size(); i++) {
 				DataPoint dataPoint = dataset.getDataPoints().get(i);
 				String[] csvRow = new String[rowSize];
+
 				for (String variableName : variablesDataset) {
 					if(!variablesNotInHeaders.contains(variableName)){
 						int csvColumn = Arrays.asList(headers).indexOf(variableName);
@@ -86,7 +91,6 @@ public class CsvTableWriter {
 					}
 				}
 				writer.writeNext(csvRow);
-
 			}
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to update CSV table: %s", filePath));
@@ -137,7 +141,7 @@ public class CsvTableWriter {
 	 */
 	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
 		// File connection
-		try (CSVWriter writer = setCSVWriter(filePath)){
+		try (ICSVWriter writer = setCSVWriter(filePath)){
 						
 			// Safety check
 			if (dataset.getDataStructure().size() == 0) {

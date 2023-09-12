@@ -67,10 +67,12 @@ public class ParaDataUE {
 	}
 
 	public String getVariableStart() {
+		if (getSessions().size()==0) return "0";
 		return Long.toString(getSessions().get(0).getInitialization());
 	}
 	
 	public String getVariableEnd() {
+		if (getSessions().size()==0) return "0";
 		return Long.toString(getLastSession().getTermination());
 	}
 

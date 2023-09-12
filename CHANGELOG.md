@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1 - [2023-09-12]
+
+### Fixed
+- Fix issue with empty paradata (missing start session)
+
 ## 1.4.0 - [2023-08-22]
 
 ### Added
