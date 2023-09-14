@@ -5,9 +5,11 @@
 ### Added
 
 ### Changed
+- Add VTL user script execution between two variable calculation (VTL from DDI)
 
 ### Fixed
 - Fix issue with rank in loop names
+
 ## 1.4.1 - [2023-09-12]
 
 ### Fixed
