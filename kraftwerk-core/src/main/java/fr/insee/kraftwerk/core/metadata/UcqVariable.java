@@ -90,7 +90,7 @@ public class UcqVariable extends Variable {
 	 */
 	public UcqModality getModalityFromValue(String value) {
 		List<UcqModality> res = modalities.stream().filter(ucqModality -> ucqModality.getValue().equals(value))
-				.collect(Collectors.toList());
+				.toList();
 		if (res.size() == 1) {
 			return res.get(0);
 		} else if (res.isEmpty()) {
@@ -115,7 +115,7 @@ public class UcqVariable extends Variable {
 	 */
 	public UcqModality getModalityFromName(String modalityName) {
 		List<UcqModality> res = modalities.stream()
-				.filter(ucqModality -> ucqModality.getVariableName().equals(modalityName)).collect(Collectors.toList());
+				.filter(ucqModality -> ucqModality.getVariableName().equals(modalityName)).toList();
 		if (res.size() == 1) {
 			return res.get(0);
 		} else if (res.isEmpty()) {

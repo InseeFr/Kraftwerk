@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.vtl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.script.SimpleBindings;
 
@@ -27,7 +28,8 @@ public class VtlBindings extends SimpleBindings {
 
     /** Return an array list of all names registered in the bindings. */
     public List<String> getDatasetNames() {
-        return new ArrayList<>(this.keySet());
+    	Stream<String> datasetNames = this.keySet().stream().filter(name -> !name.endsWith("_TEMP_KW"));
+        return datasetNames.toList();
     }
 
     

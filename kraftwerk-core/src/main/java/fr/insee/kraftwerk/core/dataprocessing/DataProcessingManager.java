@@ -10,6 +10,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DataProcessingManager {
 
+	private DataProcessingManager() {
+		//Utility class
+	}
+
 	/**
 	 * Return the data processing class adapted to the data collection tool given.
 	 *
@@ -27,8 +31,7 @@ public class DataProcessingManager {
 		case PAPER:
 			dataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
 			break;
-		case LUNATIC_XML:
-		case LUNATIC_JSON:
+		case LUNATIC_XML , LUNATIC_JSON:
 			dataProcessing = new LunaticDataProcessing(vtlBindings, variablesMap);
 			break;
 		default:
