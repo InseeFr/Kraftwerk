@@ -17,6 +17,7 @@ import fr.insee.vtl.model.Structured;
  */
 public abstract class ImportScript {
 
+	private static final String STRING_LENGTH = "255";
 	final List<TableScriptInfo> tableScriptInfoList;
 	static final String END_LINE = "\n";
 
@@ -49,7 +50,7 @@ public abstract class ImportScript {
 					variableName = addOrReplaceLength(result, variableName, variablesMap);
 				} else if (!result.containsKey(variableName)) {
 					result.put(variableName, new Variable(variableName,
-							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, "255"));
+							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, STRING_LENGTH));
 
 				}
 			}
@@ -89,7 +90,7 @@ public abstract class ImportScript {
 			// We already got the variable, so we check to see if the lengths are different
 			// -> take the maximum one then
 			if (newLengthString == null && !variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-				newLengthString = "255";
+				newLengthString = STRING_LENGTH;
 			}
 			return newLengthString;
 	}
