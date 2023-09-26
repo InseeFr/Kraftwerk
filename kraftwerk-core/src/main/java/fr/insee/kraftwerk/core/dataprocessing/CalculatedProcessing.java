@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -25,6 +27,21 @@ public class CalculatedProcessing extends DataProcessing {
     @Override
     public String getStepName() {
         return "CALCULATED VARIABLES";
+    }
+    
+    
+    public String applyCalculatedVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<KraftwerkError> errors){
+        // First step
+        String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
+        // Second step
+        if(userVtlInstructionsPath != null) {
+            applyUserVtlInstructions(userVtlInstructionsPath, errors);
+            applyAutomatedVtlInstructions(bindingName, errors);
+        } else {
+            log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
+                    bindingName, getStepName()));
+        }
+        return automatedVtlInstructions;
     }
 
     /**

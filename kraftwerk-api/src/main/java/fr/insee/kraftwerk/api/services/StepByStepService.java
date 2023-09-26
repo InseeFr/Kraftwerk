@@ -138,7 +138,7 @@ public class StepByStepService extends KraftwerkService {
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
-		unimodal.unimodalProcessing(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+		unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();

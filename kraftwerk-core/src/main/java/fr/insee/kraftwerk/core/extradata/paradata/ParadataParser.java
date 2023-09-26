@@ -85,41 +85,50 @@ public class ParadataParser {
 
 			JSONArray subParadata = (JSONArray) collectedEvents.get(i);
 			for (int j = 0; j < subParadata.size(); j++) {
-				JSONObject collectedEvent = (JSONObject) subParadata.get(j);
-				if (collectedEvent.containsKey("idOrchestrator")
-						&& collectedEvent.get("idOrchestrator").equals("orchestrator-collect")) { //check that paradata are linked to collect (not vizualisation or readonly))
-
-					Event event = new Event(identifier);
-					event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
-					event.setIdSession((String) collectedEvent.get("idSession"));
-					event.setTimestamp((long) collectedEvent.get(timestamp));
-					
-					ParadataVariable paradataVariable = new ParadataVariable(identifier);
-					paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
-					paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
-					
-					if (variablesMap.getVariableNames().contains(event.getIdParadataObject())) {
-						paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());
-						// Change value -> not String dependant
-						Object newValue = getValue(new JSONObject(collectedEvent).get(NEW_VALUE));
-						event.setValue(newValue);
-						paradataVariable.setValue(newValue);
-						paradataUE.addParadataVariable(paradataVariable);
-
-					}
-					if (inputFields.stream().anyMatch(event.getIdParadataObject().toUpperCase()::contains)) {
-						paradataVariable.setVariableName((String) collectedEvent.get("responseName"));
-						paradataUE.addParadataVariable(paradataVariable);
-					} 
-					if (event.getIdParadataObject().toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-						paradataVariable.setVariableName(event.getIdParadataObject());
-						paradataUE.addParadataVariable(paradataVariable);
-					}
-					events.add(event);
-				}
+				parseEventFromParadataUE(paradataUE, variablesMap, identifier, events, subParadata, j);
 			}
 		}
 		paradataUE.setEvents(events);
+	}
+
+	private void parseEventFromParadataUE(ParaDataUE paradataUE, VariablesMap variablesMap, String identifier, ArrayList<Event> events,
+			JSONArray subParadata, int j) {
+		JSONObject collectedEvent = (JSONObject) subParadata.get(j);
+		if (isCollectedParadata(collectedEvent)) { //check that paradata are linked to collect (not vizualisation or readonly))
+
+			Event event = new Event(identifier);
+			event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
+			event.setIdSession((String) collectedEvent.get("idSession"));
+			event.setTimestamp((long) collectedEvent.get(timestamp));
+			
+			ParadataVariable paradataVariable = new ParadataVariable(identifier);
+			paradataVariable.setTimestamp((long) collectedEvent.get(timestamp));
+			paradataVariable.setValue(collectedEvent.get(NEW_VALUE));
+			
+			if (variablesMap.getVariableNames().contains(event.getIdParadataObject())) {
+				paradataVariable.setVariableName(event.getIdParadataObject().toUpperCase());
+				// Change value -> not String dependant
+				Object newValue = getValue(new JSONObject(collectedEvent).get(NEW_VALUE));
+				event.setValue(newValue);
+				paradataVariable.setValue(newValue);
+				paradataUE.addParadataVariable(paradataVariable);
+
+			}
+			if (inputFields.stream().anyMatch(event.getIdParadataObject().toUpperCase()::contains)) {
+				paradataVariable.setVariableName((String) collectedEvent.get("responseName"));
+				paradataUE.addParadataVariable(paradataVariable);
+			} 
+			if (event.getIdParadataObject().toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
+				paradataVariable.setVariableName(event.getIdParadataObject());
+				paradataUE.addParadataVariable(paradataVariable);
+			}
+			events.add(event);
+		}
+	}
+
+	private boolean isCollectedParadata(JSONObject collectedEvent) {
+		return collectedEvent.containsKey("idOrchestrator")
+				&& collectedEvent.get("idOrchestrator").equals("orchestrator-collect");
 	}
 
 	private JSONObject getParadataFromJson(ParaDataUE paradataUE) throws NullException {

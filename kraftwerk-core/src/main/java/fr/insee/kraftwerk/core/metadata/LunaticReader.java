@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class LunaticReader {
 
+	private static final String BINDING_DEPENDENCIES = "bindingDependencies";
 	private static final String VARIABLES = "variables";
 
 	private LunaticReader() {
@@ -49,7 +50,7 @@ public class LunaticReader {
 							: variableNode.get("expression").asText();
 					CalculatedVariable calculatedVariable = new CalculatedVariable(variableNode.get("name").asText(),
 							formula);
-					JsonNode dependantVariablesNode = variableNode.get("bindingDependencies");
+					JsonNode dependantVariablesNode = variableNode.get(BINDING_DEPENDENCIES);
 					if (dependantVariablesNode != null) {
 						dependantVariablesNode.forEach(name -> calculatedVariable.addDependantVariable(name.asText()));
 					}
@@ -184,8 +185,8 @@ public class LunaticReader {
 
 	private static void iterateOnBindingsDependencies(List<String> variables, VariablesMap variablesMap,
 			JsonNode component, Group group) {
-		if (component.has("bindingDependencies")) {
-			JsonNode loopVariables = component.get("bindingDependencies");
+		if (component.has(BINDING_DEPENDENCIES)) {
+			JsonNode loopVariables = component.get(BINDING_DEPENDENCIES);
 			loopVariables.forEach(variable -> {
 				if (variables.contains(variable.asText())) {
 					variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
