@@ -1,14 +1,13 @@
 # Changelog
 
-## Not released yet
-
-### Added
+## 1.4.2 - [2023-09-26]
 
 ### Changed
 - Add VTL user script execution between two variable calculation (VTL from DDI)
 
 ### Fixed
 - Fix issue with rank in loop names
+- Fix issue CERTFR-2023-AVI-0763
 
 ## 1.4.1 - [2023-09-12]
 
