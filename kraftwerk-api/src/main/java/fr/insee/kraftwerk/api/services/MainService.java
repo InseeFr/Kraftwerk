@@ -84,6 +84,12 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
+	@PutMapping(value = "/main/genesis")
+	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesis(
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam){
+		return ResponseEntity.ok(inDirectoryParam);
+	}
 
 
 }
