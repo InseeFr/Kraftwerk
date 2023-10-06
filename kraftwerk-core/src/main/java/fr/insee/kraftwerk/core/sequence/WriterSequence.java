@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
+import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
@@ -25,5 +26,8 @@ public class WriterSequence {
 
 		/* Step 4.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataVariables, errors);
+		
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), multimodeDatasetNames);
+		parquetOutputFiles.writeOutputTables(metadataVariables);
 	}
 }
