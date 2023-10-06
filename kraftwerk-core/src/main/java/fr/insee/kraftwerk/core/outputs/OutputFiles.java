@@ -9,9 +9,8 @@ import java.util.Set;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.scripts.RDataTableImportScript;
-import fr.insee.kraftwerk.core.outputs.scripts.SASImportScript;
-import fr.insee.kraftwerk.core.outputs.scripts.TableScriptInfo;
+import fr.insee.kraftwerk.core.outputs.csv.RImportScript;
+import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -76,7 +75,7 @@ public abstract class OutputFiles {
 		}
 		// Write scripts
 		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"),
-				new RDataTableImportScript(tableScriptInfoList).generateScript());
+				new RImportScript(tableScriptInfoList).generateScript());
 		TextFileWriter.writeFile(outputFolder.resolve("import.sas"),
 				new SASImportScript(tableScriptInfoList,errors).generateScript());
 	}

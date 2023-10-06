@@ -1,4 +1,7 @@
-package fr.insee.kraftwerk.core.outputs.scripts;
+package fr.insee.kraftwerk.core.outputs.csv;
+
+import java.util.List;
+import java.util.Map;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -6,9 +9,8 @@ import fr.insee.kraftwerk.core.metadata.ErrorVariableLength;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-
-import java.util.List;
-import java.util.Map;
+import fr.insee.kraftwerk.core.outputs.ImportScript;
+import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 
 public class SASImportScript extends ImportScript {
 
@@ -34,7 +36,7 @@ public class SASImportScript extends ImportScript {
 
             // filename reference to the file
             script.append(String.format("filename %s \"&path\\%s\" ENCODING=\"UTF-8\" ;",
-                    shortenTableName, tableScriptInfo.getCsvFileName())).append(END_LINE);
+                    shortenTableName, tableScriptInfo.getFileName())).append(END_LINE);
 
             // PROC IMPORT
             // careful about special characters, which can't be imported in SAS
@@ -50,8 +52,8 @@ public class SASImportScript extends ImportScript {
             // Warning about possible problem with format of variables from suggester
             script.append("    /* Warning : the actual length of these variables may be superior than the format specified in this script").append(END_LINE);
             for (KraftwerkError error : errors){
-                if (error instanceof ErrorVariableLength){
-                    script.append("        ").append(((ErrorVariableLength) error).getVariable().getName()).append(END_LINE);
+                if (error instanceof ErrorVariableLength errorVarLength){
+                    script.append("        ").append(errorVarLength.getVariable().getName()).append(END_LINE);
                 }
             }
             script.append("       These variables may be truncated at import in SAS*/").append(END_LINE).append(END_LINE);
