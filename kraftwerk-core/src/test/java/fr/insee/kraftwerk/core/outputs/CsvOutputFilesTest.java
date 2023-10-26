@@ -25,7 +25,7 @@ import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
 @TestMethodOrder(OrderAnnotation.class)
-class OutputFilesTest {
+class CsvOutputFilesTest {
 
 	private static UserInputs testUserInputs;
 	private static OutputFiles outputFiles;

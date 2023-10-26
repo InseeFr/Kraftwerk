@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.csv.RImportScript;
 import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
@@ -90,8 +91,9 @@ public abstract class OutputFiles {
 
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
+	 * @throws KraftwerkException 
 	 */
-	public void writeOutputTables(Map<String, VariablesMap> metadataVariables) {
+	public void writeOutputTables(Map<String, VariablesMap> metadataVariables) throws KraftwerkException {
 		// implemented in subclasses
 	}
 

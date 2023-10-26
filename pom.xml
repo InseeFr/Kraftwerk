@@ -28,26 +28,7 @@
 		<!-- Pi Test-->
 		<pitest.version>1.15.0</pitest.version>
 		<pitest.junit.version>1.2.0</pitest.junit.version>
-		
-		<spark.version>3.5.0</spark.version>
-			 <spring-boot.run.jvmArguments>
-				     -XX:+IgnoreUnrecognizedVMOptions
-      --add-opens=java.base/java.lang=ALL-UNNAMED
-      --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
-      --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
-      --add-opens=java.base/java.io=ALL-UNNAMED
-      --add-opens=java.base/java.net=ALL-UNNAMED
-      --add-opens=java.base/java.nio=ALL-UNNAMED
-      --add-opens=java.base/java.util=ALL-UNNAMED
-      --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
-      --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
-      --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
-      --add-opens=java.base/sun.nio.cs=ALL-UNNAMED
-      --add-opens=java.base/sun.security.action=ALL-UNNAMED
-      --add-opens=java.base/sun.util.calendar=ALL-UNNAMED
-      -Djdk.reflect.useDirectMethodHandle=false
-		 </spring-boot.run.jvmArguments>
-
+	
 	</properties>
 	<modules>
 		<module>kraftwerk-core</module>
@@ -131,20 +112,6 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 			<!-- version from parent pom -->
-		</dependency>
-		
-		
-			
-		<!-- Parquet -->
-		<dependency>
-		    <groupId>org.apache.spark</groupId>
-		    <artifactId>spark-sql_2.13</artifactId>
-		    <version>${spark.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.spark</groupId>
-		    <artifactId>spark-tags_2.13</artifactId>
-		    <version>${spark.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -1,43 +1,35 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
-import static org.apache.spark.sql.types.DataTypes.BooleanType;
-import static org.apache.spark.sql.types.DataTypes.DateType;
-import static org.apache.spark.sql.types.DataTypes.DoubleType;
-import static org.apache.spark.sql.types.DataTypes.LongType;
-import static org.apache.spark.sql.types.DataTypes.StringType;
-import static org.apache.spark.sql.types.DataTypes.TimestampType;
-
+import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.MetadataBuilder;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.generic.GenericData;
+import org.apache.parquet.Preconditions;
+import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.apache.parquet.io.OutputFile;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Structured.Component;
+import fr.insee.vtl.model.Structured.DataPoint;
 import fr.insee.vtl.model.Structured.DataStructure;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to manage the writing of Parquet output tables.
  */
+@Slf4j
 public class ParquetOutputFiles extends OutputFiles {
-
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -47,93 +39,116 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param userInputs   Used to get the campaign name and to filter intermediate
 	 *                     datasets that we don't want to output.
 	 */
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, String multimodeDatasetNames) {
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes,
+			String multimodeDatasetNames) {
 		super(outDirectory, vtlBindings, modes, multimodeDatasetNames);
 	}
 
-
+	
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
+	 * @throws KraftwerkException 
 	 */
 	@Override
-	public void writeOutputTables(Map<String,VariablesMap> metadataVariables) {
-		/* Creating Spark Session */
-		SparkSession sparkSession = SparkSession.builder().config("spark.ui.enabled",false).appName("SparkWriteParquetFile").master("local").getOrCreate();
-		
+	public void writeOutputTables(Map<String,VariablesMap> metadataVariables) throws KraftwerkException {
+
 		for (String datasetName : getDatasetToCreate()) {
-		
-			/* Creating dataset using list of row of spark.sql */
-	        List<Row> rows = getVtlBindings().getDataset(datasetName).getDataPoints().stream().map(points -> RowFactory.create(points.toArray(new Object[]{}))).collect(Collectors.toList());
+			/* Building metadata */
+			Schema schema =  extractSchema(getVtlBindings().getDataset(datasetName).getDataStructure());
 
-	        StructType schema = toSparkSchema(getVtlBindings().getDataset(datasetName).getDataStructure());
+			/* Creating dataset using Avro GenericData */
+			 List<GenericData.Record> dataset = 
+	        getVtlBindings().getDataset(datasetName).getDataPoints().stream()
+	        	.map(point -> extractGenericData(schema, point)).toList();
 
-	        Dataset<Row> sparkDataset = sparkSession.createDataFrame(rows, schema);
+			Path fileToWrite = Path.of(getOutputFolder().toString(),outputFileName(datasetName));
+			OutputFile parquetOutFile = new NioPathOutputFile(fileToWrite);
 			
-			/* Write parquet file using write & savemode method */ //Also we can use save method to write parquet file
-			sparkDataset //.coalesce(1)
-				.write()
-				.mode(SaveMode.Append)
-				.option("header", true)
-				.parquet(outputFileName(datasetName));
+		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
+			try {
+				ParquetWriter<GenericData.Record> writerTest = AvroParquetWriter
+				        .<GenericData.Record>builder(parquetOutFile)
+				        .withSchema(schema)
+				   //     .withDataModel(dataset)
+				  //      .withConf(new Configuration())
+				        .withCompressionCodec(CompressionCodecName.SNAPPY)
+				        .build();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		        try (ParquetWriter<GenericData.Record> writer = AvroParquetWriter
+		                .<GenericData.Record>builder(parquetOutFile)
+		                .withSchema(schema)
+		                .withDataModel(GenericData.get())
+		           //     .withDataModel(dataset)
+		          //      .withConf(new Configuration())
+		                .withCompressionCodec(CompressionCodecName.SNAPPY)
+		                .build()) {
+		            for (GenericData.Record recordData : dataset) {
+		                writer.write(recordData);
+		            }
+		        } catch (IOException e) {
+		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
+		        	throw new KraftwerkException(500, e.getMessage());
+				}
 			
 		}
 
 	}
 	
+	private static GenericData.Record extractGenericData(Schema schema,  DataPoint value){
+		GenericData.Record data =  new GenericData.Record(schema);
+		for (Schema.Field key : schema.getFields()) {
+			String varName = key.name();
+			data.put(varName, value.get(varName));
+		}
+		return data;
+	}
 
-	
-    /**
+	/**
      * Transforms a {@link DataStructure} into a Spark schema.
      *
      * @param structure the dataset structure to transform
      * @return The resulting Spark schema (<code>StructType</code> object).
      */
-    public static StructType toSparkSchema(DataStructure structure) {
-        List<StructField> schema = new ArrayList<>();
+    private static Schema extractSchema(DataStructure structure) {
+    	
+    	FieldAssembler<Schema> builder = SchemaBuilder.record("survey").namespace("any.data").fields();
+
         for (Component component : structure.values()) {
-        	MetadataBuilder metadataBuilder = new MetadataBuilder();
-        	metadataBuilder.putString("vtlRole", component.getRole().name());
-        	
-        	schema.add(
-        			DataTypes.createStructField(
-        					component.getName(),
-        					fromVtlType(component.getType()),
-        					true,
-        					metadataBuilder.build()
-            ));
-        }
-        return DataTypes.createStructType(schema);
-    }
-	
-    /**
-     * Translates a VTL data type into a Spark data type.
-     *
-     * @param type the VTL data type to translate (as a class).
-     * @return The corresponding Spark {@link DataType}.
-     */
-    public static DataType fromVtlType(Class<?> type) {
-        if (String.class.equals(type)) {
-            return StringType;
-        } else if (Long.class.equals(type)) {
-            return LongType;
-        } else if (Double.class.equals(type)) {
-            return DoubleType;
-        } else if (Boolean.class.equals(type)) {
-            return BooleanType;
-        } else if (Instant.class.equals(type)) {
-            return TimestampType;
-        } else if (LocalDate.class.equals(type)) {
-            return DateType;
-        } else {
-            throw new UnsupportedOperationException("unsupported type " + type);
-        }
+	        builder.name(component.getName()).type().nullable().stringType().stringDefault("");//.stringType().noDefault();
+
+//        	
+//    		Class<?> type = component.getType();
+//    		if (String.class.equals(type)) {
+//    	        builder.name(component.getName()).type().nullable().stringType().noDefault();
+//
+//    	        } else if (Long.class.equals(type)) {
+//        	       // builder.name(component.getRole().name()).type().unionOf().nullBuilder().endNull().and().longType().endUnion().noDefault();
+//        	        builder.name(component.getName());//.type().nullable().longType().noDefault();
+//    	        } else if (Double.class.equals(type)) {
+//        	        builder.name(component.getName());//.type().nullable().doubleType().noDefault();
+//    	        } else if (Boolean.class.equals(type)) {
+//        	        builder.name(component.getName());//.type().nullable().booleanType().noDefault();
+//    	        } else if (Instant.class.equals(type)) {
+//        	        builder.name(component.getName());//.type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+//    	        } else if (LocalDate.class.equals(type)) {
+//        	        builder.name(component.getName());//.type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.date().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+//    	        } else {
+//    	            throw new UnsupportedOperationException("unsupported type " + type);
+//    	        }	
+    		
+        }    	
+        return builder.endRecord();
+
     }
 
-    
+
 
 	@Override
 	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
-		//TODO
+		// TODO
 	}
 
 	/**
