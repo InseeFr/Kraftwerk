@@ -30,5 +30,7 @@ public class WriterSequence {
 		
 		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), multimodeDatasetNames);
 		parquetOutputFiles.writeOutputTables(metadataVariables);
+		parquetOutputFiles.writeImportScripts(metadataVariables, errors);
+
 	}
 }

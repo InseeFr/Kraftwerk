@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +9,7 @@ import java.util.Set;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.csv.RImportScript;
-import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
 import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 
@@ -67,18 +63,7 @@ public abstract class OutputFiles {
 	}
 
 	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
-		// Assemble required info to write scripts
-		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
-		for (String datasetName : datasetToCreate) {
-			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
-					vtlBindings.getDataset(datasetName).getDataStructure(), metadataVariables);
-			tableScriptInfoList.add(tableScriptInfo);
-		}
-		// Write scripts
-		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"),
-				new RImportScript(tableScriptInfoList).generateScript());
-		TextFileWriter.writeFile(outputFolder.resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList,errors).generateScript());
+		//Should be override
 	}
 
 	/**

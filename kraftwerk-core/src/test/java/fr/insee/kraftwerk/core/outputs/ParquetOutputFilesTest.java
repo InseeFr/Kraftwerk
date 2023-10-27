@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -111,6 +112,11 @@ class ParquetOutputFilesTest {
 		metaVariables.put("test",varMap);
 
 		assertDoesNotThrow(() -> {outputFiles.writeOutputTables(metaVariables);});
+		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
+		File f = racinePath.toFile();
+		assertTrue(f.exists());
+		assertNotEquals(0, f.length());
+		
 //		//
 //		CSVReader reader = CsvUtils.getReader(outTestFilePath);
 //		List<String[]> rows = reader.readAll();

@@ -2,15 +2,22 @@ package fr.insee.kraftwerk.core.outputs.parquet;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.Preconditions;
 import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.io.OutputFile;
@@ -19,6 +26,8 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
+import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
@@ -62,32 +71,26 @@ public class ParquetOutputFiles extends OutputFiles {
 	        	.map(point -> extractGenericData(schema, point)).toList();
 
 			Path fileToWrite = Path.of(getOutputFolder().toString(),outputFileName(datasetName));
-			OutputFile parquetOutFile = new NioPathOutputFile(fileToWrite);
+			OutputFile parquetOutFile = new LocalOutputFile(fileToWrite);
+
+			
+	        GenericData genericData = GenericData.get();
+	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
 		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
-			try {
-				ParquetWriter<GenericData.Record> writerTest = AvroParquetWriter
-				        .<GenericData.Record>builder(parquetOutFile)
-				        .withSchema(schema)
-				   //     .withDataModel(dataset)
-				  //      .withConf(new Configuration())
-				        .withCompressionCodec(CompressionCodecName.SNAPPY)
-				        .build();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		        try (ParquetWriter<GenericData.Record> writer = AvroParquetWriter
 		                .<GenericData.Record>builder(parquetOutFile)
 		                .withSchema(schema)
-		                .withDataModel(GenericData.get())
+		                .withDataModel(genericData)
 		           //     .withDataModel(dataset)
-		          //      .withConf(new Configuration())
+		                .withConf(new Configuration())
 		                .withCompressionCodec(CompressionCodecName.SNAPPY)
+		                .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
 		                .build()) {
 		            for (GenericData.Record recordData : dataset) {
 		                writer.write(recordData);
 		            }
+		            log.info("Parquet datasize for {} is : {}",datasetName,writer.getDataSize());
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
@@ -117,27 +120,27 @@ public class ParquetOutputFiles extends OutputFiles {
     	FieldAssembler<Schema> builder = SchemaBuilder.record("survey").namespace("any.data").fields();
 
         for (Component component : structure.values()) {
-	        builder.name(component.getName()).type().nullable().stringType().stringDefault("");//.stringType().noDefault();
+//	        builder.name(component.getName()).type().nullable().stringType().stringDefault("");//.stringType().noDefault();
 
-//        	
-//    		Class<?> type = component.getType();
-//    		if (String.class.equals(type)) {
-//    	        builder.name(component.getName()).type().nullable().stringType().noDefault();
-//
-//    	        } else if (Long.class.equals(type)) {
-//        	       // builder.name(component.getRole().name()).type().unionOf().nullBuilder().endNull().and().longType().endUnion().noDefault();
-//        	        builder.name(component.getName());//.type().nullable().longType().noDefault();
-//    	        } else if (Double.class.equals(type)) {
-//        	        builder.name(component.getName());//.type().nullable().doubleType().noDefault();
-//    	        } else if (Boolean.class.equals(type)) {
-//        	        builder.name(component.getName());//.type().nullable().booleanType().noDefault();
-//    	        } else if (Instant.class.equals(type)) {
-//        	        builder.name(component.getName());//.type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
-//    	        } else if (LocalDate.class.equals(type)) {
-//        	        builder.name(component.getName());//.type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.date().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
-//    	        } else {
-//    	            throw new UnsupportedOperationException("unsupported type " + type);
-//    	        }	
+        	
+    		Class<?> type = component.getType();
+    		if (String.class.equals(type)) {
+    	        builder.name(component.getName()).type().nullable().stringType().noDefault();
+
+    	        } else if (Long.class.equals(type)) {
+        	       // builder.name(component.getRole().name()).type().unionOf().nullBuilder().endNull().and().longType().endUnion().noDefault();
+        	        builder.name(component.getName()).type().nullable().longType().noDefault();
+    	        } else if (Double.class.equals(type)) {
+        	        builder.name(component.getName()).type().nullable().doubleType().noDefault();
+    	        } else if (Boolean.class.equals(type)) {
+        	        builder.name(component.getName()).type().nullable().booleanType().noDefault();
+    	        } else if (Instant.class.equals(type)) {
+        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+    	        } else if (LocalDate.class.equals(type)) {
+        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.date().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+    	        } else {
+    	            throw new UnsupportedOperationException("unsupported type " + type);
+    	        }	
     		
         }    	
         return builder.endRecord();
@@ -148,7 +151,16 @@ public class ParquetOutputFiles extends OutputFiles {
 
 	@Override
 	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
-		// TODO
+		// Assemble required info to write scripts
+		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
+		for (String datasetName : getDatasetToCreate()) {
+			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
+					getVtlBindings().getDataset(datasetName).getDataStructure(), metadataVariables);
+			tableScriptInfoList.add(tableScriptInfo);
+		}
+		// Write scripts
+		TextFileWriter.writeFile(getOutputFolder().resolve("import_parquet.R"),
+				new RImportScript(tableScriptInfoList).generateScript());
 	}
 
 	/**
