@@ -27,6 +27,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.ParquetUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Structured.Component;
@@ -95,8 +96,15 @@ public class ParquetOutputFiles extends OutputFiles {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
 				}
+		        
+				try {
+					ParquetUtils.describeParquetFile(fileToWrite);
+				} catch (IOException e) {
+					log.debug("Can't describe parquet file {}", e.getMessage());
+				}
 			
 		}
+
 
 	}
 	
