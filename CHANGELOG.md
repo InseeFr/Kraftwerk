@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 1.4.3 - not released yet
+
+### Added
+- New format for output : parquet
+
 ## 1.4.2 - [2023-09-26]
 
 ### Changed
