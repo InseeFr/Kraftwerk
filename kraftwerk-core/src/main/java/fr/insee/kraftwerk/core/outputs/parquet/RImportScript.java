@@ -29,10 +29,8 @@ public class RImportScript extends ImportScript {
             
             
             // function call
-            script.append(String.format("%s <- open_dataset(\"%s\")", tableName, tableScriptInfo.getFileName())).append(END_LINE);
+            script.append(String.format("%s <- as.data.frame(arrow::read_parquet(\"%s\")", tableName, tableScriptInfo.getFileName())).append(END_LINE);
 
-            // request
-            script.append(String.format(" %s |>  glimpse()", tableName)).append(END_LINE);
             script.append(END_LINE).append(END_LINE);
         }
 
