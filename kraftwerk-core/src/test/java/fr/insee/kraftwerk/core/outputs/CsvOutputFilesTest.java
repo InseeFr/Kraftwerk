@@ -18,13 +18,14 @@ import org.junit.jupiter.api.TestMethodOrder;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
 @TestMethodOrder(OrderAnnotation.class)
-class OutputFilesTest {
+class CsvOutputFilesTest {
 
 	private static UserInputs testUserInputs;
 	private static OutputFiles outputFiles;
