@@ -148,6 +148,7 @@ public class ReportingDataDefinitions {
 
         // Get file content
         List<String[]> content = csvReader.readAll();
+        csvReader.close();
 
         // Get and exclude header
         assertThat(content).isNotEmpty();
@@ -184,6 +185,7 @@ public class ReportingDataDefinitions {
 
         // Get header
         String[] header = csvReader.readNext();
+        csvReader.close();
 
         // assert lack of attempt field
         assertThat(header).doesNotContain(OUTCOME_ATTEMPT_SUFFIX_NAME + "_1");

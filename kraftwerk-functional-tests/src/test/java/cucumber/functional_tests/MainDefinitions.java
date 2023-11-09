@@ -67,6 +67,8 @@ public class MainDefinitions {
 
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
+		outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
+
 		this.campaignName = campaignDirectoryName;
 		inDirectory = inDirectory.resolve(campaignName);
 		outDirectory = outDirectory.resolve(campaignName);
