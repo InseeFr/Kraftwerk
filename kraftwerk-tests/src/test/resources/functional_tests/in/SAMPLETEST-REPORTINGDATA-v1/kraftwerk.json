@@ -1,0 +1,25 @@
+{
+    "campaign": "SAMPLETEST-COMPLETE-v1",
+ 
+    "survey_data": [
+        {
+			"data_mode": "TEL",
+            "data_file": "data/tel",
+            "data_format": "LUNATIC_XML",
+            "DDI_file": "ddi-sampletest-v1-tel.xml",
+            "lunatic_file": "lunatic/sampletest_tel.json",
+            "mode_specifications": "",
+            "paradata_folder": "",
+            "reporting_data_file": "suivi/SAMPLEREPORTINGDATA_TEL.xml"
+        }
+    ],
+	
+    
+	"multimode_dataset_name": "MULTIMODE",
+	
+	"transformation_specifications": "",
+	
+	"reconciliation_specifications": "",
+	
+	"information_levels_specifications": ""
+}

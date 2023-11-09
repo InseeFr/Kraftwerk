@@ -5,6 +5,7 @@ import java.util.Map;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.ContactAttemptsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
@@ -38,6 +39,12 @@ public class MultimodalSequence {
 		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlTransformationsFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
+
+		/* Step 3.2.b : contact attempts extraction */
+		DataProcessing contactAttemptsProcessing = new ContactAttemptsProcessing(vtlBindings);
+		vtlGenerate = contactAttemptsProcessing.applyVtlTransformations(multimodeDatasetName,null,errors);
+		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "ContactAttemptsProcessing",multimodeDatasetName), vtlGenerate);
+
 
 		/* Step 3.3 : Create datasets on each information level (i.e. each group) */
 		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);

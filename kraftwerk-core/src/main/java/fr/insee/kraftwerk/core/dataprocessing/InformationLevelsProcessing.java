@@ -48,6 +48,8 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// To delete duplicates, to be eventually reviewed with a better VTL solution
 		vtlScript.add(Constants.ROOT_GROUP_NAME + " := union(" + Constants.ROOT_GROUP_NAME + ", " + Constants.ROOT_GROUP_NAME +");");
+
+		// TODO Retirer les ATTEMPTS du root ?
 		 
 		// Group datasets
 		for (String groupName : multimodeVariablesMap.getSubGroupNames()) {
