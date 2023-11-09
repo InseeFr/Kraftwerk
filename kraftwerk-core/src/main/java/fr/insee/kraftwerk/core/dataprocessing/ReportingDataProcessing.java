@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
 
 /**
- * This processing class is designed to create a dataset containing all contact attempts
+ * This processing class is designed to create a dataset containing all reporting dat
  */
-public class ContactAttemptsProcessing extends DataProcessing{
-    public ContactAttemptsProcessing(VtlBindings vtlBindings) {
+public class ReportingDataProcessing extends DataProcessing{
+    public ReportingDataProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
     }
 
@@ -48,11 +48,10 @@ public class ContactAttemptsProcessing extends DataProcessing{
             String contactAttemptsMeasures = VtlMacros.toVtlSyntax(filteredVariableNames);
 
             contactAttemptsInstructions.append(String.format("%s := %s [keep %s, %s];",
-                    Constants.CONTACT_ATTEMPTS_GROUP_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, contactAttemptsMeasures));
+                    Constants.REPORTING_DATA_DATASET_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, contactAttemptsMeasures));
 
             // Remove duplicates
-            contactAttemptsInstructions.append(String.format("%s := union (%s, %s);",
-                    Constants.CONTACT_ATTEMPTS_GROUP_NAME, Constants.CONTACT_ATTEMPTS_GROUP_NAME,Constants.CONTACT_ATTEMPTS_GROUP_NAME));
+            contactAttemptsInstructions.append(String.format("%1$s := union(%1$s,%1$s);",Constants.REPORTING_DATA_DATASET_NAME));
 
             vtlScript.add(contactAttemptsInstructions.toString());
         }

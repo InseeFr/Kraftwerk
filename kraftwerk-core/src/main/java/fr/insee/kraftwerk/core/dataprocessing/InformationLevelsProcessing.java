@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -40,7 +41,15 @@ public class InformationLevelsProcessing extends DataProcessing {
 		// Root dataset
 		StringBuilder rootInstructions = new StringBuilder();
 
-		String rootMeasures = VtlMacros.toVtlSyntax(multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME));
+
+
+		// Exclude reporting data from root dataset
+		Set<String> rootVariableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
+		VariablesMap reportingDataVariablesMap = vtlBindings.getDatasetVariablesMap(Constants.REPORTING_DATA_DATASET_NAME);
+		Set<String> reportingDataVariableNames = reportingDataVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
+		rootVariableNames.removeAll(reportingDataVariableNames);
+
+		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
 		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s];",
 				Constants.ROOT_GROUP_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, rootMeasures, Constants.MODE_VARIABLE_NAME));
 
@@ -49,7 +58,6 @@ public class InformationLevelsProcessing extends DataProcessing {
 		// To delete duplicates, to be eventually reviewed with a better VTL solution
 		vtlScript.add(Constants.ROOT_GROUP_NAME + " := union(" + Constants.ROOT_GROUP_NAME + ", " + Constants.ROOT_GROUP_NAME +");");
 
-		// TODO Retirer les ATTEMPTS du root ?
 		 
 		// Group datasets
 		for (String groupName : multimodeVariablesMap.getSubGroupNames()) {
@@ -63,7 +71,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
 					groupName, bindingName, Constants.ROOT_IDENTIFIER_NAME, groupName, groupMeasures, Constants.MODE_VARIABLE_NAME));
-			// Epmpty lines are created to produce group level tables and need to be removed
+			// Empty lines are created to produce group level tables and need to be removed
 			groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
 					groupName, groupName, groupName));
 

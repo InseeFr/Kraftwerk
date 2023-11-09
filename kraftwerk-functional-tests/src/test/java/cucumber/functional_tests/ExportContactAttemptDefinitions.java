@@ -1,9 +1,11 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+import com.opencsv.exceptions.CsvValidationException;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import io.cucumber.java.en.Then;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,19 +14,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
-import io.cucumber.java.en.Then;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
+import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 
 // These definitions are used in do_we_export_contact_attempts feature
 public class ExportContactAttemptDefinitions {
     Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
-
-
 
     // Volumetry test
     @Then("We should have {int} lines different than header in a file named {string} in directory {string}")
@@ -123,5 +121,20 @@ public class ExportContactAttemptDefinitions {
                 i++;
             }
         }
+    }
+
+    @Then("We shouldn't have any contact attempt in {string} in directory {string}")
+    public void check_contact_attempts_in_root_file(String fileName, String directory) throws IOException, CsvValidationException {
+        CSVReader csvReader = CsvUtils.getReader(
+                Path.of(outDirectory + "/" + directory + "/" + fileName)
+        );
+
+        // Get header
+        String[] header = csvReader.readNext();
+
+        // attempt lack of attempt field
+        assertThat(header).doesNotContain(OUTCOME_ATTEMPT_SUFFIX_NAME + "_1");
+        assertThat(header).doesNotContain(OUTCOME_ATTEMPT_SUFFIX_NAME + "1_DATE");
+
     }
 }

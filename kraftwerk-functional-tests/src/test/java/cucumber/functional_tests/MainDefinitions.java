@@ -261,14 +261,15 @@ public class MainDefinitions {
     // Existence and structure test
     @Then("We should have a file named {string} in directory {string} with {int} contact attempts fields")
     public void check_contact_attempt_file(String fileName, String directory, int expectedFieldCount) throws IOException, CsvException {
-        File outputContactAttemptsFile = new File(outDirectory + "/" + directory + "/" + fileName);
+        File outputContactAttemptsFile = new File(outDirectory + "/" + fileName);
 
         // File existence assertion
         assertThat(outputContactAttemptsFile).exists().isFile().canRead();
 
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                outputContactAttemptsFile.toPath()
         );
+		
 
         // Get header
         String[] header = csvReader.readNext();

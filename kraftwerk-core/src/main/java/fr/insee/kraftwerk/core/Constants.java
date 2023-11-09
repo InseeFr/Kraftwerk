@@ -46,7 +46,7 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
-	public static final String CONTACT_ATTEMPTS_GROUP_NAME = "CONTACTATTEMPTS";
+	public static final String REPORTING_DATA_DATASET_NAME = "REPORTINGDATA";
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";

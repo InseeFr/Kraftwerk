@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ContactAttemptsProcessingTest {
+public class ReportingDataProcessingTest {
     private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
 
     Dataset testDataset = new InMemoryDataset(
@@ -45,10 +45,10 @@ public class ContactAttemptsProcessingTest {
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("MULTIMODE", testDataset);
         //
-        ContactAttemptsProcessing processing = new ContactAttemptsProcessing(vtlBindings);
+        ReportingDataProcessing processing = new ReportingDataProcessing(vtlBindings);
         processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
         //
-        Dataset contactAttemptsDataset = vtlBindings.getDataset(Constants.CONTACT_ATTEMPTS_GROUP_NAME);
+        Dataset contactAttemptsDataset = vtlBindings.getDataset(Constants.REPORTING_DATA_DATASET_NAME);
 
 
         assertThat(contactAttemptsDataset).isNotNull();
@@ -74,10 +74,10 @@ public class ContactAttemptsProcessingTest {
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("MULTIMODE", testDatasetNoContactAttempt);
         //
-        ContactAttemptsProcessing processing = new ContactAttemptsProcessing(vtlBindings);
+        ReportingDataProcessing processing = new ReportingDataProcessing(vtlBindings);
         processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
         //
-        Dataset contactAttemptsDataset = vtlBindings.getDataset(Constants.CONTACT_ATTEMPTS_GROUP_NAME);
+        Dataset contactAttemptsDataset = vtlBindings.getDataset(Constants.REPORTING_DATA_DATASET_NAME);
 
 
         assertThat(contactAttemptsDataset).isNull();
