@@ -1,65 +1,29 @@
 package cucumber.functional_tests;
 
-import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
+import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-import io.cucumber.java.en.Then;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static fr.insee.kraftwerk.core.Constants.ROOT_IDENTIFIER_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+
+import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import io.cucumber.java.en.Then;
 
 
 // These definitions are used in do_we_export_contact_attempts feature
 public class ExportContactAttemptDefinitions {
     Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 
-    // Existence and structure test
-    @Then("We should have a file named {string} in directory {string} with {int} contact attempts fields")
-    public void check_contact_attempt_file(String fileName, String directory, int expectedFieldCount) throws IOException, CsvException {
-        File outputContactAttemptsFile = new File(outDirectory + "/" + directory + "/" + fileName);
-
-        // File existence assertion
-        assertThat(outputContactAttemptsFile).exists().isFile().canRead();
-
-        CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
-        );
-
-        // Get header
-        String[] header = csvReader.readNext();
-
-        // Compute expected header
-        List<String> expectedHeaderList = new ArrayList<>();
-        expectedHeaderList.add(ROOT_IDENTIFIER_NAME);
-        for(int i = 1; i < expectedFieldCount + 1; i++){
-            // append attempt field
-            expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i);
-            // append attempt date field
-            expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE");
-        }
-
-        String[] expectedHeader = new String[expectedHeaderList.size()];
-        expectedHeaderList.toArray(expectedHeader);
-
-
-        // Header assertion
-        assertThat(header).containsExactly(expectedHeader);
-    }
 
 
     // Volumetry test

@@ -33,7 +33,7 @@
 	<modules>
 		<module>kraftwerk-core</module>
 		<module>kraftwerk-api</module>
-        <module>kraftwerk-tests</module>
+        <module>kraftwerk-functional-tests</module>
     </modules>
 	<dependencies>
 		<!-- Spring -->
