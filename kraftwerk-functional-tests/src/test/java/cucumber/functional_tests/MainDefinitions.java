@@ -1,11 +1,8 @@
-package src.test.java.cucumber.functional_tests;
+package cucumber.functional_tests;
 
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static fr.insee.kraftwerk.core.Constants.ROOT_IDENTIFIER_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
@@ -19,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -256,39 +252,4 @@ public class MainDefinitions {
 		}
 	}
 
-	
-
-    // Existence and structure test
-    @Then("We should have a file named {string} in directory {string} with {int} contact attempts fields")
-    public void check_contact_attempt_file(String fileName, String directory, int expectedFieldCount) throws IOException, CsvException {
-        File outputContactAttemptsFile = new File(outDirectory + "/" + fileName);
-
-        // File existence assertion
-        assertThat(outputContactAttemptsFile).exists().isFile().canRead();
-
-        CSVReader csvReader = CsvUtils.getReader(
-                outputContactAttemptsFile.toPath()
-        );
-		
-
-        // Get header
-        String[] header = csvReader.readNext();
-
-        // Compute expected header
-        List<String> expectedHeaderList = new ArrayList<>();
-        expectedHeaderList.add(ROOT_IDENTIFIER_NAME);
-        for(int i = 1; i < expectedFieldCount + 1; i++){
-            // append attempt field
-            expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i);
-            // append attempt date field
-            expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE");
-        }
-
-        String[] expectedHeader = new String[expectedHeaderList.size()];
-        expectedHeaderList.toArray(expectedHeader);
-
-
-        // Header assertion
-        assertThat(header).containsExactly(expectedHeader);
-    }
 }
