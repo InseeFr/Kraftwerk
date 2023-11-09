@@ -46,6 +46,7 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
+	public static final String REPORTING_DATA_DATASET_NAME = "REPORTINGDATA";
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
@@ -69,22 +70,22 @@ public final class Constants {
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
 	  
-	  public static final String INTERVIEWER_ID_NAME = "IDENQ";
-	  public static final String ORGANIZATION_UNIT_ID_NAME = "ORGANIZATION_UNIT_ID";
-	  public static final String ADRESS_RGES_NAME = "RGES";
-	  public static final String ADRESS_NUMFA_NAME = "NUMFA";
-	  public static final String ADRESS_SSECH_NAME = "SSECH";
-	  public static final String ADRESS_LE_NAME = "LE";
-	  public static final String ADRESS_EC_NAME = "EC";
-	  public static final String ADRESS_BS_NAME = "BS";
-	  public static final String ADRESS_NOI_NAME = "NOI";
-	  public static final String SURVEY_DATE_DAY_NAME = "JOURENQ";
-	  public static final String SURVEY_DATE_MONTH_NAME = "MOISENQ";
-	  public static final String SURVEY_DATE_YEAR_NAME = "ANNEENQ";
-	  public static final String OUTCOME_NAME = "OUTCOME";
-	  public static final String NUMBER_ATTEMPTS_NAME = "NUMBER_CONTACT_ATTEMPTS";
-	  public static final String OUTCOME_ATTEMPT_SUFFIX_NAME = "ATTEMPT";
-	  public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
+	public static final String INTERVIEWER_ID_NAME = "IDENQ";
+	public static final String ORGANIZATION_UNIT_ID_NAME = "ORGANIZATION_UNIT_ID";
+	public static final String ADRESS_RGES_NAME = "RGES";
+	public static final String ADRESS_NUMFA_NAME = "NUMFA";
+	public static final String ADRESS_SSECH_NAME = "SSECH";
+	public static final String ADRESS_LE_NAME = "LE";
+	public static final String ADRESS_EC_NAME = "EC";
+	public static final String ADRESS_BS_NAME = "BS";
+	public static final String ADRESS_NOI_NAME = "NOI";
+	public static final String SURVEY_DATE_DAY_NAME = "JOURENQ";
+	public static final String SURVEY_DATE_MONTH_NAME = "MOISENQ";
+	public static final String SURVEY_DATE_YEAR_NAME = "ANNEENQ";
+	public static final String OUTCOME_NAME = "OUTCOME";
+	public static final String NUMBER_ATTEMPTS_NAME = "NUMBER_CONTACT_ATTEMPTS";
+	public static final String OUTCOME_ATTEMPT_SUFFIX_NAME = "ATTEMPT";
+	public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
 	public static final String LAST_ATTEMPT_DATE = "LAST_ATTEMPT_DATE";
 	public static final String OUTCOME_DATE = "OUTCOME_DATE";
 	

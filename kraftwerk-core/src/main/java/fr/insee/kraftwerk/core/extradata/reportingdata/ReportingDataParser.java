@@ -67,6 +67,9 @@ public abstract class ReportingDataParser {
 			Variable variableListAttempts = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i,
 					surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttempts);
+			Variable variableListAttemptsDates = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE",
+					surveyRawData.getVariablesMap().getRootGroup(), VariableType.DATE, "50");
+			surveyRawData.getVariablesMap().putVariable(variableListAttemptsDates);
 		}
 	}
 
@@ -120,6 +123,8 @@ public abstract class ReportingDataParser {
 		for (int k = 1; k <= reportingDataUE.getContactAttempts().size(); k++) {
 			questionnaire.getAnswers().putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
 					ContactAttemptType.getAttemptType(reportingDataUE.getContactAttempts().get(k - 1).getStatus()));
+			questionnaire.getAnswers().putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
+					DateUtils.formatDateToString(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
 		}
 		questionnaire.getAnswers().putValue(Constants.LAST_ATTEMPT_DATE,
 				DateUtils.formatDateToString(getLastContactAttempt(reportingDataUE).getDate()));
