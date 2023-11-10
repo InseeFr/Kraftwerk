@@ -20,7 +20,7 @@ public class MetadataUtils {
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables= new VariablesMap();
+		VariablesMap variables = new VariablesMap();
 		try {
 			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
 		} catch (KraftwerkException e) {
@@ -38,6 +38,10 @@ public class MetadataUtils {
 			for (String filterResult : filterResults) {
 				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
+		}
+		// Step 3 : we add reporting data group if there is any reporting data
+		if(modeInputs.getReportingDataFile() != null){
+			variables.groups.put(Constants.REPORTING_DATA_GROUP_NAME, new Group(Constants.REPORTING_DATA_GROUP_NAME));
 		}
 		metadataVariables.put(dataMode, variables);
 	}

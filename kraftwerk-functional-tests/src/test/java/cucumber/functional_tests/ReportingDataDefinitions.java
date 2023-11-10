@@ -103,6 +103,7 @@ public class ReportingDataDefinitions {
 
         // Get file content
         List<String[]> content = csvReader.readAll();
+        csvReader.close();
 
         // Get header
         String[] header = content.get(0);

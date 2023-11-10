@@ -29,6 +29,7 @@ public class ParquetUtils {
 		writeFileSchema(reader);
 		writeRowGroups(reader);
 		ecrireColumns(reader);
+		reader.close();
 	}
 
 	private static void writeFileLevelMetadata(ParquetFileReader reader)  {

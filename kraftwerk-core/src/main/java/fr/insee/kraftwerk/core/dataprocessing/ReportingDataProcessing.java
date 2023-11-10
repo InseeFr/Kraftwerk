@@ -6,18 +6,27 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
 
 /**
- * This processing class is designed to create a dataset containing all reporting dat
+ * This processing class is designed to create a dataset containing all reporting datas
  */
 public class ReportingDataProcessing extends DataProcessing{
+
+    private Map<String, VariablesMap> metadataVariables;
+
     public ReportingDataProcessing(VtlBindings vtlBindings) {
         super(vtlBindings);
     }
+
+    public ReportingDataProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables) {
+        super(vtlBindings);
+        this.metadataVariables = metadataVariables;
+    }
+
 
     @Override
     public String getStepName() {
@@ -25,33 +34,32 @@ public class ReportingDataProcessing extends DataProcessing{
     }
 
     /**
-     * The method generates VTL instructions to create a dataset containing all contact attempts
+     * The method generates VTL instructions to create a dataset containing all reporting data
      * IF there is at least 1 attempt variable
      */
-    @Override
+
     protected VtlScript generateVtlInstructions(String bindingName) {
         VtlScript vtlScript = new VtlScript();
 
-        VariablesMap multimodeVariablesMap = vtlBindings.getDatasetVariablesMap(bindingName);
+        // fetch all reporting data variable names from metadataVariables
+        Set<String> variableNames = new HashSet<>();
+        for(String mode : metadataVariables.keySet()){
+            variableNames.addAll(metadataVariables.get(mode).getGroupVariableNames(Constants.REPORTING_DATA_GROUP_NAME));
+        }
 
-        // If at least 1 contact attempt variable present in multimode dataset
-        if(multimodeVariablesMap.hasVariable(OUTCOME_ATTEMPT_SUFFIX_NAME + "_1")) {
+        // If at least 1 reporting variable present in multimode dataset
+        if(!variableNames.isEmpty()) {
 
             // Build contact attempts dataset
             StringBuilder contactAttemptsInstructions = new StringBuilder();
 
-            // Remove all variables other than identifier and contact attempts
-            Set<String> variableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
-            Set<String> filteredVariableNames = variableNames.stream().filter(s -> s.startsWith(OUTCOME_ATTEMPT_SUFFIX_NAME)
-                    || s.equals(Constants.ROOT_IDENTIFIER_NAME)).collect(Collectors.toSet());
-
-            String contactAttemptsMeasures = VtlMacros.toVtlSyntax(filteredVariableNames);
+            String contactAttemptsMeasures = VtlMacros.toVtlSyntax(variableNames);
 
             contactAttemptsInstructions.append(String.format("%s := %s [keep %s, %s];",
-                    Constants.REPORTING_DATA_DATASET_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, contactAttemptsMeasures));
+                    Constants.REPORTING_DATA_GROUP_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, contactAttemptsMeasures));
 
             // Remove duplicates
-            contactAttemptsInstructions.append(String.format("%1$s := union(%1$s,%1$s);",Constants.REPORTING_DATA_DATASET_NAME));
+            contactAttemptsInstructions.append(String.format("%1$s := union(%1$s,%1$s);", Constants.REPORTING_DATA_GROUP_NAME));
 
             vtlScript.add(contactAttemptsInstructions.toString());
         }

@@ -45,7 +45,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// Exclude reporting data from root dataset
 		Set<String> rootVariableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
-		VariablesMap reportingDataVariablesMap = vtlBindings.getDatasetVariablesMap(Constants.REPORTING_DATA_DATASET_NAME);
+		VariablesMap reportingDataVariablesMap = vtlBindings.getDatasetVariablesMap(Constants.REPORTING_DATA_GROUP_NAME);
 		Set<String> reportingDataVariableNames = reportingDataVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
 		rootVariableNames.removeAll(reportingDataVariableNames);
 

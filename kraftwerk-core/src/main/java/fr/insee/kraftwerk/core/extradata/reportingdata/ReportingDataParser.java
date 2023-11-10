@@ -65,10 +65,10 @@ public abstract class ReportingDataParser {
 				surveyRawData.getVariablesMap().getRootGroup(),  VariableType.DATE, "50"));
 		for (int i = 1; i <= this.maxAttempts; i++) {
 			Variable variableListAttempts = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i,
-					surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
+					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttempts);
 			Variable variableListAttemptsDates = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE",
-					surveyRawData.getVariablesMap().getRootGroup(), VariableType.DATE, "50");
+					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.DATE, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttemptsDates);
 		}
 	}
