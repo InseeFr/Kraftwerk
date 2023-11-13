@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -26,43 +27,46 @@ public abstract class ReportingDataParser {
 
 	private void createReportingVariables(SurveyRawData surveyRawData) {
 		Variable variableInterviewer = new Variable(Constants.INTERVIEWER_ID_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "20");
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "20");
 		surveyRawData.getVariablesMap().putVariable(variableInterviewer);
 		Variable variableOrganization = new Variable(Constants.ORGANIZATION_UNIT_ID_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
 		surveyRawData.getVariablesMap().putVariable(variableOrganization);
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_RGES_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "2"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "2"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_NUMFA_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "6"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "6"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_SSECH_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "2"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "2"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_LE_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "1"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "1"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_EC_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "1"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "1"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_BS_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "1"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "1"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_NOI_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "2"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "2"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.ADRESS_ID_STAT_INSEE,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "15"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "15"));
 		for (int k = 1; k <= this.maxStates; k++) {
 			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k,
-					surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
+					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListStates);
+			Variable variableListStatesDates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
+					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.DATE, "50");
+			surveyRawData.getVariablesMap().putVariable(variableListStatesDates);
 		}
 		Variable variableLastState = new Variable(Constants.LAST_STATE_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50");
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
 		surveyRawData.getVariablesMap().putVariable(variableLastState);
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.OUTCOME_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "50"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.OUTCOME_DATE,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.DATE, "50"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.DATE, "50"));
 				surveyRawData.getVariablesMap().putVariable(new Variable(Constants.NUMBER_ATTEMPTS_NAME,
-				surveyRawData.getVariablesMap().getRootGroup(), VariableType.STRING, "4"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "4"));
 		surveyRawData.getVariablesMap().putVariable(new Variable(Constants.LAST_ATTEMPT_DATE,
-				surveyRawData.getVariablesMap().getRootGroup(),  VariableType.DATE, "50"));
+				surveyRawData.getVariablesMap().getReportingDataGroup(),  VariableType.DATE, "50"));
 		for (int i = 1; i <= this.maxAttempts; i++) {
 			Variable variableListAttempts = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i,
 					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
@@ -144,6 +148,8 @@ public abstract class ReportingDataParser {
 		for (int k = 1; k <= reportingDataUE.size(); k++) {
 			questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
 					StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
+			questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
+					DateUtils.formatDateToString(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
 		}
 		questionnaire.getAnswers().putValue(Constants.LAST_STATE_NAME,
 				StateType.getStateType(
