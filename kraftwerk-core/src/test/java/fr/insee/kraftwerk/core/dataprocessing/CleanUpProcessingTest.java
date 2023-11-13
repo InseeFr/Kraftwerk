@@ -24,7 +24,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
-public class CleanUpProcessingTest {
+class CleanUpProcessingTest {
 
     Dataset cawiDataset = new InMemoryDataset(
             List.of(
@@ -72,7 +72,7 @@ public class CleanUpProcessingTest {
     );
 
     @Test
-    public void applyCleanUp() {
+    void applyCleanUp() {
         // Metadata variables object
         Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
         // Errors list

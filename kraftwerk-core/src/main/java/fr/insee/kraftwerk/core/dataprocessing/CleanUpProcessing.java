@@ -67,7 +67,7 @@ public class CleanUpProcessing extends DataProcessing {
             paperUcqVtlNames.addAll(
                     variablesMap.getPaperUcq().stream()
                             .map(variable -> variablesMap.getFullyQualifiedName(variable.getName()))
-                            .collect(Collectors.toList())
+                            .toList()
             );
         }
         if (!paperUcqVtlNames.isEmpty()) {

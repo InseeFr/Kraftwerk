@@ -12,6 +12,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MetadataUtils {
 
+	private MetadataUtils(){
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));

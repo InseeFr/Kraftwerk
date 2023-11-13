@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -8,6 +9,10 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 public class DataParserManager {
+
+	private DataParserManager(){
+		throw new IllegalStateException("Utility class");
+	}
 	
 	/**
 	 * Return the parser adapted to read data from the data collection tool given.

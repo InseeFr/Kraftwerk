@@ -30,8 +30,8 @@ public enum ContactOutcomeType {
     valueToTextMapping = new HashMap<>();
     byte b;
     int i;
-    ContactOutcomeType[] arrayOfContactOutcomeType;
-    for (i = (arrayOfContactOutcomeType = values()).length, b = 0; b < i; ) {
+    ContactOutcomeType[] arrayOfContactOutcomeType = values();
+    for (i = arrayOfContactOutcomeType.length, b = 0; b < i; ) {
       ContactOutcomeType s = arrayOfContactOutcomeType[b];
       valueToTextMapping.put(s.key, s.value);
       b++;

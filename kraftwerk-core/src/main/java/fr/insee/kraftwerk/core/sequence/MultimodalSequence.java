@@ -2,9 +2,7 @@ package fr.insee.kraftwerk.core.sequence;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReportingDataProcessing;

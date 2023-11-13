@@ -3,16 +3,9 @@ package cucumber.functional_tests;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
-import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +21,6 @@ import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
 import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
 import static fr.insee.kraftwerk.core.Constants.ROOT_IDENTIFIER_NAME;
-import static org.apache.tomcat.util.http.fileupload.FileUtils.deleteDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 

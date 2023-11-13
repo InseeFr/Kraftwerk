@@ -66,7 +66,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			// First init the dataset using measure names, that are fully qualified name
 			List<String> groupVariableNames = new ArrayList<>(multimodeVariablesMap.getGroupVariableNames(groupName));
 			List<String> groupMeasureNames = groupVariableNames.stream()
-					.map(multimodeVariablesMap::getFullyQualifiedName).collect(Collectors.toList());
+					.map(multimodeVariablesMap::getFullyQualifiedName).toList();
 
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",

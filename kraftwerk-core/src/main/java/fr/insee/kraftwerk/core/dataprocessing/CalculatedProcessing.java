@@ -10,7 +10,6 @@ import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
-;
 
 @Log4j2
 public class CalculatedProcessing extends DataProcessing {

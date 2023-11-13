@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ReportingDataProcessingTest {
+class ReportingDataProcessingTest {
     private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
 
     private Map<String, VariablesMap> metadataVariables;
@@ -84,17 +84,17 @@ public class ReportingDataProcessingTest {
         assertThat(contactAttemptsDataset).isNotNull();
 
         Map<String, Object> contactAttemptsMap0 = contactAttemptsDataset.getDataAsMap().get(0);
-        assertThat(contactAttemptsMap0).containsEntry(rootId,"001");
-        assertThat(contactAttemptsMap0).containsEntry("ATTEMPT_1","REF");
-        assertThat(contactAttemptsMap0).containsEntry("ATTEMPT_1_DATE","2022-01-01 00:00:01");
-        assertThat(contactAttemptsMap0).doesNotContainEntry("DATA1","TEST1");
+        assertThat(contactAttemptsMap0).containsEntry(rootId,"001")
+        .containsEntry("ATTEMPT_1","REF")
+        .containsEntry("ATTEMPT_1_DATE","2022-01-01 00:00:01")
+        .doesNotContainEntry("DATA1","TEST1");
 
         Map<String, Object> contactAttemptsMap1 = contactAttemptsDataset.getDataAsMap().get(1);
-        assertThat(contactAttemptsMap1).containsEntry("ATTEMPT_1","APT");
-        assertThat(contactAttemptsMap1).containsEntry("ATTEMPT_1_DATE","2022-01-01 00:00:02");
-        assertThat(contactAttemptsMap1).containsEntry("ATTEMPT_2","INA");
-        assertThat(contactAttemptsMap1).containsEntry("ATTEMPT_2_DATE","2022-02-02 00:00:02");
-        assertThat(contactAttemptsMap1).doesNotContainEntry("DATA1","TEST2");
+        assertThat(contactAttemptsMap1).containsEntry("ATTEMPT_1","APT")
+                .containsEntry("ATTEMPT_1_DATE","2022-01-01 00:00:02")
+                .containsEntry("ATTEMPT_2","INA")
+                .containsEntry("ATTEMPT_2_DATE","2022-02-02 00:00:02")
+                .doesNotContainEntry("DATA1","TEST2");
     }
 
     @Test
