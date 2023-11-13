@@ -95,4 +95,3 @@ Feature: Do we save correctly all reporting data ?
 
     |Directory                        |
     |SAMPLETEST-DATAONLY-v1           |
-    #TODO finir le dataonly
