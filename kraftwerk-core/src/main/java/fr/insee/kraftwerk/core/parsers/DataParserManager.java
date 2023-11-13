@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**

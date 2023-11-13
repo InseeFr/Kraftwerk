@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
