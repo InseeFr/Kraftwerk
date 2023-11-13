@@ -4,6 +4,7 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import java.sql.Date;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -16,10 +17,13 @@ public abstract class ReportingDataParser {
 
 	private int maxStates = 0;
 	private int maxAttempts = 0;
+	Group reportingGroup ;
 
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
+		reportingGroup = new Group(Constants.REPORTING_DATA_GROUP_NAME, Constants.ROOT_GROUP_NAME);
+		surveyRawData.getVariablesMap().putGroup(reportingGroup);
 		createReportingVariables(surveyRawData);
 		addReportingValues(surveyRawData, reportingData, withAllReportingData);
 	}
@@ -65,10 +69,10 @@ public abstract class ReportingDataParser {
 				surveyRawData.getVariablesMap().getRootGroup(),  VariableType.DATE, "50"));
 		for (int i = 1; i <= this.maxAttempts; i++) {
 			Variable variableListAttempts = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i,
-					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+					reportingGroup, VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttempts);
 			Variable variableListAttemptsDates = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE",
-					surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.DATE, "50");
+					reportingGroup, VariableType.DATE, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttemptsDates);
 		}
 	}

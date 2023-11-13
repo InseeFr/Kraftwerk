@@ -143,7 +143,7 @@ public class ParquetOutputFiles extends OutputFiles {
     	        } else if (Boolean.class.equals(type)) {
         	        builder.name(component.getName()).type().nullable().booleanType().noDefault();
     	        } else if (Instant.class.equals(type)) {
-        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().longType())).endUnion().noDefault();
     	        } else if (LocalDate.class.equals(type)) {
         	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.date().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
     	        } else {
