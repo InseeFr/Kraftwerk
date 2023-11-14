@@ -5,6 +5,7 @@ import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
+import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
 import io.cucumber.java.en.Then;
 
@@ -72,7 +73,7 @@ public class ReportingDataDefinitions {
         csvReader.close();
 
         // Header assertion
-        assertThat(header).hasSize(expectedFieldCount - 1);
+        assertThat(header).hasSize(expectedFieldCount + 1);
         assertThat(header).containsAll(Arrays.asList(reportingDataFields));
     }
 
@@ -181,7 +182,7 @@ public class ReportingDataDefinitions {
             String fieldName = header[i];
 
             // Increment if valid
-            if (element.equals(ContactAttemptType.getAttemptType(expectedStatus)) // the field content matches with expected
+            if (element.equals(StateType.getStateType(expectedStatus)) // the field content matches with expected
                     && fieldName.startsWith(STATE_SUFFIX_NAME) // is a contact attempt field
                     && !fieldName.contains("DATE")){ // not the attempt date field
                 actualSpecificStatusCount++;

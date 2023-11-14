@@ -72,7 +72,7 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedStatus : Expected status (in input file)
 
       |Directory                        |OutputFileName                                    |SurveyUnitId |ExpectedSpecificStatusCount  |ExpectedStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003      |2                            |REF              |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002      |5                            |WFT              |
 
 
   Scenario Outline: The root file doesn't have any reporting data
