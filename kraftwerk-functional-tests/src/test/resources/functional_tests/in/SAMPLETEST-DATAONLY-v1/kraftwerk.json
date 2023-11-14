@@ -5,7 +5,7 @@
   "survey_data": [
     {
       "data_mode": "FAF",
-	  "data_file": "data",
+	  "data_file": "data/faf",
 	  "DDI_file": "ddi-SAMPLETEST-DATAONLY-v1.xml",
 	  "lunatic_file": "SAMPLETEST-DATAONLY-v1.json",
 	  "data_format": "LUNATIC_XML",

@@ -1,13 +1,9 @@
 Feature: Do we save correctly all reporting data ?
   Everybody wants to know if we save them correctly
 
-  Background:
-    Given Step 0 : We have some survey in directory "SAMPLETEST-REPORTINGDATA-v1"
-    # TODO put COMPLETE directory when ready
-    When Step 1 : We launch main service
-
-
   Scenario Outline: Do we create reporting data file with the right structure
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then We should have a file named "<OutputFileName>" in directory "<Directory>" with <ExpectedReportingDataFieldCount> reporting data fields
 
     Examples:
@@ -22,6 +18,8 @@ Feature: Do we save correctly all reporting data ?
 
 
   Scenario Outline: Do we have the good amount of lines
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then We should have <ExpectedTotalCount> lines different than header in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -34,6 +32,8 @@ Feature: Do we save correctly all reporting data ?
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |3                  |
 
   Scenario Outline: Does the file have a correct date format
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then In file named "<OutputFileName>" in directory "<Directory>" we should have the following date format : "<ExpectedDateFormat>"
 
     Examples:
@@ -47,6 +47,8 @@ Feature: Do we save correctly all reporting data ?
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then For SurveyUnit "<SurveyUnitId>" we should have <ExpectedSpecificStatusCount> contact attempts with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -61,6 +63,8 @@ Feature: Do we save correctly all reporting data ?
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003      |2                            |REF              |
 
   Scenario Outline: The file has all the contact states of a specific type
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then For SurveyUnit "<SurveyUnitId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -76,6 +80,8 @@ Feature: Do we save correctly all reporting data ?
 
 
   Scenario Outline: The root file doesn't have any reporting data
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
     Then We shouldn't have any reporting data in "<RootFileName>" in directory "<Directory>"
 
     Examples:
@@ -87,7 +93,9 @@ Feature: Do we save correctly all reporting data ?
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_RACINE.csv     |
 
   Scenario Outline: If there is no reporting data, there is no reporting data file
-  Then We shouldn't have any reporting data file in directory "<Directory>"
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then We shouldn't have any reporting data file in directory "<Directory>"
 
   Examples:
   # Parameters :
