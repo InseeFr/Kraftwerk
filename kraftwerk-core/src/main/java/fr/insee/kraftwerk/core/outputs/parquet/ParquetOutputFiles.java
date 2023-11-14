@@ -79,11 +79,19 @@ public class ParquetOutputFiles extends OutputFiles {
 	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
 		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
+		
+		    // need to add logicalTime Support
+		    GenericData timeSupport = new GenericData();
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.DateConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
+		    
 		        try (ParquetWriter<GenericData.Record> writer = AvroParquetWriter
 		                .<GenericData.Record>builder(parquetOutFile)
 		                .withSchema(schema)
 		                .withDataModel(genericData)
-		           //     .withDataModel(dataset)
+		                .withDataModel(timeSupport)
 		                .withConf(new Configuration())
 		                .withCompressionCodec(CompressionCodecName.SNAPPY)
 		                .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
@@ -91,7 +99,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		            for (GenericData.Record recordData : dataset) {
 		                writer.write(recordData);
 		            }
-		            log.info("Parquet datasize for {} is : {}",datasetName,writer.getDataSize());
+		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset.size());
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
@@ -143,7 +151,7 @@ public class ParquetOutputFiles extends OutputFiles {
     	        } else if (Boolean.class.equals(type)) {
         	        builder.name(component.getName()).type().nullable().booleanType().noDefault();
     	        } else if (Instant.class.equals(type)) {
-        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
+        	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.timestampMillis().addToSchema(SchemaBuilder.builder().longType())).endUnion().noDefault();
     	        } else if (LocalDate.class.equals(type)) {
         	        builder.name(component.getName()).type().unionOf().nullBuilder().endNull().and().stringType().and().type(LogicalTypes.date().addToSchema(SchemaBuilder.builder().intType())).endUnion().noDefault();
     	        } else {
