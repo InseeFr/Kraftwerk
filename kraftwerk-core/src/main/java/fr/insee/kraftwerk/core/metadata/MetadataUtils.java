@@ -39,6 +39,12 @@ public class MetadataUtils {
 				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
 		}
+		if (variables.getVariable("LIENS") != null) {
+			for (int k=1;k<21;k++) {
+				Variable varLien = new Variable("LIEN_"+k, variables.getGroup("BOUCLE_PRENOMS"), VariableType.INTEGER);
+				variables.putVariable(varLien);
+			}
+		}
 		metadataVariables.put(dataMode, variables);
 	}
 
