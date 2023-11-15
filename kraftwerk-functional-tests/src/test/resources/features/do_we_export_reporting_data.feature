@@ -91,6 +91,7 @@ Feature: Do we save correctly all reporting data ?
 
       |Directory                        |RootFileName                               |
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_RACINE.csv     |
+      |SAMPLETEST-DATAONLY-v1           |SAMPLETEST-DATAONLY-v1_RACINE.csv          |
 
   Scenario Outline: If there is no reporting data, there is no reporting data file
     Given Step 0 : We have some survey in directory "<Directory>"
