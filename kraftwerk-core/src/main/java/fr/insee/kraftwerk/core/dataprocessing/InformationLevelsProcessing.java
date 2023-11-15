@@ -64,7 +64,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
 					groupName, bindingName, Constants.ROOT_IDENTIFIER_NAME, groupName, groupMeasures, Constants.MODE_VARIABLE_NAME));
 			// Empty lines are created to produce group level tables and need to be removed
-			if (!groupName.equals(Constants.REPORTING_DATA_GROUP_NAME)) groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
+			groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
 					groupName, groupName, groupName));
 
 
