@@ -13,7 +13,7 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding IdUE
 
     |Directory                        |OutputFileName                                    |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |64                                |
+    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |70                                |
 
 
 
@@ -104,3 +104,18 @@ Feature: Do we save correctly all reporting data ?
 
     |Directory                        |
     |SAMPLETEST-DATAONLY-v1           |
+
+  Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the OUTCOME_SPOTTING field
+
+    Examples:
+    # Parameters :
+    # - Directory : Directory of test campaigns
+    # - SurveyUnitId : Survey unit identifier
+    # - OutputFileName : Name of reporting data file (with .csv extension)
+    # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
+
+      |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedOutcomeSpottingStatus   |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000001        |DESTROY                         |

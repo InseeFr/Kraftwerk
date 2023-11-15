@@ -118,8 +118,8 @@ public class ReportingDataDefinitions {
 
         // Fetch concerned survey unit line from file
         String[] concernedLine = null;
-        for(String[] line : content){
-            if(line[0].equals(surveyUnitId)){
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
                 concernedLine = line;
                 break;
             }
@@ -132,13 +132,13 @@ public class ReportingDataDefinitions {
         int actualSpecificStatusCount = 0;
         int i = 0;
 
-        for(String element : concernedLine){
+        for (String element : concernedLine) {
             String fieldName = header[i];
 
             // Increment if valid
             if (element.equals(ContactAttemptType.getAttemptType(expectedStatus)) // the field content matches with expected
                     && fieldName.startsWith(OUTCOME_ATTEMPT_SUFFIX_NAME) // is a contact attempt field
-                    && !fieldName.contains("DATE")){ // not the attempt date field
+                    && !fieldName.contains("DATE")) { // not the attempt date field
                 actualSpecificStatusCount++;
             }
 
@@ -164,8 +164,8 @@ public class ReportingDataDefinitions {
 
         // Fetch concerned survey unit line from file
         String[] concernedLine = null;
-        for(String[] line : content){
-            if(line[0].equals(surveyUnitId)){
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
                 concernedLine = line;
                 break;
             }
@@ -178,13 +178,13 @@ public class ReportingDataDefinitions {
         int actualSpecificStatusCount = 0;
         int i = 0;
 
-        for(String element : concernedLine){
+        for (String element : concernedLine) {
             String fieldName = header[i];
 
             // Increment if valid
             if (element.equals(StateType.getStateType(expectedStatus)) // the field content matches with expected
                     && fieldName.startsWith(STATE_SUFFIX_NAME) // is a contact attempt field
-                    && !fieldName.contains("DATE")){ // not the attempt date field
+                    && !fieldName.contains("DATE")) { // not the attempt date field
                 actualSpecificStatusCount++;
             }
 
@@ -212,18 +212,17 @@ public class ReportingDataDefinitions {
 
         //Date check
         SimpleDateFormat sdf = new SimpleDateFormat(expectedDateFormat);
-        for(String[] line : content){
+        for (String[] line : content) {
             int i = 0;
             // For each field
-            for(String element : line){
+            for (String element : line) {
                 String fieldName = header[i];
 
                 // Date format assertion if filled
-                if(fieldName.contains("_DATE") && !element.isEmpty()){
+                if (fieldName.contains("_DATE") && !element.isEmpty()) {
                     try {
                         sdf.parse(element);
-                    }
-                    catch (ParseException e){
+                    } catch (ParseException e) {
                         fail("Wrong date format in file");
                     }
                 }
@@ -244,5 +243,46 @@ public class ReportingDataDefinitions {
 
         // assert lack of unique reporting data field
         assertThat(header).doesNotContainAnyElementsOf(Arrays.asList(reportingDataFields));
+    }
+
+    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the OUTCOME_SPOTTING field")
+    public void check_outcome_spotting_result(String surveyUnitId, String fileName, String directory, String expectedOutcomeSpotting) throws IOException, CsvException {
+        CSVReader csvReader = CsvUtils.getReader(
+                Path.of(outDirectory + "/" + directory + "/" + fileName)
+        );
+
+        // Get file content
+        List<String[]> content = csvReader.readAll();
+        csvReader.close();
+
+        // Get header
+        String[] header = content.get(0);
+
+        // OUTCOME_SPOTTING field existence assertion
+        assertThat(header).contains("OUTCOME_SPOTTING");
+
+        // Fetch concerned survey unit line from file
+        String[] concernedLine = null;
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
+                concernedLine = line;
+                break;
+            }
+        }
+
+        // Survey unit existence assertion
+        assertThat(concernedLine).isNotNull();
+
+        // Check OUTCOME_SPOTTING content
+        int i = 0;
+        String outcomeSpottingContent = null;
+        for (String element : concernedLine) {
+            if (header[i].equals("OUTCOME_SPOTTING")) {
+                outcomeSpottingContent = element;
+                break;
+            }
+            i++;
+        }
+        assertThat(outcomeSpottingContent).isEqualTo(expectedOutcomeSpotting);
     }
 }

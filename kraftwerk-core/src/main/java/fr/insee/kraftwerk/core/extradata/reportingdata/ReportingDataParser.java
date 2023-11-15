@@ -78,6 +78,21 @@ public abstract class ReportingDataParser {
 					reportingGroup, VariableType.DATE, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListAttemptsDates);
 		}
+		Variable variableIdentification = new Variable(Constants.IDENTIFICATION_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+		surveyRawData.getVariablesMap().putVariable(variableIdentification);
+		Variable variableAccess = new Variable(Constants.ACCESS_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+		surveyRawData.getVariablesMap().putVariable(variableAccess);
+		Variable variableSituation = new Variable(Constants.SITUATION_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+		surveyRawData.getVariablesMap().putVariable(variableSituation);
+		Variable variableCategory = new Variable(Constants.CATEGORY_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+		surveyRawData.getVariablesMap().putVariable(variableCategory);
+		Variable variableOccupant = new Variable(Constants.OCCUPANT_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
+		surveyRawData.getVariablesMap().putVariable(variableOccupant);
 	}
 
 	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {

@@ -89,6 +89,11 @@ public final class Constants {
 	public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
 	public static final String LAST_ATTEMPT_DATE = "LAST_ATTEMPT_DATE";
 	public static final String OUTCOME_DATE = "OUTCOME_DATE";
+	public static final String IDENTIFICATION_NAME = "identification";
+	public static final String ACCESS_NAME = "access";
+	public static final String SITUATION_NAME = "situation";
+	public static final String CATEGORY_NAME = "category";
+	public static final String OCCUPANT_NAME = "occupant";
 	
 	// ---------- Functions
 	// ---------- Get a file
