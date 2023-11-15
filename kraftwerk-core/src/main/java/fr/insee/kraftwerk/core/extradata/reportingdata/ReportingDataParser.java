@@ -7,6 +7,8 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.rawdata.GroupData;
+import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.DateUtils;
@@ -125,9 +127,9 @@ public abstract class ReportingDataParser {
 
 	private void addContactAttempts(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
 		for (int k = 1; k <= reportingDataUE.getContactAttempts().size(); k++) {
-			questionnaire.getAnswers().putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance("Report_" + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
 					ContactAttemptType.getAttemptType(reportingDataUE.getContactAttempts().get(k - 1).getStatus()));
-			questionnaire.getAnswers().putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance("Report_" + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
 					DateUtils.formatDateToString(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
 		}
 		questionnaire.getAnswers().putValue(Constants.LAST_ATTEMPT_DATE,

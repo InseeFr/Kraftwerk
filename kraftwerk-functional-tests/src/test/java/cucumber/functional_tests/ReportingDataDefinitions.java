@@ -3,6 +3,7 @@ package cucumber.functional_tests;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
 import io.cucumber.java.en.Then;
@@ -53,6 +54,7 @@ public class ReportingDataDefinitions {
         // Compute expected header
         List<String> expectedHeaderList = new ArrayList<>();
         expectedHeaderList.add(ROOT_IDENTIFIER_NAME);
+        expectedHeaderList.add(Constants.REPORTING_DATA_GROUP_NAME);
         for(int i = 1; i < expectedFieldCount + 1; i++){
             // append attempt field
             expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i);
