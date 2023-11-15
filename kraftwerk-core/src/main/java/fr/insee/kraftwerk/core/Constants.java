@@ -67,6 +67,7 @@ public final class Constants {
 
 
 	// ----- Reporting Variables Names
+	public static final String REPORTING_DATA_PREFIX_NAME = "Report_";
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
 	  

@@ -2,14 +2,11 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.rawdata.GroupData;
-import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.DateUtils;
@@ -104,19 +101,19 @@ public abstract class ReportingDataParser {
 			log.info("Missing questionnaire for reporting data: {}.", reportingDataUE.getIdentifier() );
 		}
 		if (reportingDataUE.getInterviewerId() != null)
-			questionnaire.getAnswers().putValue(Constants.INTERVIEWER_ID_NAME, reportingDataUE.getInterviewerId());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.INTERVIEWER_ID_NAME, reportingDataUE.getInterviewerId());
 		if (reportingDataUE.getOrganizationUnitId() != null)
-			questionnaire.getAnswers().putValue(Constants.ORGANIZATION_UNIT_ID_NAME,
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ORGANIZATION_UNIT_ID_NAME,
 					reportingDataUE.getOrganizationUnitId());
 		if (reportingDataUE.getInseeSampleIdentifier() != null) {
-			questionnaire.getAnswers().putValue(Constants.ADRESS_RGES_NAME, reportingDataUE.getInseeSampleIdentifier().getRges());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_NUMFA_NAME, reportingDataUE.getInseeSampleIdentifier().getNumfa());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_SSECH_NAME, reportingDataUE.getInseeSampleIdentifier().getSsech());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_LE_NAME, reportingDataUE.getInseeSampleIdentifier().getLe());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_EC_NAME, reportingDataUE.getInseeSampleIdentifier().getEc());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_BS_NAME, reportingDataUE.getInseeSampleIdentifier().getBs());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_NOI_NAME, reportingDataUE.getInseeSampleIdentifier().getNoi());
-			questionnaire.getAnswers().putValue(Constants.ADRESS_ID_STAT_INSEE, reportingDataUE.getInseeSampleIdentifier().getIdStatInsee());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_RGES_NAME, reportingDataUE.getInseeSampleIdentifier().getRges());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_NUMFA_NAME, reportingDataUE.getInseeSampleIdentifier().getNumfa());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_SSECH_NAME, reportingDataUE.getInseeSampleIdentifier().getSsech());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_LE_NAME, reportingDataUE.getInseeSampleIdentifier().getLe());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_EC_NAME, reportingDataUE.getInseeSampleIdentifier().getEc());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_BS_NAME, reportingDataUE.getInseeSampleIdentifier().getBs());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_NOI_NAME, reportingDataUE.getInseeSampleIdentifier().getNoi());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ADRESS_ID_STAT_INSEE, reportingDataUE.getInseeSampleIdentifier().getIdStatInsee());
 		}
 		if (!reportingDataUE.getStates().isEmpty()) {
 			addStates(reportingDataUE, questionnaire);
@@ -131,33 +128,33 @@ public abstract class ReportingDataParser {
 
 	private void addContactAttempts(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
 		for (int k = 1; k <= reportingDataUE.getContactAttempts().size(); k++) {
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance("Report_" + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k,
 					ContactAttemptType.getAttemptType(reportingDataUE.getContactAttempts().get(k - 1).getStatus()));
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance("Report_" + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
 					DateUtils.formatDateToString(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
 		}
-		questionnaire.getAnswers().putValue(Constants.LAST_ATTEMPT_DATE,
+		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.LAST_ATTEMPT_DATE,
 				DateUtils.formatDateToString(getLastContactAttempt(reportingDataUE).getDate()));
 	}
 
 	private void addContactOutcome(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
 		ContactOutcome contactOutcome = reportingDataUE.getContactOutcome();
-		questionnaire.getAnswers().putValue(Constants.OUTCOME_NAME, contactOutcome.getOutcomeType());
+		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_NAME, contactOutcome.getOutcomeType());
 		if (contactOutcome.getDateEndContact() != 0L) {
-			questionnaire.getAnswers().putValue(Constants.OUTCOME_DATE, DateUtils.formatDateToString(new Date(contactOutcome.getDateEndContact())));
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_DATE, DateUtils.formatDateToString(new Date(contactOutcome.getDateEndContact())));
 		}
-		questionnaire.getAnswers().putValue(Constants.NUMBER_ATTEMPTS_NAME,
+		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.NUMBER_ATTEMPTS_NAME,
 					Integer.toString(contactOutcome.getTotalNumberOfContactAttempts()));
 	}
 
 	private void addStates(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
 		for (int k = 1; k <= reportingDataUE.size(); k++) {
-			questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
 					StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
-			questionnaire.getAnswers().putValue(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
 					DateUtils.formatDateToString(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
 		}
-		questionnaire.getAnswers().putValue(Constants.LAST_STATE_NAME,
+		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.LAST_STATE_NAME,
 				StateType.getStateType(
 						(reportingDataUE.getStates().get(reportingDataUE.getStates().size() - 1))
 								.getStateType()));

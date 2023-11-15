@@ -10,10 +10,10 @@ Feature: Do we save correctly all reporting data ?
     # Parameters :
     # - Directory : Directory of test campaigns
     # - OutputFileName : Name of reporting data file (with .csv extension)
-    # - ExpectedReportingDataFieldCount : Expected field quantity
+    # - ExpectedReportingDataFieldCount : Expected field quantity excluding IdUE
 
     |Directory                        |OutputFileName                                    |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |63                                |
+    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |64                                |
 
 
 
