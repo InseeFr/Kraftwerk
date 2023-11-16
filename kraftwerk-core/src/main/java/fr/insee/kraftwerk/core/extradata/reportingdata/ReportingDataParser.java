@@ -139,6 +139,21 @@ public abstract class ReportingDataParser {
 		if (!reportingDataUE.getContactAttempts().isEmpty()) {
 			addContactAttempts(reportingDataUE, questionnaire);
 		}
+		if (reportingDataUE.getIdentification() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.IDENTIFICATION_NAME, reportingDataUE.getIdentification());
+		}
+		if (reportingDataUE.getAccess() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ACCESS_NAME, reportingDataUE.getAccess());
+		}
+		if (reportingDataUE.getSituation() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.SITUATION_NAME, reportingDataUE.getSituation());
+		}
+		if (reportingDataUE.getCategory() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.CATEGORY_NAME, reportingDataUE.getCategory());
+		}
+		if (reportingDataUE.getOccupant() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OCCUPANT_NAME, reportingDataUE.getOccupant());
+		}
 	}
 
 	private void addContactAttempts(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {

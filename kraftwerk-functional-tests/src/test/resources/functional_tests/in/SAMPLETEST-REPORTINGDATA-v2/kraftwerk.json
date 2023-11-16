@@ -6,7 +6,7 @@
 			"data_mode": "TEL",
             "data_file": "data/tel",
             "data_format": "LUNATIC_XML",
-            "DDI_file": "ddi-sampletest-v1-tel.xml",
+            "DDI_file": "ddi-sampletest-v2-tel.xml",
             "lunatic_file": "lunatic/sampletest_tel.json",
             "mode_specifications": "",
             "paradata_folder": "",

@@ -14,6 +14,7 @@ Feature: Do we save correctly all reporting data ?
 
     |Directory                        |OutputFileName                                    |ExpectedReportingDataFieldCount   |
     |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |70                                |
+    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |70                                |
 
 
 
@@ -118,4 +119,4 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
       |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedOutcomeSpottingStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000001        |DESTROY                         |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |DESTROY                         |

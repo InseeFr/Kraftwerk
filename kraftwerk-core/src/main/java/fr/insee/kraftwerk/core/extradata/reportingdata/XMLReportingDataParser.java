@@ -80,7 +80,19 @@ public class XMLReportingDataParser extends ReportingDataParser {
           String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
           String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
           reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
-        }  
+        }
+
+      if(surveyUnitElement.getFirstChildElement("identification") != null)
+        reportingDataUE.setIdentification(surveyUnitElement.getFirstChildElement("identification").getValue());
+      if(surveyUnitElement.getFirstChildElement("access")!= null)
+        reportingDataUE.setAccess(surveyUnitElement.getFirstChildElement("access").getValue());
+      if(surveyUnitElement.getFirstChildElement("situation") != null)
+        reportingDataUE.setSituation(surveyUnitElement.getFirstChildElement("situation").getValue());
+      if(surveyUnitElement.getFirstChildElement("category") != null)
+        reportingDataUE.setCategory(surveyUnitElement.getFirstChildElement("category").getValue());
+      if(surveyUnitElement.getFirstChildElement("occupant") != null)
+        reportingDataUE.setOccupant(surveyUnitElement.getFirstChildElement("occupant").getValue());
+
       reportingData.addReportingDataUE(reportingDataUE);
     } 
     integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
