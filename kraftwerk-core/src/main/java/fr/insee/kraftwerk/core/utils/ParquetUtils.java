@@ -22,6 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ParquetUtils {
 
+	private ParquetUtils(){
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static void describeParquetFile(Path path) throws IOException {
 		ParquetFileReader reader = createParquetFileReader(path);
 		writeFileLevelMetadata(reader);
@@ -29,6 +33,7 @@ public class ParquetUtils {
 		writeFileSchema(reader);
 		writeRowGroups(reader);
 		ecrireColumns(reader);
+		reader.close();
 	}
 
 	private static void writeFileLevelMetadata(ParquetFileReader reader)  {

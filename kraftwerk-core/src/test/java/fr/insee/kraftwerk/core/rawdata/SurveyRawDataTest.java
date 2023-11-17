@@ -12,7 +12,7 @@ public class SurveyRawDataTest {
 	/* Unit testing */
 
 	@Test
-	public void constructorsAndDataModeTest() {
+	void constructorsAndDataModeTest() {
 		SurveyRawData d1 = new SurveyRawData("CAWI");
 		SurveyRawData d2 = new SurveyRawData();
 		d2.setDataMode("PAPI");
@@ -22,7 +22,7 @@ public class SurveyRawDataTest {
 	}
 	
 	@Test
-	public void addQuestionnaireAndQuestionnairesCountTest() {
+	void addQuestionnaireAndQuestionnairesCountTest() {
 		SurveyRawData data = new SurveyRawData();
 		data.addQuestionnaire(new QuestionnaireData());
 		data.addQuestionnaire(new QuestionnaireData());
@@ -31,7 +31,7 @@ public class SurveyRawDataTest {
 	}
 
 	@Test
-	public void surveyRawDataTest(){
+	void surveyRawDataTest(){
 		SurveyRawData testData = createFakeCawiSurveyRawData();
 		//
 		QuestionnaireData q1 = testData.getQuestionnaires().get(0);

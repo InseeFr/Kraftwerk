@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 
-public class VariableTest {
+class VariableTest {
 
 	static final String DDI_FOLDER = TestConstants.UNIT_TESTS_DIRECTORY + "/ddi";
 
@@ -31,7 +31,7 @@ public class VariableTest {
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
 	@Test
-	public void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -65,7 +65,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -103,7 +103,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
@@ -144,7 +144,7 @@ public class VariableTest {
 	}
 
 	@Test
-	public void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");

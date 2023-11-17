@@ -21,12 +21,6 @@
 			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
-<!--		<dependency>
-			<groupId>fr.insee.kraftwerk</groupId>
-			<artifactId>kraftwerk-core</artifactId>
-			<version>${kraftwerk.version}</version>
-			<scope>test</scope>
-		</dependency>-->
 		<dependency>
 			<groupId>fr.insee.kraftwerk</groupId>
 			<artifactId>kraftwerk-api</artifactId>

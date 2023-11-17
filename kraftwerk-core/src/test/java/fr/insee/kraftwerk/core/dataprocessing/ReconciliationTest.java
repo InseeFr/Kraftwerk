@@ -20,7 +20,7 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 
-public class ReconciliationTest {
+class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
 	private List<KraftwerkError> errors;
@@ -70,14 +70,14 @@ public class ReconciliationTest {
 	Map<String, Dataset> testDatasets = Map.of("CAPI", capiDataset, "CAWI", cawiDataset, "PAPI", papiDataset);
 
 	@BeforeEach
-	public void initVtlBindings() {
+	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
 		errors = new ArrayList<>();
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = {"CAPI", "CAWI", "PAPI"})
-	public void applyReconciliation_singleMode(String dsName) {
+	void applyReconciliation_singleMode(String dsName) {
 		//
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
@@ -100,7 +100,7 @@ public class ReconciliationTest {
 	}
 
 	@Test
-	public void reconciliation_capiCawi() {
+	void reconciliation_capiCawi() {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAPI", "CAWI");
 		//
 		assertNotNull(multimodeDataset);
@@ -112,7 +112,7 @@ public class ReconciliationTest {
 	}
 
 	@Test
-	public void reconciliation_capiPapi() {
+	void reconciliation_capiPapi() {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAPI", "PAPI");
 		//
 		assertNotNull(multimodeDataset);
@@ -122,7 +122,7 @@ public class ReconciliationTest {
 	}
 
 	@Test
-	public void reconciliation_cawiPapi() {
+	void reconciliation_cawiPapi() {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAWI", "PAPI");
 		//
 		assertNotNull(multimodeDataset);
@@ -132,7 +132,7 @@ public class ReconciliationTest {
 	}
 
 	@Test
-	public void applyReconciliation_threeModes() {
+	void applyReconciliation_threeModes() {
 		vtlBindings.put("CAPI", cawiDataset);
 		vtlBindings.put("CAWI", capiDataset);
 		vtlBindings.put("PAPI", papiDataset);

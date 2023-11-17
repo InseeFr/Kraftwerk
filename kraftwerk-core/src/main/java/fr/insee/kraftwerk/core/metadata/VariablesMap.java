@@ -91,6 +91,13 @@ public class VariablesMap {
         }
         return groups.get(Constants.ROOT_GROUP_NAME);
     }
+    /** Return the reporting data group. */
+    public Group getReportingDataGroup() {
+        if (! groups.containsKey(Constants.REPORTING_DATA_GROUP_NAME)) {
+            log.debug("Reporting data group not in the variables map.");
+        }
+        return groups.get(Constants.REPORTING_DATA_GROUP_NAME);
+    }
     /** Return the name of all groups registered in the map, including the root group. */
     public List<String> getGroupNames() {
         return new ArrayList<>(groups.keySet());
@@ -262,4 +269,5 @@ public class VariablesMap {
                 .map(PaperUcq.class::cast)
                 .toList();
     }
+
 }

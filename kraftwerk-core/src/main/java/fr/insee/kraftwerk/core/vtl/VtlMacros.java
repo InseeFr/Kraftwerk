@@ -8,6 +8,10 @@ import java.util.StringJoiner;
  */
 public class VtlMacros {
 
+    private VtlMacros(){
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Return a string that is an enumeration of variables in the VTL
      * syntax from the given variable names set.

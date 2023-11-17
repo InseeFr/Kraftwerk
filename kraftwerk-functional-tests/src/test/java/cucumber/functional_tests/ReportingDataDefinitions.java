@@ -3,16 +3,10 @@ package cucumber.functional_tests;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
-import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +22,6 @@ import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
 import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
 import static fr.insee.kraftwerk.core.Constants.ROOT_IDENTIFIER_NAME;
-import static org.apache.tomcat.util.http.fileupload.FileUtils.deleteDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -61,6 +54,7 @@ public class ReportingDataDefinitions {
         // Compute expected header
         List<String> expectedHeaderList = new ArrayList<>();
         expectedHeaderList.add(ROOT_IDENTIFIER_NAME);
+        expectedHeaderList.add(Constants.REPORTING_DATA_GROUP_NAME);
         for(int i = 1; i < expectedFieldCount + 1; i++){
             // append attempt field
             expectedHeaderList.add(OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i);
@@ -103,6 +97,7 @@ public class ReportingDataDefinitions {
 
         // Get file content
         List<String[]> content = csvReader.readAll();
+        csvReader.close();
 
         // Get header
         String[] header = content.get(0);

@@ -19,6 +19,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class FileUtils {
 
+	private FileUtils(){
+		throw new IllegalStateException("Utility class");
+	}
 
 	private static final String ARCHIVE = "Archive";
 	
