@@ -7,6 +7,7 @@
 - New format for output : parquet
 - Exportation of reporting data variables into a separate table (Contact attempts only for now)
 - Functional tests module
+- Add Pairwise
 
 ## 1.4.2 - [2023-09-26]
 
