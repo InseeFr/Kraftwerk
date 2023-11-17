@@ -12,6 +12,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MetadataUtils {
 
+	private MetadataUtils(){
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
 		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
@@ -20,7 +24,7 @@ public class MetadataUtils {
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables= new VariablesMap();
+		VariablesMap variables = new VariablesMap();
 		try {
 			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
 		} catch (KraftwerkException e) {
@@ -44,6 +48,10 @@ public class MetadataUtils {
 				Variable varLien = new Variable("LIEN_"+k, variables.getGroup("BOUCLE_PRENOMS"), VariableType.INTEGER);
 				variables.putVariable(varLien);
 			}
+		}
+		// Step 3 : we add reporting data group if there is any reporting data
+		if(modeInputs.getReportingDataFile() != null){
+			variables.groups.put(Constants.REPORTING_DATA_GROUP_NAME, new Group(Constants.REPORTING_DATA_GROUP_NAME));
 		}
 		metadataVariables.put(dataMode, variables);
 	}

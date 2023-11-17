@@ -103,7 +103,7 @@ public class CsvTableWriter {
 		//We add the identifiers prior to the other variables
 		columns.add(Constants.ROOT_IDENTIFIER_NAME);
 		//Columns for loop identifier
-		if (!datasetName.equals(Constants.ROOT_GROUP_NAME) && !datasetName.equals(Constants.REPORTING_DATA_DATASET_NAME)){
+		if (!datasetName.equals(Constants.ROOT_GROUP_NAME)){
 			columns.add(datasetName);
 		}
 		//We add all variables found in specifications

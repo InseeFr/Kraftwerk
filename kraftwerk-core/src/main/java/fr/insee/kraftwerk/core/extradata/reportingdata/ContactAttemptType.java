@@ -28,8 +28,8 @@ public enum ContactAttemptType {
     valueToTextMapping = new HashMap<>();
     byte b;
     int i;
-    ContactAttemptType[] arrayOfContactAttemptType;
-    for (i = (arrayOfContactAttemptType = values()).length, b = 0; b < i; ) {
+    ContactAttemptType[] arrayOfContactAttemptType = values();
+    for (i = arrayOfContactAttemptType.length, b = 0; b < i; ) {
       ContactAttemptType s = arrayOfContactAttemptType[b];
       valueToTextMapping.put(s.key, s.value);
       b++;

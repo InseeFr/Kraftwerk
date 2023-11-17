@@ -66,7 +66,7 @@ public class ReportingDataUETest {
 	}
 
 	@Test
-	public void containsReportingDataUETest() {
+	void containsReportingDataUETest() {
 		ReportingData reportingData = new ReportingData();
 		List<ReportingDataUE> listReportingDataUE = new ArrayList<ReportingDataUE>();
 		listReportingDataUE.add(new ReportingDataUE("Report0001"));

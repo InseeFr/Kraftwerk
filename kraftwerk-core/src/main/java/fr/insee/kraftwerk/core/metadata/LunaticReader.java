@@ -23,6 +23,9 @@ public class LunaticReader {
 	private static final String BINDING_DEPENDENCIES = "bindingDependencies";
 	private static final String VARIABLES = "variables";
 
+	
+	private static final String EXCEPTION_MESSAGE = "Unable to read Lunatic questionnaire file: ";
+
 	private LunaticReader() {
 		throw new IllegalStateException("Utility class");
 	}
@@ -61,7 +64,7 @@ public class LunaticReader {
 			return calculatedVariables;
 
 		} catch (IOException e) {
-			log.error("Unable to read Lunatic questionnaire file: {}", lunaticFile);
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return new CalculatedVariables();
 		}
 	}
@@ -85,7 +88,7 @@ public class LunaticReader {
 					.filter(varToRead -> varToRead.endsWith(MISSING_SUFFIX) || varsEno.contains(varToRead)).toList();
 
 		} catch (IOException e) {
-			log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return Collections.emptyList();
 		}
 	}
@@ -107,7 +110,7 @@ public class LunaticReader {
 			return variables.stream().filter(variable -> variable.startsWith(FILTER_RESULT_PREFIX)).toList();
 
 		} catch (IOException e) {
-			log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return Collections.emptyList();
 		}
 	}
@@ -148,7 +151,7 @@ public class LunaticReader {
 					varName -> variablesMap.putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
 			return variablesMap;
 		} catch (IOException e) {
-			log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return null;
 		}
 	}
@@ -209,7 +212,7 @@ public class LunaticReader {
 			rootNode = JsonFileReader.read(lunaticFile);
 			return rootNode.get("id").asText();
 		} catch (IOException e) {
-			log.error("Unable to read Lunatic questionnaire file: " + lunaticFile);
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return null;
 		}
 	}

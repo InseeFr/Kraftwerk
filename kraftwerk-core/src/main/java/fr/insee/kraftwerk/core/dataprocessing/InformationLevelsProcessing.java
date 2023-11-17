@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -40,14 +39,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// Root dataset
 		StringBuilder rootInstructions = new StringBuilder();
-
-
-
-		// Exclude reporting data from root dataset
 		Set<String> rootVariableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
-		VariablesMap reportingDataVariablesMap = vtlBindings.getDatasetVariablesMap(Constants.REPORTING_DATA_DATASET_NAME);
-		Set<String> reportingDataVariableNames = reportingDataVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
-		rootVariableNames.removeAll(reportingDataVariableNames);
 
 		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
 		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s];",
@@ -66,7 +58,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			// First init the dataset using measure names, that are fully qualified name
 			List<String> groupVariableNames = new ArrayList<>(multimodeVariablesMap.getGroupVariableNames(groupName));
 			List<String> groupMeasureNames = groupVariableNames.stream()
-					.map(multimodeVariablesMap::getFullyQualifiedName).collect(Collectors.toList());
+					.map(multimodeVariablesMap::getFullyQualifiedName).toList();
 
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
