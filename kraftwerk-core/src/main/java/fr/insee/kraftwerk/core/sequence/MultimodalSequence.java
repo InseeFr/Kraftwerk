@@ -1,14 +1,8 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.util.List;
-import java.util.Map;
-
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
-import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.*;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.FileUtils;
@@ -16,11 +10,14 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 @NoArgsConstructor
 public class MultimodalSequence {
 	
 	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
-		String multimodeDatasetName = userInputs.getMultimodeDatasetName();
+		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);

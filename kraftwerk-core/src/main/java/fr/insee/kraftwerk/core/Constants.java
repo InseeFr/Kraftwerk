@@ -46,6 +46,7 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
+	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";

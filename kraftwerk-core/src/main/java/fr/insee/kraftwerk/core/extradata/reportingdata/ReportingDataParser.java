@@ -17,7 +17,7 @@ public abstract class ReportingDataParser {
 	private int maxStates = 0;
 	private int maxAttempts = 0;
 
-	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
+	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData){
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
 		createReportingVariables(surveyRawData);

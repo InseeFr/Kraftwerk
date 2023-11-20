@@ -1,5 +1,12 @@
 package fr.insee.kraftwerk.core.utils;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.util.FileSystemUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,13 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import org.springframework.util.FileSystemUtils;
-
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class FileUtils {
@@ -68,17 +68,17 @@ public class FileUtils {
 		}
 	}
 
-	public static void archiveInputFiles(UserInputs userInputs) throws KraftwerkException {
+	public static void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException {
 		//
-		Path inputFolder = userInputs.getInputDirectory();
+		Path inputFolder = userInputsFile.getInputDirectory();
 		String[] directories = inputFolder.toString().split(Pattern.quote(File.separator));
 		String campaignName = directories[directories.length - 1];
 
 		createArchiveDirectoryIfNotExists(inputFolder);
 
 		//
-		for (String mode : userInputs.getModes()) {
-			ModeInputs modeInputs = userInputs.getModeInputs(mode);
+		for (String mode : userInputsFile.getModes()) {
+			ModeInputs modeInputs = userInputsFile.getModeInputs(mode);
 			archiveData(inputFolder, campaignName, modeInputs);
 			archiveParadata(inputFolder, campaignName, modeInputs);
 			archiveReportingData(inputFolder, campaignName, modeInputs);

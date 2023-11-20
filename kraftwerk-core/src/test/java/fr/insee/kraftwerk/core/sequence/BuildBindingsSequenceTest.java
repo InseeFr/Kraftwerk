@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -28,7 +28,7 @@ class BuildBindingsSequenceTest {
 	@Test
 	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
 		//GIVEN
-		UserInputs userInputs = new UserInputs(
+		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory);
 		String dataMode = "CAPI";
@@ -40,7 +40,7 @@ class BuildBindingsSequenceTest {
 		Map<String,VariablesMap> metadataVariables = new HashMap<>();
 		
 		//THEN
-		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDdi));
+		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi));
 		
 	}
 	
@@ -48,7 +48,7 @@ class BuildBindingsSequenceTest {
 	@CsvSource({"true,true", "true,false", "false,false", "false,true"})
 	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException {
 		//GIVEN
-		UserInputs userInputs = new UserInputs(
+		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory);
 		String dataMode = "CAPI";
@@ -62,7 +62,7 @@ class BuildBindingsSequenceTest {
 		
 		//WHEN
 		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDdi));
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi));
 	}
 	
 	

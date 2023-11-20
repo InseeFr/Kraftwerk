@@ -17,10 +17,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WriterSequence {
 
-	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, String multimodeDatasetNames, Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
+	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
 		Path outDirectory = FileUtils.transformToOut(inDirectory);
 		/* Step 4.1 : write csv output tables */
-		OutputFiles outputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), multimodeDatasetNames);
+		OutputFiles outputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()));
 		outputFiles.writeOutputTables(metadataVariables);
 
 		/* Step 4.2 : write scripts to import csv tables in several languages */

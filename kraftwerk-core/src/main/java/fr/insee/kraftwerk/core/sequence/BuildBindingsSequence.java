@@ -10,7 +10,7 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
@@ -28,8 +28,8 @@ public class BuildBindingsSequence {
 		this.withAllReportingData = withAllReportingData;
 	}
 
-	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, boolean withDDI) throws NullException {
-		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
+	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, boolean withDDI) throws NullException {
+		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -41,7 +41,7 @@ public class BuildBindingsSequence {
 		if (withDDI) {
 			parser.parseSurveyData(modeInputs.getDataFile());
 		} else {
-			parser.parseSurveyDataWithoutDDI(modeInputs.getDataFile(),modeInputs.getLunaticFile());
+			parser.parseSurveyDataWithoutDDI(modeInputs.getDataFile(), modeInputs.getLunaticFile());
 		}
 
 		/* Step 2.2 : Get paradata for the survey */
