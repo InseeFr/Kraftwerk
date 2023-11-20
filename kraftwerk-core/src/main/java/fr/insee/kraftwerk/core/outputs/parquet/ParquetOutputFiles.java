@@ -78,6 +78,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	        GenericData genericData = GenericData.get();
 	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
+		    Preconditions.checkArgument(dataset == null , "Empty schema");
 		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
 		
 		    // need to add logicalTime Support
