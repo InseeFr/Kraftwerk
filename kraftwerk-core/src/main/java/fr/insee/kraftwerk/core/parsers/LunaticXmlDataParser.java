@@ -206,7 +206,7 @@ public class LunaticXmlDataParser extends DataParser {
 			boolean collected) {
 
 		if (!variables.hasVariable(variableName)) {
-			log.debug("Variable not define : {}", variableName);
+			log.debug("Variable not defined : {}", variableName);
 			return;
 		}
 		manageTcmLiens(variableName, answers, node);
@@ -229,8 +229,8 @@ public class LunaticXmlDataParser extends DataParser {
 	}
 
 	private void manageTcmLiens(String variableName, GroupInstance answers, Element node) {
-		if (variableName.equals("LIENS")) {
-			String groupName = "BOUCLE_PRENOMS";
+		if (variableName.equals(Constants.LIENS)) {
+			String groupName = Constants.BOUCLE_PRENOMS;
 			GroupData groupData = answers.getSubGroup(groupName);
 			Elements individualNodes = node.getChildElements();
 			
@@ -238,16 +238,16 @@ public class LunaticXmlDataParser extends DataParser {
 				Element individualNode = individualNodes.get(j);
 				Elements valueNodes = individualNode.getChildElements();
 
-				for (int k=1;k <21;k++) {
-					String value = "99";
+				for (int k=1;k <Constants.MAX_LINKS_ALLOWED;k++) {
+					String value = Constants.NO_PAIRWISE_VALUE;
 					if (k<=valueNodes.size()) { 
-						value="0";
+						value=Constants.SAME_AXIS_VALUE;
 						Element valueNode = valueNodes.get(k-1);
 						if (nodeExistsWithCompleteAttribute(valueNode)) {
 							value = valueNodes.get(k-1).getValue();
 						}
 					}
-					groupData.putValue(value, "LIEN_"+k, j);
+					groupData.putValue(value, Constants.LIEN+k, j);
 				}
 			}
 		}

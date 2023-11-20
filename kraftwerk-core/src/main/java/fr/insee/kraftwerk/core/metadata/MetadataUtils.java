@@ -12,6 +12,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MetadataUtils {
 
+
+
 	private MetadataUtils(){
 		throw new IllegalStateException("Utility class");
 	}
@@ -43,9 +45,9 @@ public class MetadataUtils {
 				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
 		}
-		if (variables.getVariable("LIENS") != null) {
-			for (int k=1;k<21;k++) {
-				Variable varLien = new Variable("LIEN_"+k, variables.getGroup("BOUCLE_PRENOMS"), VariableType.INTEGER);
+		if (variables.getVariable(Constants.LIENS) != null) {
+			for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
+				Variable varLien = new Variable(Constants.LIEN+k, variables.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
 				variables.putVariable(varLien);
 			}
 		}
