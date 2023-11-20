@@ -12,6 +12,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MetadataUtils {
 
+
+
 	private MetadataUtils(){
 		throw new IllegalStateException("Utility class");
 	}
@@ -41,6 +43,12 @@ public class MetadataUtils {
 			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputs.getLunaticFile());
 			for (String filterResult : filterResults) {
 				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
+			}
+		}
+		if (variables.getVariable(Constants.LIENS) != null) {
+			for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
+				Variable varLien = new Variable(Constants.LIEN+k, variables.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
+				variables.putVariable(varLien);
 			}
 		}
 		// Step 3 : we add reporting data group if there is any reporting data

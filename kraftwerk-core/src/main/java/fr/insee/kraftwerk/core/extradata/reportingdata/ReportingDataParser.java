@@ -7,8 +7,6 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.rawdata.GroupData;
-import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.DateUtils;

@@ -19,6 +19,7 @@ public class RImportScript extends ImportScript {
         StringBuilder script = new StringBuilder();
 
         //import libraries
+        script.append("install.packages(\"arrow\",type = \"binary\")").append(END_LINE);
         script.append("library(dplyr)").append(END_LINE);
         script.append("library(arrow)").append(END_LINE);
         script.append(END_LINE).append(END_LINE);
@@ -29,7 +30,7 @@ public class RImportScript extends ImportScript {
             
             
             // function call
-            script.append(String.format("%s <- as.data.frame(arrow::read_parquet(\"%s\")", tableName, tableScriptInfo.getFileName())).append(END_LINE);
+            script.append(String.format("%s <- as.data.frame(arrow::read_parquet(\"%s\"))", tableName, tableScriptInfo.getFileName())).append(END_LINE);
 
             script.append(END_LINE).append(END_LINE);
         }
