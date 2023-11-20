@@ -78,7 +78,6 @@ public class ParquetOutputFiles extends OutputFiles {
 	        GenericData genericData = GenericData.get();
 	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
-		    Preconditions.checkArgument(dataset == null , "Empty schema");
 		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
 		
 		    // need to add logicalTime Support
@@ -100,7 +99,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		            for (GenericData.Record recordData : dataset) {
 		                writer.write(recordData);
 		            }
-		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset.size());
+		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset == null ? 0 : dataset.size());
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
