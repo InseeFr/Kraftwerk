@@ -1,11 +1,10 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
@@ -23,7 +22,6 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -74,22 +72,13 @@ public class UnimodalSequence {
 		/* Step 2.5 : Apply standard mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
 				vtlBindings, variablesMap);
-		try { // TODO Find alternative to this try/catch
-			//getSystemResource to use core module path
-			InputStream vtlInputStream = ClassLoader.getSystemResourceAsStream("vtl/unimode/" + dataMode + ".vtl");
-			if(vtlInputStream != null) {
-				String vtlStandardInstructions = new String(vtlInputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-				TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
-						vtlGenerate);
-				VtlExecute vtlExecute = new VtlExecute();
-				if (!(vtlStandardInstructions.isEmpty() || vtlStandardInstructions.contentEquals(""))) {
-					vtlExecute.evalVtlScript(vtlStandardInstructions, vtlBindings, errors);
-				}
-			}
-		}catch (IOException e){
-			log.warn("Unimode standard VTL file not found !");
-		}
+		vtlGenerate = dataProcessing.applyVtlTransformations(
+				dataMode,
+				Path.of(Constants.VTL_FOLDER_PATH)
+						.resolve("unimode")
+						.resolve(dataMode+".vtl"),
+				errors);
+		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate);
 
 		/* Step 2.5b : Apply user specified mode-specific VTL transformations */
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);

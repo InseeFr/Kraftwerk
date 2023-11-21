@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import java.nio.file.Path;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
@@ -82,16 +83,16 @@ public class XMLReportingDataParser extends ReportingDataParser {
           reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
         }
 
-      if(surveyUnitElement.getFirstChildElement("identification") != null)
-        reportingDataUE.setIdentification(surveyUnitElement.getFirstChildElement("identification").getValue());
-      if(surveyUnitElement.getFirstChildElement("access")!= null)
-        reportingDataUE.setAccess(surveyUnitElement.getFirstChildElement("access").getValue());
-      if(surveyUnitElement.getFirstChildElement("situation") != null)
-        reportingDataUE.setSituation(surveyUnitElement.getFirstChildElement("situation").getValue());
-      if(surveyUnitElement.getFirstChildElement("category") != null)
-        reportingDataUE.setCategory(surveyUnitElement.getFirstChildElement("category").getValue());
-      if(surveyUnitElement.getFirstChildElement("occupant") != null)
-        reportingDataUE.setOccupant(surveyUnitElement.getFirstChildElement("occupant").getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+        reportingDataUE.setIdentification(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME)!= null)
+        reportingDataUE.setAccess(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+        reportingDataUE.setSituation(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+        reportingDataUE.setCategory(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+        reportingDataUE.setOccupant(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
 
       reportingData.addReportingDataUE(reportingDataUE);
     } 
