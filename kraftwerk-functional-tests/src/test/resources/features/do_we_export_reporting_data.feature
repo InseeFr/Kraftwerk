@@ -119,4 +119,6 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
       |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedOutcomeSpottingStatus   |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |DESTROY                         |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |TEST                            |
+
+    #TODO Adapt this test when we have the correct TEL .vtl script

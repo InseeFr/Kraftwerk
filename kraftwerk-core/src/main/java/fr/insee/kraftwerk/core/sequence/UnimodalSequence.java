@@ -1,9 +1,8 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -74,14 +74,20 @@ public class UnimodalSequence {
 		/* Step 2.5 : Apply standard mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
 				vtlBindings, variablesMap);
-		try {
+		try { // TODO Find alternative to this try/catch
 			//getSystemResource to use core module path
-			if(ClassLoader.getSystemResource("vtl/unimode/"+ dataMode + ".vtl") != null) {
-				vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, Paths.get(ClassLoader.getSystemResource("vtl/unimode/" + dataMode + ".vtl").toURI()), errors);
+			InputStream vtlInputStream = ClassLoader.getSystemResourceAsStream("vtl/unimode/" + dataMode + ".vtl");
+			if(vtlInputStream != null) {
+				String vtlStandardInstructions = new String(vtlInputStream.readAllBytes(), StandardCharsets.UTF_8);
+
 				TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
 						vtlGenerate);
+				VtlExecute vtlExecute = new VtlExecute();
+				if (!(vtlStandardInstructions.isEmpty() || vtlStandardInstructions.contentEquals(""))) {
+					vtlExecute.evalVtlScript(vtlStandardInstructions, vtlBindings, errors);
+				}
 			}
-		}catch (URISyntaxException e){  // TODO Find alternative to this try/catch
+		}catch (IOException e){
 			log.warn("Unimode standard VTL file not found !");
 		}
 

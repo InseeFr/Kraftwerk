@@ -115,6 +115,7 @@ public abstract class ReportingDataParser {
 			surveyRawData.addQuestionnaire(questionnaire);
 			log.info("Missing questionnaire for reporting data: {}.", reportingDataUE.getIdentifier() );
 		}
+		//TODO Find another way than Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier() to fill the identifier field
 		if (reportingDataUE.getInterviewerId() != null)
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.INTERVIEWER_ID_NAME, reportingDataUE.getInterviewerId());
 		if (reportingDataUE.getOrganizationUnitId() != null)
