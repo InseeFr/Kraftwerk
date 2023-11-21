@@ -83,7 +83,7 @@ public class ParquetUtils {
 		Map<String, Set<String>> metadonnees = new HashMap<>();
 		int idRowGroup = 0;
 		for (BlockMetaData rowgroup : reader.getRowGroups()) {
-			metadonnees = extractColumnMetadataFromRowGroup(metadonnees, rowgroup, idRowGroup);
+			extractColumnMetadataFromRowGroup(metadonnees, rowgroup, idRowGroup);
 			idRowGroup++;
 		}
 		for (Entry<String, Set<String>> variable : metadonnees.entrySet()) {
@@ -91,7 +91,7 @@ public class ParquetUtils {
 		}
 	}
 
-	private static Map<String, Set<String>> extractColumnMetadataFromRowGroup(Map<String, Set<String>> metadata,
+	private static void extractColumnMetadataFromRowGroup(Map<String, Set<String>> metadata,
 			BlockMetaData rowgroup, int idRowGroup) {
 		for (ColumnChunkMetaData column : rowgroup.getColumns()) {
 			String key = column.getPath().toString();
@@ -133,7 +133,6 @@ public class ParquetUtils {
 			rowGroups.add(sb.toString());
 			metadata.put(key, rowGroups);
 		}
-		return metadata;
 	}
 
 	private static void ecrireMetadonneesColonne(Entry<String, Set<String>> variable) {

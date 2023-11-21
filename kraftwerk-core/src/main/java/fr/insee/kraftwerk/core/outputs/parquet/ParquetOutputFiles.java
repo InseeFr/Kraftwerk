@@ -79,11 +79,19 @@ public class ParquetOutputFiles extends OutputFiles {
 	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
 		    Preconditions.checkArgument(dataset != null && dataset.size() ==   getVtlBindings().getDataset(datasetName).getDataPoints().size(), "Invalid schemas");
+		
+		    // need to add logicalTime Support
+		    GenericData timeSupport = new GenericData();
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.DateConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
+		    timeSupport.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
+		    
 		        try (ParquetWriter<GenericData.Record> writer = AvroParquetWriter
 		                .<GenericData.Record>builder(parquetOutFile)
 		                .withSchema(schema)
 		                .withDataModel(genericData)
-		           //     .withDataModel(dataset)
+		                .withDataModel(timeSupport)
 		                .withConf(new Configuration())
 		                .withCompressionCodec(CompressionCodecName.SNAPPY)
 		                .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
@@ -91,7 +99,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		            for (GenericData.Record recordData : dataset) {
 		                writer.write(recordData);
 		            }
-		            log.info("Parquet datasize for {} is : {}",datasetName,writer.getDataSize());
+		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset == null ? 0 : dataset.size());
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
@@ -128,15 +136,12 @@ public class ParquetOutputFiles extends OutputFiles {
     	FieldAssembler<Schema> builder = SchemaBuilder.record("survey").namespace("any.data").fields();
 
         for (Component component : structure.values()) {
-//	        builder.name(component.getName()).type().nullable().stringType().stringDefault("");//.stringType().noDefault();
-
         	
     		Class<?> type = component.getType();
     		if (String.class.equals(type)) {
     	        builder.name(component.getName()).type().nullable().stringType().noDefault();
 
     	        } else if (Long.class.equals(type)) {
-        	       // builder.name(component.getRole().name()).type().unionOf().nullBuilder().endNull().and().longType().endUnion().noDefault();
         	        builder.name(component.getName()).type().nullable().longType().noDefault();
     	        } else if (Double.class.equals(type)) {
         	        builder.name(component.getName()).type().nullable().doubleType().noDefault();

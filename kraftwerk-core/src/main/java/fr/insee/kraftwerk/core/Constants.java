@@ -95,6 +95,15 @@ public final class Constants {
 	public static final String CATEGORY_NAME = "category";
 	public static final String OCCUPANT_NAME = "occupant";
 	
+	// ------ Pairwise variables
+	
+	public static final int MAX_LINKS_ALLOWED = 21;
+	public static final String BOUCLE_PRENOMS = "BOUCLE_PRENOMS";
+	public static final String LIEN = "LIEN_";
+	public static final String LIENS = "LIENS";
+	public static final String SAME_AXIS_VALUE = "0";
+	public static final String NO_PAIRWISE_VALUE = "99";
+	
 	// ---------- Functions
 	// ---------- Get a file
 	/**
