@@ -22,6 +22,12 @@
 
 	<dependencies>
 
+		<!-- DDI library -->
+		<dependency>
+			<groupId>io.github.nsenave</groupId>
+			<artifactId>ddi-lifecycle</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
 		<!-- XML libraries -->
 		<!-- XML-XSLT with Saxon -->
 		<dependency>

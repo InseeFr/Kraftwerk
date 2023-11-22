@@ -35,6 +35,19 @@
 		<module>kraftwerk-api</module>
         <module>kraftwerk-functional-tests</module>
     </modules>
+	<repositories>
+		<!-- Maven central snapshot repository -->
+		<repository>
+			<id>oss.sonatype.org-snapshot</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<dependencies>
 		<!-- Spring -->
 		<dependency>
