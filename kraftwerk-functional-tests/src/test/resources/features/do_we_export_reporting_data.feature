@@ -109,6 +109,7 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
+    And We have test standard vtl scripts
     Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the OUTCOME_SPOTTING field
 
     Examples:
