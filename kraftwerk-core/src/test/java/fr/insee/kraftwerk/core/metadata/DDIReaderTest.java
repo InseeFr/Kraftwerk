@@ -22,14 +22,6 @@ class DDIReaderTest {
 	static final String DDI_SIMPSONS_V2 = "ddi-simpsons-v2.xml";
 	static final String DDI_VQS_WEB = "vqs-2021-x00-xforms-ddi.xml";
 	static final String DDI_VQS_PAP = "vqs-2021-x00-fo-ddi.xml";
-	static final String DDI_TIC_WEB = "tic-2021-a00-xforms-ddi.xml";
-	static final String DDI_TIC_PAP = "tic-2021-a00-fo-ddi.xml";
-	static final String DDI_LOG_T01 = "S1logement13juil_ddi.xml";
-	static final String DDI_LOG_X01 = "ddi-log-2021-x01.xml";
-	static final String DDI_LOG_X12 = "ddi-log-2021-x12-web.xml";
-	static final String DDI_LOG_X21 = "ddi-log-2021-x21-web.xml";
-	static final String DDI_LOG_X22 = "S2_WEB.xml";
-
 	@Test
 	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
 
