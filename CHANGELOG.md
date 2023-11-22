@@ -7,7 +7,7 @@
 - New format for output : parquet
 - Exportation of reporting data variables into a separate table
 - Functional tests module
-- Add standard unimode VTL script executed before user script(s)
+- Added possibility to insert standard VTL scripts before user script(s)
 - Add Pairwise
 
 ## 1.4.2 - [2023-09-26]

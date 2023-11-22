@@ -10,6 +10,14 @@ Feature: Do we apply all standard vtl scripts ?
     Examples:
       | Directory               | ColumnName            | ExpectedContent     |
       | SAMPLETEST-DATAONLY-v1  | TESTVTLFAF            | TESTFAF             |
-      | SAMPLETEST-DATAONLY-v1  | TESTVTLRECONCILIATION | TESTRECONCILIATION  |
       | SAMPLETEST-DATAONLY-v1  | TESTVTLMULTIMODE      | TESTMULTIMODE       |
       | SAMPLETEST-DATAONLY-v1  | TESTVTLINFOLEVEL      | TESTINFOLEVEL       |
+
+  Scenario Outline: Do we apply standard script without creating _keep tables
+    Given Step 0 : We have some survey in directory "<Directory>"
+    And We have test standard vtl scripts
+    When Step 1 : We launch main service
+    Then we shouldn't have any _keep file in "<Directory>" output directory
+    Examples:
+      | Directory |
+      | SAMPLETEST-DATAONLY-v1  |
