@@ -1,18 +1,16 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @Log4j2
 public class MetadataUtils {
-
-
 
 	private MetadataUtils(){
 		throw new IllegalStateException("Utility class");
@@ -28,7 +26,7 @@ public class MetadataUtils {
 		// Step 1 : we add the variables read in the DDI
 		VariablesMap variables = new VariablesMap();
 		try {
-			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+			variables = new XsltDDIReader().getVariablesFromDDI(modeInputs.getDdiUrl());
 		} catch (KraftwerkException e) {
 			log.error(e.getMessage());
 		}

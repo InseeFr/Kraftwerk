@@ -1,18 +1,5 @@
 package cucumber.functional_tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cucumber.TestConstants;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -20,9 +7,9 @@ import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.metadata.LunaticReader;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.XsltDDIReader;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -35,6 +22,13 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // calculated_processing.feature
 public class CalculatedProcessingDefinition {
@@ -68,7 +62,7 @@ public class CalculatedProcessingDefinition {
         this.campaignName = campaignName;
         this.dataMode = dataMode;
         //
-        variablesMap = DDIReader.getVariablesFromDDI(
+        variablesMap = new XsltDDIReader().getVariablesFromDDI(
                 Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
         //
         SurveyRawData data = new SurveyRawData();

@@ -1,18 +1,15 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.MalformedURLException;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class DDIReaderTest {
 
@@ -22,8 +19,17 @@ class DDIReaderTest {
 	static final String DDI_SIMPSONS_V2 = "ddi-simpsons-v2.xml";
 	static final String DDI_VQS_WEB = "vqs-2021-x00-xforms-ddi.xml";
 	static final String DDI_VQS_PAP = "vqs-2021-x00-fo-ddi.xml";
-	@Test
-	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
+
+	private static Stream<Arguments> provideDDIReaders() {
+		return Stream.of(
+				Arguments.of(new XsltDDIReader())//,
+				//Arguments.of(new JavaDDIReader()) // (work in progress)
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("provideDDIReaders")
+	void readSimpsonsV1Variables(DDIReader ddiReader) throws Exception {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -35,7 +41,7 @@ class DDIReaderTest {
 				"PERCENTAGE_EXPENSES11", "PERCENTAGE_EXPENSES101", "CLOWNING11", "CLOWNING42", "TRAVEL11", "TRAVEL46",
 				"SURVEY_COMMENT");
 
-		VariablesMap simpsonsVariables = DDIReader
+		VariablesMap simpsonsVariables = ddiReader
 				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1));
 
 		//
@@ -56,8 +62,9 @@ class DDIReaderTest {
 				simpsonsVariables.getVariable("FAVOURITE_CHARACTERS102").getGroup().getName());
 	}
 
-	@Test
-	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
+	@ParameterizedTest
+	@MethodSource("provideDDIReaders")
+	void readSimpsonsV2Variables(DDIReader ddiReader) throws Exception {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -73,7 +80,7 @@ class DDIReaderTest {
 				"LAST_FOOD_SHOPPING813CL", "CLOWNING11", "CLOWNING42", "TRAVEL11", "TRAVEL46", "FEELCHAREV1",
 				"FEELCHAREV4", "LEAVDURATION11", "LEAVDURATION52", "NB_CHAR", "SURVEY_COMMENT");
 
-		VariablesMap simpsonsVariables = DDIReader
+		VariablesMap simpsonsVariables = ddiReader
 				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2));
 
 		//
@@ -94,14 +101,15 @@ class DDIReaderTest {
 		assertEquals("Loop1", simpsonsVariables.getVariable("NAME_CHAR").getGroup().getName());
 	}
 
-	@Test
-	void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
+	@ParameterizedTest
+	@MethodSource("provideDDIReaders")
+	void readVqsWebVariables(DDIReader ddiReader) throws Exception {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
 				"RESIDM", "NHAB");
 
-		VariablesMap vqsVariables = DDIReader
+		VariablesMap vqsVariables = ddiReader
 				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB));
 
 		//
@@ -135,13 +143,14 @@ class DDIReaderTest {
 		assertFalse(vqsVariables.getVariable("PRENOM") instanceof UcqVariable);
 	}
 
-	@Test
-	void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
+	@ParameterizedTest
+	@MethodSource("provideDDIReaders")
+	void readVqsPapVariables(DDIReader ddiReader) throws Exception {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");
 
-		VariablesMap vqsVariables = DDIReader
+		VariablesMap vqsVariables = ddiReader
 				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP));
 
 		//

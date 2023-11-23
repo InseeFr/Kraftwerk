@@ -1,11 +1,5 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
@@ -13,7 +7,7 @@ import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
+import fr.insee.kraftwerk.core.metadata.XsltDDIReader;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -23,6 +17,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.extern.log4j.Log4j2;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 public class ParadataDefinitions {
@@ -46,7 +46,7 @@ public class ParadataDefinitions {
 		// parse data
 		data = new SurveyRawData();
 		data.setDataMode(modeInputs.getDataMode());
-		data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
+		data.setVariablesMap(new XsltDDIReader().getVariablesFromDDI(modeInputs.getDdiUrl()));
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
 		parser.parseSurveyData(modeInputs.getDataFile());
 		// get paradata folder

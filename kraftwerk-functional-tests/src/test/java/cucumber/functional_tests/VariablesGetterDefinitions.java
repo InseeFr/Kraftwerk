@@ -1,17 +1,17 @@
 package cucumber.functional_tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.XsltDDIReader;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // Used in do_we_get_variables
 public class VariablesGetterDefinitions {
@@ -29,7 +29,7 @@ public class VariablesGetterDefinitions {
 
     @When("I try to collect the variables's infos")
     public void collect_variables() throws KraftwerkException {
-    	variablesMap = DDIReader.getVariablesFromDDI(linkDDI);
+    	variablesMap = new XsltDDIReader().getVariablesFromDDI(linkDDI);
     }
 
     @Then("The variables I try to count should answer {int} and have {string} in it")
