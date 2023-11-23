@@ -28,6 +28,8 @@ public class ParaDataUE {
 	private List<Session> sessions = new ArrayList<>();
 	@Getter
 	private List<Orchestrator> orchestrators = new ArrayList<>();
+	@Getter
+	private long collectionDateTimeStamp;
 
 	public List<ParadataVariable> getParadataVariable(String variableName) {
 		return this.paraDataVariables.get(variableName);
@@ -209,4 +211,14 @@ public class ParaDataUE {
 		return session;
 	}
 
+	/**
+	 * Gets the validation timestamp from events and put it into the collectionDateTimeStamp
+	 * @param validationParadataObjectId idParadataObject considered as validation event
+	 */
+	public void setCollectionDateTimeStamp(String validationParadataObjectId) {
+		for(Event event : this.events){
+			if(event.getIdParadataObject().equals(validationParadataObjectId))
+				this.collectionDateTimeStamp = event.getTimestamp();
+		}
+	}
 }

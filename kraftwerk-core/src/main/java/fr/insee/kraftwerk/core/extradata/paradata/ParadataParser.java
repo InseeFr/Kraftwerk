@@ -56,6 +56,7 @@ public class ParadataParser {
 						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
 						listParaDataUE.add(paraDataUE);
 					}
+					paraDataUE.setCollectionDateTimeStamp("agree-sending-modal-button-orchestrator-collect");
 				}
 				paradata.setListParadataUE(listParaDataUE);
 			} catch (Exception e) {
@@ -188,6 +189,8 @@ public class ParadataParser {
 				VariableType.INTEGER, "3.");
 		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3.");
+		Variable variableDateCollecte = new Variable(Constants.COLLECTION_DATE_NAME, variablesMap.getRootGroup(),
+				VariableType.STRING, "3.");
 		
 	//	Add variables to map : some variables are calculated but not used (variableDuree,variableDureeBrute, variableNbOrch)
 		variablesMap.putVariable(variableDureeSession);
@@ -220,6 +223,7 @@ public class ParadataParser {
 				questionnaire.getAnswers().putValue(variableEnd.getName(), paraDataUE.getVariableEnd());
 				questionnaire.getAnswers().putValue(variableNbOrch.getName(), Long.toString(paraDataUE.getOrchestrators().size()));
 				questionnaire.getAnswers().putValue(variableNbSessions.getName(), Long.toString(paraDataUE.getSessions().size()));
+				questionnaire.getAnswers().putValue(variableDateCollecte.getName(), Long.toString(paraDataUE.getCollectionDateTimeStamp()));
 				for (String variableName : paradataVariables) {
 					if (variableName.contentEquals("PRENOM")) {
 						questionnaire.getAnswers().putValue(Constants.PARADATA_VARIABLES_PREFIX + variableName,

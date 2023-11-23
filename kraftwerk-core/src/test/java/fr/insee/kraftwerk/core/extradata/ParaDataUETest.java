@@ -54,5 +54,38 @@ class ParaDataUETest {
 		assertEquals("A", sortedList.get(2).getIdParadataObject());
 		assertEquals(2, sortedList.get(2).getTimestamp());
 	}
-	
+	@Test
+	void setCollectionDateTest(){
+		//Given
+		Event e1 = new Event("s1");
+		e1.setIdParadataObject("A");
+		e1.setTimestamp(1);
+
+		Event e2 = new Event("s1");
+		e2.setIdParadataObject("A");
+		e2.setTimestamp(2);
+
+		Event e3 = new Event("s1");
+		e3.setIdParadataObject("B");
+		e3.setTimestamp(3);
+
+		Event e4 = new Event("s1");
+		e4.setIdParadataObject("V");
+		e4.setTimestamp(4);
+
+
+		List<Event> events = new ArrayList<>();
+		events.add(e3);
+		events.add(e1);
+		events.add(e2);
+		events.add(e4);
+
+		//When
+		paraDataUE.setEvents(events);
+		paraDataUE.setCollectionDateTimeStamp("V");
+
+		//Then
+		assertEquals(4,paraDataUE.getCollectionDateTimeStamp());
+	}
+
 }
