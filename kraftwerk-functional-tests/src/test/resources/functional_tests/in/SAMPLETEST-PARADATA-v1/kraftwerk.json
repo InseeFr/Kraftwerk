@@ -1,0 +1,25 @@
+{
+  "campaign": "SAMPLETEST-PARADATA-v1",  
+  
+  "survey_data": [
+    {
+      "data_mode": "WEB",
+	  "data_file": "reponse-platine",
+	  "DDI_file": "ddi-SAMPLETEST-PARADATA-v1.xml",
+	  "lunatic_file": "questionnaire_web.json",
+	  "data_format": "LUNATIC_XML",
+	  "paradata_folder": "paradata-platine",
+	  "reporting_data_file": "",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}
