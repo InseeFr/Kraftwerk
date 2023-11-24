@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import java.nio.file.Path;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
@@ -80,7 +81,19 @@ public class XMLReportingDataParser extends ReportingDataParser {
           String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
           String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
           reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
-        }  
+        }
+
+      if(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+        reportingDataUE.setIdentification(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME)!= null)
+        reportingDataUE.setAccess(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+        reportingDataUE.setSituation(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+        reportingDataUE.setCategory(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+      if(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+        reportingDataUE.setOccupant(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+
       reportingData.addReportingDataUE(reportingDataUE);
     } 
     integrateReportingDataIntoUE(data, reportingData, withAllReportingData);

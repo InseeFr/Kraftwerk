@@ -69,6 +69,7 @@ public final class Constants {
 
 
 	// ----- Reporting Variables Names
+	public static final String REPORTING_DATA_PREFIX_NAME = "Report_";
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
 	  
@@ -90,6 +91,11 @@ public final class Constants {
 	public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
 	public static final String LAST_ATTEMPT_DATE = "LAST_ATTEMPT_DATE";
 	public static final String OUTCOME_DATE = "OUTCOME_DATE";
+	public static final String IDENTIFICATION_NAME = "identification";
+	public static final String ACCESS_NAME = "access";
+	public static final String SITUATION_NAME = "situation";
+	public static final String CATEGORY_NAME = "category";
+	public static final String OCCUPANT_NAME = "occupant";
 	
 	// ------ Pairwise variables
 	
