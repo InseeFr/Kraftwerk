@@ -33,6 +33,7 @@ public class ReportingDataDefinitions {
     Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
     static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
     Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
+
     private static final String[] reportingDataFields = {
             Constants.INTERVIEWER_ID_NAME,
             Constants.ORGANIZATION_UNIT_ID_NAME,
