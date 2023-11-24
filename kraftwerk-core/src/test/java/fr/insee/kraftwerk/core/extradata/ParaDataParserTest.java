@@ -87,6 +87,9 @@ class ParaDataParserTest {
 		assertEquals(2, paradata.getParadataUE("PL1100000101").getOrchestrators().size());
 		assertEquals(134671, paradata.getParadataUE("PL1100000101").createLengthOrchestratorsVariable());
 
+		//COLLECTION_DATE
+		assertEquals("1645807741929", Long.valueOf(paradata.getParadataUE("PL1100000101").getSurveyValidationDateTimeStamp()).toString());
+
 		
 		//SESSIONS
 		assertEquals(5, paradata.getParadataUE("RR100144").getSessions().size());
@@ -95,6 +98,9 @@ class ParaDataParserTest {
 		//ORCHESTRATORS
 		assertEquals(6, paradata.getParadataUE("RR100144").getOrchestrators().size());
 		assertEquals(2577505436L, paradata.getParadataUE("RR100144").createLengthOrchestratorsVariable());
+
+		//COLLECTION_DATE
+		assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
 
 	}
 	

@@ -64,6 +64,12 @@ public final class Constants {
 	public static final String NUMBER_ORCHESTRATORS_NAME = "NB_ORCHESTRATORS";
 	public static final String NUMBER_SESSIONS_NAME = "NB_SESSIONS";
 	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
+	public static final String PARADATA_TIMESTAMP_SUFFIX = "_LONG";
+	public static final String SURVEY_VALIDATION_DATE_NAME = "DATE_COLLECTE";
+
+	// ----- Paradata event name
+	public static final String PARADATA_SURVEY_VALIDATION_EVENT_NAME = "agree-sending-modal-button-orchestrator-collect";
+
 
 
 	// ----- Reporting Variables Names
