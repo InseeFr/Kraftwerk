@@ -56,13 +56,6 @@ public class CalculatedProcessingDefinition {
         return Arrays.asList(arg.split(",\\s?"));
     }
 
-    @Before
-    public void setUpCampaignPacks() {
-        //Sample test campaign (with reporting data)
-        campaignPacks.put(TestConstants.SAMPLETEST_REPORTINGDATA_CAMPAIGN_NAME, new HashMap<>());
-        //TODO Put other sample test campaigns once they are ready
-    }
-
     @Given("I read data from campaign {string}, mode {string}")
     public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException {
         this.campaignName = campaignName;

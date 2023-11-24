@@ -78,5 +78,12 @@ public class ParadataDefinitions {
 		
 
 	}
-	
+
+	@Then("For UE {string} the collection date should be {string}")
+	public void check_collection_date(String identifier, String expectedCollectionDate) {
+		QuestionnaireData questionnaire = data.getQuestionnaires().stream().filter(
+						questionnaireToSearch -> identifier.equals(questionnaireToSearch.getIdentifier()))
+				.findAny().orElse(null);
+		assertEquals(expectedCollectionDate,questionnaire.getAnswers().getValue(Constants.COLLECTION_DATE_NAME));
+	}
 }

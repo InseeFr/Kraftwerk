@@ -2,10 +2,13 @@ package fr.insee.kraftwerk.core.extradata.paradata;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
@@ -51,12 +54,12 @@ public class ParadataParser {
 					paraDataUE.setFilepath(fileParaDataPath);
 					parseParadataUE(paraDataUE, surveyRawData);
 					paraDataUE.sortEvents();
+					paraDataUE.setCollectionDateTimeStamp("agree-sending-modal-button-orchestrator-collect");
 					if (paraDataUE.getEvents().size() > 2) {
 						paraDataUE.createOrchestratorsAndSessions();
 						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
 						listParaDataUE.add(paraDataUE);
 					}
-					paraDataUE.setCollectionDateTimeStamp("agree-sending-modal-button-orchestrator-collect");
 				}
 				paradata.setListParadataUE(listParaDataUE);
 			} catch (Exception e) {
@@ -167,7 +170,7 @@ public class ParadataParser {
 	/**
 	 * Save paradata information in a variable hardcoded in the dataset
 	 *
-	 * @param paradataUE    the paradata
+	 * @param paraDataUE    the paradata
 	 * @param surveyRawData dataset where the paradata will be saved
 	 */
 	private void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) {
@@ -175,11 +178,11 @@ public class ParadataParser {
 		Set<String> paradataVariables = paraDataUE.getParaDataVariables().keySet();
 		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
 				VariableType.STRING, "30");
-		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + "_LONG",
+		Variable variableDureeBrute = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX,
 				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
 		Variable variableDureeSession = new Variable(Constants.LENGTH_SESSIONS_NAME, variablesMap.getRootGroup(),
 				VariableType.STRING, "30");
-		Variable variableDureeSessionBrute = new Variable(Constants.LENGTH_SESSIONS_NAME + "_LONG",
+		Variable variableDureeSessionBrute = new Variable(Constants.LENGTH_SESSIONS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX,
 				variablesMap.getRootGroup(), VariableType.INTEGER, "20.");
 		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "20.");
@@ -189,6 +192,8 @@ public class ParadataParser {
 				VariableType.INTEGER, "3.");
 		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, variablesMap.getRootGroup(),
 				VariableType.INTEGER, "3.");
+		Variable variableDateCollecteBrute = new Variable(Constants.COLLECTION_DATE_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX, variablesMap.getRootGroup(),
+				VariableType.STRING, "3.");
 		Variable variableDateCollecte = new Variable(Constants.COLLECTION_DATE_NAME, variablesMap.getRootGroup(),
 				VariableType.STRING, "3.");
 		
@@ -198,6 +203,8 @@ public class ParadataParser {
 		variablesMap.putVariable(variableNbSessions);
 		variablesMap.putVariable(variableStart);
 		variablesMap.putVariable(variableEnd);
+		variablesMap.putVariable(variableDateCollecte);
+		variablesMap.putVariable(variableDateCollecteBrute);
 		for (String variableName : paradataVariables) {
 			if (variableName.contentEquals("PRENOM")) {
 				Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName,
@@ -223,7 +230,9 @@ public class ParadataParser {
 				questionnaire.getAnswers().putValue(variableEnd.getName(), paraDataUE.getVariableEnd());
 				questionnaire.getAnswers().putValue(variableNbOrch.getName(), Long.toString(paraDataUE.getOrchestrators().size()));
 				questionnaire.getAnswers().putValue(variableNbSessions.getName(), Long.toString(paraDataUE.getSessions().size()));
-				questionnaire.getAnswers().putValue(variableDateCollecte.getName(), Long.toString(paraDataUE.getCollectionDateTimeStamp()));
+				questionnaire.getAnswers().putValue(variableDateCollecte.getName(),
+						LocalDateTime.ofInstant(Instant.ofEpochMilli(paraDataUE.getCollectionDateTimeStamp()),TimeZone.getDefault().toZoneId()).toString());
+				questionnaire.getAnswers().putValue(variableDateCollecteBrute.getName(), Long.toString(paraDataUE.getCollectionDateTimeStamp()));
 				for (String variableName : paradataVariables) {
 					if (variableName.contentEquals("PRENOM")) {
 						questionnaire.getAnswers().putValue(Constants.PARADATA_VARIABLES_PREFIX + variableName,
