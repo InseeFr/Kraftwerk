@@ -54,7 +54,7 @@ public class ParadataParser {
 					paraDataUE.setFilepath(fileParaDataPath);
 					parseParadataUE(paraDataUE, surveyRawData);
 					paraDataUE.sortEvents();
-					paraDataUE.setSurveyValidationDateTimeStamp("agree-sending-modal-button-orchestrator-collect");
+					paraDataUE.setSurveyValidationDateTimeStamp(Constants.PARADATA_SURVEY_VALIDATION_EVENT_NAME);
 					if (paraDataUE.getEvents().size() > 2) {
 						paraDataUE.createOrchestratorsAndSessions();
 						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
