@@ -80,10 +80,10 @@ public class ParadataDefinitions {
 	}
   
 	@Then("For UE {string} the survey validation date should be {string}")
-	public void check_collection_date(String identifier, String expectedSurveyValidationDate) {
+	public void check_collection_timestamp(String identifier, String expectedSurveyValidationTimestamp) {
 		QuestionnaireData questionnaire = data.getQuestionnaires().stream().filter(
 						questionnaireToSearch -> identifier.equals(questionnaireToSearch.getIdentifier()))
 				.findAny().orElse(null);
-		assertEquals(expectedSurveyValidationDate,questionnaire.getAnswers().getValue(Constants.SURVEY_VALIDATION_DATE_NAME));
+		assertEquals(expectedSurveyValidationTimestamp,questionnaire.getAnswers().getValue(Constants.SURVEY_VALIDATION_DATE_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX));
 	}
 }
