@@ -79,11 +79,11 @@ public class ParadataDefinitions {
 
 	}
   
-	@Then("For UE {string} the collection date should be {string}")
-	public void check_collection_date(String identifier, String expectedCollectionDate) {
+	@Then("For UE {string} the survey validation date should be {string}")
+	public void check_collection_date(String identifier, String expectedSurveyValidationDate) {
 		QuestionnaireData questionnaire = data.getQuestionnaires().stream().filter(
 						questionnaireToSearch -> identifier.equals(questionnaireToSearch.getIdentifier()))
 				.findAny().orElse(null);
-		assertEquals(expectedCollectionDate,questionnaire.getAnswers().getValue(Constants.COLLECTION_DATE_NAME));
+		assertEquals(expectedSurveyValidationDate,questionnaire.getAnswers().getValue(Constants.SURVEY_VALIDATION_DATE_NAME));
 	}
 }

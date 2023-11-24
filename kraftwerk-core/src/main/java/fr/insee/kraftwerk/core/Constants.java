@@ -65,7 +65,7 @@ public final class Constants {
 	public static final String NUMBER_SESSIONS_NAME = "NB_SESSIONS";
 	public static final String PARADATA_VARIABLES_PREFIX = "CHANGES_";
 	public static final String PARADATA_TIMESTAMP_SUFFIX = "_LONG";
-	public static final String COLLECTION_DATE_NAME = "DATE_COLLECTE";
+	public static final String SURVEY_VALIDATION_DATE_NAME = "DATE_COLLECTE";
 
 
 	// ----- Reporting Variables Names

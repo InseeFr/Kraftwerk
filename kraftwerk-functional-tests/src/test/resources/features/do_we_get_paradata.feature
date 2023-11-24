@@ -5,7 +5,7 @@ Feature: Do we get the paradata from the collected surveys ?
     Given We read data from input named "<Directory>"
     When I try to collect paradata's useful infos
     Then We check we have <nbLines> paradata lines in total, and that UE "<identifier>" has <nbOrchestrators> orchestrators during "<expectedDuration>" and <nbSessions> sessions during "<sessionTime>"
-    And For UE "<identifier>" the collection date should be "<expectedCollectionDate>"
+    And For UE "<identifier>" the survey validation date should be "<expectedCollectionDate>"
 
     Examples:
     # We try to get the paradata, and count the values

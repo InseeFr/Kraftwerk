@@ -82,10 +82,10 @@ class ParaDataUETest {
 
 		//When
 		paraDataUE.setEvents(events);
-		paraDataUE.setCollectionDateTimeStamp("V");
+		paraDataUE.setSurveyValidationDateTimeStamp("V");
 
 		//Then
-		assertEquals(4,paraDataUE.getCollectionDateTimeStamp());
+		assertEquals(4,paraDataUE.getSurveyValidationDateTimeStamp());
 	}
 
 }
