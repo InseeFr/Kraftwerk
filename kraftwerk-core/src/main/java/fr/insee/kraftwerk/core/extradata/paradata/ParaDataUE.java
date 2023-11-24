@@ -216,9 +216,12 @@ public class ParaDataUE {
 	 * @param validationParadataObjectId idParadataObject considered as validation event
 	 */
 	public void setCollectionDateTimeStamp(String validationParadataObjectId) {
+		long maxTimestamp = 0;
 		for(Event event : this.events){
-			if(event.getIdParadataObject().equals(validationParadataObjectId))
+			if(event.getIdParadataObject().equals(validationParadataObjectId) && event.getTimestamp() >= maxTimestamp) {
 				this.collectionDateTimeStamp = event.getTimestamp();
+				maxTimestamp = event.getTimestamp();
+			}
 		}
 	}
 }
