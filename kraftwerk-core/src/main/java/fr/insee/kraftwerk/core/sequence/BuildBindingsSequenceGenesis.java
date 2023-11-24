@@ -4,6 +4,9 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
+import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
@@ -12,6 +15,8 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +28,7 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, List<SurveyUnitUpdateLatest> surveyUnits) {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws NullException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -56,7 +61,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 
 //		/* Step 2.2 : Get paradata for the survey */
-//		parseParadata(modeInputs, data);
+		parseParadata(dataMode, data, inDirectory);
 //
 //		/* Step 2.3 : Get reportingData for the survey */
 //		parseReportingData(modeInputs, data);
@@ -66,14 +71,15 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-//	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
-//		Path paraDataFolder = modeInputs.getParadataFolder();
-//		if (paraDataFolder != null) {
-//			ParadataParser paraDataParser = new ParadataParser();
-//			Paradata paraData = new Paradata(paraDataFolder);
-//			paraDataParser.parseParadata(paraData, data);
-//		}
-//	}
+	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+		Path paraDataPath = inDirectory.resolve(dataMode).resolve(Constants.PARADATA_FOLDER);
+		File paradataFolder = paraDataPath.toFile();
+		if (paradataFolder.exists()) {
+			ParadataParser paraDataParser = new ParadataParser();
+			Paradata paraData = new Paradata(paraDataPath);
+			paraDataParser.parseParadata(paraData, data);
+		}
+	}
 //
 //	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
 //		Path reportingDataFile = modeInputs.getReportingDataFile();

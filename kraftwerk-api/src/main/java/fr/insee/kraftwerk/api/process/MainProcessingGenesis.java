@@ -81,7 +81,7 @@ public class MainProcessingGenesis {
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataVariables, suLatest);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataVariables, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		}
