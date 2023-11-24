@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.outputs.scripts;
+package fr.insee.kraftwerk.core.outputs;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,8 +18,8 @@ import fr.insee.vtl.model.Structured;
 public abstract class ImportScript {
 
 	private static final String STRING_LENGTH = "255";
-	final List<TableScriptInfo> tableScriptInfoList;
-	static final String END_LINE = "\n";
+	protected final List<TableScriptInfo> tableScriptInfoList;
+	protected static final String END_LINE = "\n";
 
 	/** @see TableScriptInfo */
 	protected ImportScript(List<TableScriptInfo> tableScriptInfoList) {
@@ -28,7 +28,7 @@ public abstract class ImportScript {
 
 	public abstract String generateScript();
 
-	static Map<String, Variable> getAllLength(Structured.DataStructure dataStructure,
+	public static Map<String, Variable> getAllLength(Structured.DataStructure dataStructure,
 			Map<String, VariablesMap> metadataVariables) {
 		Map<String, Variable> result = new LinkedHashMap<>();
 		// datastructure : noms complets

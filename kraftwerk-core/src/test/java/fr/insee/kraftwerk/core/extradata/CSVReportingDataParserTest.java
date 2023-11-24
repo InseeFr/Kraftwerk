@@ -16,7 +16,7 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 
-public class CSVReportingDataParserTest {
+class CSVReportingDataParserTest {
 
 	@Test
 	 void parseReportingDataTest() {
@@ -50,7 +50,7 @@ public class CSVReportingDataParserTest {
 	}
 
 	@Test
-	public void controlHeaderTest() {
+	void controlHeaderTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 		String[] validHeaderToControl = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot"};
 		String[] invalidHeaderWrongValues = new String [] {"statut", "dateInfo", "idUe2", "idContact", "nom", "prenom", "adresse2", "numeroDeLot2"};
@@ -62,7 +62,7 @@ public class CSVReportingDataParserTest {
 	}
 
 	@Test
-	public void convertDateTest() {
+	void convertDateTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 		assertEquals(1645007098, csvReportingDataParser.convertToTimestamp("16/02/2022 11:24:58"));
 		assertEquals(1566544132, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));

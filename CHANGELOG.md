@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 1.4.3 - not released yet
+
+### Added
+- New format for output : parquet
+- Export of reporting data variables into a separate table (Contact attempts only for now)
+- Functional tests module
+- Add Pairwise
+
 ## 1.4.2 - [2023-09-26]
 
 ### Changed

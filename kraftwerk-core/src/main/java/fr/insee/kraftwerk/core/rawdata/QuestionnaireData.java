@@ -76,12 +76,10 @@ public class QuestionnaireData {
         GroupData groupData;
         for (Pair<String, Object> instanceReference : instanceReferences) {
             String groupName = instanceReference.getLeft();
-            if (instanceReference.getRight() instanceof String) {
-                String groupId = (String) instanceReference.getRight();
+            if (instanceReference.getRight() instanceof String groupId) {
                 groupData = currentInstance.getSubGroup(groupName);
                 currentInstance = groupData.getInstance(groupId);
-            } else if (instanceReference.getRight() instanceof Integer) {
-                Integer instanceNumber = (Integer) instanceReference.getRight();
+            } else if (instanceReference.getRight() instanceof Integer instanceNumber) {
                 groupData = currentInstance.getSubGroup(groupName);
                 currentInstance = groupData.getInstance(instanceNumber);
             } else {

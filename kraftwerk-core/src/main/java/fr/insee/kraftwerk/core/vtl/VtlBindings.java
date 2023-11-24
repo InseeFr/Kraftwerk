@@ -124,27 +124,31 @@ public class VtlBindings extends SimpleBindings {
         Group rootGroup = variablesMap.getRootGroup();
 
         Dataset ds = this.getDataset(bindingName);
+        if (ds == null) {
+            log.warn("Dataset " + bindingName + " inexistant !");
+            return variablesMap;
+        }
         Structured.DataStructure dataStructure = ds.getDataStructure();
 
-        for(Entry<String, Component> fullyQualifiedEntry : dataStructure.entrySet()){
-        	
-        	String fullyQualifiedName = fullyQualifiedEntry.getKey();
+        for (Entry<String, Component> fullyQualifiedEntry : dataStructure.entrySet()) {
+
+            String fullyQualifiedName = fullyQualifiedEntry.getKey();
             Structured.Component datasetVariable = dataStructure.get(fullyQualifiedName);
 
-            switch (datasetVariable.getRole()){
+            switch (datasetVariable.getRole()) {
 
                 case IDENTIFIER:
                     /* Identifiers in VTL datasets are the root identifier or group identifiers,
-                    * these are not variables.
-                    * With the actual implementation, group structured is managed through the
-                    * putVariable(Variable variable) method from VariablesMap */
+                     * these are not variables.
+                     * With the actual implementation, group structured is managed through the
+                     * putVariable(Variable variable) method from VariablesMap */
                     log.info(String.format("\"%s\" identifier found in dataset under binding name \"%s\"",
                             fullyQualifiedName, bindingName));
                     break;
 
                 case MEASURE:
                     /* Measures in VTL datasets are the variable objects.
-                    * We will use these to create Variable and Group objects */
+                     * We will use these to create Variable and Group objects */
                     String[] decomposition = fullyQualifiedName.split("\\" + Constants.METADATA_SEPARATOR);
                     VariableType type = VariableType.getTypeFromJavaClass(datasetVariable.getType());
                     if (decomposition.length == 0) {
@@ -156,8 +160,8 @@ public class VtlBindings extends SimpleBindings {
                     } else {
                         Group group = new Group(decomposition[0], Constants.ROOT_GROUP_NAME);
                         variablesMap.putGroup(group);
-                        for(int k=1; k<decomposition.length - 1; k++) {
-                            group = new Group(decomposition[k], decomposition[k-1]);
+                        for (int k = 1; k < decomposition.length - 1; k++) {
+                            group = new Group(decomposition[k], decomposition[k - 1]);
                             variablesMap.putGroup(group);
                         }
                         variablesMap.putVariable(
@@ -172,7 +176,6 @@ public class VtlBindings extends SimpleBindings {
 
             }
         }
-
         return variablesMap;
     }
 

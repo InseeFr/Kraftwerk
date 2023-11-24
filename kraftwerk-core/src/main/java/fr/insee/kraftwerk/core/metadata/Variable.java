@@ -2,11 +2,13 @@ package fr.insee.kraftwerk.core.metadata;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Object class to represent a variable.
  *
  */
+@Slf4j
 public class Variable {
 
 	/** Variable name. */
@@ -50,7 +52,7 @@ public class Variable {
 		this.name = name;
 		this.group = group;
 		this.type = type;
-		this.sasFormat = sasFormat;
+		if (!"".equals(sasFormat)) this.sasFormat = sasFormat;
 	}
 
 	public String getGroupName() {
@@ -63,7 +65,13 @@ public class Variable {
 			return Integer.parseInt(sasFormatPart[0]);
 		}
 		if (this.sasFormat != null){
-			return Integer.parseInt(this.sasFormat);
+			try {
+				return Integer.parseInt(this.sasFormat);
+			}
+			catch (NumberFormatException e){
+				log.error("Variable {} expected length is not a number : {} ", name, sasFormat);
+				return 1;
+			}
 		}
 		// Not sure about that return
 		return 1;

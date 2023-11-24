@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.outputs;
+package fr.insee.kraftwerk.core.outputs.csv;
 
 import java.io.File;
 import java.io.FileNotFoundException;
