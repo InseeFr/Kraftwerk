@@ -286,4 +286,45 @@ public class ReportingDataDefinitions {
         }
         assertThat(outcomeSpottingContent).isEqualTo(expectedOutcomeSpotting);
     }
+
+    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the identification field")
+    public void check_identification(String surveyUnitId, String fileName, String directory, String expectedValue) throws IOException, CsvException {
+        CSVReader csvReader = CsvUtils.getReader(
+                Path.of(outDirectory + "/" + directory + "/" + fileName)
+        );
+
+        // Get file content
+        List<String[]> content = csvReader.readAll();
+        csvReader.close();
+
+        // Get header
+        String[] header = content.get(0);
+
+        // OUTCOME_SPOTTING field existence assertion
+        assertThat(header).contains(Constants.IDENTIFICATION_NAME);
+
+        // Fetch concerned survey unit line from file
+        String[] concernedLine = null;
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
+                concernedLine = line;
+                break;
+            }
+        }
+
+        // Survey unit existence assertion
+        assertThat(concernedLine).isNotNull();
+
+        // Check OUTCOME_SPOTTING content
+        int i = 0;
+        String identificationContent = null;
+        for (String element : concernedLine) {
+            if (header[i].equals(Constants.IDENTIFICATION_NAME)) {
+                identificationContent = element;
+                break;
+            }
+            i++;
+        }
+        assertThat(identificationContent).isEqualTo(expectedValue);
+    }
 }

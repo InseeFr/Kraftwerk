@@ -140,20 +140,20 @@ public abstract class ReportingDataParser {
 		if (!reportingDataUE.getContactAttempts().isEmpty()) {
 			addContactAttempts(reportingDataUE, questionnaire);
 		}
-		if (reportingDataUE.getIdentification() != null){
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.IDENTIFICATION_NAME, reportingDataUE.getIdentification());
+		if (reportingDataUE.getIdentification().getIdentification() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.IDENTIFICATION_NAME, reportingDataUE.getIdentification().getIdentification());
 		}
-		if (reportingDataUE.getAccess() != null){
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ACCESS_NAME, reportingDataUE.getAccess());
+		if (reportingDataUE.getIdentification().getAccess() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.ACCESS_NAME, reportingDataUE.getIdentification().getAccess());
 		}
-		if (reportingDataUE.getSituation() != null){
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.SITUATION_NAME, reportingDataUE.getSituation());
+		if (reportingDataUE.getIdentification().getSituation() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.SITUATION_NAME, reportingDataUE.getIdentification().getSituation());
 		}
-		if (reportingDataUE.getCategory() != null){
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.CATEGORY_NAME, reportingDataUE.getCategory());
+		if (reportingDataUE.getIdentification().getCategory() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.CATEGORY_NAME, reportingDataUE.getIdentification().getCategory());
 		}
-		if (reportingDataUE.getOccupant() != null){
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OCCUPANT_NAME, reportingDataUE.getOccupant());
+		if (reportingDataUE.getIdentification().getOccupant() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OCCUPANT_NAME, reportingDataUE.getIdentification().getOccupant());
 		}
 	}
 

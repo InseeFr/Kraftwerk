@@ -181,7 +181,9 @@
                <date>1648470600000</date>
             </ContactAttempt>
          </ContactAttempts>
-		 <identification>DESTROY</identification>
+		 <Identification>
+			<identification>DESTROY</identification>
+		 </Identification>
       </SurveyUnit>
       <SurveyUnit>
          <Id>0000002</Id>
@@ -340,9 +342,11 @@
                <date>1648457340001</date>
             </ContactAttempt>
          </ContactAttempts>
-		 <identification>IDENTIFIED</identification>
-		 <access>NACC</access>
-		 <situation>NOORDINARY</situation>
+		 <Identification>
+			 <identification>IDENTIFIED</identification>
+			 <access>NACC</access>
+			 <situation>NOORDINARY</situation>
+		 </Identification>
       </SurveyUnit>
       <SurveyUnit>
          <Id>0000003</Id>
@@ -521,11 +525,13 @@
                <date>1648562029494</date>
             </ContactAttempt>
          </ContactAttempts>
-		 <identification>IDENTIFIED</identification>
-		 <access>NACC</access>
-		 <situation>ORDINARY</situation>
-		 <category>DK</category>
-		 <occupant>IDENTIFIED</occupant>
+		 <Identification>
+			 <identification>IDENTIFIED</identification>
+			 <access>NACC</access>
+			 <situation>ORDINARY</situation>
+			 <category>DK</category>
+			 <occupant>IDENTIFIED</occupant>
+		 </Identification>
       </SurveyUnit>
    </SurveyUnits>
 </Campaign>

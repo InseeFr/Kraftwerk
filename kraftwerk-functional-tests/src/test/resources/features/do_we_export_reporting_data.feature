@@ -106,6 +106,22 @@ Feature: Do we save correctly all reporting data ?
     |Directory                        |
     |SAMPLETEST-DATAONLY-v1           |
 
+
+  Scenario Outline: Does the new variables are computed correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+
+    Examples:
+    # Parameters :
+    # - Directory : Directory of test campaigns
+    # - SurveyUnitId : Survey unit identifier
+    # - OutputFileName : Name of reporting data file (with .csv extension)
+    # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
+
+      |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedIdentification          |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |DESTROY                         |
+
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service

@@ -83,16 +83,19 @@ public class XMLReportingDataParser extends ReportingDataParser {
           reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
         }
 
-      if(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
-        reportingDataUE.setIdentification(surveyUnitElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
-      if(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME)!= null)
-        reportingDataUE.setAccess(surveyUnitElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
-      if(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
-        reportingDataUE.setSituation(surveyUnitElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
-      if(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
-        reportingDataUE.setCategory(surveyUnitElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
-      if(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
-        reportingDataUE.setOccupant(surveyUnitElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+      //Get identification
+      Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
+      reportingDataUE.setIdentification(new Identification());
+      if(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+        reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
+      if(identificationElement.getFirstChildElement(Constants.ACCESS_NAME)!= null)
+        reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
+      if(identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+        reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+      if(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+        reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+      if(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+        reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
 
       reportingData.addReportingDataUE(reportingDataUE);
     } 
