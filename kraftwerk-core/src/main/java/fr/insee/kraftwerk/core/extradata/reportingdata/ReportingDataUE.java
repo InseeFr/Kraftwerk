@@ -29,6 +29,17 @@ public class ReportingDataUE {
   
   @Getter@Setter
   private List<ContactAttempt> contactAttempts;
+
+  @Getter@Setter
+  private String identification;
+  @Getter@Setter
+  private String access;
+  @Getter@Setter
+  private String situation;
+  @Getter@Setter
+  private String category;
+  @Getter@Setter
+  private String occupant;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();

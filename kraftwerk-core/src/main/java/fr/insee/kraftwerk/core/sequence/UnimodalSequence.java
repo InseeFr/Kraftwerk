@@ -1,8 +1,10 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
@@ -67,9 +69,18 @@ public class UnimodalSequence {
 		vtlGenerate = new GroupProcessing(vtlBindings, variablesMap).applyVtlTransformations(dataMode, null, errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate);
 
-		/* Step 2.5 : Apply mode-specific VTL transformations */
+		/* Step 2.5 : Apply standard mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
 				vtlBindings, variablesMap);
+		vtlGenerate = dataProcessing.applyVtlTransformations(
+				dataMode,
+				Path.of(Constants.VTL_FOLDER_PATH)
+						.resolve("unimode")
+						.resolve(dataMode+".vtl"),
+				errors);
+		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate);
+
+		/* Step 2.5b : Apply user specified mode-specific VTL transformations */
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
 				vtlGenerate);
