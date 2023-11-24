@@ -5,7 +5,8 @@
 
 ### Added
 - New format for output : parquet
-- Exportation of reporting data variables into a separate table
+- Export of reporting data variables into a separate table
+- Export of last collection date from paradata into root
 - Functional tests module
 - Add standard unimode VTL script executed before user script(s)
 - Add Pairwise
