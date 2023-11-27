@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class ReportingDataUE {
-	@Getter@Setter
+  @Getter@Setter
   private String identifier;
   
   @Getter@Setter
@@ -29,6 +29,9 @@ public class ReportingDataUE {
   
   @Getter@Setter
   private List<ContactAttempt> contactAttempts;
+
+  @Getter@Setter
+  private Identification identification;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();

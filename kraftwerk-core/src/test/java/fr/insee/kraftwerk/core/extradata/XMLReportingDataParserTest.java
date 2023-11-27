@@ -41,8 +41,8 @@ class XMLReportingDataParserTest {
 		// Second state of the first UE
 		assertEquals("ANV", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
 		// Check the reporting data is correctly translated in the output
-		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getValue("STATE_2"));
-		assertEquals("UE finalisée", questionnaire.getAnswers().getValue(Constants.LAST_STATE_NAME));
+		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
+		assertEquals("UE finalisée", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
 	}
 
 	@Test

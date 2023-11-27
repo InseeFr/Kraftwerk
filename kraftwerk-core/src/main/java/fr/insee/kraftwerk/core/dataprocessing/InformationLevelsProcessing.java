@@ -2,7 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -39,8 +39,9 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// Root dataset
 		StringBuilder rootInstructions = new StringBuilder();
+		Set<String> rootVariableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
 
-		String rootMeasures = VtlMacros.toVtlSyntax(multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME));
+		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
 		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s];",
 				Constants.ROOT_GROUP_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, rootMeasures, Constants.MODE_VARIABLE_NAME));
 
@@ -48,6 +49,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// To delete duplicates, to be eventually reviewed with a better VTL solution
 		vtlScript.add(Constants.ROOT_GROUP_NAME + " := union(" + Constants.ROOT_GROUP_NAME + ", " + Constants.ROOT_GROUP_NAME +");");
+
 		 
 		// Group datasets
 		for (String groupName : multimodeVariablesMap.getSubGroupNames()) {
@@ -56,12 +58,12 @@ public class InformationLevelsProcessing extends DataProcessing {
 			// First init the dataset using measure names, that are fully qualified name
 			List<String> groupVariableNames = new ArrayList<>(multimodeVariablesMap.getGroupVariableNames(groupName));
 			List<String> groupMeasureNames = groupVariableNames.stream()
-					.map(multimodeVariablesMap::getFullyQualifiedName).collect(Collectors.toList());
+					.map(multimodeVariablesMap::getFullyQualifiedName).toList();
 
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
 					groupName, bindingName, Constants.ROOT_IDENTIFIER_NAME, groupName, groupMeasures, Constants.MODE_VARIABLE_NAME));
-			// Epmpty lines are created to produce group level tables and need to be removed
+			// Empty lines are created to produce group level tables and need to be removed
 			groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
 					groupName, groupName, groupName));
 

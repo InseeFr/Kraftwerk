@@ -8,6 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonFileReader {
 
+    private JsonFileReader(){
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Read a json local json file.
      *

@@ -11,6 +11,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class TextFileReader {
 
+    private TextFileReader(){
+        throw new IllegalStateException("Utility class");
+    }
+
 
     /**
      * Read the content of a text file.

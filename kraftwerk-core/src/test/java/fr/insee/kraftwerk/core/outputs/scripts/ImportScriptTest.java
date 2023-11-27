@@ -17,6 +17,8 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
+import fr.insee.kraftwerk.core.outputs.ImportScript;
+import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;

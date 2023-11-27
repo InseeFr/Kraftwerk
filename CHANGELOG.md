@@ -1,5 +1,17 @@
 # Changelog
 
+
+## 1.5.0 - [2023-11-24]
+
+### Added
+- New format for output : parquet
+- Add new reporting data in output
+- Add possibility to calculate variables from reporting data with VTL script
+- Export of reporting data variables into a separate table
+- Export of last survey validation date from paradata into root
+- Functional tests module
+- Add Pairwise
+
 ## 1.4.2 - [2023-09-26]
 
 ### Changed

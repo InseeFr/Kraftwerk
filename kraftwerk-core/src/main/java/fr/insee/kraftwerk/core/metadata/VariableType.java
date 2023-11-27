@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import java.time.Instant;
 import java.util.Date;
 
 import lombok.Getter;
@@ -42,7 +43,7 @@ public enum VariableType {
 			return STRING;
 		} else if (clazz.isAssignableFrom(Boolean.class)){
 			return BOOLEAN;
-		} else if (clazz.isAssignableFrom(Date.class)){
+		} else if (clazz.isAssignableFrom(Date.class)||clazz.isAssignableFrom(Instant.class)){
 			return DATE;
 		} else {
 			log.warn(String.format("Unrecognized type for class %s ", clazz));

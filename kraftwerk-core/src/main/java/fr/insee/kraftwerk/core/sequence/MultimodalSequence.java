@@ -39,11 +39,13 @@ public class MultimodalSequence {
 				userInputs.getVtlTransformationsFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
 
-		/* Step 3.3 : Create datasets on each information level (i.e. each group) */
+		/* Step 3.3 : create datasets on each information level (i.e. each group) */
 		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
 		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlInformationLevelsFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
+
+
 
 	}
 

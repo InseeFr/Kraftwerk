@@ -4,6 +4,8 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
