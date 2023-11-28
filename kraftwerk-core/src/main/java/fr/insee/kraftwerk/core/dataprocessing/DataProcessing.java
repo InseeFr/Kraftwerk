@@ -38,7 +38,12 @@ public abstract class DataProcessing {
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
         // Second step
         if(userVtlInstructionsPath != null) {
-            applyUserVtlInstructions(userVtlInstructionsPath, errors);
+            if(userVtlInstructionsPath.toFile().exists())
+                applyUserVtlInstructions(userVtlInstructionsPath, errors);
+            else{
+                log.info(String.format("No user VTL instructions found for dataset named %s (step %s).",
+                        bindingName, getStepName()));
+            }
         } else {
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));

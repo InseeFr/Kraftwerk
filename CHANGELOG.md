@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1 - [NOT REALEASED YET]
+### Fixed
+- Fix exception when reporting VTL script not found
 
 ## 1.5.0 - [2023-11-24]
 
