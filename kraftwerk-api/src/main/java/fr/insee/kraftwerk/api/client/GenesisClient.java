@@ -2,7 +2,7 @@ package fr.insee.kraftwerk.api.client;
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
-import fr.insee.kraftwerk.core.inputs.Mode;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;

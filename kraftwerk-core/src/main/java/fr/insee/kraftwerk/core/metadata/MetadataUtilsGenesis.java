@@ -16,20 +16,21 @@ public class MetadataUtilsGenesis {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
+	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap) throws KraftwerkException {
 		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
-		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
+		for (Map.Entry<String, ModeInputs> entry : modeInputsMap.entrySet()) {
+			String k = entry.getKey();
+			ModeInputs v = entry.getValue();
+			putToMetadataVariable(k, v, metadataVariables);
+		}
 		return metadataVariables;
 	}
 
-	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, VariablesMap> metadataVariables ) {
+	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, VariablesMap> metadataVariables ) throws KraftwerkException {
 		// Step 1 : we add the variables read in the DDI
 		VariablesMap variables= new VariablesMap();
-		try {
-			variables = DDIReader.getVariablesFromDDI(modeInputsGenesis.getDdiUrl());
-		} catch (KraftwerkException e) {
-			log.error(e.getMessage());
-		}
+		variables = DDIReader.getVariablesFromDDI(modeInputsGenesis.getDdiUrl());
+
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputsGenesis.getLunaticFile() != null) {
 			// First we add the collected _MISSING variables

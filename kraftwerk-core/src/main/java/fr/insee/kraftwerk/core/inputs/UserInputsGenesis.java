@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.inputs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;

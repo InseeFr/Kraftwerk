@@ -90,23 +90,19 @@ public class UserInputsFile extends UserInputs {
 			String text = value.asText();
 			if (!(text.equals("") || text.equals("null"))) {
 				return text;
-			} else {
-				if (mandatoryFields.contains(field)) {
-					throw new MissingMandatoryFieldException(String
-							.format("Empty or null value in mandatory field \"%s\" in the input file given", field));
-				} else {
-					return null;
-				}
 			}
-		} else {
 			if (mandatoryFields.contains(field)) {
-				throw new MissingMandatoryFieldException(
-						String.format("Mandatory field \"%s\" missing in the input file given", field));
-			} else {
-				log.info(String.format("Optional field \"%s\" missing in the input file given", field));
-				return null;
+				throw new MissingMandatoryFieldException(String
+						.format("Empty or null value in mandatory field \"%s\" in the input file given", field));
 			}
+			return null;
 		}
+		if (mandatoryFields.contains(field)) {
+			throw new MissingMandatoryFieldException(
+					String.format("Mandatory field \"%s\" missing in the input file given", field));
+		}
+		log.info(String.format("Optional field \"%s\" missing in the input file given", field));
+		return null;
 	}
 
 	private Path convertToPath(String userField) throws KraftwerkException {
@@ -116,17 +112,15 @@ public class UserInputsFile extends UserInputs {
 				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
 			}
 			return inputPath;
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	private Path convertToUserPath(String userField) {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
 			return Paths.get(userField);
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	private URL convertToUrl(String userField) {
@@ -137,9 +131,8 @@ public class UserInputsFile extends UserInputs {
 		try {
 			if (userField.startsWith("http")) {
 				return new URL(userField);
-			} else {
-				return inputDirectory.resolve(userField).toFile().toURI().toURL();
 			}
+			return inputDirectory.resolve(userField).toFile().toURI().toURL();
 		} catch (MalformedURLException e) {
 			log.error("Unable to convert URL from user input: " + userField);
 			return null;

@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 public class ControlInputSequenceGenesis {
 
 	String defaultDirectory;
+	private static final String INPUT_FOLDER = "in";
 
 	@Getter
 	boolean hasConfigFile = true;
@@ -25,7 +26,7 @@ public class ControlInputSequenceGenesis {
 	}
 
 	public Path getInDirectory(String inDirectoryParam) {
-		Path inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
+		Path inDirectory = Paths.get(defaultDirectory, INPUT_FOLDER, inDirectoryParam);
 		hasConfigFile = verifyInDirectory(inDirectory);
 		return inDirectory;
 	}
