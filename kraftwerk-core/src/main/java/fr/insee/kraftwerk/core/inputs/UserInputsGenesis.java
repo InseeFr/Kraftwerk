@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,7 +68,7 @@ public class UserInputsGenesis extends UserInputs{
 			for (JsonNode fileNode : filesNode) {
 				String dataMode = readField(fileNode, "data_mode");
 				if (dataMode.equals(mode.name())) {
-					return convertToPath(readField(fileNode, "mode_specifications"));
+					return FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				}
 			}
 		} catch (IOException e) {
@@ -83,9 +84,9 @@ public class UserInputsGenesis extends UserInputs{
 		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
 		try {
 			JsonNode userInputs = JsonFileReader.read(userInputFile);
-			vtlReconciliationFile = convertToPath(readField(userInputs, "reconciliation_specifications"));
-			vtlTransformationsFile = convertToPath(readField(userInputs, "transformation_specifications"));
-			vtlInformationLevelsFile = convertToPath(readField(userInputs, "information_levels_specifications"));
+			vtlReconciliationFile = FileUtils.convertToPath(readField(userInputs, "reconciliation_specifications"),inputDirectory);
+			vtlTransformationsFile = FileUtils.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
+			vtlInformationLevelsFile = FileUtils.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
@@ -108,18 +109,6 @@ public class UserInputsGenesis extends UserInputs{
 			}
 		}
 		return null;
-	}
-
-	private Path convertToPath(String userField) throws KraftwerkException {
-		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
-			Path inputPath = inputDirectory.resolve(userField);
-			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
-			}
-			return inputPath;
-		} else {
-			return null;
-		}
 	}
 
 	/**

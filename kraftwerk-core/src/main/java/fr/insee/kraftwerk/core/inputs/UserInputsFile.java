@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class UserInputsFile extends UserInputs {
 	@Setter
 	private Path userInputFile;
 
-	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", 			"data_format", "multimode_dataset_name");
+	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "data_format", "multimode_dataset_name");
 
 	public UserInputsFile(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
 		super(inputDirectory);
@@ -49,13 +50,13 @@ public class UserInputsFile extends UserInputs {
 				String dataFolder = readField(fileNode, "data_file");
 				String paradataFolder = readField(fileNode, "paradata_folder");
 				String reportingFolder = readField(fileNode, "reporting_data_file");
-				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : convertToPath(dataFolder);
-				URL ddiFile = convertToUrl(readField(fileNode, "DDI_file"));
-				Path lunaticFile = convertToPath(readField(fileNode, "lunatic_file"));
+				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : FileUtils.convertToPath(dataFolder,inputDirectory);
+				URL ddiFile = FileUtils.convertToUrl(readField(fileNode, "DDI_file"),inputDirectory);
+				Path lunaticFile = FileUtils.convertToPath(readField(fileNode, "lunatic_file"),inputDirectory);
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : convertToPath(paradataFolder);
-				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : convertToPath(reportingFolder);
-				Path vtlFile = convertToPath(readField(fileNode, "mode_specifications"));
+				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : FileUtils.convertToPath(paradataFolder,inputDirectory);
+				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : FileUtils.convertToPath(reportingFolder,inputDirectory);
+				Path vtlFile = FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataPath);
 				modeInputs.setDdiUrl(ddiFile);
@@ -68,9 +69,9 @@ public class UserInputsFile extends UserInputs {
 			}
 			//
 			multimodeDatasetName = readField(userInputs, "multimode_dataset_name");
-			vtlReconciliationFile = convertToPath(readField(userInputs, "reconciliation_specifications"));
-			vtlTransformationsFile = convertToPath(readField(userInputs, "transformation_specifications"));
-			vtlInformationLevelsFile = convertToPath(readField(userInputs, "information_levels_specifications"));
+			vtlReconciliationFile = FileUtils.convertToPath(readField(userInputs, "reconciliation_specifications"),inputDirectory);
+			vtlTransformationsFile = FileUtils.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
+			vtlInformationLevelsFile = FileUtils.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
@@ -105,38 +106,11 @@ public class UserInputsFile extends UserInputs {
 		return null;
 	}
 
-	private Path convertToPath(String userField) throws KraftwerkException {
-		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
-			Path inputPath = inputDirectory.resolve(userField);
-			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
-			}
-			return inputPath;
-		}
-		return null;
-	}
-
 	private Path convertToUserPath(String userField) {
 		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
 			return Paths.get(userField);
 		}
 		return null;
-	}
-
-	private URL convertToUrl(String userField) {
-		if (userField == null) {
-			log.debug("null value out of method that reads DDI field (should not happen).");
-			return null;
-		}
-		try {
-			if (userField.startsWith("http")) {
-				return new URL(userField);
-			}
-			return inputDirectory.resolve(userField).toFile().toURI().toURL();
-		} catch (MalformedURLException e) {
-			log.error("Unable to convert URL from user input: " + userField);
-			return null;
-		}
 	}
 
 }
