@@ -75,28 +75,34 @@ public class XMLReportingDataParser extends ReportingDataParser {
       } 
       Elements contactAttemptsElements = surveyUnitElement.getFirstChildElement("ContactAttempts")
         .getChildElements("ContactAttempt");
-      if (contactAttemptsElements != null)
+      if (contactAttemptsElements != null) {
         for (int k = 0; k < contactAttemptsElements.size(); k++) {
           Element contactAttemptsElement = contactAttemptsElements.get(k);
           String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
           String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
           reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
         }
+      }
 
       //Get identification
       Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
       reportingDataUE.setIdentification(new Identification());
       if (identificationElement != null) {
-        if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+        if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null) {
           reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
-        if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null)
+        }
+        if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null) {
           reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
-        if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+        }
+        if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null) {
           reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
-        if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+        }
+        if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null) {
           reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
-        if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+        }
+        if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null) {
           reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+        }
       }
       reportingData.addReportingDataUE(reportingDataUE);
     } 
