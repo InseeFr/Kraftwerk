@@ -106,7 +106,7 @@ class ParaDataParserTest {
 	
 	private SurveyRawData addIdToTest(SurveyRawData srd, String idToAdd) {
 		List<String> ids = srd.getIdSurveyUnits();
-		if (ids == null) ids = new ArrayList<>();
+		if (ids == null) { ids = new ArrayList<>();}
 		ids.add(idToAdd);
 		srd.setIdSurveyUnits(ids);
 		
