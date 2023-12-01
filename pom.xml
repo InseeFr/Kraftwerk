@@ -27,7 +27,7 @@
 		<skipSurefireReport>true</skipSurefireReport>
 		<!-- Pi Test-->
 		<pitest.version>1.15.3</pitest.version>
-		<pitest.junit.version>1.2.0</pitest.junit.version>
+		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>
 	<modules>
