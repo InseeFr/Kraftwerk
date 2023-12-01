@@ -19,16 +19,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WriterSequence {
 
-	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, String multimodeDatasetNames, Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) throws KraftwerkException {
+	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) throws KraftwerkException {
 		Path outDirectory = FileUtils.transformToOut(inDirectory);
 		/* Step 4.1 : write csv output tables */
-		OutputFiles outputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()));
+		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()));
 		csvOutputFiles.writeOutputTables(metadataVariables);
 
 		/* Step 4.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataVariables, errors);
 		
-		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), multimodeDatasetNames);
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()));
 		parquetOutputFiles.writeOutputTables(metadataVariables);
 		parquetOutputFiles.writeImportScripts(metadataVariables, errors);
 

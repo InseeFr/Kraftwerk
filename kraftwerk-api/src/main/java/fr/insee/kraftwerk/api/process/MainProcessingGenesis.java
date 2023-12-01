@@ -94,7 +94,7 @@ public class MainProcessingGenesis {
 	}
 
 	/* Step 4 : Write output files */
-	private void outputFileWriter() {
+	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataVariables, errors);
 	}

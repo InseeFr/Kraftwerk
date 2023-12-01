@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ import fr.insee.vtl.model.Structured;
 @TestMethodOrder(OrderAnnotation.class)
 class ParquetOutputFilesTest {
 
-	private static UserInputs testUserInputs;
+	private static UserInputsFile testUserInputs;
 	private static OutputFiles outputFiles;
 
 
@@ -62,7 +63,7 @@ class ParquetOutputFilesTest {
 	void createInstance() {
 		assertDoesNotThrow(() -> {
 			//
-			testUserInputs = new UserInputs(
+			testUserInputs = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
 			//
@@ -75,7 +76,7 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("LOOP", testDataset);
 			vtlBindings.put("FROM_USER", testDataset);
 			//
-			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testUserInputs.getMultimodeDatasetName());
+			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes());
 		});
 	}
 
