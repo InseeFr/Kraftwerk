@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.rawdata;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +15,7 @@ public class GroupData {
     /** A map containing data of one of the instances of a group.
      * Keys: a group instance id.
      * Values: a GroupInstance (which is a subgroup of the current group). */
-    public LinkedHashMap<String, GroupInstance> groupInstances = new LinkedHashMap<>();
+    protected final Map<String, GroupInstance> groupInstances = new LinkedHashMap<>();
 
     public GroupData(String name){
         this.groupName = name;

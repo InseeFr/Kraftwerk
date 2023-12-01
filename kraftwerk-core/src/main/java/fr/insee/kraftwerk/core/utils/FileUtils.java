@@ -21,6 +21,9 @@ import java.util.stream.Stream;
 @Log4j2
 public class FileUtils {
 
+	private FileUtils(){
+		throw new IllegalStateException("Utility class");
+	}
 
 	private static final String ARCHIVE = "Archive";
 	

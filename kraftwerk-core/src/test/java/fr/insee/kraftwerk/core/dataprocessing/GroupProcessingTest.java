@@ -18,10 +18,10 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 
-public class GroupProcessingTest {
+class GroupProcessingTest {
 
     @Test
-    public void addPrefixes() {
+    void addPrefixes() {
         //
         Dataset initialDataset = new InMemoryDataset(
                 List.of(

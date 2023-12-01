@@ -5,14 +5,14 @@
   <parent>
     <groupId>fr.insee.kraftwerk</groupId>
     <artifactId>kraftwerk</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
   </parent>
   <artifactId>kraftwerk-api</artifactId>
   <name>kraftwerk-api</name>
   <packaging>jar</packaging> 
   
 	<properties>
-		<kraftwerk.version>1.4.2</kraftwerk.version>
+		<kraftwerk.version>1.5.0</kraftwerk.version>
 	</properties>
 	
 	<dependencies>
@@ -21,6 +21,12 @@
 			<groupId>fr.insee.kraftwerk</groupId>
 			<artifactId>kraftwerk-core</artifactId>
 			<version>${kraftwerk.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Spring -->
@@ -32,7 +38,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.0</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +8,9 @@ import java.util.Set;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.scripts.RDataTableImportScript;
-import fr.insee.kraftwerk.core.outputs.scripts.SASImportScript;
-import fr.insee.kraftwerk.core.outputs.scripts.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 
@@ -66,18 +62,7 @@ public abstract class OutputFiles {
 	}
 
 	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
-		// Assemble required info to write scripts
-		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
-		for (String datasetName : datasetToCreate) {
-			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
-					vtlBindings.getDataset(datasetName).getDataStructure(), metadataVariables);
-			tableScriptInfoList.add(tableScriptInfo);
-		}
-		// Write scripts
-		TextFileWriter.writeFile(outputFolder.resolve("import_with_data_table.R"),
-				new RDataTableImportScript(tableScriptInfoList).generateScript());
-		TextFileWriter.writeFile(outputFolder.resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList,errors).generateScript());
+		//Should be override
 	}
 
 	/**
@@ -90,8 +75,9 @@ public abstract class OutputFiles {
 
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
+	 * @throws KraftwerkException 
 	 */
-	public void writeOutputTables(Map<String, VariablesMap> metadataVariables) {
+	public void writeOutputTables(Map<String, VariablesMap> metadataVariables) throws KraftwerkException {
 		// implemented in subclasses
 	}
 

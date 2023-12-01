@@ -50,7 +50,7 @@ public class StepByStepService extends KraftwerkService {
 		boolean withDDI = true;
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			mp.runMain();
+			mp.init();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -87,7 +87,7 @@ public class StepByStepService extends KraftwerkService {
 		boolean withDDI = true;
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
 		try {
-			mp.runMain();
+			mp.init();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -201,7 +201,7 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
-			) {
+			) throws KraftwerkException {
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);

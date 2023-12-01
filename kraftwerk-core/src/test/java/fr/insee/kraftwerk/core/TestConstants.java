@@ -6,6 +6,8 @@ package fr.insee.kraftwerk.core;
 public class TestConstants {
 
 	public static final String TEST_RESOURCES_DIRECTORY = "src/test/resources";
+
+	//Unit tests
 	public static final String UNIT_TESTS_DIRECTORY = TEST_RESOURCES_DIRECTORY + "/unit_tests";
 	public static final String UNIT_TESTS_DUMP = TEST_RESOURCES_DIRECTORY + "/unit_tests/out";
 

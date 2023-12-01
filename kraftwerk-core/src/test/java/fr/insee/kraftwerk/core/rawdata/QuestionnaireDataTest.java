@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class QuestionnaireDataTest {
+class QuestionnaireDataTest {
 
     private QuestionnaireData questionnaireData;
 
     @BeforeEach
-    public void initQuestionnaireData() {
+    void initQuestionnaireData() {
         questionnaireData = new QuestionnaireData();
     }
 
     @Test
-    public void putAndGetFromGroupInstance() {
+    void putAndGetFromGroupInstance() {
 
         GroupInstance root = questionnaireData.getAnswers();
 
@@ -46,7 +46,7 @@ public class QuestionnaireDataTest {
     }
 
     @Test
-    public void putAndGetFromGroupData() {
+    void putAndGetFromGroupData() {
 
         GroupInstance root = questionnaireData.getAnswers();
 
@@ -68,7 +68,7 @@ public class QuestionnaireDataTest {
     }
 
     @Test
-    public void putAndGetFromQuestionnaireData() {
+    void putAndGetFromQuestionnaireData() {
         // Put a value from questionnaire data
         // at root
         questionnaireData.putValue("foo", "FOO");

@@ -63,7 +63,7 @@ public class LunaticXmlDataParser extends DataParser {
 			Elements questionnaireNodeList = document.getRootElement().getFirstChildElement("SurveyUnits")
 					.getChildElements("SurveyUnit");
 			String questionnaireModelId = null;
-			if (lunaticFile!= null) {
+			if (lunaticFile != null) {
 				questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile);
 			}
 
@@ -101,7 +101,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 */
 	@Override
 	void parseDataFile(Path filePath) {
-		parseDataFile(filePath,null);
+		parseDataFile(filePath, null);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 */
 	@Override
 	void parseDataFileWithoutDDI(Path filePath, Path lunaticFile) {
-		parseDataFile(filePath,lunaticFile);
+		parseDataFile(filePath, lunaticFile);
 	}
 
 	private boolean checkLunaticQuestionnaire(String questionnaireModelId, Element questionnaireNode) {
@@ -204,18 +204,50 @@ public class LunaticXmlDataParser extends DataParser {
 
 	private void addGroupVariables(VariablesMap variables, String variableName, GroupInstance answers, Element node,
 			boolean collected) {
+
+		if (!variables.hasVariable(variableName)) {
+			log.debug("Variable not defined : {}", variableName);
+			return;
+		}
+		manageTcmLiens(variableName, answers, node);
+		
+		String groupName = variables.getVariable(variableName).getGroupName();
+		GroupData groupData = answers.getSubGroup(groupName);
 		Elements valueNodes = node.getChildElements();
 
-		if (variables.hasVariable(variableName)) {
-			String groupName = variables.getVariable(variableName).getGroupName();
+		for (int j = 0; j < valueNodes.size(); j++) {
+			Element valueNode = valueNodes.get(j);
+			if (nodeExistsWithCompleteAttribute(valueNode)) {
+				String value = valueNodes.get(j).getValue();
+				if (collected) {
+					updateMaxLength(variables, variableName, value);
+				}
+				groupData.putValue(value, variableName, j);
+			}
+		}
+
+	}
+
+	private void manageTcmLiens(String variableName, GroupInstance answers, Element node) {
+		if (variableName.equals(Constants.LIENS)) {
+			String groupName = Constants.BOUCLE_PRENOMS;
 			GroupData groupData = answers.getSubGroup(groupName);
-			for (int j = 0; j < valueNodes.size(); j++) {
-				Element valueNode = valueNodes.get(j);
-				if (nodeExistsWithCompleteAttribute(valueNode)) {
-					String value = valueNodes.get(j).getValue();
-					if (collected)
-						updateMaxLength(variables, variableName, value);
-					groupData.putValue(value, variableName, j);
+			Elements individualNodes = node.getChildElements();
+			
+			for (int j = 0; j < individualNodes.size(); j++) {
+				Element individualNode = individualNodes.get(j);
+				Elements valueNodes = individualNode.getChildElements();
+
+				for (int k=1;k <Constants.MAX_LINKS_ALLOWED;k++) {
+					String value = Constants.NO_PAIRWISE_VALUE;
+					if (k<=valueNodes.size()) { 
+						value=Constants.SAME_AXIS_VALUE;
+						Element valueNode = valueNodes.get(k-1);
+						if (nodeExistsWithCompleteAttribute(valueNode)) {
+							value = valueNodes.get(k-1).getValue();
+						}
+					}
+					groupData.putValue(value, Constants.LIEN+k, j);
 				}
 			}
 		}

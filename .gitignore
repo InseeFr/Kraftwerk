@@ -31,6 +31,8 @@ RemoteSystemsTempFiles
 # Test generated files
 src/test/resources/functional_tests/out/*
 !src/test/resources/functional_tests/out/.gitkeep
+src/test/resources/functional_tests/temp/*
+!src/test/resources/functional_tests/temp/.gitkeep
 src/test/resources/unit_tests/out/*
 !src/test/resources/unit_tests/out/.gitkeep
 kraftwerk-core/src/test/resources/unit_tests/out/*
