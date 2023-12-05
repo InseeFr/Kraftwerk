@@ -75,16 +75,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
       } 
       Elements contactAttemptsElements = surveyUnitElement.getFirstChildElement("ContactAttempts")
         .getChildElements("ContactAttempt");
-      if (contactAttemptsElements != null) {
         for (int k = 0; k < contactAttemptsElements.size(); k++) {
-          Element contactAttemptsElement = contactAttemptsElements.get(k);
-          String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
-          String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
-          reportingDataUE.addContactAttempts(new ContactAttempt(status, Long.parseLong(timestamp)));
+            Element contactAttemptsElement = contactAttemptsElements.get(k);
+            String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
+            String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
+            reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
         }
-      }
 
-      //Get identification
+        //Get identification
       Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
       reportingDataUE.setIdentification(new Identification());
       if (identificationElement != null) {
@@ -104,7 +102,18 @@ public class XMLReportingDataParser extends ReportingDataParser {
           reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
         }
       }
-      reportingData.addReportingDataUE(reportingDataUE);
+
+      //Get comments
+      Elements commentsElements = surveyUnitElement.getFirstChildElement("Comments")
+              .getChildElements("Comment");
+        for (int k = 0; k < commentsElements.size(); k++) {
+            Element commentsElement = commentsElements.get(k);
+            String status = commentsElement.getFirstChildElement("type").getValue();
+            String value = commentsElement.getFirstChildElement("value").getValue();
+            reportingDataUE.addComment(new Comment(status, value));
+        }
+
+        reportingData.addReportingDataUE(reportingDataUE);
     } 
     integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
     this.document = null;
