@@ -17,11 +17,13 @@ public abstract class ReportingDataParser {
 
 	private int maxStates = 0;
 	private int maxAttempts = 0;
+	private int maxComments = 0;
 	Group reportingGroup ;
 
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
+		this.maxComments = countMaxComments(reportingData);
 		reportingGroup = new Group(Constants.REPORTING_DATA_GROUP_NAME, Constants.ROOT_GROUP_NAME);
 		surveyRawData.getVariablesMap().putGroup(reportingGroup);
 		createReportingVariables(surveyRawData);
@@ -93,6 +95,14 @@ public abstract class ReportingDataParser {
 		Variable variableOccupant = new Variable(Constants.OCCUPANT_NAME,
 				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.STRING, "50");
 		surveyRawData.getVariablesMap().putVariable(variableOccupant);
+		for (int i = 1; i <= this.maxComments; i++){
+			Variable variableListCommentTypes = new Variable(Constants.COMMENT_PREFIX_NAME + "_TYPE_" + i,
+					reportingGroup, VariableType.STRING, "50");
+			surveyRawData.getVariablesMap().putVariable(variableListCommentTypes);
+			Variable variableListComments = new Variable(Constants.COMMENT_PREFIX_NAME + "_" + i,
+					reportingGroup, VariableType.STRING, "50");
+			surveyRawData.getVariablesMap().putVariable(variableListComments);
+		}
 	}
 
 	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
@@ -147,6 +157,9 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.CATEGORY_NAME, reportingDataUE.getIdentification().getCategory());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OCCUPANT_NAME, reportingDataUE.getIdentification().getOccupant());
 		}
+		if(!reportingDataUE.getComments().isEmpty()){
+			addComments(reportingDataUE,questionnaire);
+		}
 	}
 
 	private void addContactAttempts(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
@@ -183,6 +196,15 @@ public abstract class ReportingDataParser {
 								.getStateType()));
 	}
 
+	private void addComments(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire){
+		for (int k = 1; k <= reportingDataUE.getComments().size(); k++) {
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.COMMENT_PREFIX_NAME + "_TYPE_" + k,
+					reportingDataUE.getComments().get(k - 1).getType());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.COMMENT_PREFIX_NAME + "_" + k,
+					reportingDataUE.getComments().get(k - 1).getValue());
+		}
+	}
+
 	private ContactAttempt getLastContactAttempt(ReportingDataUE reportingDataUE) {
 		return reportingDataUE.getContactAttempts().get(reportingDataUE.getContactAttempts().size()-1);
 	}
@@ -193,6 +215,11 @@ public abstract class ReportingDataParser {
 
 	public int countMaxAttempts(ReportingData reportingData) {
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getContactAttempts().size()).max()
+				.getAsInt();
+	}
+
+	public int countMaxComments(ReportingData reportingData) {
+		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getComments().size()).max()
 				.getAsInt();
 	}
 }
