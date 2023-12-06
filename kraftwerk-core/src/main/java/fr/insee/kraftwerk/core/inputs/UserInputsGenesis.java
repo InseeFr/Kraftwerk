@@ -44,7 +44,7 @@ public class UserInputsGenesis extends UserInputs{
 			modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toFile().toURI().toURL());
 			modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
 			modeInputs.setDataMode(mode.name());
-			if (mode == Mode.WEB || mode == Mode.TEL) {
+			if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
 				modeInputs.setDataFormat("LUNATIC_XML");
 			} else {
 				// Not implemented yet

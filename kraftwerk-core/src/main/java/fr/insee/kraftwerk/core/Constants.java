@@ -32,6 +32,7 @@ public final class Constants {
 	public static final String XSLT_FOLDER_PATH = RESOURCES_FOLDER + XSLT_FOLDER;
 	public static final String VTL_FOLDER_PATH = RESOURCES_FOLDER + "/vtl";
 	public static final String PARADATA_FOLDER = "/PARADATA";
+	public static final String REPORTING_DATA_FOLDER = "/REPORTING_DATA";
 
 	// ----- XSL scripts
 	public static final String XSLT_STRUCTURED_VARIABLES = "xslt/structured-variables.xsl";

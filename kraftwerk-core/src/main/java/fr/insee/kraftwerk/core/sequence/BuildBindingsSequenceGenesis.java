@@ -7,16 +7,21 @@ import fr.insee.kraftwerk.core.data.model.VariableState;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
+import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
+import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +65,11 @@ public class BuildBindingsSequenceGenesis {
 			data.getQuestionnaires().add(questionnaire);
 		}
 
-//		/* Step 2.2 : Get paradata for the survey */
+		/* Step 2.2 : Get paradata for the survey */
 		parseParadata(dataMode, data, inDirectory);
-//
-//		/* Step 2.3 : Get reportingData for the survey */
-//		parseReportingData(modeInputs, data);
+
+		/* Step 2.3 : Get reportingData for the survey */
+		parseReportingData(dataMode, data, inDirectory);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -72,7 +77,7 @@ public class BuildBindingsSequenceGenesis {
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
-		Path paraDataPath = inDirectory.resolve(dataMode).resolve(Constants.PARADATA_FOLDER);
+		Path paraDataPath = inDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
 		File paradataFolder = paraDataPath.toFile();
 		if (paradataFolder.exists()) {
 			ParadataParser paraDataParser = new ParadataParser();
@@ -80,21 +85,25 @@ public class BuildBindingsSequenceGenesis {
 			paraDataParser.parseParadata(paraData, data);
 		}
 	}
-//
-//	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
-//		Path reportingDataFile = modeInputs.getReportingDataFile();
-//		if (reportingDataFile != null) {
-//			ReportingData reportingData = new ReportingData(reportingDataFile);
-//			if (reportingDataFile.toString().contains(".xml")) {
-//				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
-//				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-//
-//			} else if (reportingDataFile.toString().contains(".csv")) {
-//				CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-//				cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-//			}
-//		}
-//	}
+
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
+		File reportingDataFolder = reportingDataFile.toFile();
+		if (reportingDataFolder.exists()) {
+			List<String> listFiles = FileUtils.listFiles(reportingDataFile.toString());
+			for (String file : listFiles) {
+				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
+				if (file.contains(".xml")) {
+					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+					xMLReportingDataParser.parseReportingData(reportingData, data, true);
+
+				} else if (file.contains(".csv")) {
+					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
+					cSVReportingDataParser.parseReportingData(reportingData, data, true);
+				}
+			}
+		}
+	}
 
 	private void addGroupVariables(VariablesMap variables, String variableName, GroupInstance answers, VariableState variableState) {
 		if (variables.hasVariable(variableName)) {
