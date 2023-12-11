@@ -32,7 +32,7 @@ class XMLReportingDataParserTest {
 		}
 
 		// Check the reporting data is well captured
-		assertEquals(10, reportingData.getListReportingDataUE().size());
+		assertEquals(12, reportingData.getListReportingDataUE().size());
 		QuestionnaireData questionnaire = data.getQuestionnaires().stream()
 				.filter(questionnaireToSearch -> "TNL1102000275".equals(questionnaireToSearch.getIdentifier())).findAny()
 				.orElse(null);
@@ -43,6 +43,20 @@ class XMLReportingDataParserTest {
 		// Check the reporting data is correctly translated in the output
 		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
 		assertEquals("UE finalisée", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
+
+		// Null interviewrIds checks
+		//Check interviewerId placeholder value on TNL1102000278
+		questionnaire = data.getQuestionnaires().stream()
+				.filter(questionnaireToSearch -> "TNL1102000278".equals(questionnaireToSearch.getIdentifier())).findAny()
+				.orElse(null);
+        assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "_01", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000278").getValue(Constants.INTERVIEWER_ID_NAME));
+
+		//Check interviewerId placeholder incrementation on TNL1102000279
+		questionnaire = data.getQuestionnaires().stream()
+				.filter(questionnaireToSearch -> "TNL1102000279".equals(questionnaireToSearch.getIdentifier())).findAny()
+				.orElse(null);
+		assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "_02", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000279").getValue(Constants.INTERVIEWER_ID_NAME));
+
 	}
 
 	@Test

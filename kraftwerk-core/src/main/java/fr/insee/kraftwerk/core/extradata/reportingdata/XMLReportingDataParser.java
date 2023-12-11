@@ -27,6 +27,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
     }
     // Read information on each survey unit
 
+    int interviewerIdPlaceholder = 1;
     Element surveyUnitsNode = root.getFirstChildElement("SurveyUnits");
     Elements surveyUnitsNodeList = surveyUnitsNode.getChildElements("SurveyUnit");
 	log.info("Read {} surveyUnit in file {}", surveyUnitsNodeList.size(),filePath);
@@ -38,7 +39,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
       String identifier = identifierElement.getValue();
       reportingDataUE.setIdentifier(identifier);
       Element interviewerIdentifierElement = surveyUnitElement.getFirstChildElement("InterviewerId");
-      String interviewerIdentifier = interviewerIdentifierElement.getValue();
+      String interviewerIdentifier;
+      if(interviewerIdentifierElement == null){
+        interviewerIdentifier = Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER
+                + "_" + String.format("%02d",interviewerIdPlaceholder); // zero padding
+        interviewerIdPlaceholder++;
+      }else{
+        interviewerIdentifier = interviewerIdentifierElement.getValue();
+      }
       reportingDataUE.setInterviewerId(interviewerIdentifier);
       Element organizationalUnitIdentifierElement = surveyUnitElement
         .getFirstChildElement("OrganizationalUnitId");
