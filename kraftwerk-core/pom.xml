@@ -182,6 +182,10 @@
 					<groupId>com.github.pjfanning</groupId>
 					<artifactId>jersey-json</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>
