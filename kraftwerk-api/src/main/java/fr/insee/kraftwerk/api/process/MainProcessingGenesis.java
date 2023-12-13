@@ -16,6 +16,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
@@ -64,18 +65,20 @@ public class MainProcessingGenesis {
 	}
 
 	public void runMain(String idQuestionnaire) throws KraftwerkException, IOException {
-		// First implementation we retrieve all the survey unit at once and
-		// then we process them at the same time
-		// TODO : retrieve survey units by batch of n survey units (optimal n to be determined)
+		// We limit the size of the batch to 100 survey unit at a time
+		int batchSize = 1000;
 		init(idQuestionnaire);
 		List <SurveyUnitId> ids = client.getSurveyUnitIds(idQuestionnaire);
-		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(idQuestionnaire, ids);
-		log.info("Number of documents retrieved from database : {}", suLatest.size());
-		unimodalProcess(suLatest);
-		multimodalProcess();
-		outputFileWriter();
-		writeErrors();
-
+		List <List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
+		for (List<SurveyUnitId> listId : listIds) {
+			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(idQuestionnaire, listId);
+			log.info("Number of documents retrieved from database : {}", suLatest.size());
+			vtlBindings = new VtlBindings();
+			unimodalProcess(suLatest);
+			multimodalProcess();
+			outputFileWriter();
+			writeErrors();
+		}
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
