@@ -21,6 +21,7 @@ import jakarta.annotation.PostConstruct;
 @ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Success"),
 		@ApiResponse(responseCode = "400", description = "Bad Request"),
+		@ApiResponse(responseCode = "413", description = "Request Entity Too Large"),
 		@ApiResponse(responseCode = "500", description = "Internal server error") })
 public class KraftwerkService {
 
