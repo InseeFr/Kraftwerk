@@ -62,10 +62,10 @@ public class StepByStepService extends KraftwerkService {
 		for (String dataMode : mp.getUserInputs().getModeInputsMap().keySet()) {
 			try {
 				buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
-			} catch (NullException e) {
+			} catch (KraftwerkException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
-			
+
 			vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		}
 		
@@ -96,7 +96,7 @@ public class StepByStepService extends KraftwerkService {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
-		} catch (NullException e) {
+		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		

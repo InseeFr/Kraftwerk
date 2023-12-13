@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.sequence;
 import java.nio.file.Path;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -17,7 +18,10 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 
+@Log4j2
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
@@ -28,7 +32,7 @@ public class BuildBindingsSequence {
 		this.withAllReportingData = withAllReportingData;
 	}
 
-	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, boolean withDDI) throws NullException {
+	public void buildVtlBindings(UserInputs userInputs, String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, boolean withDDI) throws KraftwerkException {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 

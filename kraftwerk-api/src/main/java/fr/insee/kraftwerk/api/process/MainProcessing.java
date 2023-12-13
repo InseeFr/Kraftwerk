@@ -24,6 +24,7 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 
 @Log4j2
 public class MainProcessing {
@@ -98,10 +99,23 @@ public class MainProcessing {
 	
 		if (fileByFile) userInputsList = getUserInputs(userInputs);
 
+		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
+		//In case of file-by-file processing we check the size of each file.
+		long limitSize = 419430400L;
+		if (fileByFile) {
+			for (UserInputs userInputsFile : userInputsList) {
+				isDataTooBig(userInputsFile,"At least one file size is greater than 400Mo. Split data files greater than 400 MB.", limitSize);
+			}
+		}
+		//In case of main processing we check the folder
+		if (!fileByFile) {
+			isDataTooBig(userInputs,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
+		}
+
 	}
 
 	/* Step 2 : unimodal data */
-	private void unimodalProcess() throws NullException {
+	private void unimodalProcess() throws KraftwerkException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
@@ -176,6 +190,16 @@ public class MainProcessing {
 			}
 		}
 		return files;
+	}
+
+	private void isDataTooBig(UserInputs userInputsFile, String errorMessage, long limitSize) throws KraftwerkException {
+		for (String dataMode : userInputs.getModeInputsMap().keySet()){
+			long dataSize = FileUtils.sizeOf(userInputsFile.getModeInputs(dataMode).getDataFile().toFile());
+			if (dataSize > limitSize) {
+				log.error("Size of data folder/file {} : {}",userInputsFile.getModeInputs(dataMode).getDataFile(), FileUtils.byteCountToDisplaySize(dataSize));
+				throw new KraftwerkException(413,errorMessage);
+			}
+		}
 	}
 
 }

@@ -111,7 +111,7 @@ public class MainDefinitions {
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws NullException {
+	public void unimodal_treatments() throws KraftwerkException {
 		metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
