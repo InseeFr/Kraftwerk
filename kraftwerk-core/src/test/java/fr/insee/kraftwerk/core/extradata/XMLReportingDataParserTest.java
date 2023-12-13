@@ -49,13 +49,13 @@ class XMLReportingDataParserTest {
 		questionnaire = data.getQuestionnaires().stream()
 				.filter(questionnaireToSearch -> "TNL1102000278".equals(questionnaireToSearch.getIdentifier())).findAny()
 				.orElse(null);
-        assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "_01", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000278").getValue(Constants.INTERVIEWER_ID_NAME));
+        assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "TNL1102000278", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000278").getValue(Constants.INTERVIEWER_ID_NAME));
 
 		//Check interviewerId placeholder incrementation on TNL1102000279
 		questionnaire = data.getQuestionnaires().stream()
 				.filter(questionnaireToSearch -> "TNL1102000279".equals(questionnaireToSearch.getIdentifier())).findAny()
 				.orElse(null);
-		assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "_02", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000279").getValue(Constants.INTERVIEWER_ID_NAME));
+		assertEquals(Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + "TNL1102000279", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000279").getValue(Constants.INTERVIEWER_ID_NAME));
 
 	}
 
