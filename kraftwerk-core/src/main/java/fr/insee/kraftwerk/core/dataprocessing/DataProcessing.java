@@ -37,17 +37,12 @@ public abstract class DataProcessing {
         // First step
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
         // Second step
-        if(userVtlInstructionsPath != null) {
-            if(userVtlInstructionsPath.toFile().exists())
-                applyUserVtlInstructions(userVtlInstructionsPath, errors);
-            else{
-                log.info(String.format("No user VTL instructions found for dataset named %s (step %s).",
-                        bindingName, getStepName()));
-            }
-        } else {
+        if(userVtlInstructionsPath == null || !userVtlInstructionsPath.toFile().exists()){
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));
+            return automatedVtlInstructions;
         }
+        applyUserVtlInstructions(userVtlInstructionsPath, errors);
         return automatedVtlInstructions;
     }
 
