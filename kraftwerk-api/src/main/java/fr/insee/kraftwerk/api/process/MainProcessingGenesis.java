@@ -65,7 +65,7 @@ public class MainProcessingGenesis {
 	}
 
 	public void runMain(String idQuestionnaire) throws KraftwerkException, IOException {
-		// We limit the size of the batch to 100 survey unit at a time
+		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idQuestionnaire);
 		List <SurveyUnitId> ids = client.getSurveyUnitIds(idQuestionnaire);
