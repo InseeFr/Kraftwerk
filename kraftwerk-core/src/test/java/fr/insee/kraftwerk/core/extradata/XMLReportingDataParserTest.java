@@ -90,8 +90,14 @@ class XMLReportingDataParserTest {
 		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + idUE).getValue("STATE_1"));
 
 
-		// Survey answer date checks
+
+		// Survey validation date checks
 		// Case 1 VALPAP only
+		questionnaire = data.getQuestionnaires().stream()
+				.filter(questionnaireToSearch -> "BLA000001".equals(questionnaireToSearch.getIdentifier())).findAny()
+				.orElse(null);
+        assert questionnaire != null;
+        assertNotEquals(null, questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "BLA000001").getValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME));
 		ReportingDataUE reportingDataUE = reportingData.getListReportingDataUE().stream().filter(
 				reportingDataUEtmp -> reportingDataUEtmp.getIdentifier().equals("BLA000001")
 		).findAny().orElse(null);
