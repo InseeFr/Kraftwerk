@@ -2,6 +2,9 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
@@ -103,6 +106,10 @@ public abstract class ReportingDataParser {
 					reportingGroup, VariableType.STRING, "50");
 			surveyRawData.getVariablesMap().putVariable(variableListComments);
 		}
+
+		Variable variableSurveyValidationDate = new Variable(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
+				surveyRawData.getVariablesMap().getReportingDataGroup(), VariableType.DATE, "50");
+		surveyRawData.getVariablesMap().putVariable(variableSurveyValidationDate);
 	}
 
 	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
@@ -159,6 +166,11 @@ public abstract class ReportingDataParser {
 		}
 		if(!reportingDataUE.getComments().isEmpty()){
 			addComments(reportingDataUE,questionnaire);
+		}
+		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
+					LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getSurveyValidationDateTimeStamp()),
+							TimeZone.getDefault().toZoneId()).toString());
 		}
 	}
 

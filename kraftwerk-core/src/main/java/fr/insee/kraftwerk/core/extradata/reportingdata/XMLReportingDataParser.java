@@ -88,11 +88,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
         }
       }
 
-        //Get identification
+      //Get identification
       getIdentification(surveyUnitElement,reportingDataUE);
 
       //Get comments
       getComments(surveyUnitElement, reportingDataUE);
+
+      //Get survey validation date from states
+      setSurveyValidationDate(reportingDataUE);
 
       reportingData.addReportingDataUE(reportingDataUE);
     }
@@ -178,6 +181,18 @@ public class XMLReportingDataParser extends ReportingDataParser {
         String value = commentsElement.getFirstChildElement("value").getValue();
         reportingDataUE.addComment(new Comment(status, value));
       }
+    }
+  }
+
+  private void setSurveyValidationDate(ReportingDataUE reportingDataUE) {
+    if(!reportingDataUE.getStates().isEmpty()) {
+      State validationState = null;
+      for (State contactState : reportingDataUE.getStates()) {
+        if(contactState.isValidationState() && contactState.isPriorityTo(validationState))
+          validationState = contactState;
+      }
+      if(validationState != null)
+        reportingDataUE.setSurveyValidationDateTimeStamp(validationState.getTimestamp());
     }
   }
 

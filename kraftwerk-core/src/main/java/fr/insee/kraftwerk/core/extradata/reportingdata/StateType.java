@@ -22,14 +22,14 @@ public enum StateType {
   STATE14("QNA", "Questionnaire non accessible enquêteur"),
   STATE15("CLO", "UE close"),
   STATE16("NVA", "UE non visible gestionnaire"),
-  STATE17("INITLA", "INITLA"),
-  STATE18("PND", "PND"),
-  STATE19("DECHET", "DECHET"),
-  STATE20("PARTIELINT", "PARTIELINT"),
-  STATE21("HC", "HC"),
-  STATE22("VALPAP", "VALPAP"),
-  STATE23("VALINT", "VALINT"),
-  STATE24("REFUS", "REFUS"),
+  STATE17("INITLA", "Questionnaire initialisé"),
+  STATE18("PND", "Pli non distribué"),
+  STATE19("DECHET", "Déchet"),
+  STATE20("PARTIELINT", "Répondu partiellement sur internet"),
+  STATE21("HC", "Hors Champs"),
+  STATE22("VALPAP", "Questionnaire validé sur papier"),
+  STATE23("VALINT", "Questionnaire validé sur internet"),
+  STATE24("REFUS", "Refus de répondre"),
   STATE25("RELANCE", "RELANCE");
   
 	@Getter

@@ -20,6 +20,10 @@
                 <type>HC</type>
                 <date>1696318304931</date>
               </State>
+              <State>
+                <type>VALPAP</type>
+                <date>1696418304931</date>
+              </State>
             </States>
           </SurveyUnit>
           <SurveyUnit>
@@ -28,6 +32,10 @@
               <State>
                 <type>INITLA</type>
                 <date>1692194692392</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696418304931</date>
               </State>
             </States>
           </SurveyUnit>
@@ -38,6 +46,10 @@
                 <type>INITLA</type>
                 <date>1692194692507</date>
               </State>
+              <State>
+                <type>PARTIELINT</type>
+                <date>1696418304931</date>
+              </State>
             </States>
           </SurveyUnit>
           <SurveyUnit>
@@ -46,6 +58,18 @@
               <State>
                 <type>INITLA</type>
                 <date>1692194692062</date>
+              </State>
+              <State>
+                <type>PARTIELINT</type>
+                <date>1696418304931</date>
+              </State>
+              <State>
+                <type>VALPAP</type>
+                <date>1696518304931</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696618304931</date>
               </State>
             </States>
           </SurveyUnit>
@@ -56,6 +80,14 @@
                 <type>INITLA</type>
                 <date>1692194692734</date>
               </State>
+              <State>
+                <type>PARTIELINT</type>
+                <date>1696618304931</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696418304931</date>
+              </State>
             </States>
           </SurveyUnit>
           <SurveyUnit>
@@ -64,6 +96,14 @@
               <State>
                 <type>INITLA</type>
                 <date>1692194692846</date>
+              </State>
+              <State>
+                <type>PARTIELINT</type>
+                <date>1696618304931</date>
+              </State>
+              <State>
+                <type>VALPAP</type>
+                <date>1696418304931</date>
               </State>
             </States>
           </SurveyUnit>
@@ -74,6 +114,14 @@
                 <type>INITLA</type>
                 <date>1692194692962</date>
               </State>
+              <State>
+                <type>VALPAP</type>
+                <date>1696618304931</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696418304931</date>
+              </State>
             </States>
           </SurveyUnit>
           <SurveyUnit>
@@ -82,6 +130,14 @@
               <State>
                 <type>INITLA</type>
                 <date>1692194693078</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696418304931</date>
+              </State>
+              <State>
+                <type>VALINT</type>
+                <date>1696618304931</date>
               </State>
             </States>
           </SurveyUnit>
