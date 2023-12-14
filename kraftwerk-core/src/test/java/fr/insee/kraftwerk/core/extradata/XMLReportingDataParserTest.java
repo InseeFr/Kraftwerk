@@ -81,7 +81,7 @@ class XMLReportingDataParserTest {
 
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
-		assertEquals("INITLA", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
+		assertEquals("REFUSAL", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
 		// Check the reporting data is correctly translated in the output
 		assertEquals("INITLA", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "BLA000010").getValue("STATE_1"));
 	}

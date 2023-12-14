@@ -46,18 +46,20 @@ public class XMLReportingDataParser extends ReportingDataParser {
       reportingDataUE.setInterviewerId(interviewerIdentifier);
       Element organizationalUnitIdentifierElement = surveyUnitElement
         .getFirstChildElement("OrganizationalUnitId");
-      // Get adress values
-      String organizationalUnitIdentifier = organizationalUnitIdentifierElement.getValue();
-      reportingDataUE.setOrganizationUnitId(organizationalUnitIdentifier);
-      Element adressElement = surveyUnitElement.getFirstChildElement("InseeSampleIdentiers");
-      reportingDataUE.setInseeSampleIdentifier(new InseeSampleIdentifier());
-      reportingDataUE.getInseeSampleIdentifier().setRges(adressElement.getFirstChildElement("Rges").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setNumfa(adressElement.getFirstChildElement("Numfa").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setSsech(adressElement.getFirstChildElement("Ssech").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setLe(adressElement.getFirstChildElement("Le").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setEc(adressElement.getFirstChildElement("Ec").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setBs(adressElement.getFirstChildElement("Bs").getValue());
-      reportingDataUE.getInseeSampleIdentifier().setNoi(adressElement.getFirstChildElement("Noi").getValue());
+      if(organizationalUnitIdentifierElement != null) {
+        // Get address values
+        String organizationalUnitIdentifier = organizationalUnitIdentifierElement.getValue();
+        reportingDataUE.setOrganizationUnitId(organizationalUnitIdentifier);
+        Element adressElement = surveyUnitElement.getFirstChildElement("InseeSampleIdentiers");
+        reportingDataUE.setInseeSampleIdentifier(new InseeSampleIdentifier());
+        reportingDataUE.getInseeSampleIdentifier().setRges(adressElement.getFirstChildElement("Rges").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setNumfa(adressElement.getFirstChildElement("Numfa").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setSsech(adressElement.getFirstChildElement("Ssech").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setLe(adressElement.getFirstChildElement("Le").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setEc(adressElement.getFirstChildElement("Ec").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setBs(adressElement.getFirstChildElement("Bs").getValue());
+        reportingDataUE.getInseeSampleIdentifier().setNoi(adressElement.getFirstChildElement("Noi").getValue());
+      }
       Elements stateNodeList = surveyUnitElement.getFirstChildElement("States").getChildElements("State");
       for (int j = 0; j < stateNodeList.size(); j++) {
         Element stateElement = stateNodeList.get(j);
@@ -77,14 +79,16 @@ public class XMLReportingDataParser extends ReportingDataParser {
         reportingDataUE.getContactOutcome().setTotalNumberOfContactAttempts(
             Integer.parseInt(contactOutcomeElement.getFirstChildElement("totalNumberOfContactAttempts").getValue()));
       }
-      Elements contactAttemptsElements = surveyUnitElement.getFirstChildElement("ContactAttempts")
-        .getChildElements("ContactAttempt");
+      Element contactAttemptsNode = surveyUnitElement.getFirstChildElement("ContactAttempts");
+      if(contactAttemptsNode != null) {
+        Elements contactAttemptsElements = contactAttemptsNode.getChildElements("ContactAttempt");
         for (int k = 0; k < contactAttemptsElements.size(); k++) {
-            Element contactAttemptsElement = contactAttemptsElements.get(k);
-            String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
-            String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
-            reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
+          Element contactAttemptsElement = contactAttemptsElements.get(k);
+          String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
+          String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
+          reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
         }
+      }
 
         //Get identification
       Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
@@ -108,14 +112,16 @@ public class XMLReportingDataParser extends ReportingDataParser {
       }
 
       //Get comments
-      Elements commentsElements = surveyUnitElement.getFirstChildElement("Comments")
-              .getChildElements("Comment");
+      Element commentsNode = surveyUnitElement.getFirstChildElement("Comments");
+      if(commentsNode != null) {
+        Elements commentsElements = commentsNode.getChildElements("Comment");
         for (int k = 0; k < commentsElements.size(); k++) {
-            Element commentsElement = commentsElements.get(k);
-            String status = commentsElement.getFirstChildElement("type").getValue();
-            String value = commentsElement.getFirstChildElement("value").getValue();
-            reportingDataUE.addComment(new Comment(status, value));
+          Element commentsElement = commentsElements.get(k);
+          String status = commentsElement.getFirstChildElement("type").getValue();
+          String value = commentsElement.getFirstChildElement("value").getValue();
+          reportingDataUE.addComment(new Comment(status, value));
         }
+      }
 
         reportingData.addReportingDataUE(reportingDataUE);
     }
