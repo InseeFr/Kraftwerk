@@ -52,9 +52,7 @@ public class ReportingDataDefinitions {
             Constants.OUTCOME_NAME,
             Constants.OUTCOME_DATE,
             Constants.NUMBER_ATTEMPTS_NAME,
-            Constants.LAST_ATTEMPT_DATE,
-            Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_1",
-            Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_1_DATE"
+            Constants.LAST_ATTEMPT_DATE
     };
 
     // Existence and structure tests

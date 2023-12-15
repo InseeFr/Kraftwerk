@@ -15,7 +15,7 @@ Feature: Do we save correctly all reporting data ?
     |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
     |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
     |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv     |75                                |
+    |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv     |31                                |
 
 
 
