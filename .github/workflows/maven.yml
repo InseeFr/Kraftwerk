@@ -27,6 +27,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
+        timeout-minutes: 15
+
+
     - name: Build with Maven
       run: mvn -B clean package --file pom.xml
 
