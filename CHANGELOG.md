@@ -5,6 +5,9 @@
 ### Added
 - Look for data in Genesis
 
+### Changed
+- Migrated to Java 21
+
 ### Fixed
 - Fix issue with null interviewerId
 - Fix exception when reporting VTL script not found
