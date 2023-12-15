@@ -1,8 +1,13 @@
 # Changelog
 
-## 1.5.1 - [NOT RELEASED YET]
+## 2.0.0 - [NOT RELEASED YET]
+
+### Added
+- Look for data in Genesis
+
 ### Fixed
 - Fix issue with null interviewerId
+- Fix exception when reporting VTL script not found
 
 ## 1.5.0 - [2023-11-24]
 

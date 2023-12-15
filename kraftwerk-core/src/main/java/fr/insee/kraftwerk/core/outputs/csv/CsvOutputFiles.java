@@ -24,11 +24,9 @@ public class CsvOutputFiles extends OutputFiles {
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
-	 * @param userInputs   Used to get the campaign name and to filter intermediate
-	 *                     datasets that we don't want to output.
 	 */
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, String multimodeDatasetNames) {
-		super(outDirectory, vtlBindings, modes, multimodeDatasetNames);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
+		super(outDirectory, vtlBindings, modes);
 	}
 
 

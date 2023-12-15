@@ -17,7 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
@@ -27,7 +27,7 @@ import fr.insee.vtl.model.Structured;
 @TestMethodOrder(OrderAnnotation.class)
 class CsvOutputFilesTest {
 
-	private static UserInputs testUserInputs;
+	private static UserInputsFile testUserInputsFile;
 	private static OutputFiles outputFiles;
 
 	Dataset fooDataset = new InMemoryDataset(List.of(),
@@ -38,20 +38,20 @@ class CsvOutputFilesTest {
 	void createInstance() {
 		assertDoesNotThrow(() -> {
 			//
-			testUserInputs = new UserInputs(
+			testUserInputsFile = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
 			//
 			VtlBindings vtlBindings = new VtlBindings();
-			for (String mode : testUserInputs.getModes()) {
+			for (String mode : testUserInputsFile.getModes()) {
 				vtlBindings.put(mode, fooDataset);
 			}
-			vtlBindings.put(testUserInputs.getMultimodeDatasetName(), fooDataset);
+			vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), fooDataset);
 			vtlBindings.put(Constants.ROOT_GROUP_NAME, fooDataset);
 			vtlBindings.put("LOOP", fooDataset);
 			vtlBindings.put("FROM_USER", fooDataset);
 			//
-			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testUserInputs.getMultimodeDatasetName());
+			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes());
 		});
 	}
 
@@ -62,10 +62,10 @@ class CsvOutputFilesTest {
 		Set<String> outputDatasetNames = outputFiles.getDatasetToCreate();
 
 		//
-		for (String mode : testUserInputs.getModes()) {
+		for (String mode : testUserInputsFile.getModes()) {
 			assertFalse(outputDatasetNames.contains(mode));
 		}
-		assertFalse(outputDatasetNames.contains(testUserInputs.getMultimodeDatasetName()));
+		assertFalse(outputDatasetNames.contains(testUserInputsFile.getMultimodeDatasetName()));
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
 	}
 

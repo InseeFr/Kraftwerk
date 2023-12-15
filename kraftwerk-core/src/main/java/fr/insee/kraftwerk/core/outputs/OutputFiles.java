@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
@@ -32,12 +33,10 @@ public abstract class OutputFiles {
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
-	 * @param userInputs   Used to get the campaign name and to filter intermediate
-	 *                     datasets that we don't want to output.
 	 */
-	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, String multimodeDatasetNames) {
+	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
 		this.vtlBindings = vtlBindings;
-		setOutputDatasetNames(modes, multimodeDatasetNames);
+		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
 		createOutputFolder();
 	}
@@ -48,13 +47,13 @@ public abstract class OutputFiles {
 	}
 
 	/** See getOutputDatasetNames doc. */
-	private void setOutputDatasetNames(List<String> modes, String multimodeDatasetNames) {
+	private void setOutputDatasetNames(List<String> modes) {
 		Set<String> unwantedDatasets = new HashSet<>(modes);
 		for (String modeName : modes) { // NOTE: deprecated code since clean up processing class
 			unwantedDatasets.add(modeName);
 			unwantedDatasets.add(modeName + "_keep"); // datasets created during Reconciliation step
 		}
-		unwantedDatasets.add(multimodeDatasetNames);
+		unwantedDatasets.add(Constants.MULTIMODE_DATASET_NAME);
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			if (!unwantedDatasets.contains(datasetName)) {
 				datasetToCreate.add(datasetName);

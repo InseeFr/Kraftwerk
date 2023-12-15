@@ -23,7 +23,7 @@ public abstract class ReportingDataParser {
 	private int maxComments = 0;
 	Group reportingGroup ;
 
-	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData) {
+	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData, boolean withAllReportingData){
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
 		this.maxComments = countMaxComments(reportingData);
