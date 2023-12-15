@@ -32,16 +32,21 @@ public class ReportingDataUE {
 
   @Getter@Setter
   private Identification identification;
+
+  @Getter@Setter
+  private List<Comment> comments;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();
     this.contactAttempts = new ArrayList<>();
+    this.comments = new ArrayList<>();
   }
   
   public ReportingDataUE(String identifier) {
     this.identifier = identifier;
     this.states = new ArrayList<>();
     this.contactAttempts = new ArrayList<>();
+    this.comments = new ArrayList<>();
   }
    
   public void putStates(List<State> states) {
@@ -59,8 +64,11 @@ public class ReportingDataUE {
     return this.states.size();
   }
       
-  public void addContactAttempts(ContactAttempt contactAttempt) {
+  public void addContactAttempt(ContactAttempt contactAttempt) {
     this.contactAttempts.add(contactAttempt);
+  }
+  public void addComment(Comment comment) {
+    this.comments.add(comment);
   }
   
   public void sortStates() {

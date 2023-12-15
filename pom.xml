@@ -11,23 +11,23 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.5</version>
+		<version>3.2.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>7.14.0</cucumber.version>
+		<cucumber.version>7.15.0</cucumber.version>
 		<!-- Proprietes sonar -->
-		<jacoco.version>0.8.10</jacoco.version>
+		<jacoco.version>0.8.11</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 		<skipSurefireReport>true</skipSurefireReport>
 		<!-- Pi Test-->
-		<pitest.version>1.15.0</pitest.version>
-		<pitest.junit.version>1.2.0</pitest.junit.version>
+		<pitest.version>1.15.3</pitest.version>
+		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>
 	<modules>
@@ -64,6 +64,10 @@
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-to-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

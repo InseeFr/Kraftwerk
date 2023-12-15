@@ -1,13 +1,12 @@
 package cucumber.functional_tests;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-import com.opencsv.exceptions.CsvValidationException;
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
-import io.cucumber.java.en.Then;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
+import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
+import static fr.insee.kraftwerk.core.Constants.STATE_SUFFIX_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +17,15 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static fr.insee.kraftwerk.core.Constants.STATE_SUFFIX_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+import com.opencsv.exceptions.CsvValidationException;
+
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
+import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import io.cucumber.java.en.Then;
 
 
 // These definitions are used in do_we_export_contact_attempts feature
@@ -214,7 +215,7 @@ public class ReportingDataDefinitions {
         //Date check
         SimpleDateFormat sdf = new SimpleDateFormat(expectedDateFormat);
         for (String[] line : content) {
-            int i = 0;
+            int i = 0; 
             // For each field
             for (String element : line) {
                 String fieldName = header[i];
@@ -263,13 +264,7 @@ public class ReportingDataDefinitions {
         assertThat(header).contains("OUTCOME_SPOTTING");
 
         // Fetch concerned survey unit line from file
-        String[] concernedLine = null;
-        for (String[] line : content) {
-            if (line[0].equals(surveyUnitId)) {
-                concernedLine = line;
-                break;
-            }
-        }
+        String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
 
         // Survey unit existence assertion
         assertThat(concernedLine).isNotNull();
@@ -287,6 +282,17 @@ public class ReportingDataDefinitions {
         assertThat(outcomeSpottingContent).isEqualTo(expectedOutcomeSpotting);
     }
 
+	public String[] fetchConcernedSurveyUnitLineFromFile(String surveyUnitId, List<String[]> content) {
+		String[] concernedLine = null;
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
+                concernedLine = line;
+                break;
+            }
+        }
+		return concernedLine;
+	}
+
     @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the identification field")
     public void check_identification(String surveyUnitId, String fileName, String directory, String expectedValue) throws IOException, CsvException {
         CSVReader csvReader = CsvUtils.getReader(
@@ -303,14 +309,7 @@ public class ReportingDataDefinitions {
         // OUTCOME_SPOTTING field existence assertion
         assertThat(header).contains(Constants.IDENTIFICATION_NAME);
 
-        // Fetch concerned survey unit line from file
-        String[] concernedLine = null;
-        for (String[] line : content) {
-            if (line[0].equals(surveyUnitId)) {
-                concernedLine = line;
-                break;
-            }
-        }
+        String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
 
         // Survey unit existence assertion
         assertThat(concernedLine).isNotNull();

@@ -49,9 +49,8 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param userInputs   Used to get the campaign name and to filter intermediate
 	 *                     datasets that we don't want to output.
 	 */
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes,
-			String multimodeDatasetNames) {
-		super(outDirectory, vtlBindings, modes, multimodeDatasetNames);
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
+		super(outDirectory, vtlBindings, modes);
 	}
 
 	
