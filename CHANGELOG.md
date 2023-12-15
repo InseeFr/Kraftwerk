@@ -7,6 +7,7 @@
 
 ### Fixed
 - Fix issue with null interviewerId
+- Fix exception when reporting VTL script not found
 
 ## 1.5.0 - [2023-11-24]
 
