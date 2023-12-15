@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
@@ -40,8 +41,8 @@ public class MainProcessing {
 	private Path inDirectory;
 	
 	@Getter
-	private UserInputs userInputs; // if main is called on all files
-	List<UserInputs> userInputsList; // for file by file process
+	private UserInputsFile userInputsFile; // if main is called on all files
+	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
 	private List<KraftwerkError> errors = new ArrayList<>();
@@ -70,8 +71,8 @@ public class MainProcessing {
 	public void runMain() throws KraftwerkException {
 		init();
 		if (Boolean.TRUE.equals(fileByFile)) { //iterate on files
-			for (UserInputs userInputsFile : userInputsList) {
-				userInputs = userInputsFile;
+			for (UserInputsFile userInputsFile : userInputsFileList) {
+				this.userInputsFile = userInputsFile;
 				vtlBindings = new VtlBindings();
 				unimodalProcess();
 				multimodalProcess();
@@ -92,35 +93,34 @@ public class MainProcessing {
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
-		userInputs = controlInputSequence.getUserInputs(inDirectory);
-		if (withDDI) metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-		if (!withDDI) metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputs.getModeInputsMap());
+		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+		if (withDDI) metadataVariables = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		if (!withDDI) metadataVariables = MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
 	
-		if (fileByFile) userInputsList = getUserInputs(userInputs);
+		if (fileByFile) userInputsFileList = getUserInputsFile(userInputsFile);
 
 	}
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws NullException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
+		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDDI);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataVariables);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataVariables);
 	}
 
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(),
-				userInputs.getMultimodeDatasetName(), metadataVariables, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataVariables, errors);
 	}
 
 	/* Step 5 : Write errors */
@@ -128,12 +128,12 @@ public class MainProcessing {
 		TextFileWriter.writeErrorsFile(inDirectory, errors);
 	}
 
-	private static List<UserInputs> getUserInputs(UserInputs source) throws KraftwerkException {
-		List<UserInputs> userInputsList = new ArrayList<>();
+	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source) throws KraftwerkException {
+		List<UserInputsFile> userInputsFileList = new ArrayList<>();
 		for (String dataMode : source.getModeInputsMap().keySet()) {
 			List<Path> dataFiles = getFilesToProcess(source, dataMode);
 			for (Path dataFile : dataFiles) {
-				UserInputs currentFileInputs = new UserInputs(source.getUserInputFile(),source.getUserInputFile().getParent());
+				UserInputsFile currentFileInputs = new UserInputsFile(source.getUserInputFile(),source.getUserInputFile().getParent());
 				currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
 				currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
 				currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
@@ -149,15 +149,15 @@ public class MainProcessing {
 				currentFileModeInputs.setParadataFolder(sourceModeInputs.getParadataFolder());
 				currentFileModeInputs.setReportingDataFile(sourceModeInputs.getReportingDataFile());
 				currentFileInputs.getModeInputsMap().put(dataMode, currentFileModeInputs);
-				userInputsList.add(currentFileInputs);
+				userInputsFileList.add(currentFileInputs);
 			}
 		}
-		return userInputsList;
+		return userInputsFileList;
 	}
 
-	private static List<Path> getFilesToProcess(UserInputs userInputs, String dataMode) {
+	private static List<Path> getFilesToProcess(UserInputsFile userInputsFile, String dataMode) {
 		List<Path> files = new ArrayList<>();
-		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
+		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		Path dataPath = modeInputs.getDataFile();
 		if (dataPath == null)
 			log.error("Datapath is null");

@@ -1,6 +1,11 @@
 package fr.insee.kraftwerk.api.services;
 
 
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,12 +18,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-
+import java.io.IOException;
 
 
 @RestController
 @Tag(name = "${tag.main}")
 public class MainService extends KraftwerkService {
+
+	ConfigProperties configProperties;
+
+	@Autowired
+	public MainService(ConfigProperties configProperties) {
+		this.configProperties = configProperties;
+	}
 
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
@@ -84,6 +96,20 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
+	@PutMapping(value = "/main/genesis")
+	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesis(@RequestParam("idQuestionnaire") String idQuestionnaire) {
+		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties);
+		try {
+			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory));
+			mpGenesis.runMain(idQuestionnaire);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(idQuestionnaire);
+	}
 
 
 }

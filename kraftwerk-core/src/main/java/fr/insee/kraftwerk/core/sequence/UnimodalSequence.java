@@ -30,7 +30,7 @@ import lombok.extern.log4j.Log4j2;
 public class UnimodalSequence {
 
 	public void applyUnimodalSequence(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
-								   List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
+									  List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		String vtlGenerate;
 
@@ -57,12 +57,7 @@ public class UnimodalSequence {
 					vtlGenerate);
 
 		} else {
-			log.info(String.format("No Lunatic questionnaire file for mode \"%s\"", dataMode));
-			if (modeInputs.getDataFormat() == DataFormat.LUNATIC_XML
-					|| modeInputs.getDataFormat() == DataFormat.LUNATIC_JSON) {
-				log.warn(String.format("Calculated variables for lunatic data of mode \"%s\" will not be evaluated.",
-						dataMode));
-			}
+			log.info(String.format("No Lunatic questionnaire file for mode \"%s\". Calculated variables will not be evaluated", dataMode));
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
