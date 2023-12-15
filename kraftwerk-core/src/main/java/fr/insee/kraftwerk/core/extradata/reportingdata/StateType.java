@@ -29,7 +29,7 @@ public enum StateType {
   STATE21("HC", "Hors Champs"),
   STATE22("VALPAP", "Questionnaire validé sur papier"),
   STATE23("VALINT", "Questionnaire validé sur internet"),
-  STATE24("REFUS", "Refus de répondre"),
+  STATE24("REFUSAL", "Refus de répondre"),
   STATE25("RELANCE", "RELANCE");
   
 	@Getter
