@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1 - [NOT RELEASED YET]
+### Fixed
+- Fix issue with null interviewerId
 
 ## 1.5.0 - [2023-11-24]
 

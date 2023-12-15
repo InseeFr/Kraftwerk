@@ -38,7 +38,10 @@ public class XMLReportingDataParser extends ReportingDataParser {
       String identifier = identifierElement.getValue();
       reportingDataUE.setIdentifier(identifier);
       Element interviewerIdentifierElement = surveyUnitElement.getFirstChildElement("InterviewerId");
-      String interviewerIdentifier = interviewerIdentifierElement.getValue();
+      String interviewerIdentifier = Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + identifier;
+      if(interviewerIdentifierElement != null){
+        interviewerIdentifier = interviewerIdentifierElement.getValue();
+      }
       reportingDataUE.setInterviewerId(interviewerIdentifier);
       Element organizationalUnitIdentifierElement = surveyUnitElement
         .getFirstChildElement("OrganizationalUnitId");
