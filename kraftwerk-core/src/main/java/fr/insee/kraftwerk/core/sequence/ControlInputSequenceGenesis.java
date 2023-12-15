@@ -1,15 +1,12 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Component;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import fr.insee.kraftwerk.core.Constants;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class ControlInputSequenceGenesis {

@@ -1,5 +1,10 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -18,12 +23,6 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 public class BuildBindingsSequenceGenesis {
 
