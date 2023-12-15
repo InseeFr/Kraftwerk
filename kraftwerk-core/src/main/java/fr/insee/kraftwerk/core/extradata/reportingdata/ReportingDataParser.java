@@ -171,6 +171,7 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
 					LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getSurveyValidationDateTimeStamp()),
 							TimeZone.getDefault().toZoneId()).toString());
+			DateUtils.formatDateToString(new Date((reportingDataUE.getSurveyValidationDateTimeStamp())))
 		}
 	}
 

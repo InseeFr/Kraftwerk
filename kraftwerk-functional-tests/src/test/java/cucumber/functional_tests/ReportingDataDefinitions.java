@@ -197,8 +197,8 @@ public class ReportingDataDefinitions {
         assertThat(actualSpecificStatusCount).isEqualTo(expectedSpecificStatusCount);
     }
 
-    @Then("In file named {string} in directory {string} we should have the following date format : {string}")
-    public void check_contact_attempt_date_format(String fileName, String directory, String expectedDateFormat) throws IOException, CsvException {
+    @Then("In file named {string} in directory {string} we should have the date format {string} for field {string}")
+    public void check_contact_attempt_date_format(String fileName, String directory, String expectedDateFormat, String fieldName) throws IOException, CsvException {
         CSVReader csvReader = CsvUtils.getReader(
                 Path.of(outDirectory + "/" + directory + "/" + fileName)
         );
@@ -212,20 +212,25 @@ public class ReportingDataDefinitions {
         String[] header = content.get(0);
         content.remove(0);
 
+        // Field presence assertion
+        assertThat(header).contains(fieldName);
+
         //Date check
         SimpleDateFormat sdf = new SimpleDateFormat(expectedDateFormat);
         for (String[] line : content) {
-            int i = 0; 
+            int i = 0;
             // For each field
             for (String element : line) {
-                String fieldName = header[i];
 
                 // Date format assertion if filled
-                if (fieldName.contains("_DATE") && !element.isEmpty()) {
+                if (header[i].equals(fieldName) && !element.isEmpty()) {
                     try {
                         sdf.parse(element);
                     } catch (ParseException e) {
-                        fail("Wrong date format in file");
+                        fail("Wrong date format on field " + fieldName + "\n" +
+                                "Expected " + expectedDateFormat + "\n"
+                                + "to be parsed on actual date : " + element
+                        );
                     }
                 }
                 i++;

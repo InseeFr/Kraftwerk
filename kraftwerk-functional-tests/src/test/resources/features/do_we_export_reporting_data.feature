@@ -12,9 +12,10 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding IdUE
 
-    |Directory                        |OutputFileName                                    |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |74                                |
-    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |74                                |
+    |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
+    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
+    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
+    |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv     |75                                |
 
 
 
@@ -35,7 +36,7 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the file have a correct date format
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then In file named "<OutputFileName>" in directory "<Directory>" we should have the following date format : "<ExpectedDateFormat>"
+    Then In file named "<OutputFileName>" in directory "<Directory>" we should have the date format "<ExpectedDateFormat>" for field "<FieldName>"
 
     Examples:
     # Parameters :
@@ -43,8 +44,9 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedDateformat : Expected date format in file
 
-      |Directory                        |OutputFileName                                    |ExpectedDateFormat  |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |yyyy-MM-dd-hh-mm-ss |
+      |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
+      |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
