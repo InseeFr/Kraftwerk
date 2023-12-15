@@ -7,6 +7,9 @@
 - Add support for partitioned reporting data files (Moog)
 - Add survey validation date in reporting data
 
+### Changed
+- Migrated to Java 21
+
 ### Fixed
 - Fix issue with null interviewerId
 - Fix exception when reporting VTL script not found
