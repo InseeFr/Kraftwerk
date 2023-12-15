@@ -2,9 +2,6 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
 import java.sql.Date;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.TimeZone;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;

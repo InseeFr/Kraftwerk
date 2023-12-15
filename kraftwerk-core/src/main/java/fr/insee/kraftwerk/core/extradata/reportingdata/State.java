@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.Objects;
-
 @AllArgsConstructor
 @Getter@Setter
 @EqualsAndHashCode
@@ -45,7 +43,7 @@ public class State{
 
     return (
             this.getPriorityOrder() < otherState.getPriorityOrder()
-            || (Objects.equals(this.getPriorityOrder(), otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
+            || (this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
     );
   }
   

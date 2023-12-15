@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.nio.file.Paths;
 
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
