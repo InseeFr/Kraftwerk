@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 - [NOT RELEASED YET]
+## 2.0.0 - [2023-12-18]
 
 ### Added
 - Look for data in Genesis
