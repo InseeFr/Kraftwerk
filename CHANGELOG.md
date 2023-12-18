@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0 - [2023-12-18]
+
+### Added
+- Look for data in Genesis
+
+### Changed
+- Migrated to Java 21
+
+### Fixed
+- Fix issue with null interviewerId
+- Fix exception when reporting VTL script not found
 
 ## 1.5.0 - [2023-11-24]
 

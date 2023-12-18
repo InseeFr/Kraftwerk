@@ -16,7 +16,7 @@ import org.springframework.util.FileSystemUtils;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 
 class FileUtilsTest {
 
@@ -72,11 +72,11 @@ class FileUtilsTest {
 		new File(Constants.getResourceAbsolutePath(paradataDirectory +"/L0000009.json")).createNewFile();
 		new File(Constants.getResourceAbsolutePath(paradataDirectory +"/L0000010.json")).createNewFile();
 
-		UserInputs testUserInputs = new UserInputs(Path.of(inputDirectory.toString(), "move_files.json"),inputDirectory);
+		UserInputsFile testUserInputsFile = new UserInputsFile(Path.of(inputDirectory.toString(), "move_files.json"),inputDirectory);
 
 
 		//WHEN
-		FileUtils.archiveInputFiles(testUserInputs);
+		FileUtils.archiveInputFiles(testUserInputsFile);
 		
 		//THEN
 		assertTrue(new File(inputDirectory.toString() + "/Archive/papier").exists());

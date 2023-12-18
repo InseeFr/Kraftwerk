@@ -23,11 +23,11 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
+import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
@@ -49,7 +49,7 @@ public class MainDefinitions {
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	String userInputFileName = Constants.USER_INPUT_FILE;
-	UserInputs userInputs;
+	UserInputsFile userInputs;
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
@@ -87,7 +87,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputs = new UserInputs(inDirectory.resolve(inputFileName), inDirectory);
+		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
 		vtlBindings = new VtlBindings();
 	}
 
@@ -131,11 +131,9 @@ public class MainDefinitions {
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(),
-				userInputs.getMultimodeDatasetName(), metadataVariables, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataVariables, errors);
 		writeErrorsFile(inDirectory, errors);
-		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(),
-				userInputs.getMultimodeDatasetName());
+		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
