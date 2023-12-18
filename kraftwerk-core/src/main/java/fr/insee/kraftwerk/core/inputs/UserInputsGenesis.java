@@ -67,6 +67,7 @@ public class UserInputsGenesis extends UserInputs{
 			JsonNode filesNode = userInputs.get("survey_data");
 			for (JsonNode fileNode : filesNode) {
 				String dataMode = readField(fileNode, "data_mode");
+				if (dataMode == null) {break;}
 				if (dataMode.equals(mode.name())) {
 					return FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				}

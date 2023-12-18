@@ -70,8 +70,8 @@ public class MainProcessing {
 	public void runMain() throws KraftwerkException {
 		init();
 		if (Boolean.TRUE.equals(fileByFile)) { //iterate on files
-			for (UserInputsFile userInputsFile : userInputsFileList) {
-				this.userInputsFile = userInputsFile;
+			for (UserInputsFile userFile : userInputsFileList) {
+				this.userInputsFile = userFile;
 				vtlBindings = new VtlBindings();
 				unimodalProcess();
 				multimodalProcess();
