@@ -37,12 +37,14 @@ public class State{
     return (getPriorityOrder() != null);
   }
 
-  public boolean isPriorityTo(State otherState){
+  public boolean isPriorTo(State otherState){
     if(otherState == null)
       return true;
 
     return (
+            // True if this state is more priority than the other
             this.getPriorityOrder() < otherState.getPriorityOrder()
+            //True if the other state has the same priority and this state is more recent
             || (this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
     );
   }

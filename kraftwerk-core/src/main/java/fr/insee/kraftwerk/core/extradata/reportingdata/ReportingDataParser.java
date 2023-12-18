@@ -166,7 +166,7 @@ public abstract class ReportingDataParser {
 		}
 		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
-					DateUtils.formatDateToString(new Date((reportingDataUE.getSurveyValidationDateTimeStamp()))));
+					DateUtils.formatLongToString(reportingDataUE.getSurveyValidationDateTimeStamp()));
 		}
 	}
 
@@ -185,7 +185,8 @@ public abstract class ReportingDataParser {
 		ContactOutcome contactOutcome = reportingDataUE.getContactOutcome();
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_NAME, contactOutcome.getOutcomeType());
 		if (contactOutcome.getDateEndContact() != 0L) {
-			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_DATE, DateUtils.formatDateToString(new Date(contactOutcome.getDateEndContact())));
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.OUTCOME_DATE,
+					DateUtils.formatLongToString(contactOutcome.getDateEndContact()));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.NUMBER_ATTEMPTS_NAME,
 					Integer.toString(contactOutcome.getTotalNumberOfContactAttempts()));
@@ -196,7 +197,7 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
 					StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
-					DateUtils.formatDateToString(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
+					DateUtils.formatLongToString((reportingDataUE.getStates().get(k - 1)).getTimestamp()));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.LAST_STATE_NAME,
 				StateType.getStateType(

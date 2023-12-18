@@ -120,19 +120,22 @@ public class XMLReportingDataParser extends ReportingDataParser {
     Element partitioningsNode = root.getFirstChildElement("Partitionings");
     if(partitioningsNode == null){
       // Survey unit list directly in root
-      Element surveyUnitsNode = root.getFirstChildElement("SurveyUnits");
-      for(Element surveyUnitElement : surveyUnitsNode.getChildElements("SurveyUnit"))
-        surveyUnitList.add(surveyUnitElement);
+      getSurveyUnitsFromElement(root,surveyUnitList);
     }else{
       //  Survey unit list divided into partitionings
       for(Element partitioningElement : partitioningsNode.getChildElements("Partitioning")){
-        Element surveyUnitsNode = partitioningElement.getFirstChildElement("SurveyUnits");
-        for(Element surveyUnitElement : surveyUnitsNode.getChildElements("SurveyUnit"))
-          surveyUnitList.add(surveyUnitElement);
+        getSurveyUnitsFromElement(partitioningElement, surveyUnitList);
       }
     }
 
     return surveyUnitList;
+  }
+
+  private void getSurveyUnitsFromElement(Element element, List<Element> surveyUnitList){
+      Element surveyUnitsNode = element.getFirstChildElement("SurveyUnits");
+      for(Element surveyUnitElement : surveyUnitsNode.getChildElements("SurveyUnit")) {
+        surveyUnitList.add(surveyUnitElement);
+      }
   }
 
   private void getAddress(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
@@ -153,47 +156,51 @@ public class XMLReportingDataParser extends ReportingDataParser {
   private void getIdentification(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
     Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
     reportingDataUE.setIdentification(new Identification());
-    if (identificationElement != null) {
-      if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
-        reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
+    if (identificationElement == null)
+      return;
 
-      if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null)
-        reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
+    if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+      reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
 
-      if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
-        reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+    if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null)
+      reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
 
-      if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
-        reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+    if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+      reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
 
-      if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
-        reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
-    }
+    if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+      reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+
+    if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+      reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
   }
 
   private void getComments(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
     Element commentsNode = surveyUnitElement.getFirstChildElement("Comments");
-    if(commentsNode != null) {
-      Elements commentsElements = commentsNode.getChildElements("Comment");
-      for (int k = 0; k < commentsElements.size(); k++) {
-        Element commentsElement = commentsElements.get(k);
-        String status = commentsElement.getFirstChildElement("type").getValue();
-        String value = commentsElement.getFirstChildElement("value").getValue();
-        reportingDataUE.addComment(new Comment(status, value));
-      }
+    if(commentsNode == null)
+      return;
+
+    Elements commentsElements = commentsNode.getChildElements("Comment");
+    for (int k = 0; k < commentsElements.size(); k++) {
+      Element commentsElement = commentsElements.get(k);
+      String status = commentsElement.getFirstChildElement("type").getValue();
+      String value = commentsElement.getFirstChildElement("value").getValue();
+      reportingDataUE.addComment(new Comment(status, value));
     }
   }
 
   private void setSurveyValidationDate(ReportingDataUE reportingDataUE) {
-    if(!reportingDataUE.getStates().isEmpty()) {
-      State validationState = null;
-      for (State contactState : reportingDataUE.getStates()) {
-        if(contactState.isValidationState() && contactState.isPriorityTo(validationState))
-          validationState = contactState;
-      }
-      if(validationState != null)
-        reportingDataUE.setSurveyValidationDateTimeStamp(validationState.getTimestamp());
-    }
+  if(reportingDataUE.getStates().isEmpty()) {
+    return;
   }
 
+    State validationState = null;
+    for (State contactState : reportingDataUE.getStates()) {
+      if(contactState.isValidationState() && contactState.isPriorTo(validationState)){
+        validationState = contactState;
+      }
+    }
+    if(validationState != null)
+      reportingDataUE.setSurveyValidationDateTimeStamp(validationState.getTimestamp());
+  }
 }
