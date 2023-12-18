@@ -15,7 +15,7 @@ Feature: Do we save correctly all reporting data ?
     |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
     |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
     |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv     |31                                |
+    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
 
 
 
@@ -46,7 +46,7 @@ Feature: Do we save correctly all reporting data ?
 
       |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
-      |SAMPLETEST-REPORTINGDATA-MOOG-V1 |SAMPLETEST-REPORTINGDATA-MOOG-V1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
+      |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
