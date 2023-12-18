@@ -7,8 +7,10 @@ import java.util.Map;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.TCMSequencesProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
@@ -74,7 +76,12 @@ public class UnimodalSequence {
 				errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate);
 
-		/* Step 2.5b : Apply user specified mode-specific VTL transformations */
+		/* Step 2.5b : Apply TCM VTL transformations */
+		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(vtlBindings, metadataVariables, Constants.VTL_FOLDER_PATH);
+		vtlGenerate = tcmSequencesProcessing.applyAutomatedVtlInstructions(dataMode, errors);
+		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "TCMSequenceVTL", dataMode), vtlGenerate);
+
+		/* Step 2.5c : Apply user specified mode-specific VTL transformations */
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
 				vtlGenerate);

@@ -17,7 +17,7 @@ public class TCMSequencesProcessing extends DataProcessing {
     private final String vtlDirectory;
     private final Map<String, VariablesMap> metadataVariables;
 
-    protected TCMSequencesProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables,String vtlDirectory) {
+    public TCMSequencesProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables,String vtlDirectory) {
         super(vtlBindings);
         this.metadataVariables = metadataVariables;
         this.vtlDirectory = vtlDirectory;
@@ -34,7 +34,7 @@ public class TCMSequencesProcessing extends DataProcessing {
     }
 
     @Override
-    protected String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
+    public String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, this.metadataVariables);
         log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName()));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {

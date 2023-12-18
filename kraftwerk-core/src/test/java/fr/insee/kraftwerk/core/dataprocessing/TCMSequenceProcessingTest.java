@@ -42,7 +42,6 @@ class TCMSequenceProcessingTest {
             )
     );
     static VtlBindings vtlBindings = new VtlBindings();
-    static List<KraftwerkError> errors = new ArrayList<>();
     Dataset outDataset;
     @BeforeAll
     static void init() throws IOException {
@@ -54,15 +53,12 @@ class TCMSequenceProcessingTest {
         Files.write(path,vtlScript.getBytes());
 
         vtlBindings.put("TEST", unimodalDataset);
-
-
     }
 
     //When + Then
     @Test
     @DisplayName("We should have TCM Module variable in binding")
     void check_standard_vtl_execution(){
-        //TODO
         //Metadata variables object
         Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
         VariablesMap variablesMap = new VariablesMap();

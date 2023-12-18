@@ -3,11 +3,14 @@ package cucumber.functional_tests;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
+import static cucumber.TestConstants.TEST_RESOURCES_DIRECTORY;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -76,6 +80,20 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
+	}
+
+	@Given("We have a test VTL script named {string} creating a variable {string} in dataset {string}")
+	public void init_VTL_script(String vtlScriptName, String variableToCreate, String datasetName) throws IOException {
+		String generatedVTL = datasetName + " := " + datasetName + " [calc " + variableToCreate + " := \"TEST\"];";
+
+		Path vtlFolderPath = Files.createDirectories(Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm"));
+		Path vtlPath = vtlFolderPath.resolve(vtlScriptName + ".vtl");
+
+		if(Files.exists(vtlPath)) //If file already exist (legitimate script) backup
+			Files.copy(vtlPath,vtlFolderPath.resolve(vtlScriptName + ".bkp"));
+		else
+			Files.createFile(vtlPath);
+		Files.write(vtlPath,generatedVTL.getBytes());
 	}
 
 	@When("Step 1 : We initialize the input files")
@@ -205,7 +223,7 @@ public class MainDefinitions {
 				.getReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
 		// get header
 		String[] header = csvReader.readNext();
-		int idUEPosition = Arrays.asList(header).indexOf("IdUE");
+		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
 		int varPosition = Arrays.asList(header).indexOf(variable);
 
 		// get the line corresponding to idUE
@@ -252,4 +270,35 @@ public class MainDefinitions {
 		}
 	}
 
+	@Then("In a file named {string} there should be a {string} field")
+	public void check_field_existence(String fileName, String fieldName) throws IOException, CsvValidationException {
+		File outputReportingDataFile = new File(outDirectory + "/" + fileName);
+
+		// File existence assertion
+		assertThat(outputReportingDataFile).exists().isFile().canRead();
+
+		CSVReader csvReader = CsvUtils.getReader(
+				outputReportingDataFile.toPath()
+		);
+
+
+		// Get header
+		String[] header = csvReader.readNext();
+		csvReader.close();
+
+		assertThat(header).isNotEmpty().contains(fieldName);
+	}
+
+	@When("We clean the test VTL script named {string}")
+	public void clean_vtl(String vtlScriptName) throws IOException {
+		Path vtlPath = Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm").resolve(vtlScriptName + ".vtl");
+		Path bkpPath = vtlPath.getParent().resolve(vtlScriptName + ".bkp");
+
+		Files.deleteIfExists(vtlPath);
+
+		if(Files.exists(bkpPath)) // Put backup back
+			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
+
+		Files.deleteIfExists(bkpPath);
+	}
 }
