@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.utils;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.*;
 import javax.xml.stream.events.EndDocument;
 import javax.xml.stream.events.StartDocument;
