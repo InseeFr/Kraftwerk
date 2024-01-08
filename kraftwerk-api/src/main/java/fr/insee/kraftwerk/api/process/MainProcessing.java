@@ -103,13 +103,13 @@ public class MainProcessing {
 		//In case of file-by-file processing we check the size of each file.
 		long limitSize = 419430400L;
 		if (fileByFile) {
-			for (UserInputs userInputsFile : userInputsList) {
-				isDataTooBig(userInputsFile,"At least one file size is greater than 400Mo. Split data files greater than 400 MB.", limitSize);
+			for (UserInputsFile userInputs : userInputsFileList) {
+				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400 MB.", limitSize);
 			}
 		}
 		//In case of main processing we check the folder
 		if (!fileByFile) {
-			isDataTooBig(userInputs,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
+			isDataTooBig(userInputsFile,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
 		}
 
 	}
@@ -191,8 +191,8 @@ public class MainProcessing {
 		return files;
 	}
 
-	private void isDataTooBig(UserInputs userInputsFile, String errorMessage, long limitSize) throws KraftwerkException {
-		for (String dataMode : userInputs.getModeInputsMap().keySet()){
+	private void isDataTooBig(UserInputsFile userInputsFile, String errorMessage, long limitSize) throws KraftwerkException {
+		for (String dataMode : userInputsFile.getModeInputsMap().keySet()){
 			long dataSize = FileUtils.sizeOf(userInputsFile.getModeInputs(dataMode).getDataFile().toFile());
 			if (dataSize > limitSize) {
 				log.error("Size of data folder/file {} : {}",userInputsFile.getModeInputs(dataMode).getDataFile(), FileUtils.byteCountToDisplaySize(dataSize));

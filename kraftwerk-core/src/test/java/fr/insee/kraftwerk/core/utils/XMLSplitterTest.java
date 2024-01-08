@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 class XMLSplitterTest {
 
@@ -37,7 +36,7 @@ class XMLSplitterTest {
 	}
 
 	@Test
-	@DisplayName("Split a file in 3")
+	@DisplayName("OutDirectory should contain 3 files")
 	void splitInThreeTest() throws XMLStreamException, IOException {
 		List<String> splitFiles = FileUtils.listFiles(outDirectory);
 		assertEquals(3,splitFiles.size());
