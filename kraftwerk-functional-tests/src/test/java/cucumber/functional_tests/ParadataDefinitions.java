@@ -12,7 +12,7 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
@@ -39,7 +39,7 @@ public class ParadataDefinitions {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
 		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
-		UserInputs userInputs = controlInputSequence.getUserInputs(campaignDirectory);;
+		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);;
 		// For now, only one file
 		String modeName = userInputs.getModes().get(0);
 		modeInputs = userInputs.getModeInputs(modeName);

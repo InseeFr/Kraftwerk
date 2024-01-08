@@ -18,7 +18,7 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
@@ -59,10 +59,10 @@ public class StepByStepService extends KraftwerkService {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
-		for (String dataMode : mp.getUserInputs().getModeInputsMap().keySet()) {
+		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
-			} catch (KraftwerkException e) {
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
+			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 
@@ -95,8 +95,8 @@ public class StepByStepService extends KraftwerkService {
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
-			buildBindingsSequence.buildVtlBindings(mp.getUserInputs(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
-		} catch (KraftwerkException e) {
+			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
+		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
@@ -122,9 +122,9 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
+		UserInputsFile userInputsFile;
 		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -134,11 +134,11 @@ public class StepByStepService extends KraftwerkService {
 		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
 		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
-		unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataVariables);
 		
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
@@ -163,9 +163,9 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		UserInputs userInputs;
+		UserInputsFile userInputsFile;
 		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -176,15 +176,15 @@ public class StepByStepService extends KraftwerkService {
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 
 		//Process
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataVariables);
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
@@ -221,14 +221,14 @@ public class StepByStepService extends KraftwerkService {
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
-		UserInputs userInputs;
+		UserInputsFile userInputsFile;
 		try {
-			userInputs = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), userInputs.getMultimodeDatasetName(), metadataVariables, errors);
+		Map<String, VariablesMap> metadataVariables = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataVariables, errors);
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}

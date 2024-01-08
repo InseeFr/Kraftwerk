@@ -24,11 +24,11 @@ class UserInputsTest {
 
 	@Test
 	void testReadValidUserInput_singleMode() throws KraftwerkException {
-		UserInputs userInputs = new UserInputs(
+		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory);
 		//
-		ModeInputs modeInputs = userInputs.getModeInputs("CAPI");
+		ModeInputs modeInputs = userInputsFile.getModeInputs("CAPI");
 		assertNotNull(modeInputs.getDataFile());
 		assertNotNull(modeInputs.getDdiUrl());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
@@ -36,28 +36,28 @@ class UserInputsTest {
 		assertNotNull(modeInputs.getReportingDataFile());
 		assertNull(modeInputs.getModeVtlFile());
 		//
-		assertEquals( "MULTIMODE", userInputs.getMultimodeDatasetName());
-		assertNull(userInputs.getVtlReconciliationFile());
-		assertNull(userInputs.getVtlTransformationsFile());
-		assertNull(userInputs.getVtlInformationLevelsFile());
+		assertEquals( "MULTIMODE", userInputsFile.getMultimodeDatasetName());
+		assertNull(userInputsFile.getVtlReconciliationFile());
+		assertNull(userInputsFile.getVtlTransformationsFile());
+		assertNull(userInputsFile.getVtlInformationLevelsFile());
 	}
 
 	@Test
 	void testReadValidUserInput_missingOptionalFields() {
-		assertDoesNotThrow(() -> new UserInputs(
+		assertDoesNotThrow(() -> new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid_missing_fields.json"),
 				inputSamplesDirectory));
 	}
 
 	@Test
 	void testReadValidUserInput_severalModes() throws KraftwerkException {
-		UserInputs userInputs = new UserInputs(
+		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid_several_modes.json"),
 				inputSamplesDirectory);
 		//
-		assertTrue(userInputs.getModes().containsAll(Set.of("CAPI", "CAWI", "PAPI")));
+		assertTrue(userInputsFile.getModes().containsAll(Set.of("CAPI", "CAWI", "PAPI")));
 		//
-		ModeInputs modeInputs = userInputs.getModeInputs("CAWI");
+		ModeInputs modeInputs = userInputsFile.getModeInputs("CAWI");
 		assertNotNull(modeInputs.getDataFile());
 		assertNotNull(modeInputs.getDdiUrl());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
@@ -65,17 +65,17 @@ class UserInputsTest {
 		assertNotNull(modeInputs.getReportingDataFile());
 		assertNotNull(modeInputs.getModeVtlFile());
 		//
-		assertEquals("MULTIMODE", userInputs.getMultimodeDatasetName());
-		assertNull(userInputs.getVtlReconciliationFile());
-		assertEquals("test2.vtl", userInputs.getVtlTransformationsFile().getFileName().toString());
-		assertNull(userInputs.getVtlInformationLevelsFile());
+		assertEquals("MULTIMODE", userInputsFile.getMultimodeDatasetName());
+		assertNull(userInputsFile.getVtlReconciliationFile());
+		assertEquals("test2.vtl", userInputsFile.getVtlTransformationsFile().getFileName().toString());
+		assertNull(userInputsFile.getVtlInformationLevelsFile());
 	}
 
 	@Test
 	void testReadInvalidUserInput_wrongDataFormat() {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_data_format.json");
 		assertThrows(UnknownDataFormatException.class, () -> {
-			new UserInputs(path,inputSamplesDirectory);
+			new UserInputsFile(path,inputSamplesDirectory);
 		});
 	}
 
@@ -83,7 +83,7 @@ class UserInputsTest {
 	void testReadInvalidUserInput_wrongFieldNames() {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_field_names.json");
 		assertThrows(MissingMandatoryFieldException.class, () -> {
-			new UserInputs(	path,inputSamplesDirectory);
+			new UserInputsFile(	path,inputSamplesDirectory);
 		});
 	}
 
@@ -91,7 +91,7 @@ class UserInputsTest {
 	void testReadMalformedInput() throws KraftwerkException {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_malformed.json");
 		assertThrows(UnknownDataFormatException.class, () -> {
-			new UserInputs(path,inputSamplesDirectory);
+			new UserInputsFile(path,inputSamplesDirectory);
 		});
 	}
 	
@@ -99,7 +99,7 @@ class UserInputsTest {
 	void testReadInputMissingFile() throws KraftwerkException {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_several_modes_fileNotExist.json");
 		assertThrows(KraftwerkException.class, () -> {
-			new UserInputs(path,inputSamplesDirectory);
+			new UserInputsFile(path,inputSamplesDirectory);
 		});
 	}
 	
@@ -107,7 +107,7 @@ class UserInputsTest {
 	void testReadInputCompletePath() throws KraftwerkException {
 		Path path = inputSamplesDirectory.resolve("inputs_valid_several_modes_completePath.json");
 		assertDoesNotThrow(() -> {
-			new UserInputs(path,inputSamplesDirectory);
+			new UserInputsFile(path,inputSamplesDirectory);
 		});
 	}
 	

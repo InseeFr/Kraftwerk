@@ -31,6 +31,8 @@ public final class Constants {
 	public static final String XSLT_FOLDER = RESOURCES_FOLDER + "/xslt";
 	public static final String XSLT_FOLDER_PATH = RESOURCES_FOLDER + XSLT_FOLDER;
 	public static final String VTL_FOLDER_PATH = RESOURCES_FOLDER + "/vtl";
+	public static final String PARADATA_FOLDER = "/PARADATA";
+	public static final String REPORTING_DATA_FOLDER = "/REPORTING_DATA";
 
 	// ----- XSL scripts
 	public static final String XSLT_STRUCTURED_VARIABLES = "xslt/structured-variables.xsl";
@@ -46,7 +48,10 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
+	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
+	public static final String REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER = "NON_AFFECTE_";
+
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
