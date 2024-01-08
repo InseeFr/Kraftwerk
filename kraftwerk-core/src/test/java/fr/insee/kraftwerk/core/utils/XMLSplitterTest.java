@@ -10,6 +10,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,10 +26,13 @@ class XMLSplitterTest {
 
 	@BeforeAll
 	static void cleanUpBeforeTests() throws Exception {
-		List<String> splitFiles = FileUtils.listFiles(outDirectory);
-		for (String splitFile : splitFiles) {
-			if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
-				System.out.println("File "+splitFile+" not deleted");
+		File file = new File(outDirectory);
+		if (file.exists()) {
+			List<String> splitFiles = FileUtils.listFiles(outDirectory);
+			for (String splitFile : splitFiles) {
+				if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
+					System.out.println("File "+splitFile+" not deleted");
+				}
 			}
 		}
 		XMLSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
