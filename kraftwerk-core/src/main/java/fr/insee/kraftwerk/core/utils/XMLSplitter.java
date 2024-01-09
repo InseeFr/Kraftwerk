@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class XMLSplitter {
 
 	public static void split(String inputfolder, String xmlfile, String outputFolder, String condition, int nbElementsByFile) throws XMLStreamException, IOException {
 
+		FileUtils.createDirectoryIfNotExist(Paths.get(outputFolder));
 		String xmlResource = inputfolder + xmlfile;
 		List<XMLEvent> header = getHeader(xmlResource, condition);
 
