@@ -55,7 +55,7 @@ class XMLSplitterTest {
 		int count = 0;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		try {
-			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(outDirectory+splitFiles.get(0)));
+			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(outDirectory+"split1.xml"));
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
 				if (event.isStartElement()) {
