@@ -22,16 +22,18 @@ import static org.junit.Assert.assertEquals;
 
 class XMLSplitterTest {
 
-	static final String outDirectory = TestConstants.UNIT_TESTS_DIRECTORY+"/out/split/";
+	static final String outDirectory = TestConstants.UNIT_TESTS_DUMP+"/split/";
 
 	@BeforeAll
 	static void cleanUpBeforeTests() throws Exception {
 		File file = new File(outDirectory);
 		if (file.exists()) {
 			List<String> splitFiles = FileUtils.listFiles(outDirectory);
-			for (String splitFile : splitFiles) {
-				if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
-					System.out.println("File "+splitFile+" not deleted");
+			if (splitFiles != null){
+				for (String splitFile : splitFiles) {
+					if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
+						System.out.println("File "+splitFile+" not deleted");
+					}
 				}
 			}
 		}
