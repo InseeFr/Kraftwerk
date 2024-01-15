@@ -1,16 +1,17 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.EnumUtils;
+
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class TCMSequencesProcessing extends DataProcessing {
@@ -59,7 +60,7 @@ public class TCMSequencesProcessing extends DataProcessing {
                 .toList()){
             TCMSequenceEnum tcmSequenceEnum = TCMSequenceEnum.valueOf(tcmSequenceString);
 
-            for(TCMModuleEnum tcmModuleEnum : TCMModuleEnum.getModules(tcmSequenceEnum)){
+            for(TCMModuleEnum tcmModuleEnum : tcmSequenceEnum.getTcmModules()){
                 Path tcmModulePath = Path.of(this.vtlDirectory).resolve("tcm").resolve(tcmModuleEnum.toString() + ".vtl");
                 if(tcmModulePath.toFile().exists()){
                     vtlScriptBuilder.append(TextFileReader.readFromPath(tcmModulePath));

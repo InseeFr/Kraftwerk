@@ -7,7 +7,6 @@ import java.util.Map;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.TCMSequencesProcessing;

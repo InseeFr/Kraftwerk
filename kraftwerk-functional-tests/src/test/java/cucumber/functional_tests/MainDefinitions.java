@@ -3,7 +3,6 @@ package cucumber.functional_tests;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static cucumber.TestConstants.TEST_RESOURCES_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +40,6 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
