@@ -73,8 +73,6 @@ public class UserInputsFile extends UserInputs {
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
 			throw new UnknownDataFormatException(e.getMessage());
-		} catch (KraftwerkException e) {
-			throw e;
 		}
 	}
 
