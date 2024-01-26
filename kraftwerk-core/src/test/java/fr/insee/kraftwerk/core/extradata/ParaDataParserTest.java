@@ -1,25 +1,23 @@
 package fr.insee.kraftwerk.core.extradata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
+import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
-import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ParaDataParserTest {
 
@@ -47,7 +45,7 @@ class ParaDataParserTest {
 		expectedMessage = "Cannot invoke \"fr.insee.kraftwerk.core.extradata.paradata.Paradata.getFilepath()\" because \"paradata\" is null";
 		actualMessage = exception.getMessage();
 
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 		
 		//Empty paradata and empty SurveyRawData
 		Paradata paradata = new Paradata();
@@ -58,8 +56,8 @@ class ParaDataParserTest {
 		expectedMessage = "JSONFile not defined";
 		actualMessage = exception.getMessage();
 		int actualStatus = ((KraftwerkException) exception).getStatus();
-		assertEquals(500, actualStatus);
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertEquals(500, actualStatus);
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 		
 		//assert that do nothng without file
 		paradata.setFilepath(Path.of(""));
@@ -70,7 +68,7 @@ class ParaDataParserTest {
 	@Test
 	void whenCorrectParadata_thenCalculatedTimeIsOk() throws NullException {
 		SurveyRawData srd = new SurveyRawData();
-		srd.setVariablesMap(new VariablesMap());
+		srd.setMetadataModel(new MetadataModel());
 
 		srd = addIdToTest(srd, "PL1100000101");
 		srd = addIdToTest(srd, "RR100144");

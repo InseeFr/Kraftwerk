@@ -9,36 +9,30 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@Getter
 public class Variable {
 
 	/** Variable name. */
-	@Getter
 	protected String name;
 
 	/** Group reference */
-	@Getter
 	protected Group group;
 
 	/** Variable type from the enum class (STRING, INTEGER, DATE, ...) */
-	@Getter
 	protected VariableType type;
 
 	/** Format for SAS script import */
-	@Getter
 	protected String sasFormat;
 
 	/** Maximum length received in input for the variable. */
-	@Getter
 	@Setter
 	protected int maxLengthData;
 
 	/** Name of the item used to collect the answer. */
-	@Getter
 	@Setter
 	protected String questionItemName;
 
 	/** Identifies if the variable is part a question grid */
-	@Getter
 	@Setter
 	protected boolean isInQuestionGrid;
 

@@ -1,13 +1,5 @@
 package cucumber.unit_tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.script.Bindings;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
@@ -20,6 +12,13 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import javax.script.Bindings;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // Used in do_we_aggregate
 public class AggregateDefinitions {
@@ -38,9 +37,9 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakeCawiData, firstDataset, vtlBindings);
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel());
 		groupProcessing.applyVtlTransformations(firstDataset, null,errors);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getVariablesMap());
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel());
 		groupProcessing2.applyVtlTransformations(secondDataset, null,errors);
 
 		//
@@ -59,12 +58,12 @@ public class AggregateDefinitions {
 	public void the_aggregated_dataset_shoud_exist() {
 		assertEquals(17, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
 		// On check que l'aggregation a conservé les identifiants
-		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains(Constants.ROOT_IDENTIFIER_NAME));
+		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));
 		// On check que l'aggregation a conserve les variables qui sont en commun.
-		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains("LAST_NAME"));
+		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("LAST_NAME"));
 		// On check que l'aggregation a conserve les variables qui sont dans un seul des deux datasets.
-		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains("AGE"));
-		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().keySet().contains("ADDRESS"));
+		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("AGE"));
+		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("ADDRESS"));
 		// On vérifie les valeurs de quelques variables
 		assertEquals(40, ((Long) vtlBindings.getDataset("MULTIMODE").getDataPoints().get(0).get("AGE")).intValue());
 		assertEquals("Simpson in PAPI", vtlBindings.getDataset("MULTIMODE").getDataPoints().get(4).get("LAST_NAME"));

@@ -1,36 +1,30 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Stream;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.log4j.Log4j2;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Log4j2
 public class ParadataParser {
 
-	private String timestamp = "timestamp";
-
 	private static final String NEW_VALUE = "newValue";
 
-	private List<String> inputFields = Arrays.asList("RADIO", "CHECKBOX", "INPUT", "DATEPICKER");
+	private final List<String> inputFields = Arrays.asList("RADIO", "CHECKBOX", "INPUT", "DATEPICKER");
 
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
@@ -75,8 +69,8 @@ public class ParadataParser {
 	}
 
 	private void parseParadataUE(ParaDataUE paradataUE, SurveyRawData surveyRawData) throws NullException {
-		// To convert to a entire folder instead of a single file
-		VariablesMap variablesMap = surveyRawData.getVariablesMap();
+		// To convert to an entire folder instead of a single file
+		VariablesMap variablesMap = surveyRawData.getMetadataModel().getVariables();
 		JSONObject jsonObject = getParadataFromJson(paradataUE);
 		// Get Identifier
 		String identifier = (String) jsonObject.get("idSu");
@@ -85,9 +79,8 @@ public class ParadataParser {
 		// Now we get each event recorded
 		ArrayList<Event> events = new ArrayList<>();
 		JSONArray collectedEvents = (JSONArray) jsonObject.get("events");
-		for (int i = 0; i < collectedEvents.size(); i++) {
-
-			JSONArray subParadata = (JSONArray) collectedEvents.get(i);
+		for (Object collectedEvent : collectedEvents) {
+			JSONArray subParadata = (JSONArray) collectedEvent;
 			for (int j = 0; j < subParadata.size(); j++) {
 				parseEventFromParadataUE(paradataUE, variablesMap, identifier, events, subParadata, j);
 			}
@@ -98,12 +91,13 @@ public class ParadataParser {
 	private void parseEventFromParadataUE(ParaDataUE paradataUE, VariablesMap variablesMap, String identifier,
 			ArrayList<Event> events, JSONArray subParadata, int j) {
 		JSONObject collectedEvent = (JSONObject) subParadata.get(j);
-		if (isCollectedParadata(collectedEvent)) { // check that paradata are linked to collect (not vizualisation or
+		if (isCollectedParadata(collectedEvent)) { // check that paradata are linked to collect (not visualisation or
 													// readonly))
 
 			Event event = new Event(identifier);
 			event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
 			event.setIdSession((String) collectedEvent.get("idSession"));
+			String timestamp = "timestamp";
 			event.setTimestamp((long) collectedEvent.get(timestamp));
 
 			ParadataVariable paradataVariable = new ParadataVariable(identifier);
@@ -138,7 +132,7 @@ public class ParadataParser {
 
 	private JSONObject getParadataFromJson(ParaDataUE paradataUE) throws NullException {
 		Path filePath = paradataUE.getFilepath();
-		JSONObject jsonObject = null;
+		JSONObject jsonObject;
 		try {
 			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
 		} catch (Exception e) {
@@ -156,12 +150,13 @@ public class ParadataParser {
 			return object.toString();
 		} else if (object instanceof JSONArray jsonArray) {
 			List<String> values = new ArrayList<>();
-			for (int index = 0; index < jsonArray.size(); index++) {
-				values.add((String) getValue(jsonArray.get(index)));
+			for (Object o : jsonArray) {
+				values.add((String) getValue(o));
 			}
 			return values;
 		} else if (object instanceof Integer) {
 			// do what you want
+			log.debug("This object is an integer");
 		}
 
 		return null;
@@ -175,30 +170,32 @@ public class ParadataParser {
 	 * @param surveyRawData dataset where the paradata will be saved
 	 */
 	private void integrateParaDataVariablesIntoUE(ParaDataUE paraDataUE, SurveyRawData surveyRawData) {
-		VariablesMap variablesMap = surveyRawData.getVariablesMap();
+		VariablesMap variablesMap = surveyRawData.getMetadataModel().getVariables();
+		Group rootGroup = surveyRawData.getMetadataModel().getRootGroup();
+
 		Set<String> paradataVariables = paraDataUE.getParaDataVariables().keySet();
-		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+		Variable variableDuree = new Variable(Constants.LENGTH_ORCHESTRATORS_NAME,rootGroup,
 				VariableType.STRING, "30");
 		Variable variableDureeBrute = new Variable(
-				Constants.LENGTH_ORCHESTRATORS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX, variablesMap.getRootGroup(),
+				Constants.LENGTH_ORCHESTRATORS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX, rootGroup,
 				VariableType.INTEGER, "20.");
-		Variable variableDureeSession = new Variable(Constants.LENGTH_SESSIONS_NAME, variablesMap.getRootGroup(),
+		Variable variableDureeSession = new Variable(Constants.LENGTH_SESSIONS_NAME, rootGroup,
 				VariableType.STRING, "30");
 		Variable variableDureeSessionBrute = new Variable(
-				Constants.LENGTH_SESSIONS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX, variablesMap.getRootGroup(),
+				Constants.LENGTH_SESSIONS_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX, rootGroup,
 				VariableType.INTEGER, "20.");
-		Variable variableStart = new Variable(Constants.START_SESSION_NAME, variablesMap.getRootGroup(),
+		Variable variableStart = new Variable(Constants.START_SESSION_NAME, rootGroup,
 				VariableType.INTEGER, "20.");
-		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, variablesMap.getRootGroup(),
+		Variable variableEnd = new Variable(Constants.FINISH_SESSION_NAME, rootGroup,
 				VariableType.INTEGER, "20.");
-		Variable variableNbOrch = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, variablesMap.getRootGroup(),
+		Variable variableNbOrch = new Variable(Constants.NUMBER_ORCHESTRATORS_NAME, rootGroup,
 				VariableType.INTEGER, "3.");
-		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, variablesMap.getRootGroup(),
+		Variable variableNbSessions = new Variable(Constants.NUMBER_SESSIONS_NAME, rootGroup,
 				VariableType.INTEGER, "3.");
 		Variable variableDateCollecteBrute = new Variable(
 				Constants.SURVEY_VALIDATION_DATE_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX,
-				variablesMap.getRootGroup(), VariableType.STRING, "3.");
-		Variable variableDateCollecte = new Variable(Constants.SURVEY_VALIDATION_DATE_NAME, variablesMap.getRootGroup(),
+				rootGroup, VariableType.STRING, "3.");
+		Variable variableDateCollecte = new Variable(Constants.SURVEY_VALIDATION_DATE_NAME, rootGroup,
 				VariableType.STRING, "3.");
 
 		// Add variables to map : some variables are calculated but not used
@@ -213,7 +210,7 @@ public class ParadataParser {
 		for (String variableName : paradataVariables) {
 			if (variableName.contentEquals("PRENOM")) {
 				Variable variable = new Variable(Constants.PARADATA_VARIABLES_PREFIX + variableName,
-						variablesMap.getRootGroup(), VariableType.STRING, "3");
+						rootGroup, VariableType.STRING, "3");
 				variablesMap.putVariable(variable);
 			}
 		}
@@ -224,7 +221,7 @@ public class ParadataParser {
 		long lengthSessions = paraDataUE.createLengthSessionsVariable();
 
 		QuestionnaireData questionnaire = surveyRawData.getQuestionnaires().stream()
-				.filter(questionnaireToSearch -> paraDataUE.getOrchestrators().get(0).getIdentifier()
+				.filter(questionnaireToSearch -> paraDataUE.getOrchestrators().getFirst().getIdentifier()
 						.equals(questionnaireToSearch.getIdentifier()))
 				.findAny().orElse(null);
 		

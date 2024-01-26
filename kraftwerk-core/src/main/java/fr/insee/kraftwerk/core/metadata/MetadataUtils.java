@@ -1,34 +1,32 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @Log4j2
 public class MetadataUtils {
-
-
 
 	private MetadataUtils(){
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Map<String, VariablesMap> getMetadata(Map<String, ModeInputs> modeInputsMap){
-		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
-		modeInputsMap.forEach((k, v) -> putToMetadataVariable(k,v,metadataVariables));
-		return metadataVariables;
+	public static Map<String, MetadataModel> getMetadata(Map<String, ModeInputs> modeInputsMap){
+		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
+		modeInputsMap.forEach((k, v) -> putToMetadataModels(k,v,metadataModels));
+		return metadataModels;
 	}
 
-	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
+	private static void putToMetadataModels(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels ) {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables = new VariablesMap();
+		MetadataModel metadataModel = new MetadataModel();
 		try {
-			variables = DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl());
+			metadataModel = DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl());
 		} catch (KraftwerkException e) {
 			log.error(e.getMessage());
 		}
@@ -37,36 +35,36 @@ public class MetadataUtils {
 			// First we add the collected _MISSING variables
 			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile());
 			for (String missingVar : missingVars) {
-				addLunaticVariable(variables, missingVar, Constants.MISSING_SUFFIX, VariableType.STRING);
+				addLunaticVariable(metadataModel, missingVar, Constants.MISSING_SUFFIX, VariableType.STRING);
 			}
 			// Then we add calculated FILTER_RESULT_ variables
 			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputs.getLunaticFile());
 			for (String filterResult : filterResults) {
-				addLunaticVariable(variables, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
+				addLunaticVariable(metadataModel, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
 		}
-		if (variables.getVariable(Constants.LIENS) != null) {
+		if (metadataModel.getVariables().getVariable(Constants.LIENS) != null) {
 			for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
-				Variable varLien = new Variable(Constants.LIEN+k, variables.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
-				variables.putVariable(varLien);
+				Variable varLien = new Variable(Constants.LIEN+k, metadataModel.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
+				metadataModel.getVariables().putVariable(varLien);
 			}
 		}
 		// Step 3 : we add reporting data group if there is any reporting data
 		if(modeInputs.getReportingDataFile() != null){
-			variables.groups.put(Constants.REPORTING_DATA_GROUP_NAME, new Group(Constants.REPORTING_DATA_GROUP_NAME));
+			metadataModel.getGroups().put(Constants.REPORTING_DATA_GROUP_NAME, new Group(Constants.REPORTING_DATA_GROUP_NAME));
 		}
-		metadataVariables.put(dataMode, variables);
+		metadataModels.put(dataMode, metadataModel);
 	}
 
-	public static void addLunaticVariable(VariablesMap variables, String missingVar, String prefixOrSuffix, VariableType varType) {
+	public static void addLunaticVariable(MetadataModel metadata, String missingVar, String prefixOrSuffix, VariableType varType) {
 		String correspondingVariableName = missingVar.replace(prefixOrSuffix, "");
 		Group group;
-		if (variables.hasVariable(correspondingVariableName)) { // the variable is directly found
-			group = variables.getVariable(correspondingVariableName).getGroup();
-		} else if (variables.isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
-			group = variables.getQuestionGridGroup(correspondingVariableName);
+		if (metadata.getVariables().hasVariable(correspondingVariableName)) { // the variable is directly found
+			group = metadata.getVariables().getVariable(correspondingVariableName).getGroup();
+		} else if (metadata.getVariables().isInQuestionGrid(correspondingVariableName)) { // otherwise, it should be from a question grid
+			group = metadata.getVariables().getQuestionGridGroup(correspondingVariableName);
 		} else {
-			group = variables.getGroup(variables.getGroupNames().get(0));
+			group = metadata.getGroup(metadata.getGroupNames().getFirst());
 			log.warn(String.format(
 					"No information from the DDI about question named \"%s\".",
 					correspondingVariableName));
@@ -74,17 +72,17 @@ public class MetadataUtils {
 					"\"%s\" has been arbitrarily associated with group \"%s\".",
 					missingVar, group.getName()));
 		}
-		variables.putVariable(new Variable(missingVar, group, varType));
+		metadata.getVariables().putVariable(new Variable(missingVar, group, varType));
 	}
 
-	public static Map<String, VariablesMap> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap) {
-		Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
-		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataVariables));
-		return metadataVariables;
+	public static Map<String, MetadataModel> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap) {
+		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
+		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataModels));
+		return metadataModels;
 	}
 
-	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, VariablesMap> metadataVariables ) {
-		VariablesMap variables = LunaticReader.getVariablesFromLunatic(modeInputs.getLunaticFile());
-		metadataVariables.put(dataMode, variables);
+	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels ) {
+		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(modeInputs.getLunaticFile());
+		metadataModels.put(dataMode, metadataModel);
 	}
 }

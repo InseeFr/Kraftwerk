@@ -1,22 +1,26 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import java.util.List;
+import java.util.Map;
+
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
+import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
-
 @NoArgsConstructor
 public class MultimodalSequence {
 	
-	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
+	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels) {
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
@@ -26,7 +30,7 @@ public class MultimodalSequence {
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate);
 
 		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataModels);
 		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate);
 

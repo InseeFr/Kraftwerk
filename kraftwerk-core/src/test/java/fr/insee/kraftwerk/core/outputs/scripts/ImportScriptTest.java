@@ -1,22 +1,11 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -27,6 +16,16 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.DataStructure;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ImportScriptTest {
 	
@@ -36,42 +35,42 @@ class ImportScriptTest {
 
 	TableScriptInfo tableScriptInfo;
 
-	Map<String, VariablesMap> metadataVariables;
+	Map<String, MetadataModel> metadata;
 	
 	VtlExecute vtlExecute = new VtlExecute();
 
 	@BeforeEach
-	public void initMetadataVariablesMap() {
-		metadataVariables = new LinkedHashMap<>();
+	public void initMetadata() {
+		metadata = new LinkedHashMap<>();
 	}
 
 	private void instantiateMap() {
-		metadataVariables.put("CAWI", VariablesMapTest.createCompleteFakeVariablesMap());
+		metadata.put("CAWI", MetadataModelTest.createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		srdWeb.setVariablesMap(VariablesMapTest.createCompleteFakeVariablesMap());
+		srdWeb.setMetadataModel(MetadataModelTest.createCompleteFakeVariablesMap());
 		vtlExecute.convertToVtlDataset(srdWeb, "CAWI", vtlBindings);
-		
-		metadataVariables.put("PAPI", VariablesMapTest.createAnotherFakeVariablesMap());
+
+		metadata.put("PAPI", MetadataModelTest.createAnotherFakeVariablesMap());
 		SurveyRawData srdPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
-		srdPaper.setVariablesMap(VariablesMapTest.createAnotherFakeVariablesMap());
+		srdPaper.setMetadataModel(MetadataModelTest.createAnotherFakeVariablesMap());
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
 		List<KraftwerkError> errors = new ArrayList<>();
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel());
 		groupProcessing.applyVtlTransformations("CAWI", null, errors);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getVariablesMap());
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel());
 		groupProcessing2.applyVtlTransformations("PAPI", null, errors);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
-		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadataVariables);
+		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadata);
 		
 	}
 	
 	@Test
 	void getAllLengthTest() {
 		instantiateMap();
-		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadataVariables);
+		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadata);
 		assertEquals("50", listVariables.get("LAST_NAME").getSasFormat());
 		assertEquals("50", listVariables.get("FIRST_NAME").getSasFormat());
 		assertEquals("50", listVariables.get("AGE").getSasFormat());
@@ -81,19 +80,19 @@ class ImportScriptTest {
 	@Test
 	void testGetAllLengthWithNumberType() {
 		//
-		VariablesMap testVariablesMap1 = new VariablesMap();
-		testVariablesMap1.putVariable(new Variable("FOO", testVariablesMap1.getRootGroup(), VariableType.NUMBER, "4.1"));
-		metadataVariables.put("TEST1", testVariablesMap1);
-		VariablesMap testVariablesMap2 = new VariablesMap();
-		testVariablesMap2.putVariable(new Variable("FOO", testVariablesMap2.getRootGroup(), VariableType.NUMBER, "4"));
-		metadataVariables.put("TEST2", testVariablesMap2);
+		MetadataModel testMetadata1 = new MetadataModel();
+		testMetadata1.getVariables().putVariable(new Variable("FOO", testMetadata1.getRootGroup(), VariableType.NUMBER, "4.1"));
+		metadata.put("TEST1", testMetadata1);
+		MetadataModel testMetadata2 = new MetadataModel();
+		testMetadata2.getVariables().putVariable(new Variable("FOO", testMetadata2.getRootGroup(), VariableType.NUMBER, "4"));
+		metadata.put("TEST2", testMetadata2);
 		//
 		DataStructure testDataStructure = new DataStructure(List.of(
 				new Structured.Component("ID", String.class, Dataset.Role.IDENTIFIER),
 				new Structured.Component("FOO", Double.class, Dataset.Role.MEASURE)
 		));
 		//
-		assertDoesNotThrow(() -> ImportScript.getAllLength(testDataStructure, metadataVariables));
+		assertDoesNotThrow(() -> ImportScript.getAllLength(testDataStructure, metadata));
 	}
 
 	@Test

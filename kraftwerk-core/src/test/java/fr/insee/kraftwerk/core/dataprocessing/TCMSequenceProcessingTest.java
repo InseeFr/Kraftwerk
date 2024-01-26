@@ -2,9 +2,9 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -60,24 +60,24 @@ class TCMSequenceProcessingTest {
     @DisplayName("We should have TCM Module variable in binding")
     void check_standard_vtl_execution(){
         //Metadata variables object
-        Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
-        VariablesMap variablesMap = new VariablesMap();
+        Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
+        MetadataModel metadataModel = new MetadataModel();
 
-        variablesMap.putVariable(new Variable("TCM_THLHAB", variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable("PRENOM", variablesMap.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable("TCM_THLHAB", metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable("PRENOM", metadataModel.getRootGroup(), VariableType.STRING));
 
-        metadataVariables.put("TEST",variablesMap);
+        metadatas.put("TEST",metadataModel);
 
         // Errors list
         List<KraftwerkError> errors = new ArrayList<>();
 
-        TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataVariables, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString());
+        TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString());
         processing.applyAutomatedVtlInstructions("TEST", errors);
         outDataset = vtlBindings.getDataset("TEST");
 
         Assertions.assertThat(errors).isEmpty();
         assertTrue(outDataset.getDataStructure().containsKey("TCM_THL_DET"));
-        assertEquals("TESTTCM1", outDataset.getDataPoints().get(0).get("TCM_THL_DET"));
+        assertEquals("TESTTCM1", outDataset.getDataPoints().getFirst().get("TCM_THL_DET"));
     }
 
     @AfterAll

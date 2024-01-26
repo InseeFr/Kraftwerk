@@ -1,18 +1,8 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.vtl.model.Dataset;
@@ -20,6 +10,15 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
 class VtlBindingsTest {
@@ -150,19 +149,19 @@ class VtlBindingsTest {
 	void testGetDatasetVariablesMap(){
 		vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", ds1);
-		VariablesMap variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
+		MetadataModel variablesMap = vtlBindings.getDatasetVariablesMap("TEST");
 		//
 		assertEquals(2, variablesMap.getGroupsCount());
 		assertTrue(variablesMap.hasGroup(Constants.ROOT_GROUP_NAME));
 		assertTrue(variablesMap.hasGroup("INDIVIDU"));
 		// Variable objects = measures in VTL dataset => 3 variables expected
-		assertEquals(3, variablesMap.getVariables().size());
-		assertTrue(variablesMap.hasVariable("LIB_COMMUNE"));
-		assertEquals(Constants.ROOT_GROUP_NAME, variablesMap.getVariable("LIB_COMMUNE").getGroupName());
-		assertTrue(variablesMap.hasVariable("PRENOM"));
-		assertTrue(variablesMap.hasVariable("AGE"));
-		assertEquals("INDIVIDU", variablesMap.getVariable("PRENOM").getGroupName());
-		assertEquals("INDIVIDU", variablesMap.getVariable("AGE").getGroupName());
+		assertEquals(3, variablesMap.getVariables().getVariables().size());
+		assertTrue(variablesMap.getVariables().hasVariable("LIB_COMMUNE"));
+		assertEquals(Constants.ROOT_GROUP_NAME, variablesMap.getVariables().getVariable("LIB_COMMUNE").getGroupName());
+		assertTrue(variablesMap.getVariables().hasVariable("PRENOM"));
+		assertTrue(variablesMap.getVariables().hasVariable("AGE"));
+		assertEquals("INDIVIDU", variablesMap.getVariables().getVariable("PRENOM").getGroupName());
+		assertEquals("INDIVIDU", variablesMap.getVariables().getVariable("AGE").getGroupName());
 	}
 
 }

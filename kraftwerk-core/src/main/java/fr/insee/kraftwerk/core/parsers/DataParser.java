@@ -1,13 +1,13 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
-
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * Template method for data parsers.
@@ -23,8 +23,8 @@ public abstract class DataParser {
 	 *             The variables must have been previously set.
 	 */
 	protected DataParser(SurveyRawData data) {
-		if (data.getVariablesMap() == null) {
-			log.debug("No variables map set on data object. Parsing will most likely fail.");
+		if (data.getMetadataModel() == null || data.getMetadataModel().getVariables() == null) {
+			log.debug("No metadata set on data object. Parsing will most likely fail.");
 		}
 		this.data = data;
 	}

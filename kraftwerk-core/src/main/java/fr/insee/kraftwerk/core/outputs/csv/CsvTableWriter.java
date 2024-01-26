@@ -1,27 +1,22 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Structured.Component;
+import fr.insee.vtl.model.Structured.DataPoint;
+import lombok.extern.log4j.Log4j2;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Scanner;
-
-import com.opencsv.CSVWriterBuilder;
-import com.opencsv.ICSVWriter;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Structured.Component;
-import fr.insee.vtl.model.Structured.DataPoint;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * To write in memory data into CSV files.
@@ -52,12 +47,12 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
+	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String, MetadataModel> metadataModels, String datasetName) {
 		File file = filePath.toFile();
 		try (ICSVWriter writer = setCSVWriter(filePath)){
 			String[] headers = getHeaders(file);
 
-			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
+			List<String> variablesSpec = initializeVariablesSpec(metadataModels, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -107,9 +102,7 @@ public class CsvTableWriter {
 			columns.add(datasetName);
 		}
 		//We add all variables found in specifications
-		for (String varSpec : variablesSpec) {
-			columns.add(varSpec);
-		}
+		columns.addAll(variablesSpec);
 		//We add additional variables produced in the process
 		for (String varDataset : variablesDataset){
 			if (!columns.contains(varDataset)) {
@@ -139,16 +132,16 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
+	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,MetadataModel> metadataModels, String datasetName) {
 		// File connection
 		try (ICSVWriter writer = setCSVWriter(filePath)){
 						
 			// Safety check
-			if (dataset.getDataStructure().size() == 0) {
+			if (dataset.getDataStructure().isEmpty()) {
 				log.warn("The data object has no variables.");
 			}
 
-			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
+			List<String> variablesSpec = initializeVariablesSpec(metadataModels, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -180,12 +173,12 @@ public class CsvTableWriter {
 	}
 
 
-	private static List<String> initializeVariablesSpec(Map<String, VariablesMap> metadataVariables,
+	private static List<String> initializeVariablesSpec(Map<String, MetadataModel> metadataModels,
 			String datasetName) {
 		List<String> variablesSpec = new ArrayList<>();
-		for (Entry<String, VariablesMap> entry :  metadataVariables.entrySet()){
-			VariablesMap variablesMap = entry.getValue();
-			for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
+		for (Entry<String, MetadataModel> entry :  metadataModels.entrySet()){
+			MetadataModel metadata = entry.getValue();
+			for (String varName : metadata.getVariables().getGroupVariableNamesAsList(datasetName)){
 				if (!variablesSpec.contains(varName)){
 					variablesSpec.add(varName);
 				}

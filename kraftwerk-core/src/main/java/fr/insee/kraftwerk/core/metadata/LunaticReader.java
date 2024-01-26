@@ -1,7 +1,10 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
-import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
+import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import fr.insee.kraftwerk.core.utils.JsonFileReader;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,12 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-import fr.insee.kraftwerk.core.utils.JsonFileReader;
-import lombok.extern.log4j.Log4j2;
+import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
+import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
 
 @Log4j2
 public class LunaticReader {
@@ -23,7 +22,7 @@ public class LunaticReader {
 	private static final String BINDING_DEPENDENCIES = "bindingDependencies";
 	private static final String VARIABLES = "variables";
 
-	
+
 	private static final String EXCEPTION_MESSAGE = "Unable to read Lunatic questionnaire file: ";
 
 	private LunaticReader() {
@@ -33,7 +32,7 @@ public class LunaticReader {
 	/**
 	 * Read the lunatic questionnaire given to get VTL expression of calculated
 	 * variables.
-	 * 
+	 *
 	 * @param lunaticFile Path to a lunatic questionnaire file.
 	 * @return A CalculatedVariables map.
 	 */
@@ -122,7 +121,7 @@ public class LunaticReader {
 	 * @param lunaticFile : Path to a Lunatic specification file.
 	 * @return The variables found in the Lunatic specification.
 	 */
-	public static VariablesMap getVariablesFromLunatic(Path lunaticFile) {
+	public static MetadataModel getMetadataFromLunatic(Path lunaticFile) {
 		JsonNode rootNode;
 		try {
 			rootNode = JsonFileReader.read(lunaticFile);
@@ -131,55 +130,54 @@ public class LunaticReader {
 			variablesNode.forEach(newVar -> variables.add(newVar.get("name").asText()));
 			JsonNode componentsNode = rootNode.get("components");
 			// Root group is created in VariablesMap constructor
-			VariablesMap variablesMap = new VariablesMap();
+			MetadataModel metadataModel = new MetadataModel();
 			if (componentsNode.isArray()) {
 				int i = 1;
 				for (JsonNode component : componentsNode) {
 					if (component.get("componentType").asText().equals("Loop")) {
 						// No imbricated loops so the parent is the root group
-						Group group = getNewGroup(variablesMap, i);
+						Group group = getNewGroup(metadataModel, i);
 						i++;
-						iterateOnBindingsDependencies(variables, variablesMap, component, group);
-						iterateOnComponents(rootNode, variables, variablesMap, group);
+						iterateOnBindingsDependencies(variables, metadataModel.getVariables(), component, group);
+						iterateOnComponents(rootNode, variables, metadataModel, group);
 					}
 				}
 			}
 
 			// We get the root group
-			Group rootGroup = variablesMap.getGroup(variablesMap.getGroupNames().get(0));
+			Group rootGroup = metadataModel.getGroup(metadataModel.getGroupNames().getFirst());
 			variables.forEach(
-					varName -> variablesMap.putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
-			return variablesMap;
+					varName -> metadataModel.getVariables().putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
+			return metadataModel;
 		} catch (IOException e) {
 			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return null;
 		}
 	}
 
-	private static Group getNewGroup(VariablesMap variablesMap, int i) {
+	private static Group getNewGroup(MetadataModel metadataModel, int i) {
 		Group group = new Group(String.format("BOUCLE%d", i), Constants.ROOT_GROUP_NAME);
-		variablesMap.putGroup(group);
+		metadataModel.putGroup(group);
 		return group;
 	}
 
-	private static Group getNewGroup(VariablesMap variablesMap, String newName) {
+	private static Group getNewGroup(MetadataModel metadataModel, String newName) {
 		Group group = new Group(newName, Constants.ROOT_GROUP_NAME);
-		variablesMap.putGroup(group);
+		metadataModel.putGroup(group);
 		return group;
 	}
 
-	private static void iterateOnComponents(JsonNode rootNode, List<String> variables, VariablesMap variablesMap,
-			Group group) {
+	private static void iterateOnComponents(JsonNode rootNode, List<String> variables, MetadataModel metadataModel,
+											Group group) {
 		JsonNode loopComponentsNode = rootNode.get("components");
 		if (loopComponentsNode.isArray()) {
 			for (JsonNode componentInLoop : loopComponentsNode) {
 				if (componentInLoop.get("componentType").asText().equals("Loop")) {
-					Group subgroup = getNewGroup(variablesMap, group.getName().concat(componentInLoop.asText()));
-					iterateOnBindingsDependencies(variables, variablesMap, componentInLoop, subgroup);
-					iterateOnComponents(componentInLoop, variables, variablesMap, subgroup);
-				}
-				else {
-					iterateOnBindingsDependencies(variables, variablesMap, componentInLoop, group);
+					Group subgroup = getNewGroup(metadataModel, group.getName().concat(componentInLoop.asText()));
+					iterateOnBindingsDependencies(variables, metadataModel.getVariables(), componentInLoop, subgroup);
+					iterateOnComponents(componentInLoop, variables, metadataModel, subgroup);
+				} else {
+					iterateOnBindingsDependencies(variables, metadataModel.getVariables(), componentInLoop, group);
 				}
 			}
 		}
@@ -187,7 +185,7 @@ public class LunaticReader {
 
 
 	private static void iterateOnBindingsDependencies(List<String> variables, VariablesMap variablesMap,
-			JsonNode component, Group group) {
+													  JsonNode component, Group group) {
 		if (component.has(BINDING_DEPENDENCIES)) {
 			JsonNode loopVariables = component.get(BINDING_DEPENDENCIES);
 			loopVariables.forEach(variable -> {

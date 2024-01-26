@@ -1,18 +1,19 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.PaperUcq;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlScript;
+import lombok.extern.log4j.Log4j2;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
-
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.PaperUcq;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlScript;
-import lombok.extern.log4j.Log4j2;
 
 
 /**
@@ -21,11 +22,11 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class CleanUpProcessing extends DataProcessing {
 
-    private Map<String, VariablesMap> metadataVariables;
+    private Map<String, MetadataModel> metadataModels;
 
-    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables) {
+    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels) {
         super(vtlBindings);
-        this.metadataVariables=metadataVariables;
+        this.metadataModels=metadataModels;
     }
 
     @Override
@@ -41,7 +42,6 @@ public class CleanUpProcessing extends DataProcessing {
      *
      * @param bindingName The name of the multimode dataset.
      * @param userVtlInstructionsPath User vtl script (none for this step).
-     * @param objects The metadata object instance is expected here.
      */
     @Override
     public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<KraftwerkError> errors) {
@@ -61,11 +61,11 @@ public class CleanUpProcessing extends DataProcessing {
     protected VtlScript generateVtlInstructions(String bindingName) {
         VtlScript vtlScript = new VtlScript();
         List<String> paperUcqVtlNames = new ArrayList<>();
-        for (Entry<String,VariablesMap> mode : metadataVariables.entrySet()) {
-            VariablesMap variablesMap = mode.getValue();
+        for (Entry<String,MetadataModel> mode : metadataModels.entrySet()) {
+            VariablesMap variablesMap = mode.getValue().getVariables();
             paperUcqVtlNames.addAll(
                     variablesMap.getPaperUcq().stream()
-                            .map(variable -> variablesMap.getFullyQualifiedName(variable.getName()))
+                            .map(variable -> mode.getValue().getFullyQualifiedName(variable.getName()))
                             .toList()
             );
         }
@@ -84,14 +84,14 @@ public class CleanUpProcessing extends DataProcessing {
 
     /** Remove PaperUcq variables from concerned VariablesMap */
     private void removePaperUcqVariables() {
-        for (VariablesMap variablesMap : metadataVariables.values()) {
-            variablesMap.getVariables().values().removeIf(PaperUcq.class::isInstance);
+        for (MetadataModel metadata : metadataModels.values()) {
+            metadata.getVariables().getVariables().values().removeIf(PaperUcq.class::isInstance);
         }
     }
 
     /** Remove unimodal dataset from the bindings. */
     private void removeUnimodalDatasets() {
-        for (String datasetName : metadataVariables.keySet()) {
+        for (String datasetName : metadataModels.keySet()) {
             // unimodal datasets
             vtlBindings.remove(datasetName);
             log.info(String.format("%s unimodal dataset removed from vtl bindings.", datasetName));

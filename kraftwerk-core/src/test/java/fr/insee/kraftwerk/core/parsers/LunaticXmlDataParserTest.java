@@ -1,25 +1,24 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.rawdata.GroupData;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
-import fr.insee.kraftwerk.core.rawdata.GroupData;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class LunaticXmlDataParserTest {
 
@@ -40,9 +39,9 @@ class LunaticXmlDataParserTest {
 	void parseLunaticDataFolder() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
-		VariablesMap variablesMap = new VariablesMap();
-		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
-		data.setVariablesMap(variablesMap);
+		MetadataModel metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
+		data.setMetadataModel(metadataModel);
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-multiple-files");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
 		parser.parseSurveyData(dataPath);
@@ -62,7 +61,7 @@ class LunaticXmlDataParserTest {
 	void parseLunaticXml_rootOnly() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
-		data.setVariablesMap(VariablesMapTest.createVariablesMap_rootOnly());
+		data.setMetadataModel(MetadataModelTest.createVariablesMap_rootOnly());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
 		parser.parseSurveyData(dataPath);
@@ -75,7 +74,7 @@ class LunaticXmlDataParserTest {
 
 	public void checkRootContent(SurveyRawData data) {
 		//
-		QuestionnaireData q1 = data.getQuestionnaires().get(0);
+		QuestionnaireData q1 = data.getQuestionnaires().getFirst();
 		assertEquals("T0000001", q1.getIdentifier());
 		assertEquals("742 Evergreen Terrace", q1.getValue("ADDRESS"));
 		assertEquals("20000", q1.getValue("HOUSEHOLD_INCOME"));
@@ -95,7 +94,7 @@ class LunaticXmlDataParserTest {
 	void parseLunaticXml_oneLevel() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
-		data.setVariablesMap(VariablesMapTest.createVariablesMap_oneLevel());
+		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
 		parser.parseSurveyData(dataPath);

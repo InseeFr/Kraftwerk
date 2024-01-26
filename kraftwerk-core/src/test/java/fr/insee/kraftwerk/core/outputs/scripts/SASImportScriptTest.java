@@ -1,9 +1,7 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
 import fr.insee.vtl.model.Dataset;
@@ -31,15 +29,15 @@ class SASImportScriptTest {
                 new Structured.Component(idName, String.class, Dataset.Role.IDENTIFIER),
                 new Structured.Component(fooName, Double.class, Dataset.Role.MEASURE)
         ));
-        Map<String, VariablesMap> metadataVariables = new HashMap<>();
-        VariablesMap variablesMap = new VariablesMap();
-        variablesMap.putVariable(new Variable(idName, variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable(fooName, variablesMap.getRootGroup(), VariableType.NUMBER));
-        metadataVariables.put("FOO", variablesMap);
+        Map<String, MetadataModel> metadata = new HashMap<>();
+        MetadataModel metadataModel = new MetadataModel();
+        metadataModel.getVariables().putVariable(new Variable(idName, metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable(fooName, metadataModel.getRootGroup(), VariableType.NUMBER));
+        metadata.put("FOO", metadataModel);
 
         // When
         List<KraftwerkError> errors = new ArrayList<>();
-        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
+        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadata);
         SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then
@@ -68,18 +66,18 @@ class SASImportScriptTest {
                 new Structured.Component(longName2, String.class, Dataset.Role.MEASURE),
                 new Structured.Component(normalName, String.class, Dataset.Role.MEASURE)
         ));
-        Map<String, VariablesMap> metadataVariables = new HashMap<>();
-        VariablesMap variablesMap = new VariablesMap();
-        variablesMap.putVariable(new Variable(idName, variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable(fooName, variablesMap.getRootGroup(), VariableType.NUMBER));
-        variablesMap.putVariable(new Variable(longName1, variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable(longName2, variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable(normalName, variablesMap.getRootGroup(), VariableType.STRING));
-        metadataVariables.put("FOO", variablesMap);
+        Map<String, MetadataModel> metadata = new HashMap<>();
+        MetadataModel metadataModel = new MetadataModel();
+        metadataModel.getVariables().putVariable(new Variable(idName, metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable(fooName, metadataModel.getRootGroup(), VariableType.NUMBER));
+        metadataModel.getVariables().putVariable(new Variable(longName1, metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable(longName2, metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable(normalName, metadataModel.getRootGroup(), VariableType.STRING));
+        metadata.put("FOO", metadataModel);
 
         // When
         List<KraftwerkError> errors = new ArrayList<>();
-        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
+        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadata);
         SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then
@@ -105,16 +103,16 @@ class SASImportScriptTest {
                 new Structured.Component(fooName, Double.class, Dataset.Role.MEASURE),
                 new Structured.Component(normalName, String.class, Dataset.Role.MEASURE)
         ));
-        Map<String, VariablesMap> metadataVariables = new HashMap<>();
-        VariablesMap variablesMap = new VariablesMap();
-        variablesMap.putVariable(new Variable(idName, variablesMap.getRootGroup(), VariableType.STRING));
-        variablesMap.putVariable(new Variable(fooName, variablesMap.getRootGroup(), VariableType.NUMBER));
-        variablesMap.putVariable(new Variable(normalName, variablesMap.getRootGroup(), VariableType.STRING));
-        metadataVariables.put("FOO", variablesMap);
+        Map<String, MetadataModel> metadata = new HashMap<>();
+        MetadataModel metadataModel = new MetadataModel();
+        metadataModel.getVariables().putVariable(new Variable(idName, metadataModel.getRootGroup(), VariableType.STRING));
+        metadataModel.getVariables().putVariable(new Variable(fooName, metadataModel.getRootGroup(), VariableType.NUMBER));
+        metadataModel.getVariables().putVariable(new Variable(normalName, metadataModel.getRootGroup(), VariableType.STRING));
+        metadata.put("FOO", metadataModel);
 
         // When
         List<KraftwerkError> errors = new ArrayList<>();
-        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadataVariables);
+        TableScriptInfo tableScriptInfo = new TableScriptInfo(tableName, csvFileName, dataStructure, metadata);
         SASImportScript sasImportScript = new SASImportScript(List.of(tableScriptInfo),errors);
 
         // Then

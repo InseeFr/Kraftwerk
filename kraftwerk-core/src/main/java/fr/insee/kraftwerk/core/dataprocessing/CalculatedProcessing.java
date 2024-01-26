@@ -1,15 +1,15 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Log4j2
 public class CalculatedProcessing extends DataProcessing {
@@ -47,9 +47,6 @@ public class CalculatedProcessing extends DataProcessing {
      * Return the VTL instruction for each calculated variable registered in the CalculatedVariables object given.
      * FILTER_RESULT variables are added in the given variables map.
      * @param bindingName The name of the concerned dataset.
-     * @param objects  Objects expected here are:
-     *                - a CalculatedVariables instance,
-     *                - the corresponding VariablesMap object (used to get fully qualified name).
      * @return a VtlScript with one instruction for each "calculated" variable.
      */
     @Override

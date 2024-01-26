@@ -1,10 +1,26 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.outputs.OutputFiles;
+import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
+import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,32 +33,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
-
-import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.OutputFiles;
-import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
-import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
-import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
-import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
-import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
-import fr.insee.kraftwerk.core.sequence.WriterSequence;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import static cucumber.TestConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Main example
 public class MainDefinitions {
@@ -55,7 +48,7 @@ public class MainDefinitions {
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
-	Map<String, VariablesMap> metadataVariables;
+	Map<String, MetadataModel> metadataModelMap;
 
 	private ControlInputSequence controlInputSequence;
 
@@ -128,26 +121,26 @@ public class MainDefinitions {
 
 	@When("Step 2 : We get each unimodal dataset")
 	public void unimodal_treatments() throws NullException {
-		metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
 	}
 
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataVariables, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
 		writeErrorsFile(inDirectory, errors);
 		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
 	}

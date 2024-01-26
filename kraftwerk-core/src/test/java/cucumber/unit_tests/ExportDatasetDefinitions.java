@@ -1,10 +1,5 @@
 package cucumber.unit_tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
@@ -16,6 +11,11 @@ import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // Used in do_we_export_datasets
 public class ExportDatasetDefinitions {
@@ -45,7 +45,7 @@ public class ExportDatasetDefinitions {
 	public void importDataset(String nameDataset) throws Exception {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getVariablesMap());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel());
 		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<KraftwerkError>());
 	}
 
@@ -53,9 +53,9 @@ public class ExportDatasetDefinitions {
 	public void checkDataset(String nameDataset) throws Exception {
 		assertEquals(15, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
 		assertEquals(4, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().size());
-		assertEquals("Purple", vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().get(0).get("CARS_LOOP.CAR_COLOR"));
-		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().keySet().contains(Constants.ROOT_IDENTIFIER_NAME));
-		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().keySet().contains("AGE"));
+		assertEquals("Purple", vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().getFirst().get("CARS_LOOP.CAR_COLOR"));
+		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));
+		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().containsKey("AGE"));
 	}
 
 }

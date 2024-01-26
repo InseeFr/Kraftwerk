@@ -1,13 +1,7 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.nio.file.Path;
-import java.util.Arrays;
-
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -17,6 +11,9 @@ import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+
+import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * Parser add FILTER_RESULT to variablesMap
@@ -81,10 +78,10 @@ public class LunaticXmlDataParser extends DataParser {
 					questionnaireData.setIdentifier(questionnaireNode.getFirstChildElement("Id").getValue());
 					data.getIdSurveyUnits().add(questionnaireNode.getFirstChildElement("Id").getValue());
 
-					readCollected(questionnaireNode, questionnaireData, data.getVariablesMap());
-					readExternal(questionnaireNode, questionnaireData, data.getVariablesMap());
+					readCollected(questionnaireNode, questionnaireData, data.getMetadataModel().getVariables());
+					readExternal(questionnaireNode, questionnaireData, data.getMetadataModel());
 					// Remove this method when all questionnaires will use Lunatic V2 format
-					readCalculated(questionnaireNode, questionnaireData, data.getVariablesMap());
+					readCalculated(questionnaireNode, questionnaireData, data.getMetadataModel().getVariables());
 
 					data.addQuestionnaire(questionnaireData);
 				}
@@ -168,7 +165,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 * Read data in the EXTERNAL elements. "External" variables are always in the
 	 * root group.
 	 */
-	private void readExternal(Element questionnaireNode, QuestionnaireData questionnaireData, VariablesMap variables) {
+	private void readExternal(Element questionnaireNode, QuestionnaireData questionnaireData, MetadataModel metadataModel) {
 
 		Element externalNode = questionnaireNode.getFirstChildElement("Data").getFirstChildElement("EXTERNAL");
 		if (externalNode == null)
@@ -182,12 +179,14 @@ public class LunaticXmlDataParser extends DataParser {
 			if (externalVariableNode == null)
 				return;
 
+			VariablesMap variables = metadataModel.getVariables();
+
 			if (nodeExistsWithCompleteAttribute(externalVariableNode)) {
 				String variableName = externalVariableNode.getLocalName();
 				String value = externalVariableNode.getValue();
 				questionnaireData.putValue(value, variableName);
 				if (!variables.hasVariable(variableName)) {
-					variables.putVariable(new Variable(variableName, variables.getRootGroup(), VariableType.STRING));
+					variables.putVariable(new Variable(variableName, metadataModel.getRootGroup(), VariableType.STRING));
 					log.warn(String.format(
 							"EXTERNAL variable \"%s\" was not found in DDI and has been added, with type STRING.",
 							variableName));

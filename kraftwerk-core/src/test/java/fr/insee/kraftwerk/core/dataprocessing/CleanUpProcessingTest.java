@@ -9,15 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.metadata.*;
+import io.cucumber.messages.types.Meta;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.PaperUcq;
-import fr.insee.kraftwerk.core.metadata.UcqVariable;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -74,28 +71,28 @@ class CleanUpProcessingTest {
     @Test
     void applyCleanUp() {
         // Metadata variables object
-        Map<String, VariablesMap> metadataVariables = new LinkedHashMap<>();
+        Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
         // Errors list
         List<KraftwerkError> errors = new ArrayList<>();
         //
-        VariablesMap cawiVariables = new VariablesMap();
-        cawiVariables.putVariable(new Variable("FOO", cawiVariables.getRootGroup(), VariableType.STRING));
-        UcqVariable cawiUcq = new UcqVariable("GENDER", cawiVariables.getRootGroup(), VariableType.STRING);
+        MetadataModel cawiMetadata = new MetadataModel();
+        cawiMetadata.getVariables().putVariable(new Variable("FOO", cawiMetadata.getRootGroup(), VariableType.STRING));
+        UcqVariable cawiUcq = new UcqVariable("GENDER", cawiMetadata.getRootGroup(), VariableType.STRING);
         cawiUcq.addModality("1", "Male");
         cawiUcq.addModality("2", "Female");
-        cawiVariables.putVariable(cawiUcq);
+        cawiMetadata.getVariables().putVariable(cawiUcq);
         //
-        VariablesMap papiVariables = new VariablesMap();
-        papiVariables.putVariable(new Variable("FOO", papiVariables.getRootGroup(), VariableType.STRING));
-        UcqVariable papiUcq = new UcqVariable("GENDER", papiVariables.getRootGroup(), VariableType.STRING);
+        MetadataModel papiMetadata = new MetadataModel();
+        papiMetadata.getVariables().putVariable(new Variable("FOO", papiMetadata.getRootGroup(), VariableType.STRING));
+        UcqVariable papiUcq = new UcqVariable("GENDER", papiMetadata.getRootGroup(), VariableType.STRING);
         papiUcq.addModality("1", "Male");
         papiUcq.addModality("2", "Female");
-        papiVariables.putVariable(papiUcq);
-        papiVariables.putVariable(new PaperUcq("GENDER_1", papiUcq, "1"));
-        papiVariables.putVariable(new PaperUcq("GENDER_2", papiUcq, "2"));
+        papiMetadata.getVariables().putVariable(papiUcq);
+        papiMetadata.getVariables().putVariable(new PaperUcq("GENDER_1", papiUcq, "1"));
+        papiMetadata.getVariables().putVariable(new PaperUcq("GENDER_2", papiUcq, "2"));
         //
-        metadataVariables.put("CAWI", cawiVariables);
-        metadataVariables.put("PAPI", papiVariables);
+        metadatas.put("CAWI", cawiMetadata);
+        metadatas.put("PAPI", papiMetadata);
 
         // Datasets
         VtlBindings vtlBindings = new VtlBindings();
@@ -104,15 +101,15 @@ class CleanUpProcessingTest {
         vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
-        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataVariables);
+        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadatas);
         cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,errors);
 
         // Are paper indicator variables removed in VTL multimode dataset ?
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_2"));
         // Are these also removed in VariablesMap object ?
-        assertFalse(papiVariables.hasVariable("GENDER_1"));
-        assertFalse(papiVariables.hasVariable("GENDER_2"));
+        assertFalse(papiMetadata.getVariables().hasVariable("GENDER_1"));
+        assertFalse(papiMetadata.getVariables().hasVariable("GENDER_2"));
         // Are unimodal datasets removed ?
         assertEquals(Set.of("MULTIMODE"), vtlBindings.keySet());
     }

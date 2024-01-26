@@ -1,15 +1,14 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.nio.file.Path;
-
-import org.json.simple.JSONObject;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.log4j.Log4j2;
+import org.json.simple.JSONObject;
+
+import java.nio.file.Path;
 
 @Log4j2
 public class LunaticJsonDataParser extends DataParser {
@@ -53,7 +52,7 @@ public class LunaticJsonDataParser extends DataParser {
 		for (Object variable : collectedVariables.keySet()) {
 			String variableName = (String) variable;
 			JSONObject variableData = (JSONObject) collectedVariables.get(variableName);
-			if (data.getVariablesMap().hasVariable(variableName)) {
+			if (data.getMetadataModel().getVariables().hasVariable(variableName)) {
 				String value = "";
 				if (variableData.get(Constants.COLLECTED) != null){
 					value = variableData.get(Constants.COLLECTED).toString();

@@ -1,19 +1,10 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
@@ -23,6 +14,14 @@ import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.log4j.Log4j2;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of DataParser to read data collected in paper format.
@@ -91,7 +90,7 @@ public class PaperDataParser extends DataParser {
 
 			// Variables
 			String[] header = csvReader.readNext();
-			VariablesMap variables = data.getVariablesMap();
+			VariablesMap variables = data.getMetadataModel().getVariables();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
 			for (int j = 1; j < header.length; j++) {
 				String variableName = header[j];

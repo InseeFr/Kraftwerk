@@ -1,20 +1,16 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import javax.script.SimpleBindings;
-
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.Component;
 import lombok.extern.log4j.Log4j2;
+
+import javax.script.SimpleBindings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Class that provide method to use the Trevas library.
@@ -69,7 +65,7 @@ public class VtlBindings extends SimpleBindings {
      * Return a string corresponding to the type of a measure in a given dataset
      * @param datasetName Name of the dataset containing the measure
      * @param measure Label of the measure
-     * @return
+     * @return String measure
      */
     public String getMeasureType(String datasetName, String measure){
         String type="";
@@ -119,14 +115,14 @@ public class VtlBindings extends SimpleBindings {
      *
      * @return A VariablesMap object.
      */
-    public VariablesMap getDatasetVariablesMap(String bindingName){
-        VariablesMap variablesMap = new VariablesMap();
-        Group rootGroup = variablesMap.getRootGroup();
+    public MetadataModel getDatasetVariablesMap(String bindingName){
+        MetadataModel metadataModel = new MetadataModel();
+        Group rootGroup = metadataModel.getRootGroup();
 
         Dataset ds = this.getDataset(bindingName);
         if (ds == null) {
             log.warn("Dataset " + bindingName + " inexistant !");
-            return variablesMap;
+            return metadataModel;
         }
         Structured.DataStructure dataStructure = ds.getDataStructure();
 
@@ -156,15 +152,15 @@ public class VtlBindings extends SimpleBindings {
                         return null;
                     } else if (decomposition.length == 1) {
                         String variableName = decomposition[0];
-                        variablesMap.putVariable(new Variable(variableName, rootGroup, type));
+                        metadataModel.getVariables().putVariable(new Variable(variableName, rootGroup, type));
                     } else {
                         Group group = new Group(decomposition[0], Constants.ROOT_GROUP_NAME);
-                        variablesMap.putGroup(group);
+                        metadataModel.putGroup(group);
                         for (int k = 1; k < decomposition.length - 1; k++) {
                             group = new Group(decomposition[k], decomposition[k - 1]);
-                            variablesMap.putGroup(group);
+                            metadataModel.putGroup(group);
                         }
-                        variablesMap.putVariable(
+                        metadataModel.getVariables().putVariable(
                                 new Variable(decomposition[decomposition.length - 1], group, type));
                     }
                     break;
@@ -176,7 +172,7 @@ public class VtlBindings extends SimpleBindings {
 
             }
         }
-        return variablesMap;
+        return metadataModel;
     }
 
 }

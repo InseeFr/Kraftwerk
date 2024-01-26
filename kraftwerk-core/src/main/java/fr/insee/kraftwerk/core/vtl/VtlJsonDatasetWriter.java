@@ -1,5 +1,17 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.rawdata.GroupData;
+import fr.insee.kraftwerk.core.rawdata.GroupInstance;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import lombok.extern.log4j.Log4j2;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,19 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.rawdata.GroupData;
-import fr.insee.kraftwerk.core.rawdata.GroupInstance;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * Class to write temporary VTL datasets. These datasets are JSON files that has
@@ -37,7 +36,7 @@ public class VtlJsonDatasetWriter {
 	private static final String IDENTIFIER = "IDENTIFIER";
 	private static final String STRING = "STRING";
 	private final SurveyRawData surveyData;
-	private final VariablesMap variablesMap;
+	private final MetadataModel metadataModel;
 	private final String datasetName;
 
 	/*
@@ -54,7 +53,7 @@ public class VtlJsonDatasetWriter {
 	 */
 	public VtlJsonDatasetWriter(SurveyRawData surveyData, String datasetName) {
 		this.surveyData = surveyData;
-		this.variablesMap = surveyData.getVariablesMap();
+		this.metadataModel = surveyData.getMetadataModel();
 		this.datasetName = datasetName;
 	}
 
@@ -103,7 +102,7 @@ public class VtlJsonDatasetWriter {
 		columnsMapping.put(Constants.ROOT_IDENTIFIER_NAME, variableNumber);
 		variableNumber++;
 		// Group identifiers
-		for (String groupName : variablesMap.getSubGroupNames()) {
+		for (String groupName : metadataModel.getSubGroupNames()) {
 			// The group name is the identifier variable for the group
 			JSONObject jsonVtlGroupIdentifier = new JSONObject();
 			jsonVtlGroupIdentifier.put(NAME, groupName);
@@ -115,8 +114,8 @@ public class VtlJsonDatasetWriter {
 		}
 
 		// Variables
-		for (String variableName : variablesMap.getVariableNames()) {
-			Variable variable = variablesMap.getVariable(variableName);
+		for (String variableName : metadataModel.getVariables().getVariableNames()) {
+			Variable variable = metadataModel.getVariables().getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
 			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
 			jsonVtlVariable.put(TYPE, convertToVtlType(variable.getType()));
@@ -192,7 +191,7 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : groupInstance.getVariableNames()) {
 			if (columnsMapping.get(variableName) != null) {
 				String value = groupInstance.getValue(variableName);
-				if (variablesMap.getVariable(variableName).getType() == VariableType.BOOLEAN) { 
+				if (metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN) {
 					value = convertBooleanValue(value);
 				}
 				rowValues[columnsMapping.get(variableName)] = value;

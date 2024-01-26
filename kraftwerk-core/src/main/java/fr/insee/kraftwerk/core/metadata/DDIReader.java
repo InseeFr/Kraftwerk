@@ -44,7 +44,7 @@ public class DDIReader {
 	 * @return The variables found in the DDI.
 	 * @throws KraftwerkException
 	 */
-	public static VariablesMap getVariablesFromDDI(URL ddiUrl) throws KraftwerkException {
+	public static MetadataModel getMetadataFromDDI(URL ddiUrl) throws KraftwerkException {
 
 		try {
 			// Path of the output 'variables.xml' temp file
@@ -54,9 +54,9 @@ public class DDIReader {
 
 			transformDDI(ddiUrl, variablesTempFilePath);
 
-			VariablesMap variablesMap = readVariables(variablesTempFilePath);
+			MetadataModel metadataModel = readVariables(variablesTempFilePath);
 			Files.delete(variablesFile.toPath());
-			return variablesMap;
+			return metadataModel;
 		}
 
 		catch (MalformedURLException e) {
@@ -93,9 +93,9 @@ public class DDIReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private static VariablesMap readVariables(Path variablesFilePath)
+	private static MetadataModel readVariables(Path variablesFilePath)
 			throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
-		VariablesMap variablesMap = new VariablesMap();
+		MetadataModel metadataModel = new MetadataModel();
 
 		// Parse
 		Element root = readXmlFile(variablesFilePath);
@@ -120,14 +120,14 @@ public class DDIReader {
 						Group group;
 						if (StringUtils.isEmpty(parentGroupName)) {
 							rootGroupName = groupName;
-							group = variablesMap.getRootGroup();
+							group = metadataModel.getRootGroup();
 						} else {
 							group = new Group(groupName, parentGroupName);
-							variablesMap.putGroup(group);
+							metadataModel.putGroup(group);
 						}
 
 						// Variables in the group
-						getVariablesInGroup(variablesMap, groupNode, group);
+						getVariablesInGroup(metadataModel.getVariables(), groupNode, group);
 					
 				}
 			} catch (NullPointerException e) {
@@ -135,8 +135,8 @@ public class DDIReader {
 						((Element) groupElements.item(i)).getAttribute("name")));
 			}
 
-			for (String groupName : variablesMap.getSubGroupNames()) {
-				Group group = variablesMap.getGroup(groupName);
+			for (String groupName : metadataModel.getSubGroupNames()) {
+				Group group = metadataModel.getGroup(groupName);
 				if (group.getParentName().equals(rootGroupName)) {
 					group.setParentName(Constants.ROOT_GROUP_NAME);
 				}
@@ -147,7 +147,7 @@ public class DDIReader {
 		if (rootGroupName == null) {
 			log.debug("Failed to identify the root group while reading variables files: " + variablesFilePath);
 		}
-		return variablesMap;
+		return metadataModel;
 	}
 
 

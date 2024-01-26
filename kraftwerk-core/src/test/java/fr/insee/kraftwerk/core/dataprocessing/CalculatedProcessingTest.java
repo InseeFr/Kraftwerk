@@ -1,33 +1,29 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class CalculatedProcessingTest {
 
     private static CalculatedVariables fooCalculated;
-    private static VariablesMap fooVariables;
+    private static MetadataModel fooMetadataModel;
     private static VtlBindings vtlBindings;
     private static List<KraftwerkError> errors;
 
@@ -42,11 +38,11 @@ class CalculatedProcessingTest {
         fooCalculated.putVariable(
                 new CalculatedVariable("FOO3", "1"));
         //
-        fooVariables = new VariablesMap();
-        fooVariables.putVariable(new Variable("FOO", fooVariables.getRootGroup(), VariableType.STRING));
-        fooVariables.putVariable(new Variable("FOO1", fooVariables.getRootGroup(), VariableType.STRING));
-        fooVariables.putVariable(new Variable("FOO2", fooVariables.getRootGroup(), VariableType.STRING));
-        fooVariables.putVariable(new Variable("FOO3", fooVariables.getRootGroup(), VariableType.STRING));
+        fooMetadataModel = new MetadataModel();
+        fooMetadataModel.getVariables().putVariable(new Variable("FOO", fooMetadataModel.getRootGroup(), VariableType.STRING));
+        fooMetadataModel.getVariables().putVariable(new Variable("FOO1", fooMetadataModel.getRootGroup(), VariableType.STRING));
+        fooMetadataModel.getVariables().putVariable(new Variable("FOO2", fooMetadataModel.getRootGroup(), VariableType.STRING));
+        fooMetadataModel.getVariables().putVariable(new Variable("FOO3", fooMetadataModel.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
         errors = new ArrayList<>();

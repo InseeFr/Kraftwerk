@@ -1,26 +1,24 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.EnumUtils;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
+
+import java.nio.file.Path;
+import java.util.List;
 
 @Slf4j
 public class TCMSequencesProcessing extends DataProcessing {
     private final String vtlDirectory;
-    private final Map<String, VariablesMap> metadataVariables;
+    private final MetadataModel metadataModel;
 
-    public TCMSequencesProcessing(VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables,String vtlDirectory) {
+    public TCMSequencesProcessing(VtlBindings vtlBindings, MetadataModel metadataModel,String vtlDirectory) {
         super(vtlBindings);
-        this.metadataVariables = metadataVariables;
+        this.metadataModel = metadataModel;
         this.vtlDirectory = vtlDirectory;
     }
 
@@ -36,7 +34,7 @@ public class TCMSequencesProcessing extends DataProcessing {
 
     @Override
     public String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
-        VtlScript automatedInstructions = generateVtlInstructions(bindingName, this.metadataVariables);
+        VtlScript automatedInstructions = generateVtlInstructions(bindingName, metadataModel);
         log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName()));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
             vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, errors);
@@ -47,15 +45,14 @@ public class TCMSequencesProcessing extends DataProcessing {
     /**
      * Generate the VTL script from TCM sequences contained in DDI
      * @param bindingName unimode binding
-     * @param metadataVariables variables from DDI
+     * @param metadataModel variables from DDI
      * @return a script containing all the custom modules scripts
      */
-    protected VtlScript generateVtlInstructions(String bindingName, Map<String, VariablesMap> metadataVariables){
+    protected VtlScript generateVtlInstructions(String bindingName, MetadataModel metadataModel){
         StringBuilder vtlScriptBuilder = new StringBuilder();
-        VariablesMap variablesMap = metadataVariables.get(bindingName);
 
         //For each variable name matching TCM sequence enum
-        for(String tcmSequenceString : variablesMap.getVariableNames().stream().filter(
+        for(String tcmSequenceString : metadataModel.getVariables().getVariableNames().stream().filter(
                 variableName -> EnumUtils.isValidEnum(TCMSequenceEnum.class, variableName))
                 .toList()){
             TCMSequenceEnum tcmSequenceEnum = TCMSequenceEnum.valueOf(tcmSequenceString);
