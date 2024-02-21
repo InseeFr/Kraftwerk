@@ -79,7 +79,7 @@ class CsvTableWriterTest {
 		varMap.putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
 		metaVariables.put("test",varMap);
 
-		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaVariables, "test");
+		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaVariables, "test", null);
 		//
 		CSVReader reader = CsvUtils.getReader(outTestFilePath);
 		List<String[]> rows = reader.readAll();

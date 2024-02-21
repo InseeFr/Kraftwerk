@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
 
 
@@ -49,6 +50,17 @@ public class TextFileWriter {
 			}
 		} else {
 			log.debug("No error found during VTL transformations");
+		}
+	}
+
+	public static void writeLogFile(Path inDirectory, KraftwerkExecutionLog kraftwerkExecutionLog){
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
+		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+
+		try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
+			myWriter.write(kraftwerkExecutionLog.getFormattedString());
+		}catch (IOException e) {
+			log.warn(String.format("Error occurred when trying to write log file: %s", tempOutputPath), e);
 		}
 	}
 }
