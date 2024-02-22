@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 - [2023-12-18]
+
+### Added
+- Log for functional purpose
+
 ## 2.0.0 - [2023-12-18]
 
 ### Added
