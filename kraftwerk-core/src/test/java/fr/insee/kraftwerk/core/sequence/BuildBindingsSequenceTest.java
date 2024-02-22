@@ -40,7 +40,7 @@ class BuildBindingsSequenceTest {
 		Map<String,VariablesMap> metadataVariables = new HashMap<>();
 		
 		//THEN
-		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi));
+		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi,null));
 		
 	}
 	
@@ -62,7 +62,7 @@ class BuildBindingsSequenceTest {
 		
 		//WHEN
 		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi));
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi,null));
 	}
 	
 	

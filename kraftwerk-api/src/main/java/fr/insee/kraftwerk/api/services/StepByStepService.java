@@ -61,7 +61,7 @@ public class StepByStepService extends KraftwerkService {
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
 			try {
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI );
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataVariables(), withDDI,null);
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
@@ -95,7 +95,7 @@ public class StepByStepService extends KraftwerkService {
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		try {
-			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI);
+			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataVariables(), withDDI,null);
 		} catch (NullException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
