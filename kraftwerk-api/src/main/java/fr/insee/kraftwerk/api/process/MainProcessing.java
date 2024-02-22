@@ -21,6 +21,7 @@ import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +45,7 @@ public class MainProcessing {
 	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
+	private KraftwerkExecutionLog kraftwerkExecutionLog;
 	private List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private Map<String, VariablesMap> metadataVariables;
@@ -76,17 +78,22 @@ public class MainProcessing {
 				unimodalProcess();
 				multimodalProcess();
 				outputFileWriter();
+				kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 			}
 		} else {
 			unimodalProcess();
 			multimodalProcess();
 			outputFileWriter();
+			kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 		}
 		writeErrors();
+		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+		writeLog();
 	}
 
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
+		kraftwerkExecutionLog = new KraftwerkExecutionLog(); //Init logger
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
@@ -119,13 +126,17 @@ public class MainProcessing {
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataVariables, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataVariables, errors, kraftwerkExecutionLog);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(inDirectory, errors);
 	}
+
+
+	/* Step 6 : Write log */
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory,kraftwerkExecutionLog);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();

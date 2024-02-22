@@ -18,6 +18,7 @@ import com.opencsv.ICSVWriter;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
@@ -139,7 +140,7 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
+	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName, KraftwerkExecutionLog kraftwerkExecutionLog) {
 		// File connection
 		try (ICSVWriter writer = setCSVWriter(filePath)){
 						
@@ -173,7 +174,11 @@ public class CsvTableWriter {
 			}
 			log.debug("Nb variables in table : {}", dataset.getDataStructure().size());
 			log.debug("Nb lines in table : {}", dataset.getDataPoints().size());
+			if (kraftwerkExecutionLog != null) {
+				kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, dataset.getDataPoints().size());
+			}
 			log.info(String.format("Output CSV file: %s successfully written.", filePath));
+
 		} catch (IOException e) {
 			log.error(String.format("IOException occurred when trying to write CSV table: %s", filePath));
 		}

@@ -11,13 +11,14 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 
 /**
  * Class to manage the writing of CSV output tables.
  */
 public class CsvOutputFiles extends OutputFiles {
-
+	private final KraftwerkExecutionLog kraftwerkExecutionLog;
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -27,6 +28,11 @@ public class CsvOutputFiles extends OutputFiles {
 	 */
 	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
 		super(outDirectory, vtlBindings, modes);
+		this.kraftwerkExecutionLog = null;
+	}
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, KraftwerkExecutionLog kraftwerkExecutionLog) {
+		super(outDirectory, vtlBindings, modes);
+		this.kraftwerkExecutionLog = kraftwerkExecutionLog;
 	}
 
 
@@ -42,7 +48,7 @@ public class CsvOutputFiles extends OutputFiles {
 						getOutputFolder().resolve(outputFileName(datasetName)),metadataVariables,datasetName);
 			} else {
 				CsvTableWriter.writeCsvTable(getVtlBindings().getDataset(datasetName),
-						getOutputFolder().resolve(outputFileName(datasetName)),metadataVariables,datasetName);
+						getOutputFolder().resolve(outputFileName(datasetName)),metadataVariables,datasetName, kraftwerkExecutionLog);
 			}
 		}
 	}

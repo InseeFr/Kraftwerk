@@ -108,4 +108,8 @@ public class UserInputsFile extends UserInputs {
 		return null;
 	}
 
+	public String getFileName() {
+		return this.getUserInputFile().getFileName().toString();
+	}
+
 }
