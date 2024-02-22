@@ -5,14 +5,14 @@
   <parent>
     <groupId>fr.insee.kraftwerk</groupId>
     <artifactId>kraftwerk</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
   </parent>
   <artifactId>kraftwerk-api</artifactId>
   <name>kraftwerk-api</name>
   <packaging>jar</packaging> 
   
 	<properties>
-		<kraftwerk.version>2.0.0</kraftwerk.version>
+		<kraftwerk.version>2.0.1</kraftwerk.version>
 	</properties>
 	
 	<dependencies>

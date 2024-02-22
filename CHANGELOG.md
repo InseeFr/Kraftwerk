@@ -1,9 +1,12 @@
 # Changelog
 
-## 2.0.1 - [2023-12-18]
+## 2.0.1 - [2024-02-22]
 
 ### Added
 - Log for functional purpose
+
+### Fixed
+- Update dependencies, including Trevas (error with nvl())
 
 ## 2.0.0 - [2023-12-18]
 
