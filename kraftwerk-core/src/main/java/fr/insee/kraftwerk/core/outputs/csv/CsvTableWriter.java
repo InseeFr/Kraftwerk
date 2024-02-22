@@ -174,8 +174,9 @@ public class CsvTableWriter {
 			}
 			log.debug("Nb variables in table : {}", dataset.getDataStructure().size());
 			log.debug("Nb lines in table : {}", dataset.getDataPoints().size());
-			if (kraftwerkExecutionLog != null)
+			if (kraftwerkExecutionLog != null) {
 				kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, dataset.getDataPoints().size());
+			}
 			log.info(String.format("Output CSV file: %s successfully written.", filePath));
 
 		} catch (IOException e) {

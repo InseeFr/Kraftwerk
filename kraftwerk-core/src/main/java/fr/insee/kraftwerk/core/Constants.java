@@ -51,6 +51,7 @@ public final class Constants {
 	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
 	public static final String REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER = "NON_AFFECTE_";
+	public static final String END_LINE = "\n";
 
 
 	// ----- Explicit Variables Names

@@ -78,13 +78,13 @@ public class MainProcessing {
 				unimodalProcess();
 				multimodalProcess();
 				outputFileWriter();
-				kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getUserInputFile().getFileName().toString());
+				kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 			}
 		} else {
 			unimodalProcess();
 			multimodalProcess();
 			outputFileWriter();
-			kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getUserInputFile().getFileName().toString());
+			kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 		}
 		writeErrors();
 		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());

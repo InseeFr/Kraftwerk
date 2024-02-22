@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.utils.log;
 
+import fr.insee.kraftwerk.core.Constants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,18 +30,20 @@ public class KraftwerkExecutionLog {
         Date startDate = new Date(startTimeStamp);
         Date endDate = new Date(endTimeStamp);
 
-        StringBuilder toWrite = new StringBuilder("Début exécution: " + simpleDateFormat.format(startDate) + "\n"
-                + "Fin exécution: " + simpleDateFormat.format(endDate) + "\n"
-                + "Lignes par table:\n");
+        StringBuilder toWrite = new StringBuilder();
+
+        toWrite.append("Début exécution: ").append(simpleDateFormat.format(startDate)).append(Constants.END_LINE)
+                .append("Fin exécution: ").append(simpleDateFormat.format(endDate)).append(Constants.END_LINE)
+                .append("Lignes par table:").append(Constants.END_LINE);
 
         for(Map.Entry<String,Integer> entry : lineCountByTableMap.entrySet()){
-            toWrite.append("\t").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+            toWrite.append("\t").append(entry.getKey()).append(": ").append(entry.getValue()).append(Constants.END_LINE);
         }
 
-        toWrite.append("Fichiers traités avec succès: \n");
+        toWrite.append("Fichiers traités avec succès: ").append(Constants.END_LINE);
 
         for (String fileName : okFileNames){
-            toWrite.append("\t").append(fileName).append("\n");
+            toWrite.append("\t").append(fileName).append(Constants.END_LINE);
         }
 
         return toWrite.toString();
