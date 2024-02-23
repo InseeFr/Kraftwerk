@@ -1,8 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.nio.file.Path;
-import java.util.List;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -10,10 +7,12 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
 
+import java.nio.file.Path;
+import java.util.List;
+
 
 /**
  * Interface to apply VTL instructions.
- *
  * Each processing brick has two steps:
  * First is an automated process: VTL instructions are generated (eventually an empty string)
  * and are then applied.
@@ -51,7 +50,6 @@ public abstract class DataProcessing {
      * return the automated VTL instructions for the step.
      *
      * @param bindingName The name of the concerned dataset.
-     * @param objects Optional additional information to perform the step.
      *
      * @return a VTL script.
      */

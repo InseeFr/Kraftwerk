@@ -1,23 +1,7 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
@@ -25,6 +9,21 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Class that provide method to use the Trevas library.
@@ -66,12 +65,13 @@ public class VtlExecute {
         putVtlDataset(tempDatasetPath, bindingName, bindings);
         // Delete temp file
         Path tempDataset = Paths.get(tempDatasetPath);
-        File fileTempDataset = tempDataset.toFile();
-        if (fileTempDataset.delete()){
+
+		try {
+			Files.delete(tempDataset);
             log.debug("File {} deleted",tempDatasetPath);
-        } else {
+        } catch (IOException e) {
             log.debug("Impossible to delete file {}",tempDatasetPath);
-        }
+		}
     }
 
 
@@ -84,7 +84,7 @@ public class VtlExecute {
      * @param bindingName
      * The name the dataset will be referred to when executing VTL instructions.
      */
-    private VtlBindings putVtlDataset(URL url, String bindingName, VtlBindings bindings){
+    private void putVtlDataset(URL url, String bindingName, VtlBindings bindings){
         try {
             Dataset vtlDataset = mapper.readValue(url, Dataset.class);
             bindings.put(bindingName, vtlDataset);
@@ -92,7 +92,6 @@ public class VtlExecute {
         catch(IOException e){
             log.error(String.format("Unable to connect dataset from url: %s", url));
         }
-        return bindings;
     }
 
     /**
@@ -106,9 +105,9 @@ public class VtlExecute {
      */
     public void putVtlDataset(String filePath, String bindingName, VtlBindings bindings){
         try {
-            URL url = new URL("file:///" + filePath);
+            URL url = new URI("file:///" + filePath).toURL();
             this.putVtlDataset(url, bindingName,  bindings);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             log.error(String.format("Invalid file path: %s", filePath), e);
         }
     }
@@ -154,7 +153,7 @@ public class VtlExecute {
      * A string containing vtl instructions.
      */
     public void evalVtlScript(String vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
-        if(vtlScript != null && !vtlScript.equals("")) {
+        if(vtlScript != null && !vtlScript.isEmpty()) {
             try {
                 // set script context
                 ScriptContext context = engine.getContext();
