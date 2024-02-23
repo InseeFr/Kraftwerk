@@ -1,18 +1,15 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.MalformedURLException;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import org.junit.jupiter.api.Test;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class VariableTest {
 
@@ -31,7 +28,7 @@ class VariableTest {
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
 	@Test
-	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -65,7 +62,7 @@ class VariableTest {
 	}
 
 	@Test
-	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -103,7 +100,7 @@ class VariableTest {
 	}
 
 	@Test
-	void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsWebVariables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
@@ -144,7 +141,7 @@ class VariableTest {
 	}
 
 	@Test
-	void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsPapVariables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");

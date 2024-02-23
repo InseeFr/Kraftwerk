@@ -1,18 +1,5 @@
 package cucumber.functional_tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cucumber.TestConstants;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -35,6 +22,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // calculated_processing.feature
 public class CalculatedProcessingDefinition {
@@ -64,7 +59,7 @@ public class CalculatedProcessingDefinition {
         //TODO Put other sample test campaigns once they are ready
     }
     @Given("I read data from campaign {string}, mode {string}")
-    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException {
+    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException, URISyntaxException {
         this.campaignName = campaignName;
         this.dataMode = dataMode;
         //

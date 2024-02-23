@@ -28,8 +28,7 @@ public class MetadataUtilsGenesis {
 
 	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, VariablesMap> metadataVariables ) throws KraftwerkException {
 		// Step 1 : we add the variables read in the DDI
-		VariablesMap variables= new VariablesMap();
-		variables = DDIReader.getVariablesFromDDI(modeInputsGenesis.getDdiUrl());
+		VariablesMap variables = DDIReader.getVariablesFromDDI(modeInputsGenesis.getDdiUrl());
 
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputsGenesis.getLunaticFile() != null) {

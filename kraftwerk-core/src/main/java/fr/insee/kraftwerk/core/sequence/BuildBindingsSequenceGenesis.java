@@ -1,10 +1,5 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -24,6 +19,11 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
 public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
@@ -40,7 +40,7 @@ public class BuildBindingsSequenceGenesis {
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		// To be deported in another place in the code later at refactor step
-		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> surveyUnit.getMode().getModeName().equals(dataMode)).toList();
+		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> dataMode.equals(surveyUnit.getMode().getModeName())).toList();
 		for(SurveyUnitUpdateLatest surveyUnit : surveyUnitsFiltered) {
 			QuestionnaireData questionnaire = new QuestionnaireData();
 			questionnaire.setIdentifier(surveyUnit.getIdUE());
@@ -50,7 +50,7 @@ public class BuildBindingsSequenceGenesis {
 			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
 				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
 					// Not clean : deal with arrays (for now always a single value in array)
-					if (!variableState.getValues().isEmpty()) answers.putValue(variableState.getIdVar(), variableState.getValues().get(0));
+					if (!variableState.getValues().isEmpty()){ answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());}
 				} else {
 					addGroupVariables(data.getVariablesMap(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
 				}
@@ -58,7 +58,7 @@ public class BuildBindingsSequenceGenesis {
 
 			for (ExternalVariable extVar : surveyUnit.getExternalVariables()){
 				// The external are always in root group name
-				if (!extVar.getValues().isEmpty()) answers.putValue(extVar.getIdVar(), extVar.getValues().get(0));
+				if (!extVar.getValues().isEmpty()){ answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());}
 			}
 
 			data.getQuestionnaires().add(questionnaire);
@@ -108,7 +108,7 @@ public class BuildBindingsSequenceGenesis {
 		if (variables.hasVariable(variableName)) {
 			String groupName = variables.getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableState.getValues().get(0), variableName, variableState.getIdLoop());
+			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getIdLoop());
 		}
 	}
 

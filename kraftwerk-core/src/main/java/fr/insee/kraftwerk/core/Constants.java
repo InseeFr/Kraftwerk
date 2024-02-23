@@ -1,19 +1,20 @@
 package fr.insee.kraftwerk.core;
 
+import lombok.extern.log4j.Log4j2;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import lombok.extern.log4j.Log4j2;
 
 /**
  * This class contains paths and fixed parameters used in the application.
@@ -107,7 +108,7 @@ public final class Constants {
 	public static final String SITUATION_NAME = "situation";
 	public static final String CATEGORY_NAME = "category";
 	public static final String OCCUPANT_NAME = "occupant";
-	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + "DATE_COLLECTE";
+	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + SURVEY_VALIDATION_DATE_NAME;
 	
 	// ------ Pairwise variables
 	
@@ -224,9 +225,9 @@ public final class Constants {
 	 *
 	 * @throws MalformedURLException if the path given is incorrect.
 	 * */
-	public static URL convertToUrl(String filePath) throws MalformedURLException {
+	public static URL convertToUrl(String filePath) throws MalformedURLException, URISyntaxException {
 		if(filePath.startsWith("http")) {
-			return new URL(filePath);
+			return new URI(filePath).toURL();
 		} else {
 			return new File(filePath).toURI().toURL();
 		}
