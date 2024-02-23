@@ -34,6 +34,10 @@ public class DateUtils {
 		}
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}
+
+	public static String formatLongToString(long l) {
+		return formatDateToString(new Date(l));
+	}
 	
 	public static String formatDateToString(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");

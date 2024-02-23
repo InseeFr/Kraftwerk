@@ -12,6 +12,8 @@
 
 ### Added
 - Look for data in Genesis
+- Add support for partitioned reporting data files (Moog)
+- Add survey validation date in reporting data
 
 ### Changed
 - Migrated to Java 21

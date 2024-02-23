@@ -107,6 +107,7 @@ public final class Constants {
 	public static final String SITUATION_NAME = "situation";
 	public static final String CATEGORY_NAME = "category";
 	public static final String OCCUPANT_NAME = "occupant";
+	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + "DATE_COLLECTE";
 	
 	// ------ Pairwise variables
 	
