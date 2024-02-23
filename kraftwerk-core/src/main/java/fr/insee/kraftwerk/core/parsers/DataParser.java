@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -35,11 +36,14 @@ public abstract class DataParser {
 	 * @param dataPath A data file, or a folder only containing data files.
 	 * @throws NullException 
 	 */
-	public final void parseSurveyData(Path dataPath) throws NullException {
+	public final void parseSurveyData(Path dataPath, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
 		if (dataPath == null) log.error("Datapath is null");
 		else {
 			if (Files.isRegularFile(dataPath)) {
 				parseDataFile(dataPath);
+				if(kraftwerkExecutionLog != null) {
+					kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
+				}
 			}
 	
 			else if (Files.isDirectory(dataPath)) {
@@ -47,6 +51,9 @@ public abstract class DataParser {
 					stream.forEach(t -> {
 						try {
 							parseDataFile(t);
+							if(kraftwerkExecutionLog != null) {
+								kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
+							}
 						} catch (NullException e) {
 							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
 						}
@@ -69,11 +76,14 @@ public abstract class DataParser {
 	 * @param dataPath A data file, or a folder only containing data files.
 	 * @throws NullException
 	 */
-	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile) throws NullException {
+	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
 		if (dataPath == null) log.error("Datapath is null");
 		else {
 			if (Files.isRegularFile(dataPath)) {
 				parseDataFileWithoutDDI(dataPath,lunaticFile);
+				if(kraftwerkExecutionLog != null) {
+					kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
+				}
 			}
 
 			else if (Files.isDirectory(dataPath)) {
@@ -81,6 +91,9 @@ public abstract class DataParser {
 					stream.forEach(t -> {
 						try {
 							parseDataFileWithoutDDI(t,lunaticFile);
+							if(kraftwerkExecutionLog != null) {
+								kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
+							}
 						} catch (NullException e) {
 							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
 						}

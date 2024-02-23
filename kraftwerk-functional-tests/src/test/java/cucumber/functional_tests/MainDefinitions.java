@@ -116,7 +116,7 @@ public class MainDefinitions {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI,null);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
 		}
