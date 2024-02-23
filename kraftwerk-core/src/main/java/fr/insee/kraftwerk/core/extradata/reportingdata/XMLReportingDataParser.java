@@ -156,29 +156,35 @@ public class XMLReportingDataParser extends ReportingDataParser {
   private void getIdentification(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
     Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
     reportingDataUE.setIdentification(new Identification());
-    if (identificationElement == null)
+    if (identificationElement == null) {
       return;
+    }
 
-    if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null)
+    if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null) {
       reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
-
-    if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null)
+    }
+    if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null) {
       reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
+    }
 
-    if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null)
+    if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null) {
       reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+    }
 
-    if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null)
+    if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null) {
       reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+    }
 
-    if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null)
+    if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null) {
       reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+    }
   }
 
   private void getComments(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
     Element commentsNode = surveyUnitElement.getFirstChildElement("Comments");
-    if(commentsNode == null)
+    if(commentsNode == null) {
       return;
+    }
 
     Elements commentsElements = commentsNode.getChildElements("Comment");
     for (int k = 0; k < commentsElements.size(); k++) {
@@ -190,9 +196,9 @@ public class XMLReportingDataParser extends ReportingDataParser {
   }
 
   private void setSurveyValidationDate(ReportingDataUE reportingDataUE) {
-  if(reportingDataUE.getStates().isEmpty()) {
-    return;
-  }
+    if(reportingDataUE.getStates().isEmpty()) {
+      return;
+    }
 
     State validationState = null;
     for (State contactState : reportingDataUE.getStates()) {

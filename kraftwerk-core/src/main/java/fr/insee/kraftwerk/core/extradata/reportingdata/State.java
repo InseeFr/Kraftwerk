@@ -38,9 +38,9 @@ public class State{
   }
 
   public boolean isPriorTo(State otherState){
-    if(otherState == null)
+    if(otherState == null) {
       return true;
-
+    }
     return (
             // True if this state is more priority than the other
             this.getPriorityOrder() < otherState.getPriorityOrder()
