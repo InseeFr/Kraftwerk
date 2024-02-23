@@ -74,7 +74,7 @@ public class CalculatedProcessingDefinition {
         SurveyRawData data = new SurveyRawData();
         data.setVariablesMap(variablesMap);
         DataParser parser = new LunaticXmlDataParser(data);
-        parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")));
+        parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")),null);
         //
         vtlBindings = new VtlBindings();
         vtlExecute.convertToVtlDataset(data, "TEST", vtlBindings);

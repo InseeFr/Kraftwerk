@@ -78,13 +78,11 @@ public class MainProcessing {
 				unimodalProcess();
 				multimodalProcess();
 				outputFileWriter();
-				kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 			}
 		} else {
 			unimodalProcess();
 			multimodalProcess();
 			outputFileWriter();
-			kraftwerkExecutionLog.getOkFileNames().add(userInputsFile.getFileName());
 		}
 		writeErrors();
 		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
@@ -111,7 +109,7 @@ public class MainProcessing {
 	private void unimodalProcess() throws NullException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDDI);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDDI,kraftwerkExecutionLog);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataVariables);
 		}
