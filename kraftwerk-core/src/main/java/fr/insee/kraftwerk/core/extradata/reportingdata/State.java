@@ -45,7 +45,7 @@ public class State{
             // True if this state is more priority than the other
             this.getPriorityOrder() < otherState.getPriorityOrder()
             //True if the other state has the same priority and this state is more recent
-            || (isValidationState() && this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
+            || (this.getPriorityOrder() != null && this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
     );
   }
   
