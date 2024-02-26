@@ -22,9 +22,9 @@ import java.util.List;
 
 class TCMSequenceProcessingTest {
 
-    private static final String VTL_EXTENSION = ".vtl";
-    private static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
-    private static final List<TCMModuleEnum> modules = new ArrayList<>();
+    static final String VTL_EXTENSION = ".vtl";
+    static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
+    static final List<TCMModuleEnum> modules = new ArrayList<>();
 
     //Given
     static Dataset unimodalDataset = new InMemoryDataset(
@@ -40,7 +40,7 @@ class TCMSequenceProcessingTest {
             )
     );
     static VtlBindings vtlBindings = new VtlBindings();
-    Dataset outDataset;
+
     @BeforeAll
     static void init() throws IOException {
         modules.add(TCMModuleEnum.TCM_ACT_ANTE);
