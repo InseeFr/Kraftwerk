@@ -3,8 +3,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.Sequence;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -19,12 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TCMSequenceProcessingTest {
 
@@ -45,44 +39,70 @@ class TCMSequenceProcessingTest {
     Dataset outDataset;
     @BeforeAll
     static void init() throws IOException {
-        // VTL Test file
-        String vtlScript = "TEST := TEST[calc TCM_THL_DET := \"TESTTCM1\"];";
+        // VTL Test files generation
+        String vtlScript1 = "/* Instruction TCM_ACT_ANTE */";
+        Path path1 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_ACT_ANTE.vtl");
+        if(!Files.exists(path1)) Files.createFile(path1);
+        Files.write(path1,vtlScript1.getBytes());
 
-        Path path = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_THL_DET.vtl");
-        if(!Files.exists(path)) Files.createFile(path);
-        Files.write(path,vtlScript.getBytes());
+        String vtlScript2 = "/* Instruction TCM_ACT_BIS */";
+        Path path2 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_ACT_BIS.vtl");
+        if(!Files.exists(path2)) Files.createFile(path2);
+        Files.write(path2,vtlScript2.getBytes());
+
+        String vtlScript3 = "/* Instruction TCM_THL_DET */";
+        Path path3 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_THL_DET.vtl");
+        if(!Files.exists(path3)) Files.createFile(path3);
+        Files.write(path3,vtlScript3.getBytes());
+
+        String vtlScript4 = "/* Instruction TCM_THL_SIMPLE */";
+        Path path4 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_THL_SIMPLE.vtl");
+        if(!Files.exists(path4)) Files.createFile(path4);
+        Files.write(path4,vtlScript4.getBytes());
 
         vtlBindings.put("TEST", unimodalDataset);
     }
 
     //When + Then
     @Test
-    @DisplayName("We should have TCM Module variable in binding")
+    @DisplayName("We should generate corresponding script depending on sequences presence")
     void check_standard_vtl_execution(){
-        //Metadata variables object
-        Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
+        //GIVEN
         MetadataModel metadataModel = new MetadataModel();
-
-        metadataModel.getVariables().putVariable(new Variable("TCM_THLHAB", metadataModel.getRootGroup(), VariableType.STRING));
-        metadataModel.getVariables().putVariable(new Variable("PRENOM", metadataModel.getRootGroup(), VariableType.STRING));
-
-        metadatas.put("TEST",metadataModel);
+        metadataModel.getSequences().add(new Sequence("TCM_ACT_ANT"));
+        metadataModel.getSequences().add(new Sequence("TCM_ACTI_BIS"));
+        metadataModel.getSequences().add(new Sequence("TCM_THLHAB"));
 
         // Errors list
         List<KraftwerkError> errors = new ArrayList<>();
+        StringBuilder expectedScriptBuilder = new StringBuilder();
+        expectedScriptBuilder.append("/* Instruction TCM_ACT_ANTE */");
+        expectedScriptBuilder.append(System.lineSeparator());
+        expectedScriptBuilder.append("/* Instruction TCM_ACT_BIS */");
+        expectedScriptBuilder.append(System.lineSeparator());
+        expectedScriptBuilder.append("/* Instruction TCM_THL_DET */");
+        expectedScriptBuilder.append(System.lineSeparator());
+        expectedScriptBuilder.append("/* Instruction TCM_THL_SIMPLE */");
+        expectedScriptBuilder.append(System.lineSeparator());
+        String expectedScript = expectedScriptBuilder.toString();
 
+        //WHEN
         TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString());
-        processing.applyAutomatedVtlInstructions("TEST", errors);
-        outDataset = vtlBindings.getDataset("TEST");
+        String scriptString = processing.applyAutomatedVtlInstructions("TEST", errors);
 
-        Assertions.assertThat(errors).isEmpty();
-        assertTrue(outDataset.getDataStructure().containsKey("TCM_THL_DET"));
-        assertEquals("TESTTCM1", outDataset.getDataPoints().getFirst().get("TCM_THL_DET"));
+        //THEN
+        Assertions.assertThat(scriptString).isEqualToIgnoringNewLines(expectedScript);
     }
 
     @AfterAll
     static void clean() throws IOException {
-        Path path = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_THL_DET.vtl");
-        Files.deleteIfExists(path);
+        Path path1 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_ACT_ANTE.vtl");
+        Files.deleteIfExists(path1);
+        Path path2 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_ACT_BIS.vtl");
+        Files.deleteIfExists(path2);
+        Path path3 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_THL_DET.vtl");
+        Files.deleteIfExists(path3);
+        Path path4= Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_THL_SIMPLE.vtl");
+        Files.deleteIfExists(path4);
     }
 }

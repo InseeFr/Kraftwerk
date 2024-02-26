@@ -20,7 +20,7 @@ public class MetadataModel {
      * Values: Group. */
 	private LinkedHashMap<String, Group> groups  = new LinkedHashMap<>();;
 	
-	private List<Sequence> sequences;
+	private List<Sequence> sequences = new ArrayList<>();
 	
 	
     /** The root group is created when creating a MetadataModel instance. */
@@ -126,6 +126,10 @@ public class MetadataModel {
         set.addAll(getFullyQualifiedNames());
         set.addAll(getVariables().getVariableNames());
         return set;
+    }
+
+    public List<String> getSequencesName(){
+        return sequences.stream().map(Sequence::getName).toList();
     }
 
 }

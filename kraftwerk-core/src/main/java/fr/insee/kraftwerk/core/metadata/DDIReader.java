@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -127,7 +128,7 @@ public class DDIReader {
 						}
 
 						// Variables in the group
-						getVariablesInGroup(metadataModel.getVariables(), groupNode, group);
+						getVariablesInGroup(metadataModel.getVariables(), groupNode, group, metadataModel.getSequences());
 					
 				}
 			} catch (NullPointerException e) {
@@ -152,28 +153,36 @@ public class DDIReader {
 
 
 
-	private static void getVariablesInGroup(VariablesMap variablesMap, Node groupNode, Group group) {
+	private static void getVariablesInGroup(VariablesMap variablesMap, Node groupNode, Group group, List<Sequence> sequences) {
 		NodeList variableNodes = groupNode.getChildNodes();
 		for (int j = 0; j < variableNodes.getLength(); j++) {
 			Node variableNode = variableNodes.item(j);
 			if (nodeIsElementWithName(variableNode, "Variable")) {
-				addVariableToVariablesMap(variablesMap, group, variableNode);
+				addVariableToVariablesMap(variablesMap, group, variableNode, sequences);
 			}
 		}
 	}
 
-	private static void addVariableToVariablesMap(VariablesMap variablesMap, Group group, Node variableNode) {
+	private static void addVariableToVariablesMap(VariablesMap variablesMap, Group group, Node variableNode, List<Sequence> sequences) {
 		Element variableElement = (Element) variableNode;
 
 		// Variable name, type and size
 		String variableName = getFirstChildValue(variableElement, "Name");
 		VariableType variableType = VariableType.valueOf(getFirstChildValue(variableElement, "Format"));
 		String variableLength = getFirstChildValue(variableElement, "Size");
+		String sequenceName= getFirstChildAttribute(variableElement, "Sequence","name");
 
 		Node questionItemName = getFirstChildNode(variableElement, "QuestionItemName");
 		Node valuesElement = getFirstChildNode(variableElement, "Values");
 		Node mcqElement = getFirstChildNode(variableElement, "QGrid");
-		
+
+		if (sequenceName != null){
+			Sequence sequence = new Sequence(sequenceName);
+			if (sequences.isEmpty() || !sequences.contains(sequence)){
+				sequences.add(sequence);
+			}
+		}
+
 		if (valuesElement != null) {
 			UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
 			if (questionItemName != null) {
@@ -239,6 +248,13 @@ public class DDIReader {
 		if (child == null)
 			return null;
 		return child.getTextContent();
+	}
+
+	private static String getFirstChildAttribute(Element variableElement, String childTagName, String attribute){
+		Node child = getFirstChildNode(variableElement, childTagName);
+		if (child == null)
+			return null;
+		return child.hasAttributes() ? child.getAttributes().getNamedItem(attribute).getTextContent() : null;
 	}
 
 	private static Node getFirstChildNode(Element variableElement, String childTagName) {

@@ -52,8 +52,8 @@ public class TCMSequencesProcessing extends DataProcessing {
         StringBuilder vtlScriptBuilder = new StringBuilder();
 
         //For each variable name matching TCM sequence enum
-        for(String tcmSequenceString : metadataModel.getVariables().getVariableNames().stream().filter(
-                variableName -> EnumUtils.isValidEnum(TCMSequenceEnum.class, variableName))
+        for(String tcmSequenceString : metadataModel.getSequencesName().stream().filter(
+                sequenceName -> EnumUtils.isValidEnum(TCMSequenceEnum.class, sequenceName))
                 .toList()){
             TCMSequenceEnum tcmSequenceEnum = TCMSequenceEnum.valueOf(tcmSequenceString);
 
@@ -61,6 +61,7 @@ public class TCMSequencesProcessing extends DataProcessing {
                 Path tcmModulePath = Path.of(this.vtlDirectory).resolve("tcm").resolve(tcmModuleEnum.toString() + ".vtl");
                 if(tcmModulePath.toFile().exists()){
                     vtlScriptBuilder.append(TextFileReader.readFromPath(tcmModulePath));
+                    vtlScriptBuilder.append(System.lineSeparator());
                     log.info("TCM VTL instructions read for module " + tcmModuleEnum);
                 }else{
                     log.warn("TCM VTL instructions for module " + tcmModuleEnum + " not found");
