@@ -1,14 +1,14 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * Template method for data parsers.
@@ -37,37 +37,38 @@ public abstract class DataParser {
 	 * @throws NullException 
 	 */
 	public final void parseSurveyData(Path dataPath, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
-		if (dataPath == null) log.error("Datapath is null");
-		else {
-			if (Files.isRegularFile(dataPath)) {
-				parseDataFile(dataPath);
-				if(kraftwerkExecutionLog != null) {
-					kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
-				}
-			}
-	
-			else if (Files.isDirectory(dataPath)) {
-				try (Stream<Path> stream = Files.list(dataPath)){
-					stream.forEach(t -> {
-						try {
-							parseDataFile(t);
-							if(kraftwerkExecutionLog != null) {
-								kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
-							}
-						} catch (NullException e) {
-							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
-						}
-					});
-				} catch (IOException e) {
-					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
-				}
-			}
-	
-			else {
-				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-				log.warn("No data was parsed.");
+		if (dataPath == null){
+			log.error("Datapath is null");
+			return;
+		}
+		if (Files.isRegularFile(dataPath)) {
+			parseDataFile(dataPath);
+			if(kraftwerkExecutionLog != null) {
+				kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
 			}
 		}
+		else if (Files.isDirectory(dataPath)) {
+			try (Stream<Path> stream = Files.list(dataPath)){
+				stream.forEach(t -> {
+					try {
+						parseDataFile(t);
+						if(kraftwerkExecutionLog != null) {
+							kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
+						}
+					} catch (NullException e) {
+						log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+					}
+				});
+			} catch (IOException e) {
+				log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
+			}
+		}
+
+		else {
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			log.warn("No data was parsed.");
+		}
+
 	}
 
 	/**

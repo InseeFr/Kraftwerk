@@ -161,7 +161,7 @@ public class VtlExecute {
                 // eval
                 engine.eval(vtlScript);
                 // overwrite bindings
-                bindings = (VtlBindings) engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE);
+                engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE);
 
             } catch (ScriptException e) {
                 log.warn("ScriptException - Some VTL instruction given is invalid and has been skipped");
