@@ -24,6 +24,7 @@ class TCMSequenceProcessingTest {
 
     private static final String VTL_EXTENSION = ".vtl";
     private static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
+    private static final List<TCMModuleEnum> modules = new ArrayList<>();
 
     //Given
     static Dataset unimodalDataset = new InMemoryDataset(
@@ -42,22 +43,17 @@ class TCMSequenceProcessingTest {
     Dataset outDataset;
     @BeforeAll
     static void init() throws IOException {
+        modules.add(TCMModuleEnum.TCM_ACT_ANTE);
+        modules.add(TCMModuleEnum.TCM_ACT_BIS);
+        modules.add(TCMModuleEnum.TCM_THL_DET);
+        modules.add(TCMModuleEnum.TCM_THL_SIMPLE);
+
         // VTL Test files generation
-        Path path1 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_ACT_ANTE + VTL_EXTENSION);
-        if(!Files.exists(path1)) Files.createFile(path1);
-        Files.write(path1,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_ANTE).getBytes());
-
-        Path path2 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_ACT_BIS + VTL_EXTENSION);
-        if(!Files.exists(path2)) Files.createFile(path2);
-        Files.write(path2,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_BIS).getBytes());
-
-        Path path3 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_THL_DET + VTL_EXTENSION);
-        if(!Files.exists(path3)) Files.createFile(path3);
-        Files.write(path3,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_DET).getBytes());
-
-        Path path4 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_THL_SIMPLE + VTL_EXTENSION);
-        if(!Files.exists(path4)) Files.createFile(path4);
-        Files.write(path4,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_SIMPLE).getBytes());
+        for (TCMModuleEnum module : modules){
+            Path path = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(module + VTL_EXTENSION);
+            if(!Files.exists(path)) Files.createFile(path);
+            Files.write(path,String.format(FORMAT_INSTRUCTION,module).getBytes());
+        }
 
         vtlBindings.put("TEST", unimodalDataset);
     }
@@ -68,21 +64,17 @@ class TCMSequenceProcessingTest {
     void check_standard_vtl_execution(){
         //GIVEN
         MetadataModel metadataModel = new MetadataModel();
-        metadataModel.getSequences().add(new Sequence("TCM_ACT_ANT"));
-        metadataModel.getSequences().add(new Sequence("TCM_ACTI_BIS"));
-        metadataModel.getSequences().add(new Sequence("TCM_THLHAB"));
+        metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_ACT_ANT.name()));
+        metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_ACTI_BIS.name()));
+        metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_THLHAB.name()));
 
         // Errors list
         List<KraftwerkError> errors = new ArrayList<>();
         StringBuilder expectedScriptBuilder = new StringBuilder();
-        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_ANTE));
-        expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_BIS));
-        expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_DET));
-        expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_SIMPLE));
-        expectedScriptBuilder.append(System.lineSeparator());
+        for (TCMModuleEnum module : modules){
+            expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,module));
+            expectedScriptBuilder.append(System.lineSeparator());
+        }
         String expectedScript = expectedScriptBuilder.toString();
 
         //WHEN
@@ -95,13 +87,8 @@ class TCMSequenceProcessingTest {
 
     @AfterAll
     static void clean() throws IOException {
-        Path path1 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_ACT_ANTE.vtl");
-        Files.deleteIfExists(path1);
-        Path path2 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_ACT_BIS.vtl");
-        Files.deleteIfExists(path2);
-        Path path3 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_THL_DET.vtl");
-        Files.deleteIfExists(path3);
-        Path path4= Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve("TCM_THL_SIMPLE.vtl");
-        Files.deleteIfExists(path4);
+        for (TCMModuleEnum module : modules){
+            Files.deleteIfExists(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm").resolve(module + VTL_EXTENSION));
+        }
     }
 }
