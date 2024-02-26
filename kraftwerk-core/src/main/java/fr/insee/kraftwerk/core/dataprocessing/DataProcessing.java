@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * Interface to apply VTL instructions.
- *
  * Each processing brick has two steps:
  * First is an automated process: VTL instructions are generated (eventually an empty string)
  * and are then applied.
@@ -51,6 +50,7 @@ public abstract class DataProcessing {
      * return the automated VTL instructions for the step.
      *
      * @param bindingName The name of the concerned dataset.
+     *
      * @return a VTL script.
      */
     protected abstract VtlScript generateVtlInstructions(String bindingName);

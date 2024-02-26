@@ -1,18 +1,5 @@
 package fr.insee.kraftwerk.api.process;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class MainProcessing {
@@ -41,6 +46,7 @@ public class MainProcessing {
 	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
+	private KraftwerkExecutionLog kraftwerkExecutionLog;
 	private List<KraftwerkError> errors = new ArrayList<>();
 	
 	/**
@@ -84,10 +90,13 @@ public class MainProcessing {
 			outputFileWriter();
 		}
 		writeErrors();
+		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+		writeLog();
 	}
 
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
+		kraftwerkExecutionLog = new KraftwerkExecutionLog(); //Init logger
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
@@ -106,7 +115,7 @@ public class MainProcessing {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI,kraftwerkExecutionLog);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels);
 		}
@@ -122,13 +131,17 @@ public class MainProcessing {
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		Map<String,MetadataModel> variablesMap = metadataModels.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), variablesMap, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), variablesMap, errors, kraftwerkExecutionLog);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(inDirectory, errors);
 	}
+
+
+	/* Step 6 : Write log */
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory,kraftwerkExecutionLog);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();

@@ -40,7 +40,7 @@ public class BuildBindingsSequenceGenesis {
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		// To be deported in another place in the code later at refactor step
-		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> surveyUnit.getMode().getModeName().equals(dataMode)).toList();
+		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> dataMode.equals(surveyUnit.getMode().getModeName())).toList();
 		for(SurveyUnitUpdateLatest surveyUnit : surveyUnitsFiltered) {
 			QuestionnaireData questionnaire = new QuestionnaireData();
 			questionnaire.setIdentifier(surveyUnit.getIdUE());
@@ -50,7 +50,9 @@ public class BuildBindingsSequenceGenesis {
 			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
 				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
 					// Not clean : deal with arrays (for now always a single value in array)
-					if (!variableState.getValues().isEmpty()) answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
+					if (!variableState.getValues().isEmpty()){
+						answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
+					}
 				} else {
 					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
 				}
@@ -58,7 +60,9 @@ public class BuildBindingsSequenceGenesis {
 
 			for (ExternalVariable extVar : surveyUnit.getExternalVariables()){
 				// The external are always in root group name
-				if (!extVar.getValues().isEmpty()) answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());
+				if (!extVar.getValues().isEmpty()){
+					answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());
+				}
 			}
 
 			data.getQuestionnaires().add(questionnaire);

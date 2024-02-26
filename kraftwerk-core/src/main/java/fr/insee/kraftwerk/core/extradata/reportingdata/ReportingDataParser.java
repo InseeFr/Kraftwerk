@@ -99,6 +99,10 @@ public abstract class ReportingDataParser {
 					VariableType.STRING, "50");
 			surveyRawData.putVariable(variableListComments);
 		}
+
+		Variable variableSurveyValidationDate = new Variable(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
+				surveyRawData.getMetadataModel().getReportingDataGroup(), VariableType.DATE, "50");
+		surveyRawData.getMetadataModel().getVariables().putVariable(variableSurveyValidationDate);
 	}
 
 	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData,
@@ -189,6 +193,10 @@ public abstract class ReportingDataParser {
 		}
 		if (!reportingDataUE.getComments().isEmpty()) {
 			addComments(reportingDataUE, questionnaire);
+		}
+		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
+					DateUtils.formatLongToString(reportingDataUE.getSurveyValidationDateTimeStamp()));
 		}
 	}
 

@@ -44,7 +44,7 @@ class LunaticXmlDataParserTest {
 		data.setMetadataModel(metadataModel);
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-multiple-files");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
-		parser.parseSurveyData(dataPath);
+		parser.parseSurveyData(dataPath,null);
 
 		//
 		assertEquals(4, data.getQuestionnairesCount());
@@ -64,7 +64,7 @@ class LunaticXmlDataParserTest {
 		data.setMetadataModel(MetadataModelTest.createVariablesMap_rootOnly());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
-		parser.parseSurveyData(dataPath);
+		parser.parseSurveyData(dataPath,null);
 
 		//
 		assertEquals(5, data.getQuestionnairesCount());
@@ -97,7 +97,7 @@ class LunaticXmlDataParserTest {
 		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
-		parser.parseSurveyData(dataPath);
+		parser.parseSurveyData(dataPath,null);
 
 		//
 		assertEquals(5, data.getQuestionnairesCount());

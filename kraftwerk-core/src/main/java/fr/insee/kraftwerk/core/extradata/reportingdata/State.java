@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 @Getter@Setter
@@ -14,10 +15,42 @@ public class State{
   private String stateType;
   private long timestamp;
    
-  public State(String stateType) {
+  public State(@NotNull String stateType) {
     this.stateType = stateType;
   }
 
-  
+  /**
+   * @return the priority order if it's considered as a validation state, null otherwise
+   */
+  private Integer getPriorityOrder(){
+    return switch (stateType){
+      case "PARTIELINT" -> 3;
+      case "VALPAP" -> 2;
+      case "VALINT" -> 1;
+      default -> null;
+    };
+  }
+
+  /**
+   * @return true if it's considered as a validation state
+   */
+  public boolean isValidationState(){
+    return (getPriorityOrder() != null);
+  }
+
+  public boolean isPriorTo(State otherState){
+    if(otherState == null) {
+      return true;
+    }
+    if(this.getPriorityOrder() == null) {
+      return false;
+    }
+    return (
+            // True if this state is more priority than the other
+            this.getPriorityOrder() < otherState.getPriorityOrder()
+            //True if the other state has the same priority and this state is more recent
+            || (this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
+    );
+  }
   
 }

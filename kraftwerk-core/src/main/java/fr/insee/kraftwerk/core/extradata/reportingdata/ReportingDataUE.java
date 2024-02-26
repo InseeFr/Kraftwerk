@@ -35,6 +35,9 @@ public class ReportingDataUE {
 
   @Getter@Setter
   private List<Comment> comments;
+
+  @Getter@Setter
+  private Long surveyValidationDateTimeStamp;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();

@@ -24,6 +24,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -58,7 +59,7 @@ public class CalculatedProcessingDefinition {
         //TODO Put other sample test campaigns once they are ready
     }
     @Given("I read data from campaign {string}, mode {string}")
-    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException {
+    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException, URISyntaxException {
         this.campaignName = campaignName;
         this.dataMode = dataMode;
         //
@@ -68,7 +69,7 @@ public class CalculatedProcessingDefinition {
         SurveyRawData data = new SurveyRawData();
         data.setMetadataModel(metadataModel);
         DataParser parser = new LunaticXmlDataParser(data);
-        parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")));
+        parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")),null);
         //
         vtlBindings = new VtlBindings();
         vtlExecute.convertToVtlDataset(data, "TEST", vtlBindings);

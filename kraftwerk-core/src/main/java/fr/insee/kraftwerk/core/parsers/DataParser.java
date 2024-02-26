@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 @Log4j2
 public abstract class DataParser {
 
+	public static final String DATAPATH_IS_NULL = "Datapath is null";
 	protected final SurveyRawData data;
 
 	/**
@@ -33,84 +35,99 @@ public abstract class DataParser {
 	 * Fill the data object with the content of the file or folder given.
 	 *
 	 * @param dataPath A data file, or a folder only containing data files.
-	 * @throws NullException 
+	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
-	public final void parseSurveyData(Path dataPath) throws NullException {
-		if (dataPath == null) log.error("Datapath is null");
-		else {
-			if (Files.isRegularFile(dataPath)) {
-				parseDataFile(dataPath);
-			}
-	
-			else if (Files.isDirectory(dataPath)) {
-				try (Stream<Path> stream = Files.list(dataPath)){
-					stream.forEach(t -> {
-						try {
-							parseDataFile(t);
-						} catch (NullException e) {
-							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
-						}
-					});
-				} catch (IOException e) {
-					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
-				}
-			}
-	
-			else {
-				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-				log.warn("No data was parsed.");
+	public final void parseSurveyData(Path dataPath, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+		if (dataPath == null){
+			log.error(DATAPATH_IS_NULL);
+			throw new NullException(DATAPATH_IS_NULL);
+		}
+		if (Files.isRegularFile(dataPath)) {
+			parseDataFile(dataPath);
+			if(kraftwerkExecutionLog != null) {
+				kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
 			}
 		}
+		else if (Files.isDirectory(dataPath)) {
+			try (Stream<Path> stream = Files.list(dataPath)){
+				stream.forEach(t -> {
+					try {
+						parseDataFile(t);
+						if(kraftwerkExecutionLog != null) {
+							kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
+						}
+					} catch (NullException e) {
+						log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+					}
+				});
+			} catch (IOException e) {
+				log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
+			}
+		}
+
+		else {
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			log.warn("No data was parsed.");
+		}
+
 	}
 
 	/**
 	 * Fill the data object with the content of the file or folder given.
 	 *
 	 * @param dataPath A data file, or a folder only containing data files.
-	 * @throws NullException
+	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
-	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile) throws NullException {
-		if (dataPath == null) log.error("Datapath is null");
-		else {
-			if (Files.isRegularFile(dataPath)) {
-				parseDataFileWithoutDDI(dataPath,lunaticFile);
-			}
-
-			else if (Files.isDirectory(dataPath)) {
-				try (Stream<Path> stream = Files.list(dataPath)){
-					stream.forEach(t -> {
-						try {
-							parseDataFileWithoutDDI(t,lunaticFile);
-						} catch (NullException e) {
-							log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
-						}
-					});
-				} catch (IOException e) {
-					log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
-				}
-			}
-
-			else {
-				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-				log.warn("No data was parsed.");
+	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+		if (dataPath == null){
+			log.error(DATAPATH_IS_NULL);
+			throw new NullException(DATAPATH_IS_NULL);
+		}
+		if (Files.isRegularFile(dataPath)) {
+			parseDataFileWithoutDDI(dataPath,lunaticFile);
+			if(kraftwerkExecutionLog != null) {
+				kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
 			}
 		}
+
+		else if (Files.isDirectory(dataPath)) {
+			try (Stream<Path> stream = Files.list(dataPath)){
+				stream.forEach(t -> {
+					try {
+						parseDataFileWithoutDDI(t,lunaticFile);
+						if(kraftwerkExecutionLog != null) {
+							kraftwerkExecutionLog.getOkFileNames().add(t.getFileName().toString());
+						}
+					} catch (NullException e) {
+						log.error("IOException occurred when trying to list data file: {} in folder {}", t, dataPath);
+					}
+				});
+			} catch (IOException e) {
+				log.error(String.format("IOException occurred when trying to list data files of folder: %s", dataPath));
+			}
+		}
+
+		else {
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			log.warn("No data was parsed.");
+		}
+
 	}
 
 	/**
 	 * Fill the data object with the content of the given file.
 	 * @param dataFilePath Path to a data file.
-	 * @throws NullException 
+	 * @throws NullException  -- throws null exception if datafilepath is missing
 	 */
 	abstract void parseDataFile(Path dataFilePath) throws NullException;
 
 	/**
 	 * Fill the data object with the content of the given file for treatment without DDI specification
 	 * @param dataFilePath Path to a data file.
-	 * @throws NullException
+	 * @throws NullException -- throws null exception if datafilepath is missing
 	 */
 	void parseDataFileWithoutDDI(Path dataFilePath,Path lunaticFile) throws NullException {
-		log.info("Parsing without DDI not implemented for this data format");
+		log.info("Parsing without DDI not implemented for this data format {} {}", dataFilePath, lunaticFile);
 	}
 
 }

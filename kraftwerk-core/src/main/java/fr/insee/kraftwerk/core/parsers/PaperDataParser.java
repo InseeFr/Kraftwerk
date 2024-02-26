@@ -104,10 +104,8 @@ public class PaperDataParser extends DataParser {
 					if (variables.hasUcq(variableStem)) {
 						String ucqValue = getUcqValue(variableName);
 						// Reminder: at this point we have value and text registered from the DDI.
-						// We want to register the corresponding variable name in the ucq modality
-						// object,
-						// and have the indicator variable in the variables map associated with the data
-						// object.
+						// We want to register the corresponding variable name in the ucq modality object,
+						// and have the indicator variable in the variables map associated with the data object.
 						UcqVariable ucqVariable = (UcqVariable) variables.getVariable(variableStem);
 						PaperUcq indicatorVariable = new PaperUcq(variableName, ucqVariable, ucqValue);
 						variables.putVariable(indicatorVariable);
@@ -141,12 +139,12 @@ public class PaperDataParser extends DataParser {
 				if (rowIdentifiers.length >= 1) {
 
 					// Read variables values
-					for (int j : csvVariablesMap.keySet()) {
+					for ( Map.Entry<Integer, String> entry : csvVariablesMap.entrySet()) {
 						// Get the value
-						String value = nextRecord[j];
+						String value = nextRecord[entry.getKey()];
 
 						// Get the variable
-						String variableName = csvVariablesMap.get(j);
+						String variableName = entry.getValue();
 						Variable variable = variables.getVariable(variableName);
 						// Put the value
 						if (variable.getGroup().isRoot()) {

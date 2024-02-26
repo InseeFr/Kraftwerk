@@ -37,7 +37,7 @@ class BuildBindingsSequenceTest {
 		MetadataModel metadata = null;
 		
 		//THEN
-		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi));
+		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
 		
 	}
 	
@@ -57,7 +57,7 @@ class BuildBindingsSequenceTest {
 
 		//WHEN
 		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi));
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi,null));
 	}
 	
 	

@@ -48,7 +48,7 @@ public class ParadataDefinitions {
 		data.setDataMode(modeInputs.getDataMode());
 		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl()));
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
-		parser.parseSurveyData(modeInputs.getDataFile());
+		parser.parseSurveyData(modeInputs.getDataFile(),null);
 		// get paradata folder
 		paradataFolder = modeInputs.getParadataFolder();
 	}

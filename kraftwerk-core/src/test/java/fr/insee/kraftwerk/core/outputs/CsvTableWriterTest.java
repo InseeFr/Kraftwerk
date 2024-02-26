@@ -75,7 +75,7 @@ class CsvTableWriterTest {
 		metadataModel.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
 		metaModels.put("test",metadataModel);
 
-		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaModels, "test");
+		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaModels, "test", null);
 		//
 		CSVReader reader = CsvUtils.getReader(outTestFilePath);
 		List<String[]> rows = reader.readAll();
