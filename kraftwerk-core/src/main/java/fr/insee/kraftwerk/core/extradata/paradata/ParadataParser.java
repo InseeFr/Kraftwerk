@@ -1,19 +1,5 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Stream;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.metadata.Variable;
@@ -22,11 +8,18 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import lombok.extern.log4j.Log4j2;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Log4j2
 public class ParadataParser {
-
-	private String timestamp = "timestamp";
 
 	private static final String NEW_VALUE = "newValue";
 
@@ -104,6 +97,7 @@ public class ParadataParser {
 			Event event = new Event(identifier);
 			event.setIdParadataObject((String) collectedEvent.get("idParadataObject"));
 			event.setIdSession((String) collectedEvent.get("idSession"));
+			String timestamp = "timestamp";
 			event.setTimestamp((long) collectedEvent.get(timestamp));
 
 			ParadataVariable paradataVariable = new ParadataVariable(identifier);
@@ -150,18 +144,18 @@ public class ParadataParser {
 	}
 
 	private Object getValue(Object object) {
-		if (object instanceof String) {
+		if (object instanceof String ) {
 			return object;
 		} else if (object instanceof Long) {
 			return object.toString();
 		} else if (object instanceof JSONArray jsonArray) {
 			List<String> values = new ArrayList<>();
-			for (int index = 0; index < jsonArray.size(); index++) {
-				values.add((String) getValue(jsonArray.get(index)));
+			for (Object jsonValue : jsonArray) {
+				values.add((String) getValue(jsonValue));
 			}
 			return values;
 		} else if (object instanceof Integer) {
-			// do what you want
+			return object;
 		}
 
 		return null;

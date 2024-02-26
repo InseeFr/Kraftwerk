@@ -141,7 +141,7 @@
 						</execution>
 						<execution>
 							<id>report</id>
-							<phase>report</phase>
+							<phase>post-integration-test</phase>
 							<goals>
 								<goal>report-aggregate</goal>
 							</goals>

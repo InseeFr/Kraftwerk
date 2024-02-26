@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
-import java.sql.Date;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.Variable;

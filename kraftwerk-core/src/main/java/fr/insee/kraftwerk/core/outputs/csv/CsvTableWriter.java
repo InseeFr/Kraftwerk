@@ -1,21 +1,7 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
-
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
@@ -23,6 +9,15 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
 import fr.insee.vtl.model.Structured.DataPoint;
 import lombok.extern.log4j.Log4j2;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * To write in memory data into CSV files.
@@ -108,9 +103,8 @@ public class CsvTableWriter {
 			columns.add(datasetName);
 		}
 		//We add all variables found in specifications
-		for (String varSpec : variablesSpec) {
-			columns.add(varSpec);
-		}
+		columns.addAll(variablesSpec);
+
 		//We add additional variables produced in the process
 		for (String varDataset : variablesDataset){
 			if (!columns.contains(varDataset)) {
