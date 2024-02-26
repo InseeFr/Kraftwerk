@@ -144,19 +144,18 @@ public class ParadataParser {
 	}
 
 	private Object getValue(Object object) {
-		if (object instanceof String) {
+		if (object instanceof String ) {
 			return object;
 		} else if (object instanceof Long) {
 			return object.toString();
 		} else if (object instanceof JSONArray jsonArray) {
 			List<String> values = new ArrayList<>();
-			for (Object o : jsonArray) {
-				values.add((String) getValue(o));
+			for (Object jsonValue : jsonArray) {
+				values.add((String) getValue(jsonValue));
 			}
 			return values;
 		} else if (object instanceof Integer) {
-			// do what you want
-			log.debug("This object is an integer");
+			return object;
 		}
 
 		return null;

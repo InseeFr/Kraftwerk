@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 
-
 /**
  * To write in memory data into CSV files.
  */
@@ -29,7 +28,6 @@ public class CsvTableWriter {
 	private CsvTableWriter() {
 		//Utility class
 	}
-
 
 	private static ICSVWriter setCSVWriter(Path filePath) throws IOException {
 		File file = filePath.toFile();
@@ -105,6 +103,7 @@ public class CsvTableWriter {
 		}
 		//We add all variables found in specifications
 		columns.addAll(variablesSpec);
+
 		//We add additional variables produced in the process
 		for (String varDataset : variablesDataset){
 			if (!columns.contains(varDataset)) {

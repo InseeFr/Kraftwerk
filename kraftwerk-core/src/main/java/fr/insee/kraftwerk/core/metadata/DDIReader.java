@@ -1,18 +1,9 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,10 +11,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
-import lombok.extern.log4j.Log4j2;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 @Log4j2
 public class DDIReader {
@@ -259,8 +257,9 @@ public class DDIReader {
 
 	private static Node getFirstChildNode(Element variableElement, String childTagName) {
 		NodeList children = variableElement.getElementsByTagName(childTagName);
-		if (children == null)
+		if (children == null){
 			return null;
+		}
 		return children.item(0);
 	}
 

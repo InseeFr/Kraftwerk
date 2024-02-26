@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 @Getter@Setter
@@ -15,7 +14,7 @@ public class State{
   private String stateType;
   private long timestamp;
    
-  public State(@NotNull String stateType) {
+  public State(String stateType) {
     this.stateType = stateType;
   }
 
@@ -42,14 +41,11 @@ public class State{
     if(otherState == null) {
       return true;
     }
-    if(this.getPriorityOrder() == null) {
-      return false;
-    }
     return (
             // True if this state is more priority than the other
             this.getPriorityOrder() < otherState.getPriorityOrder()
             //True if the other state has the same priority and this state is more recent
-            || (this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
+            || (this.getPriorityOrder() != null && this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
     );
   }
   
