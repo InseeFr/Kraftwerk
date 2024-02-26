@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.vtl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.FileUtils;
@@ -17,7 +18,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -105,7 +105,7 @@ public class VtlExecute {
      */
     public void putVtlDataset(String filePath, String bindingName, VtlBindings bindings){
         try {
-            URL url = new URI("file:///" + filePath).toURL();
+            URL url = Constants.convertToUrl(filePath);
             this.putVtlDataset(url, bindingName,  bindings);
         } catch (MalformedURLException | URISyntaxException e) {
             log.error(String.format("Invalid file path: %s", filePath), e);
