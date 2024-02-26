@@ -22,6 +22,9 @@ import java.util.List;
 
 class TCMSequenceProcessingTest {
 
+    private static final String VTL_EXTENSION = ".vtl";
+    private static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
+
     //Given
     static Dataset unimodalDataset = new InMemoryDataset(
             List.of(
@@ -40,25 +43,21 @@ class TCMSequenceProcessingTest {
     @BeforeAll
     static void init() throws IOException {
         // VTL Test files generation
-        String vtlScript1 = "/* Instruction TCM_ACT_ANTE */";
-        Path path1 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_ACT_ANTE.vtl");
+        Path path1 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_ACT_ANTE + VTL_EXTENSION);
         if(!Files.exists(path1)) Files.createFile(path1);
-        Files.write(path1,vtlScript1.getBytes());
+        Files.write(path1,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_ANTE).getBytes());
 
-        String vtlScript2 = "/* Instruction TCM_ACT_BIS */";
-        Path path2 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_ACT_BIS.vtl");
+        Path path2 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_ACT_BIS + VTL_EXTENSION);
         if(!Files.exists(path2)) Files.createFile(path2);
-        Files.write(path2,vtlScript2.getBytes());
+        Files.write(path2,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_BIS).getBytes());
 
-        String vtlScript3 = "/* Instruction TCM_THL_DET */";
-        Path path3 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_THL_DET.vtl");
+        Path path3 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_THL_DET + VTL_EXTENSION);
         if(!Files.exists(path3)) Files.createFile(path3);
-        Files.write(path3,vtlScript3.getBytes());
+        Files.write(path3,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_DET).getBytes());
 
-        String vtlScript4 = "/* Instruction TCM_THL_SIMPLE */";
-        Path path4 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve("TCM_THL_SIMPLE.vtl");
+        Path path4 = Files.createDirectories(Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").resolve("tcm")).resolve(TCMModuleEnum.TCM_THL_SIMPLE + VTL_EXTENSION);
         if(!Files.exists(path4)) Files.createFile(path4);
-        Files.write(path4,vtlScript4.getBytes());
+        Files.write(path4,String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_SIMPLE).getBytes());
 
         vtlBindings.put("TEST", unimodalDataset);
     }
@@ -76,13 +75,13 @@ class TCMSequenceProcessingTest {
         // Errors list
         List<KraftwerkError> errors = new ArrayList<>();
         StringBuilder expectedScriptBuilder = new StringBuilder();
-        expectedScriptBuilder.append("/* Instruction TCM_ACT_ANTE */");
+        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_ANTE));
         expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append("/* Instruction TCM_ACT_BIS */");
+        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_ACT_BIS));
         expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append("/* Instruction TCM_THL_DET */");
+        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_DET));
         expectedScriptBuilder.append(System.lineSeparator());
-        expectedScriptBuilder.append("/* Instruction TCM_THL_SIMPLE */");
+        expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,TCMModuleEnum.TCM_THL_SIMPLE));
         expectedScriptBuilder.append(System.lineSeparator());
         String expectedScript = expectedScriptBuilder.toString();
 
