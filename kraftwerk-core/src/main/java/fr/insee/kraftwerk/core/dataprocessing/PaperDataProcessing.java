@@ -1,20 +1,20 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.util.List;
-
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqModality;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
+
+import java.util.List;
 
 /**
  * Implementation of the UnimodalDataProcessing class for data from digitized paper.
  */
 public class PaperDataProcessing extends UnimodalDataProcessing {
 
-    public PaperDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
-        super(vtlBindings, variablesMap);
+    public PaperDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel) {
+        super(vtlBindings, metadataModel);
     }
 
     @Override
@@ -32,13 +32,12 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
      * If none is ticked, the value of the result variable will be empty ("").
      *
      * @param bindingName The name of the dataset in the bindings.
-     * @param objects      a VariablesMap object is expected here.
      * @return VTL instructions
      */
     @Override
     public VtlScript generateVtlInstructions(String bindingName) {
         // Get UCQ variables
-        List<UcqVariable> ucqVariables = variablesMap.getUcqVariables();
+        List<UcqVariable> ucqVariables = metadataModel.getVariables().getUcqVariables();
 
         // Write the VTL instructions
         VtlScript vtlScript = new VtlScript();
@@ -54,33 +53,33 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
             );
 
             // Get UCQ variable name
-            String variableVtlName = variablesMap.getFullyQualifiedName(ucqVariable.getName());
+            String variableVtlName = metadataModel.getFullyQualifiedName(ucqVariable.getName());
 
             // Get UCQ modalities
             List<UcqModality> ucqModalities = ucqVariable.getModalities();
             int modalitiesCount = ucqModalities.size();
 
             // First modality and first line of the VTL instruction
-            UcqModality firstModality = ucqModalities.get(0);
-            String firstModalityVtlName = variablesMap.getFullyQualifiedName(firstModality.getVariableName());
+            UcqModality firstModality = ucqModalities.getFirst();
+            String firstModalityVtlName = metadataModel.getFullyQualifiedName(firstModality.getVariableName());
             vtlInstruction.append(String.format("%s := if %s = \"1\" then \"%s\" else (%n",
                     variableVtlName, firstModalityVtlName, firstModality.getValue()));
 
             // Middle lines of the VTL instruction
             for (int k = 1; k < modalitiesCount - 1; k++) {
                 UcqModality modality = ucqModalities.get(k);
-                String modalityVtlName = variablesMap.getFullyQualifiedName(modality.getVariableName());
+                String modalityVtlName = metadataModel.getFullyQualifiedName(modality.getVariableName());
                 vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else (%n",
                         modalityVtlName, modality.getValue()));
             }
 
             // Last line of the VTL instruction
             UcqModality lastModality = ucqModalities.get(modalitiesCount - 1);
-            String latsModalityVtlName = variablesMap.getFullyQualifiedName(lastModality.getVariableName());
+            String latsModalityVtlName = metadataModel.getFullyQualifiedName(lastModality.getVariableName());
             vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else \"\" ",
                     latsModalityVtlName, lastModality.getValue()));
 
-            // (add closing parenthesis and ';')
+            // add closing parenthesis and ';'
             vtlInstruction.append(")".repeat(modalitiesCount - 1));
             vtlInstruction.append("];");
 

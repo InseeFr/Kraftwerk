@@ -9,7 +9,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.DDIReader;
 import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -38,7 +38,7 @@ public class CalculatedProcessingDefinition {
 
     private String campaignName;
     private String dataMode;
-    private VariablesMap variablesMap;
+    private MetadataModel metadataModel;
     private VtlBindings vtlBindings;
     private Dataset outDataset;
     private List<String> variableNamesList;
@@ -63,11 +63,11 @@ public class CalculatedProcessingDefinition {
         this.campaignName = campaignName;
         this.dataMode = dataMode;
         //
-        variablesMap = DDIReader.getVariablesFromDDI(
+        metadataModel = DDIReader.getMetadataFromDDI(
                 Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
         //
         SurveyRawData data = new SurveyRawData();
-        data.setVariablesMap(variablesMap);
+        data.setMetadataModel(metadataModel);
         DataParser parser = new LunaticXmlDataParser(data);
         parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")),null);
         //
@@ -101,15 +101,14 @@ public class CalculatedProcessingDefinition {
         for (int j=0; j<variableNamesList.size(); j++) {
             //
             String calculatedName = variableNamesList.get(j);
-            Object expectedValue;
-            switch (variablesMap.getVariable(calculatedName).getType()) {
-                case STRING: expectedValue = expectedValues.get(j); break;
-                case NUMBER: expectedValue = Long.valueOf(expectedValues.get(j)); break;
-                default: throw new IllegalArgumentException(String.format(
-                        "Couldn't cast value \"%s\" defined in \"Calculated Processing\" scenario.",
-                        expectedValues.get(j)));
-            }
-            //
+            Object expectedValue = switch (metadataModel.getVariables().getVariable(calculatedName).getType()) {
+				case STRING -> expectedValues.get(j);
+				case NUMBER -> Long.valueOf(expectedValues.get(j));
+				default -> throw new IllegalArgumentException(String.format(
+						"Couldn't cast value \"%s\" defined in \"Calculated Processing\" scenario.",
+						expectedValues.get(j)));
+			};
+			//
             assertEquals(expectedValue, outDataset.getDataPoints().get(lineNumber).get(calculatedName));
         }
     }

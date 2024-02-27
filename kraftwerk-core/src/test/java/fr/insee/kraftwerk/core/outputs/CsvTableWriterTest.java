@@ -1,7 +1,21 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.outputs.csv.CsvTableWriter;
+import fr.insee.kraftwerk.core.utils.CsvUtils;
+import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
+import fr.insee.vtl.model.InMemoryDataset;
+import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,24 +25,6 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.csv.CsvTableWriter;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.InMemoryDataset;
-import fr.insee.vtl.model.Structured;
 
 class CsvTableWriterTest {
 
@@ -70,28 +66,28 @@ class CsvTableWriterTest {
 		Files.deleteIfExists(outTestFilePath);
 		FileUtils.createDirectoryIfNotExist(outTestFilePath.getParent());
 
-		Map<String, VariablesMap> metaVariables = new HashMap<>();
-		VariablesMap varMap = new VariablesMap();
+		Map<String, MetadataModel> metaModels = new HashMap<>();
+		MetadataModel metadataModel = new MetadataModel();
 		Group group = new Group("test","RACINE");
-		varMap.putVariable(new Variable("ID",group, VariableType.STRING));
-		varMap.putVariable(new Variable("ID2",group, VariableType.STRING));
-		varMap.putVariable(new Variable("FOO_STR",group, VariableType.STRING));
-		varMap.putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
-		metaVariables.put("test",varMap);
+		metadataModel.getVariables().putVariable(new Variable("ID",group, VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("ID2",group, VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("FOO_STR",group, VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
+		metaModels.put("test",metadataModel);
 
-		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaVariables, "test", null);
+		CsvTableWriter.writeCsvTable(testDataset, outTestFilePath, metaModels, "test", null);
 		//
 		CSVReader reader = CsvUtils.getReader(outTestFilePath);
 		List<String[]> rows = reader.readAll();
 		//
-		assertEquals(4, rows.size());
+		Assertions.assertEquals(4, rows.size());
 		String[] header = rows.get(0);
 		for (String columnName : List.of("ID", "ID2", "FOO_STR", "FOO_NUM")) {
-			assertTrue(arrayContains(header, columnName));
+			Assertions.assertTrue(arrayContains(header, columnName));
 		}
 		String[] row1 = rows.get(1);
 		for (String columnName : List.of("T01", "01", "foo11", "11")) {
-			assertTrue(arrayContains(row1, columnName));
+			Assertions.assertTrue(arrayContains(row1, columnName));
 		}
 
 	}
@@ -105,19 +101,19 @@ class CsvTableWriterTest {
 					List.of("T02", "foostring3", 3, 21L, true, new Date(300000))
 		 */
 		// String variable
-		assertEquals("foostring1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+		Assertions.assertEquals("foostring1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
 				testCompleteVariablesDataset.getDataStructure().get("FOO_STR")));
 		// Integer variable
-		assertEquals("1",CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+		Assertions.assertEquals("1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
 				testCompleteVariablesDataset.getDataStructure().get("FOO_INT")));
 		// Numeric variable
-		assertEquals("123456789", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+		Assertions.assertEquals("123456789", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
 				testCompleteVariablesDataset.getDataStructure().get("FOO_NUM")));
 		// Boolean variable
-		assertEquals("1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
+		Assertions.assertEquals("1", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(0),
 				testCompleteVariablesDataset.getDataStructure().get("FOO_BOO")));
 		// Date variable
-		assertEquals("1970-01-01", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(1),
+		Assertions.assertEquals("1970-01-01", CsvTableWriter.getDataPointValue(testCompleteVariablesDataset.getDataPoints().get(1),
 				testCompleteVariablesDataset.getDataStructure().get("FOO_DAT")));
 		
 	}

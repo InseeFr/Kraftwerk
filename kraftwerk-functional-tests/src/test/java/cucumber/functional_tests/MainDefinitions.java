@@ -1,38 +1,18 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
-import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
-import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
-import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
-import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
-import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -41,6 +21,21 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static cucumber.TestConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Main example
 public class MainDefinitions {
@@ -53,7 +48,7 @@ public class MainDefinitions {
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
-	Map<String, VariablesMap> metadataVariables;
+	Map<String, MetadataModel> metadataModelMap;
 
 	private ControlInputSequence controlInputSequence;
 
@@ -76,6 +71,20 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
+	}
+
+	@Given("We have a test VTL script named {string} creating a variable {string} in dataset {string}")
+	public void init_VTL_script(String vtlScriptName, String variableToCreate, String datasetName) throws IOException {
+		String generatedVTL = datasetName + " := " + datasetName + " [calc " + variableToCreate + " := \"TEST\"];";
+
+		Path vtlFolderPath = Files.createDirectories(Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm"));
+		Path vtlPath = vtlFolderPath.resolve(vtlScriptName + ".vtl");
+
+		if(Files.exists(vtlPath)) //If file already exist (legitimate script) backup
+			Files.copy(vtlPath,vtlFolderPath.resolve(vtlScriptName + ".bkp"));
+		else
+			Files.createFile(vtlPath);
+		Files.write(vtlPath,generatedVTL.getBytes());
 	}
 
 	@When("Step 1 : We initialize the input files")
@@ -112,26 +121,26 @@ public class MainDefinitions {
 
 	@When("Step 2 : We get each unimodal dataset")
 	public void unimodal_treatments() throws NullException {
-		metadataVariables = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataVariables, withDDI,null);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataVariables);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataVariables);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
 	}
 
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataVariables, errors);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
 		writeErrorsFile(inDirectory, errors);
 		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
 	}
@@ -197,7 +206,7 @@ public class MainDefinitions {
 	@Then("Step 7 : We check that id {string} has value {string} for variable {string} in table {string}")
 	public void checkVariableValue(String idUE, String expectedValue, String variable, String tableName)
 			throws IOException, CsvValidationException {
-		if (tableName == null || tableName.equals(""))
+		if (tableName == null || tableName.isEmpty())
 			tableName = Constants.ROOT_GROUP_NAME;
 
 		// Get reader to read the root table written in outputs
@@ -205,7 +214,7 @@ public class MainDefinitions {
 				.getReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
 		// get header
 		String[] header = csvReader.readNext();
-		int idUEPosition = Arrays.asList(header).indexOf("IdUE");
+		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
 		int varPosition = Arrays.asList(header).indexOf(variable);
 
 		// get the line corresponding to idUE
@@ -252,4 +261,35 @@ public class MainDefinitions {
 		}
 	}
 
+	@Then("In a file named {string} there should be a {string} field")
+	public void check_field_existence(String fileName, String fieldName) throws IOException, CsvValidationException {
+		File outputReportingDataFile = new File(outDirectory + "/" + fileName);
+
+		// File existence assertion
+		assertThat(outputReportingDataFile).exists().isFile().canRead();
+
+		CSVReader csvReader = CsvUtils.getReader(
+				outputReportingDataFile.toPath()
+		);
+
+
+		// Get header
+		String[] header = csvReader.readNext();
+		csvReader.close();
+
+		assertThat(header).isNotEmpty().contains(fieldName);
+	}
+
+	@When("We clean the test VTL script named {string}")
+	public void clean_vtl(String vtlScriptName) throws IOException {
+		Path vtlPath = Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm").resolve(vtlScriptName + ".vtl");
+		Path bkpPath = vtlPath.getParent().resolve(vtlScriptName + ".bkp");
+
+		Files.deleteIfExists(vtlPath);
+
+		if(Files.exists(bkpPath)) // Put backup back
+			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
+
+		Files.deleteIfExists(bkpPath);
+	}
 }

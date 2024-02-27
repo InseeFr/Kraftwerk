@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 /** One unique choice question = one variable. */
+@Getter
 @Log4j2
 public class UcqVariable extends Variable {
 
@@ -17,12 +18,10 @@ public class UcqVariable extends Variable {
 	 * Map to store the UCQ modalities. Keys: possible values. Values: text
 	 * associated.
 	 */
-	@Getter
 	List<UcqModality> modalities = new ArrayList<>();
 
 
     /** Common name of the different modalities of the UCQ variable, if this variable is itself a modality of a Mcq variable. */
-	@Getter
 	@Setter
     String mcqName;
     

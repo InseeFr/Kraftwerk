@@ -1,15 +1,15 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.vtl.model.Structured;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.vtl.model.Structured;
 
 /**
  * Class to generate import scripts for the output tables. Some methods that
@@ -29,7 +29,7 @@ public abstract class ImportScript {
 	public abstract String generateScript();
 
 	public static Map<String, Variable> getAllLength(Structured.DataStructure dataStructure,
-			Map<String, VariablesMap> metadataVariables) {
+			Map<String, MetadataModel> metadataModels) {
 		Map<String, Variable> result = new LinkedHashMap<>();
 		// datastructure : noms complets
 		// metadata : suffixe du nom
@@ -38,19 +38,19 @@ public abstract class ImportScript {
 			// We try to find it from the first datasets containing together all variables
 			// (except VTL and Kraftwerk-created ones)
 
-			for (Entry<String, VariablesMap> metadata : metadataVariables.entrySet()) {
-				VariablesMap variablesMap = metadata.getValue();
+			for (Entry<String, MetadataModel> metadata : metadataModels.entrySet()) {
+				MetadataModel metadataModel = metadata.getValue();
 
 				// We treat the identifiers
-				if (variablesMap.getIdentifierNames().contains(variableName) && !result.containsKey(variableName)) {
+				if (metadataModel.getIdentifierNames().contains(variableName) && !result.containsKey(variableName)) {
 					result.put(variableName,
-							new Variable(variableName, variablesMap.getGroup(variableName), VariableType.STRING, "32"));
+							new Variable(variableName, metadataModel.getGroup(variableName), VariableType.STRING, "32"));
 				}
-				if (variablesMap.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
-					variableName = addOrReplaceLength(result, variableName, variablesMap);
+				if (metadataModel.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
+					variableName = addOrReplaceLength(result, variableName, metadataModel);
 				} else if (!result.containsKey(variableName)) {
 					result.put(variableName, new Variable(variableName,
-							variablesMap.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, STRING_LENGTH));
+							metadataModel.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, STRING_LENGTH));
 
 				}
 			}
@@ -60,9 +60,9 @@ public abstract class ImportScript {
 	}
 
 	private static String addOrReplaceLength(Map<String, Variable> result, String variableName,
-			VariablesMap variablesMap) {
+			MetadataModel metadataModel) {
 		variableName = getRootName(variableName);
-		Variable variable = variablesMap.getVariable(variableName);
+		Variable variable = metadataModel.getVariables().getVariable(variableName);
 
 		final String newLengthString =getNewLength(variable, variableName);
 		if (result.containsKey(variableName)
@@ -74,7 +74,7 @@ public abstract class ImportScript {
 		}
 		// Filter results are boolean, value "true" or "false"
 		if (variableName.toUpperCase().contains(Constants.FILTER_RESULT_PREFIX)) {
-			result.put(variableName, new Variable(variableName, variablesMap.getGroup(Constants.ROOT_GROUP_NAME),
+			result.put(variableName, new Variable(variableName, metadataModel.getGroup(Constants.ROOT_GROUP_NAME),
 					VariableType.BOOLEAN, "1"));
 		}
 

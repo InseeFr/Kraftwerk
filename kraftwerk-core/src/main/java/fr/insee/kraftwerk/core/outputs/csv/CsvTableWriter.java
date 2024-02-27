@@ -3,7 +3,7 @@ package fr.insee.kraftwerk.core.outputs.csv;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured.Component;
@@ -29,7 +29,6 @@ public class CsvTableWriter {
 		//Utility class
 	}
 
-
 	private static ICSVWriter setCSVWriter(Path filePath) throws IOException {
 		File file = filePath.toFile();
 		FileWriter outputFile = new FileWriter(file, StandardCharsets.UTF_8, true);
@@ -48,12 +47,12 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName) {
+	public static void updateCsvTable(Dataset dataset, Path filePath, Map<String, MetadataModel> metadataModels, String datasetName) {
 		File file = filePath.toFile();
 		try (ICSVWriter writer = setCSVWriter(filePath)){
 			String[] headers = getHeaders(file);
 
-			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
+			List<String> variablesSpec = initializeVariablesSpec(metadataModels, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -134,16 +133,16 @@ public class CsvTableWriter {
 	 * @param dataset  A Trevas dataset.
 	 * @param filePath Path to the file to be written.
 	 */
-	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,VariablesMap> metadataVariables, String datasetName, KraftwerkExecutionLog kraftwerkExecutionLog) {
+	public static void writeCsvTable(Dataset dataset, Path filePath, Map<String,MetadataModel> metadataModels, String datasetName, KraftwerkExecutionLog kraftwerkExecutionLog) {
 		// File connection
 		try (ICSVWriter writer = setCSVWriter(filePath)){
 						
 			// Safety check
-			if (dataset.getDataStructure().size() == 0) {
+			if (dataset.getDataStructure().isEmpty()) {
 				log.warn("The data object has no variables.");
 			}
 
-			List<String> variablesSpec = initializeVariablesSpec(metadataVariables, datasetName);
+			List<String> variablesSpec = initializeVariablesSpec(metadataModels, datasetName);
 
 			//All the variables of the dataset
 			List<String> variablesDataset = new ArrayList<>(dataset.getDataStructure().keySet());
@@ -179,12 +178,12 @@ public class CsvTableWriter {
 	}
 
 
-	private static List<String> initializeVariablesSpec(Map<String, VariablesMap> metadataVariables,
+	private static List<String> initializeVariablesSpec(Map<String, MetadataModel> metadataModels,
 			String datasetName) {
 		List<String> variablesSpec = new ArrayList<>();
-		for (Entry<String, VariablesMap> entry :  metadataVariables.entrySet()){
-			VariablesMap variablesMap = entry.getValue();
-			for (String varName : variablesMap.getGroupVariableNamesAsList(datasetName)){
+		for (Entry<String, MetadataModel> entry :  metadataModels.entrySet()){
+			MetadataModel metadata = entry.getValue();
+			for (String varName : metadata.getVariables().getGroupVariableNamesAsList(datasetName)){
 				if (!variablesSpec.contains(varName)){
 					variablesSpec.add(varName);
 				}

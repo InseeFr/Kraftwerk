@@ -1,21 +1,20 @@
 package fr.insee.kraftwerk.core.extradata;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-import java.nio.file.Paths;
-
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import org.junit.jupiter.api.Test;
+
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class XMLReportingDataParserTest {
 
@@ -84,7 +83,7 @@ class XMLReportingDataParserTest {
 
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
-		assertEquals("REFUSAL", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
+		assertEquals("REFUSAL", reportingData.getListReportingDataUE().getFirst().getStates().get(1).getStateType());
 		// Check the reporting data is correctly translated in the output
 		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + idUE).getValue("STATE_1"));
 

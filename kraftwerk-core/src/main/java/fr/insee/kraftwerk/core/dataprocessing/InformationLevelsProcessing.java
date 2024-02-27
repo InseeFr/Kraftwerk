@@ -1,14 +1,14 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This processing class is designed to create one dataset per group existing in metadata.
@@ -25,9 +25,8 @@ public class InformationLevelsProcessing extends DataProcessing {
     }
 
 	/**
-	 * The binding name is the multimode dataset.
-	 * The method generates VTL instructions to create one dataset per group of variables.
-	 *
+	 * The binding name is the multimodal dataset.
+	 * The method generates VTL instructions to create one dataset per group of variables
 	 * NOTE: for now, only works with at most one level of group under root group.
 	 */
     @Override
@@ -35,11 +34,11 @@ public class InformationLevelsProcessing extends DataProcessing {
 
     	VtlScript vtlScript = new VtlScript();
 		
-		VariablesMap multimodeVariablesMap = vtlBindings.getDatasetVariablesMap(bindingName);
+		MetadataModel metadataModel = vtlBindings.getDatasetVariablesMap(bindingName);
 
 		// Root dataset
 		StringBuilder rootInstructions = new StringBuilder();
-		Set<String> rootVariableNames = multimodeVariablesMap.getGroupVariableNames(Constants.ROOT_GROUP_NAME);
+		Set<String> rootVariableNames = metadataModel.getVariables().getGroupVariableNames(Constants.ROOT_GROUP_NAME);
 
 		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
 		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s];",
@@ -52,13 +51,13 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		 
 		// Group datasets
-		for (String groupName : multimodeVariablesMap.getSubGroupNames()) {
+		for (String groupName : metadataModel.getSubGroupNames()) {
 			StringBuilder groupInstructions = new StringBuilder();
 
 			// First init the dataset using measure names, that are fully qualified name
-			List<String> groupVariableNames = new ArrayList<>(multimodeVariablesMap.getGroupVariableNames(groupName));
+			List<String> groupVariableNames = new ArrayList<>(metadataModel.getVariables().getGroupVariableNames(groupName));
 			List<String> groupMeasureNames = groupVariableNames.stream()
-					.map(multimodeVariablesMap::getFullyQualifiedName).toList();
+					.map(metadataModel::getFullyQualifiedName).toList();
 
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
 			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",

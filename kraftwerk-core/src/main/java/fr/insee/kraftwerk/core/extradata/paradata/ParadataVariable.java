@@ -4,9 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 @EqualsAndHashCode(callSuper = true)
 public class ParadataVariable extends Event {
-	@Getter@Setter
 	private String variableName;
 
 	public ParadataVariable(String idSurveyUnit) {

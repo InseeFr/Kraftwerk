@@ -26,7 +26,7 @@ public class Group {
     public Group(@NonNull String name, @NonNull String parentName){
         this.name = name;
         this.parentName = parentName;
-        if (parentName.equals("")) {
+        if (parentName.isEmpty()) {
             String msg = "Parent group name must be provided, \"\" name is invalid.";
             log.debug(msg);
             throw new IllegalArgumentException(msg);
@@ -35,7 +35,7 @@ public class Group {
 
 
     private boolean hasParent() {
-        return parentName != null && !(parentName.equals(""));
+        return parentName != null && !(parentName.isEmpty());
     }
     public boolean isRoot() {
         return !hasParent();

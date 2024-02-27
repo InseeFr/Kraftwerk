@@ -1,27 +1,20 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.vtl.model.Dataset;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.metadata.VariablesMapTest;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.vtl.model.Dataset;
+import static org.junit.jupiter.api.Assertions.*;
 
 class VtlJsonDatasetWriterTest {
 
@@ -37,7 +30,7 @@ class VtlJsonDatasetWriterTest {
 	@Test
 	void testConvertToVtlDataset_rootOnly() {
 		//
-		VariablesMap variablesMap = VariablesMapTest.createVariablesMap_rootOnly();
+		MetadataModel variablesMap = MetadataModelTest.createVariablesMap_rootOnly();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_rootOnly();
 		//
@@ -49,7 +42,7 @@ class VtlJsonDatasetWriterTest {
 		//
 		assertEquals(3, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
-		for(String variableName : variablesMap.getVariableNames()) {
+		for(String variableName : variablesMap.getVariables().getVariableNames()) {
 			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
 			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
 			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
@@ -74,7 +67,7 @@ class VtlJsonDatasetWriterTest {
 	@Test
 	void testConvertToVtlDataset_oneLevel() {
 		//
-		VariablesMap variablesMap = VariablesMapTest.createVariablesMap_oneLevel();
+		MetadataModel variablesMap = MetadataModelTest.createVariablesMap_oneLevel();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_oneLevel();
 		//
@@ -87,7 +80,7 @@ class VtlJsonDatasetWriterTest {
 		assertEquals(7, ds.getDataStructure().keySet().size());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
 		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get("INDIVIDUALS_LOOP").getRole());
-		for(String variableName : variablesMap.getVariableNames()) {
+		for(String variableName : variablesMap.getVariables().getVariableNames()) {
 			assertTrue(ds.getDataStructure().containsKey(variableName));
 			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(variableName).getRole());
 		}
@@ -115,8 +108,8 @@ class VtlJsonDatasetWriterTest {
 		//
 		SurveyRawData paperLikeData = new SurveyRawData();
 		//
-		VariablesMap variables = VariablesMapTest.createVariablesMap_oneLevel();
-		paperLikeData.setVariablesMap(variables);
+		MetadataModel variables = MetadataModelTest.createVariablesMap_oneLevel();
+		paperLikeData.setMetadataModel(variables);
 
 		// First household but split in several questionnaires
 		for (int i=0; i<3; i++) {
@@ -159,11 +152,11 @@ class VtlJsonDatasetWriterTest {
 		//
 		SurveyRawData srd = new SurveyRawData();
 		//
-		VariablesMap variablesMap = new VariablesMap();
-		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
-		variablesMap.putGroup(new Group("DEPTH1", variablesMap.getRootGroup().getName()));
-		variablesMap.putVariable(new Variable("FOO1", variablesMap.getGroup("DEPTH1"), VariableType.STRING));
-		srd.setVariablesMap(variablesMap);
+		MetadataModel metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.putGroup(new Group("DEPTH1", metadataModel.getRootGroup().getName()));
+		metadataModel.getVariables().putVariable(new Variable("FOO1", metadataModel.getGroup("DEPTH1"), VariableType.STRING));
+		srd.setMetadataModel(metadataModel);
 		//
 		QuestionnaireData questionnaire = new QuestionnaireData();
 		questionnaire.putValue("foo", "FOO");
@@ -183,13 +176,13 @@ class VtlJsonDatasetWriterTest {
 		//
 		SurveyRawData srd = new SurveyRawData();
 		//
-		VariablesMap variablesMap = new VariablesMap();
-		variablesMap.putVariable(new Variable("FOO", variablesMap.getRootGroup(), VariableType.STRING));
-		variablesMap.putGroup(new Group("GROUP_A", variablesMap.getRootGroup().getName()));
-		variablesMap.putGroup(new Group("GROUP_B", variablesMap.getRootGroup().getName()));
-		variablesMap.putVariable(new Variable("FOO_A", variablesMap.getGroup("GROUP_A"), VariableType.STRING));
-		variablesMap.putVariable(new Variable("FOO_B", variablesMap.getGroup("GROUP_B"), VariableType.STRING));
-		srd.setVariablesMap(variablesMap);
+		MetadataModel metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.putGroup(new Group("GROUP_A", metadataModel.getRootGroup().getName()));
+		metadataModel.putGroup(new Group("GROUP_B", metadataModel.getRootGroup().getName()));
+		metadataModel.getVariables().putVariable(new Variable("FOO_A", metadataModel.getGroup("GROUP_A"), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("FOO_B", metadataModel.getGroup("GROUP_B"), VariableType.STRING));
+		srd.setMetadataModel(metadataModel);
 		//
 		QuestionnaireData completeQuestionnaire = new QuestionnaireData();
 		completeQuestionnaire.putValue("foo", "FOO");

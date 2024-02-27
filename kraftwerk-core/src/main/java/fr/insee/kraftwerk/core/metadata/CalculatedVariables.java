@@ -1,11 +1,11 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-import lombok.Getter;
 
 /**
  * Map to store specific information concerning the calculated variables.
@@ -32,22 +32,16 @@ public class CalculatedVariables extends LinkedHashMap<String, CalculatedVariabl
         return this.get(calculatedName).getDependantVariables();
     }
 
-    /** If the variable is in the map, it is a calculated variable. Return true if so. */
-    public boolean isCalculated(String variableName) {
-        return this.containsKey(variableName);
-    }
 
     /** POJO class to store specific information of a calculated variable. */
+    @Getter
     public static class CalculatedVariable {
 
         /** Variable name (should be the same as in the DDI) */
-        @Getter
         String name;
         /** VTL expression that defines the variable (read in the Lunatic questionnaire). */
-        @Getter
         String vtlExpression;
         /** Variables needed to perform the calculation. */
-        @Getter
         List<String> dependantVariables;
 
         public CalculatedVariable(String name, String vtlExpression) {

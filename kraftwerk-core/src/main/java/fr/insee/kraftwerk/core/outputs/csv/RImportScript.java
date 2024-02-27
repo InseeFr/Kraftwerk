@@ -1,14 +1,14 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of ImportScript to generate R script using the <code>data.table</code> package.
@@ -44,8 +44,8 @@ public class RImportScript extends ImportScript {
             script.append(END_LINE).append(END_LINE);
 
             // specify format variables
-            Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-            Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+            Map<String, MetadataModel> metadataModels = tableScriptInfo.getMetadataModels();
+            Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataModels);
             for (Map.Entry<String, Variable> varEntry : listVariables.entrySet()) {
                 VariableType variableType = varEntry.getValue().getType();
                 script.append(String.format("%s$%s <- as.", tableName, varEntry.getKey()));

@@ -8,11 +8,11 @@ import lombok.extern.log4j.Log4j2;
 /**
  * One multiple choice question with K modalities = K MCQ Variables.
  */
+@Getter
 @Log4j2
 public class McqVariable extends Variable {
 
 	/** Text associated with the modality. */
-	@Getter
 	@Setter
 	String text;
 

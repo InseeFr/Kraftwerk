@@ -1,7 +1,5 @@
 package fr.insee.kraftwerk.core.parsers;
 
-import java.nio.file.Path;
-
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -11,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+
+import java.nio.file.Path;
 
 /**
  * Implementation of DataParser to read Xforms data files.
@@ -82,7 +82,7 @@ public class XformsDataParser extends DataParser {
 				for (int j = 0; j < variableNodeList.size(); j++) {
 					Element variableNode = variableNodeList.get(j);
 					String variableName = variableNode.getAttributeValue("idVariable");
-					if (data.getVariablesMap().hasVariable(variableName)) {
+					if (data.getMetadataModel().getVariables().hasVariable(variableName)) {
 						String value = getNodeValue(variableNode);
 						answers.putValue(variableName, value);
 					} else {
@@ -112,7 +112,7 @@ public class XformsDataParser extends DataParser {
 						Elements groupVariableNodeList = groupInstanceNode.getChildElements("Variable");
 						for (Element variableNode : groupVariableNodeList) {
 							String variableName = variableNode.getAttributeValue("idVariable");
-							if (data.getVariablesMap().hasVariable(variableName)) {
+							if (data.getMetadataModel().getVariables().hasVariable(variableName)) {
 								String value = getNodeValue(variableNode);
 								groupInstance.putValue(variableName, value);
 							} else {

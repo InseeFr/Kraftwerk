@@ -1,24 +1,21 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.UcqVariable;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.UcqVariable;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import java.nio.file.Path;
+
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class BuildBindingsSequenceTest {
 	
@@ -37,10 +34,10 @@ class BuildBindingsSequenceTest {
 		boolean withDdi = true;	
 		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
 		//WHEN 
-		Map<String,VariablesMap> metadataVariables = new HashMap<>();
+		MetadataModel metadata = null;
 		
 		//THEN
-		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi,null));
+		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
 		
 	}
 	
@@ -54,15 +51,13 @@ class BuildBindingsSequenceTest {
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
 		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
-		Map<String,VariablesMap> metadataVariables = new HashMap<>();
-        VariablesMap capiVariables = new VariablesMap();
-        capiVariables.putVariable(new Variable("VAR1", capiVariables.getRootGroup(), VariableType.STRING));
-        capiVariables.putVariable(new UcqVariable("PAYSNAIS", capiVariables.getRootGroup(), VariableType.STRING));
-		metadataVariables.put(dataMode, capiVariables);
-		
+        MetadataModel capiMetadata = new MetadataModel();
+		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
+		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));
+
 		//WHEN
 		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataVariables, withDdi,null));
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi,null));
 	}
 	
 	

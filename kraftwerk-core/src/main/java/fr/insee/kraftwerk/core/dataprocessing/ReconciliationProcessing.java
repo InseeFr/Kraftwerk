@@ -1,12 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
@@ -14,6 +7,9 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class ReconciliationProcessing extends DataProcessing {
@@ -43,7 +39,6 @@ public class ReconciliationProcessing extends DataProcessing {
 	 * concatenation of all datasets that are in the bindings when this method is
 	 * called.
 	 * A new identifier variable is created to identify the original collection mode of each row.
-	 *
 	 * Variables that does not exist in every mode are in the output dataset, with
 	 * empty values for the lines of the unconcerned modes.
 	 *
@@ -55,7 +50,7 @@ public class ReconciliationProcessing extends DataProcessing {
 	protected VtlScript generateVtlInstructions(String bindingName) {
 		int modesCount = vtlBindings.size();
 		if (modesCount == 1) {
-			String singleInstruction = String.format("%s := %s;", bindingName, vtlBindings.getDatasetNames().get(0));
+			String singleInstruction = String.format("%s := %s;", bindingName, vtlBindings.getDatasetNames().getFirst());
 			return new VtlScript(singleInstruction);
 		} else if (modesCount > 1) {
 			return severalModesInstructions(bindingName);
@@ -110,7 +105,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		// Instantiate the multimodal dataset with the first dataset that comes
 		List<String> unimodalDatasetNames = vtlBindings.getDatasetNames();
-		String firstDatasetName = unimodalDatasetNames.get(0);
+		String firstDatasetName = unimodalDatasetNames.getFirst();
 		vtlScript.add(String.format("%s := %s [keep %s];",
 				bindingName, firstDatasetName, vtlCommonVariables));
 
@@ -168,7 +163,7 @@ public class ReconciliationProcessing extends DataProcessing {
 		return identifiers;
 	}
 
-	/** Return a set containing variable names that are common to each datasets in the bindings. */
+	/** Return a set containing variable names that are common to each dataset in the bindings. */
 	private Set<String> getCommonMeasures() {
 
 		List<Set<String>> variableNamesList = new ArrayList<>();
@@ -203,17 +198,16 @@ public class ReconciliationProcessing extends DataProcessing {
 
 	/**
 	 * Return a set containing the common strings among the lists given.
-	 *
 	 * Code sample found here:
-	 * https://stackoverflow.com/questions/36110185/how-to-find-common-elements-in-multiple-lists
-	 * https://stackoverflow.com/a/36110216/13425151
+	 * <a href="https://stackoverflow.com/questions/36110185/how-to-find-common-elements-in-multiple-lists">...</a>
+	 * <a href="https://stackoverflow.com/a/36110216/13425151">...</a>
 	 *
 	 * @param lists A list containing lists of string.
 	 *
 	 * @return A set of strings.
 	 */
 	private Set<String> getCommonElements(List<Set<String>> lists) {
-		Set<String> intersection = new HashSet<>(lists.get(0));
+		Set<String> intersection = new HashSet<>(lists.getFirst());
 		for (Set<String> list : lists) {
 			Set<String> newIntersection = new HashSet<>();
 			for (String name : list) {

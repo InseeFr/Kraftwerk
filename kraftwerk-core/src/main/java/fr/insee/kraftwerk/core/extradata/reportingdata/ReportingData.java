@@ -7,12 +7,13 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
 public class ReportingData {
-	@Getter@Setter
-  private Path filepath;
+	@Getter
+    private Path filepath;
   
-	@Getter@Setter
-  public List<ReportingDataUE> listReportingDataUE;
+	@Getter
+    public List<ReportingDataUE> listReportingDataUE;
   
   public ReportingData() {
     this.listReportingDataUE = new ArrayList<>();

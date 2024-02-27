@@ -90,7 +90,7 @@ public class PaperDataParser extends DataParser {
 
 			// Variables
 			String[] header = csvReader.readNext();
-			VariablesMap variables = data.getVariablesMap();
+			VariablesMap variables = data.getMetadataModel().getVariables();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
 			for (int j = 1; j < header.length; j++) {
 				String variableName = header[j];
@@ -174,7 +174,7 @@ public class PaperDataParser extends DataParser {
 	// data files)
 	private String getVariableStem(String variableName) {
 		String[] decomposition = variableName.split("_");
-		if (decomposition.length == 2) { // (no "_" in the variable name)
+		if (decomposition.length == 2) { // no "_" in the variable name
 			return decomposition[0];
 		} else { // (otherwise, reconstitute the variable name)
 			return String.join("_", Arrays.copyOf(decomposition, decomposition.length - 1));

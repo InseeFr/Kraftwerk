@@ -10,7 +10,7 @@ import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -32,11 +32,11 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, VariablesMap> metadataVariables, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws NullException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
-		data.setVariablesMap(metadataVariables.get(dataMode));
+		data.setMetadataModel(metadataModels.get(dataMode));
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		// To be deported in another place in the code later at refactor step
@@ -50,15 +50,19 @@ public class BuildBindingsSequenceGenesis {
 			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
 				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
 					// Not clean : deal with arrays (for now always a single value in array)
-					if (!variableState.getValues().isEmpty()){ answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());}
+					if (!variableState.getValues().isEmpty()){
+						answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
+					}
 				} else {
-					addGroupVariables(data.getVariablesMap(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
+					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
 				}
 			}
 
 			for (ExternalVariable extVar : surveyUnit.getExternalVariables()){
 				// The external are always in root group name
-				if (!extVar.getValues().isEmpty()){ answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());}
+				if (!extVar.getValues().isEmpty()){
+					answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());
+				}
 			}
 
 			data.getQuestionnaires().add(questionnaire);
@@ -104,9 +108,9 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void addGroupVariables(VariablesMap variables, String variableName, GroupInstance answers, VariableState variableState) {
-		if (variables.hasVariable(variableName)) {
-			String groupName = variables.getVariable(variableName).getGroupName();
+	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableState variableState) {
+		if (models.getVariables().hasVariable(variableName)) {
+			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
 			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getIdLoop());
 		}

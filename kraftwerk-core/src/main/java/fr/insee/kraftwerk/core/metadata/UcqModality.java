@@ -6,25 +6,23 @@ import lombok.Setter;
 /**
  * POJO class to store information about a UQC modality.
  */
+@Getter
 public class UcqModality {
 
     /**
      * Value associated to the modality in survey data.
      */
-    @Getter
     @Setter
     String value;
     /**
      * Text associated to the modality
      */
-    @Getter
     @Setter
     String text;
     /**
      * If an indicator variable is associated to the modality (in a paper data
      * files).
      */
-    @Getter
     @Setter
     String variableName;
 

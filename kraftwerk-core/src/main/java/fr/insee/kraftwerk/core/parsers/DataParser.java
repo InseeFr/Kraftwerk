@@ -25,8 +25,8 @@ public abstract class DataParser {
 	 *             The variables must have been previously set.
 	 */
 	protected DataParser(SurveyRawData data) {
-		if (data.getVariablesMap() == null) {
-			log.debug("No variables map set on data object. Parsing will most likely fail.");
+		if (data.getMetadataModel() == null || data.getMetadataModel().getVariables() == null) {
+			log.debug("No metadata set on data object. Parsing will most likely fail.");
 		}
 		this.data = data;
 	}

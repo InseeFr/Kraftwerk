@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -9,11 +9,11 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public abstract class UnimodalDataProcessing extends DataProcessing {
 	
-	protected VariablesMap variablesMap;
+	protected MetadataModel metadataModel;
 
-    protected UnimodalDataProcessing(VtlBindings vtlBindings, VariablesMap variablesMap){
+    protected UnimodalDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel){
         super(vtlBindings);
-        this.variablesMap = variablesMap;
+        this.metadataModel = metadataModel;
     }
 
     /**
