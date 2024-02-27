@@ -12,6 +12,7 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -65,17 +66,7 @@ class CalculatedProcessingTest {
     @Test
     void testIfCalculatedAreProcessed() {
         //
-        Dataset fooDataset = new InMemoryDataset(
-                List.of(
-                        List.of("A","X"),
-                        List.of("B","Y"),
-                        List.of("C","Z")),
-                List.of(
-                        new Structured.Component("ID", String.class, Role.IDENTIFIER),
-                        new Structured.Component("FOO", String.class, Role.MEASURE))
-        );
-        VtlBindings vtlBindings = new VtlBindings();
-        vtlBindings.put("TEST", fooDataset);
+        VtlBindings vtlBindings = getVtlBindings();
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
         processing.applyAutomatedVtlInstructions("TEST", errors);
@@ -92,6 +83,22 @@ class CalculatedProcessingTest {
         assertEquals(1L, outDataset.getDataPoints().get(0).get("FOO3"));
         assertEquals(1L, outDataset.getDataPoints().get(0).get("FOO2"));
         assertEquals(2L, outDataset.getDataPoints().get(0).get("FOO1"));
+    }
+
+    @NotNull
+    private static VtlBindings getVtlBindings() {
+        Dataset fooDataset = new InMemoryDataset(
+                List.of(
+                        List.of("A","X"),
+                        List.of("B","Y"),
+                        List.of("C","Z")),
+                List.of(
+                        new Structured.Component("ID", String.class, Role.IDENTIFIER),
+                        new Structured.Component("FOO", String.class, Role.MEASURE))
+        );
+        VtlBindings vtlBindings = new VtlBindings();
+        vtlBindings.put("TEST", fooDataset);
+        return vtlBindings;
     }
 
 }
