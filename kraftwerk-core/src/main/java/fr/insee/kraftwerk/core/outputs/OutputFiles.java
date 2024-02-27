@@ -17,15 +17,12 @@ import java.util.Set;
 /**
  * Class to manage the writing of output tables.
  */
+@Getter
 public abstract class OutputFiles {
 
 	/** Final absolute path of the output folder */
-	@Getter
 	private final Path outputFolder;
-	@Getter
 	private final VtlBindings vtlBindings;
-
-	@Getter
 	private final Set<String> datasetToCreate = new HashSet<>();
 
 	/**

@@ -1,18 +1,19 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.nio.file.Path;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.nio.file.Path;
+import java.util.List;
+
+@Getter
 @NoArgsConstructor
 public class Paradata {
-	@Getter@Setter
+	@Setter
 	private Path filepath;
 
-	@Getter@Setter
+	@Setter
 	private List<ParaDataUE> listParadataUE;
 
 	public Paradata(Path filepath) {

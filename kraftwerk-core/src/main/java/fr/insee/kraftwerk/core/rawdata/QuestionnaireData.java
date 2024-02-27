@@ -1,28 +1,21 @@
 package fr.insee.kraftwerk.core.rawdata;
 
 import fr.insee.kraftwerk.core.Constants;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Object class to store data from a questionnaire.
  *
  */
+@Getter
 public class QuestionnaireData {
 
+    @Setter
     protected String identifier;
     protected GroupInstance answers = new GroupInstance(Constants.ROOT_GROUP_NAME, "");
 
-    public String getIdentifier() {
-        return identifier;
-    }
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public GroupInstance getAnswers() {
-        return answers;
-    }
-    
     /**
      * Put the given value corresponding to the variable given in the data object.
      * If it is a root variable, no instance reference must be given.

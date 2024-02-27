@@ -8,35 +8,36 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class ReportingDataUE {
-  @Getter@Setter
+  @Setter
   private String identifier;
   
-  @Getter@Setter
+  @Setter
   private List<State> states;
   
-  @Getter@Setter
+  @Setter
   private String organizationUnitId;
   
-  @Getter@Setter
+  @Setter
   private String interviewerId;
   
-  @Getter@Setter
+  @Setter
   private InseeSampleIdentifier inseeSampleIdentifier;
   
-  @Getter@Setter
+  @Setter
   private ContactOutcome contactOutcome;
   
-  @Getter@Setter
+  @Setter
   private List<ContactAttempt> contactAttempts;
 
-  @Getter@Setter
+  @Setter
   private Identification identification;
 
-  @Getter@Setter
+  @Setter
   private List<Comment> comments;
 
-  @Getter@Setter
+  @Setter
   private Long surveyValidationDateTimeStamp;
   
   public ReportingDataUE() {

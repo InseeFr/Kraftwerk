@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core;
 
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -44,6 +45,7 @@ public final class Constants {
 	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
+	@Getter
 	private static char csvOutputQuoteChar = '"';
 
 	// ----- Fixed parameters
@@ -233,30 +235,9 @@ public final class Constants {
 		}
 	}
 
-
-	/** Convert a string path to an URL object.
-	 *
-	 * @param filePath
-	 * Can be a URL or a local absolute path.
-	 *
-	 * @return
-	 * A java.net.URL object.
-	 *
-	 * @throws MalformedURLException if the path given is incorrect.
-	 * */
-	public static URL convertToUrl(Path filePath) throws MalformedURLException {
-		return filePath.toFile().toURI().toURL();
-	}
-
-
 	public static void setCsvOutputQuoteChar(char csvOutputQuoteChar) {
 		Constants.csvOutputQuoteChar = csvOutputQuoteChar;
 	}
-
-	public static char getCsvOutputQuoteChar() {
-		return csvOutputQuoteChar;
-	}
-
 
 	public static String[] getEnoVariables() {
 		return ENO_VARIABLES;

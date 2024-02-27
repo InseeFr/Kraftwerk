@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.data.model;
 
+import lombok.Getter;
 import org.springframework.lang.Nullable;
 
 import java.util.EnumSet;
 
+@Getter
 public enum Mode {
 
 	WEB("WEB", "WEB"),TEL("TEL", "ENQ"),F2F("F2F", "ENQ"),OTHER("OTHER", ""),PAPER("PAPER", "");
@@ -25,11 +27,4 @@ public enum Mode {
 				.orElseThrow(() -> new IllegalStateException(String.format("Unsupported mode %s.", modeName)));
 	}
 
-	public String getModeName() {
-		return modeName;
-	}
-
-	public String getFolder() {
-		return folder;
-	}
 }

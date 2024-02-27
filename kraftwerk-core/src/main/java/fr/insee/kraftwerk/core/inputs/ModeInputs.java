@@ -1,26 +1,27 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import java.net.URL;
-import java.nio.file.Path;
-
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.net.URL;
+import java.nio.file.Path;
+
 /**
  * POJO-like class to store different files associated to a collection mode.
  */
+@Getter
 public class ModeInputs {
 
-    @Getter @Setter protected Path dataFile;
-    @Getter @Setter protected URL ddiUrl;
-    @Getter @Setter protected Path lunaticFile;
-    @Getter         protected DataFormat dataFormat;
-    @Getter @Setter protected String dataMode;
-    @Getter @Setter protected Path modeVtlFile;
-    @Getter @Setter protected Path paradataFolder;
-    @Getter @Setter protected Path reportingDataFile;
+    @Setter protected Path dataFile;
+    @Setter protected URL ddiUrl;
+    @Setter protected Path lunaticFile;
+    protected DataFormat dataFormat;
+    @Setter protected String dataMode;
+    @Setter protected Path modeVtlFile;
+    @Setter protected Path paradataFolder;
+    @Setter protected Path reportingDataFile;
 
     /**
      * Allow to specify the data format using a string argument.

@@ -6,12 +6,12 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+@Setter
+@Getter
 public class ErrorVtlTransformation extends KraftwerkError {
 
-    @Getter @Setter
     private String vtlScript;
 
-    @Getter @Setter
     private String message;
 
     public ErrorVtlTransformation() {

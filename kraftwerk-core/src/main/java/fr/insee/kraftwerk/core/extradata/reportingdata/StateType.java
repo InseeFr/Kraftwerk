@@ -5,6 +5,7 @@ import java.util.Map;
 
 import lombok.Getter;
 
+@Getter
 public enum StateType {
   STATE01("NVM", "UE non visible gestionnaire"),
   STATE02("NNS", "Non affecté, non commencé"),
@@ -32,10 +33,8 @@ public enum StateType {
   STATE24("REFUSAL", "Refus de répondre"),
   STATE25("RELANCE", "RELANCE");
   
-	@Getter
-  private final String key;
-	@Getter
-  private final String value;
+	private final String key;
+	private final String value;
   
   private static Map<String, String> valueToTextMapping  = new HashMap<>();
   

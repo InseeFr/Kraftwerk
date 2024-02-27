@@ -1,8 +1,11 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
 public enum TCMSequenceEnum {
     TCM_THLHAB (TCMModuleEnum.TCM_THL_DET,TCMModuleEnum.TCM_THL_SIMPLE),
     TCM_THL_LDVIE(TCMModuleEnum.TCM_THL_LDV),
@@ -22,8 +25,5 @@ public enum TCMSequenceEnum {
 	 
 	private TCMSequenceEnum(TCMModuleEnum... tcmModules){
 		this.tcmModules = Arrays.asList(tcmModules);
-	}
-	public List<TCMModuleEnum> getTcmModules(){
-	    return tcmModules;
 	}
 }
