@@ -1,43 +1,34 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-import lombok.Setter;
-
+@Setter
 @Getter
 public class ReportingDataUE {
-  @Setter
   private String identifier;
   
-  @Setter
   private List<State> states;
   
-  @Setter
   private String organizationUnitId;
   
-  @Setter
   private String interviewerId;
   
-  @Setter
   private InseeSampleIdentifier inseeSampleIdentifier;
   
-  @Setter
   private ContactOutcome contactOutcome;
   
-  @Setter
   private List<ContactAttempt> contactAttempts;
 
-  @Setter
   private Identification identification;
 
-  @Setter
   private List<Comment> comments;
 
-  @Setter
   private Long surveyValidationDateTimeStamp;
   
   public ReportingDataUE() {
@@ -60,7 +51,7 @@ public class ReportingDataUE {
   public void addState(State state) {
 	  if (state != null) {
 		 long nbEquals = states.stream().filter(s -> s.equals(state)).count(); //count nb states equals to the state to insert
-		 if (nbEquals==0) this.states.add(state);
+		 if (nbEquals==0){ this.states.add(state);}
 	  }
   }
   

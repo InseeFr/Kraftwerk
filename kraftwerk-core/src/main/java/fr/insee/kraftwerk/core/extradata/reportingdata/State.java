@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 @Getter@Setter
 @EqualsAndHashCode
@@ -14,9 +16,6 @@ public class State{
   private String stateType;
   private long timestamp;
    
-  public State(String stateType) {
-    this.stateType = stateType;
-  }
 
   /**
    * @return the priority order if it's considered as a validation state, null otherwise
@@ -45,7 +44,7 @@ public class State{
             // True if this state is more priority than the other
             this.getPriorityOrder() < otherState.getPriorityOrder()
             //True if the other state has the same priority and this state is more recent
-            || (this.getPriorityOrder() != null && this.getPriorityOrder().equals(otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
+            || (Objects.equals(this.getPriorityOrder(),otherState.getPriorityOrder()) && this.getTimestamp() > otherState.getTimestamp())
     );
   }
   
