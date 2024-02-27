@@ -222,7 +222,7 @@ public class FileUtils {
 	}
 
 	public static Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
-		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
+		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
 				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));

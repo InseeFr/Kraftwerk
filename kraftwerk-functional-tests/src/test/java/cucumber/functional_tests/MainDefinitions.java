@@ -206,7 +206,7 @@ public class MainDefinitions {
 	@Then("Step 7 : We check that id {string} has value {string} for variable {string} in table {string}")
 	public void checkVariableValue(String idUE, String expectedValue, String variable, String tableName)
 			throws IOException, CsvValidationException {
-		if (tableName == null || tableName.equals(""))
+		if (tableName == null || tableName.isEmpty())
 			tableName = Constants.ROOT_GROUP_NAME;
 
 		// Get reader to read the root table written in outputs

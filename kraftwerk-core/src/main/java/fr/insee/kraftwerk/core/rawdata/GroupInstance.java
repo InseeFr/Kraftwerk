@@ -1,11 +1,11 @@
 package fr.insee.kraftwerk.core.rawdata;
 
+import fr.insee.kraftwerk.core.Constants;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import fr.insee.kraftwerk.core.Constants;
 
 /**
  * Object containing concrete data of a group.
@@ -29,7 +29,7 @@ public class GroupInstance {
 	 */
 	Map<String, String> values = new LinkedHashMap<>();
 	/**
-	 * A map containing sub groups' data. Keys: a group name. Values: a GroupData
+	 * A map containing subgroups' data. Keys: a group name. Values: a GroupData
 	 * (which is a subgroup of the current group).
 	 */
 	Map<String, GroupData> subGroups = new LinkedHashMap<>();
@@ -73,7 +73,7 @@ public class GroupInstance {
 	}
 
 	public boolean hasSubGroups() {
-		return subGroups.size() > 0;
+		return !subGroups.isEmpty();
 	}
 
 	public Set<String> getSubGroupNames() {
