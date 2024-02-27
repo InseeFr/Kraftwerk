@@ -81,14 +81,7 @@ public class MetadataModel {
     public boolean hasGroup(String groupName) {
         return groups.containsKey(groupName);
     }
-    /** Return false is there is only the root group. */
-    public boolean hasSubGroups() {
-        int size = groups.size();
-        if (size < 1) {
-            log.debug("No groups in this variables map. Should have at least the root group.");
-        }
-        return size > 1;
-    }
+
 
     /** Return the fully qualified name of a variable, that is
      * - the name of the variable if it is in the root group.

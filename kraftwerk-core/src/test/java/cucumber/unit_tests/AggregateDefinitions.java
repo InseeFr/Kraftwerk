@@ -13,7 +13,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import javax.script.Bindings;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,7 @@ import static org.junit.Assert.assertTrue;
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-	public Bindings bindings = vtlBindings;
-	public String tempDatasetPath = "";
+
 	public List<KraftwerkError> errors = new ArrayList<>();
 	
 	VtlExecute vtlExecute = new VtlExecute();
