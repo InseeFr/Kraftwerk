@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -115,20 +113,6 @@ class ParquetOutputFilesTest {
 		File f = racinePath.toFile();
 		Assertions.assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());
-		
-//		//
-//		CSVReader reader = CsvUtils.getReader(outTestFilePath);
-//		List<String[]> rows = reader.readAll();
-//		//
-//		assertEquals(4, rows.size());
-//		String[] header = rows.get(0);
-//		for (String columnName : List.of("ID", "ID2", "FOO_STR", "FOO_NUM")) {
-//			assertTrue(arrayContains(header, columnName));
-//		}
-//		String[] row1 = rows.get(1);
-//		for (String columnName : List.of("T01", "01", "foo11", "11")) {
-//			assertTrue(arrayContains(row1, columnName));
-//		}
 
 	}
 	

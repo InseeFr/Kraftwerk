@@ -43,8 +43,7 @@ class CSVReportingDataParserTest {
 		assertEquals("VALINT", reportingDataUE.getStates().get(2).getStateType());
 		// Check the reporting data is correctly translated in the output
 		/* à implémenter ? *//*
-		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getValue("STATE_2"));
-		assertEquals("Questionnaire démarré", questionnaire.getAnswers().getValue(Constants.LAST_STATE_NAME));*/
+		"Affectée, non visible enquêteur" et "Questionnaire démarré"*/
 	}
 
 	@Test
