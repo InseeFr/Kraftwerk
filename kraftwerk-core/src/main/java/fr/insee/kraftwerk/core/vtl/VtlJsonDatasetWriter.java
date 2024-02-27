@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -78,7 +77,7 @@ public class VtlJsonDatasetWriter {
 			File datasetFile = File.createTempFile(datasetName, ".json");
 			datasetFile.deleteOnExit();
 			String tempPath = datasetFile.getAbsolutePath();
-			Files.write(Paths.get(tempPath), jsonVtlDataset.toJSONString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
+			Files.writeString(Paths.get(tempPath), jsonVtlDataset.toJSONString(), StandardOpenOption.TRUNCATE_EXISTING);
 			return tempPath;
 		} catch (IOException e) {
 			log.error(String.format("Unable to write the temporary file '%s.json'.", datasetName), e);
