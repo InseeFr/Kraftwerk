@@ -21,10 +21,7 @@ public class LunaticReader {
 
 	private static final String BINDING_DEPENDENCIES = "bindingDependencies";
 	private static final String VARIABLES = "variables";
-
-
 	private static final String EXCEPTION_MESSAGE = "Unable to read Lunatic questionnaire file: ";
-
 	private LunaticReader() {
 		throw new IllegalStateException("Utility class");
 	}

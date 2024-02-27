@@ -75,7 +75,7 @@ public class CleanUpProcessing extends DataProcessing {
             );
             StringJoiner vtlDropVariables = new StringJoiner(", ");
             paperUcqVtlNames.forEach(vtlDropVariables::add);
-            dropInstruction.append(vtlDropVariables.toString());
+            dropInstruction.append(vtlDropVariables);
             dropInstruction.append(" ];");
             vtlScript.add(dropInstruction.toString());
         }

@@ -225,7 +225,7 @@ public class FileUtils {
 		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
 			}
 			return inputPath;
 		} else {

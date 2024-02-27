@@ -18,15 +18,15 @@ public class MetadataModel {
     /** Map containing the groups.
      * Keys: group name.
      * Values: Group. */
-	private LinkedHashMap<String, Group> groups  = new LinkedHashMap<>();;
+    private LinkedHashMap<String, Group> groups  = new LinkedHashMap<>();
 	
-	private List<Sequence> sequences = new ArrayList<>();
+    private List<Sequence> sequences = new ArrayList<>();
 	
 	
     /** The root group is created when creating a MetadataModel instance. */
     public MetadataModel() {
-        groups.put(Constants.ROOT_GROUP_NAME, new Group(Constants.ROOT_GROUP_NAME));
-	}
+		groups.put(Constants.ROOT_GROUP_NAME, new Group(Constants.ROOT_GROUP_NAME));
+    }
     
 
     /** Register a group in the map. */
@@ -93,7 +93,6 @@ public class MetadataModel {
     /** Return the fully qualified name of a variable, that is
      * - the name of the variable if it is in the root group.
      * - the variable name prefixed with its group and parent group names, otherwise.
-     *
      * In the second case, the separator use is defined by Constants.METADATA_SEPARATOR. */
     public String getFullyQualifiedName(String variableName) {
         if (getVariables().hasVariable(variableName) && StringUtils.isNotEmpty(variableName)) {

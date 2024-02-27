@@ -54,7 +54,7 @@ public class DDIGetterDefinitions {
     public void search_for_variables(String expectedVariable)  {
     	if (actualAnswer.contentEquals("DDI collected") &&  actualString.contains(expectedVariable)){
     		actualAnswer = actualAnswer + " with variable";
-    	};
+    	}
     }
 
 	@Then("The DDIs I compared should answer {string}")

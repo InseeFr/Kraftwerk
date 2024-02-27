@@ -8,5 +8,5 @@ public enum DataFormat {
 	XFORMS,
 	PAPER,
 	LUNATIC_XML,
-    LUNATIC_JSON;
+    LUNATIC_JSON
 }

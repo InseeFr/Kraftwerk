@@ -1,7 +1,6 @@
 package cucumber.unit_tests;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
@@ -46,7 +45,7 @@ public class ExportDatasetDefinitions {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel());
-		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<KraftwerkError>());
+		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<>());
 	}
 
 	@Then("I should get some dataset values from {string}")

@@ -16,6 +16,6 @@ public enum TCMModuleEnum {
     ,TCM_OR
     ,TCM_FAM
     ,TCM_LGT_ARCHI
-    ,TCM_LGT_LOCPR;
+    ,TCM_LGT_LOCPR
 	
 }

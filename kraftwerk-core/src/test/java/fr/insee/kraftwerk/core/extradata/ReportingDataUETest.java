@@ -1,22 +1,21 @@
 package fr.insee.kraftwerk.core.extradata;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
+import fr.insee.kraftwerk.core.extradata.reportingdata.State;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
-import fr.insee.kraftwerk.core.extradata.reportingdata.State;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ReportingDataUETest {
 	
 	public static List<ReportingDataUE> createFakeReportingDataUEs() {
-		List<ReportingDataUE> result = new ArrayList<ReportingDataUE>();
-		List<State> states = new ArrayList<State>();
+		List<ReportingDataUE> result = new ArrayList<>();
+		List<State> states = new ArrayList<>();
 		
 		// First UE
 		ReportingDataUE ue1 = new ReportingDataUE("Report0001");
@@ -68,7 +67,7 @@ public class ReportingDataUETest {
 	@Test
 	void containsReportingDataUETest() {
 		ReportingData reportingData = new ReportingData();
-		List<ReportingDataUE> listReportingDataUE = new ArrayList<ReportingDataUE>();
+		List<ReportingDataUE> listReportingDataUE = new ArrayList<>();
 		listReportingDataUE.add(new ReportingDataUE("Report0001"));
 		listReportingDataUE.add(new ReportingDataUE("Report0002"));
 		listReportingDataUE.add(new ReportingDataUE("Report0003"));

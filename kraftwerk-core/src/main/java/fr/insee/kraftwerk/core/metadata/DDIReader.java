@@ -243,15 +243,17 @@ public class DDIReader {
 
 	private static String getFirstChildValue(Element variableElement, String childTagName) {
 		Node child = getFirstChildNode(variableElement, childTagName);
-		if (child == null)
+		if (child == null){
 			return null;
+		}
 		return child.getTextContent();
 	}
 
 	private static String getFirstChildAttribute(Element variableElement, String childTagName, String attribute){
 		Node child = getFirstChildNode(variableElement, childTagName);
-		if (child == null)
+		if (child == null) {
 			return null;
+		}
 		return child.hasAttributes() ? child.getAttributes().getNamedItem(attribute).getTextContent() : null;
 	}
 

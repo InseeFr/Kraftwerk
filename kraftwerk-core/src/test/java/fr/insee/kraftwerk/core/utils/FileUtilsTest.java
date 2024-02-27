@@ -29,9 +29,7 @@ class FileUtilsTest {
     
     @Test
     void archiveInputFiles_failWhenNull() {
-		assertThrows(NullPointerException.class, () -> {
-			FileUtils.archiveInputFiles(null);
-		});
+		assertThrows(NullPointerException.class, () -> FileUtils.archiveInputFiles(null));
     }  
     
     

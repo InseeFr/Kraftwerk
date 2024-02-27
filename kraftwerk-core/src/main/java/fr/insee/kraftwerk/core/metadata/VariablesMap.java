@@ -82,14 +82,14 @@ public class VariablesMap {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
                 .anyMatch(mcqVariable -> // (FILTER_RESULT variables are upper case)
-                        ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName)
-                                || ((McqVariable) mcqVariable).getQuestionItemName().equalsIgnoreCase(questionName));
+                        mcqVariable.getQuestionItemName().equals(questionName)
+                                || mcqVariable.getQuestionItemName().equalsIgnoreCase(questionName));
     }
 
     public Group getMcqGroup(String questionName) {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
-                .filter(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName))
+                .filter(mcqVariable -> mcqVariable.getQuestionItemName().equals(questionName))
                 .map(Variable::getGroup)
                 .findFirst().orElse(null);
     }
@@ -139,7 +139,7 @@ public class VariablesMap {
     public List<String> getUcqVariablesNames() {
         return variables.values().stream()
                 .filter(UcqVariable.class::isInstance)
-                .map(ucqVariable -> ((UcqVariable) ucqVariable).getQuestionItemName())
+                .map(ucqVariable -> ucqVariable.getQuestionItemName())
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -148,7 +148,7 @@ public class VariablesMap {
     public List<String> getMcqVariablesNames() {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
-                .map(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName())
+                .map(mcqVariable -> mcqVariable.getQuestionItemName())
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();

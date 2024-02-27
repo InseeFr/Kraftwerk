@@ -1,15 +1,11 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ParaDataUE {
 	private static final String INITIALIZATION_ONGOING = "Initialization ongoing";
@@ -60,12 +56,12 @@ public class ParaDataUE {
 	}
 
 	public long createLengthOrchestratorsVariable() {
-		return getOrchestrators().stream().mapToLong(orchestrator -> orchestrator.getDuration()).sum();
+		return getOrchestrators().stream().mapToLong(Orchestrator::getDuration).sum();
 	}
 	
 
 	public long createLengthSessionsVariable() {
-		return getSessions().stream().mapToLong(session -> session.getDuration()).sum();
+		return getSessions().stream().mapToLong(Session::getDuration).sum();
 	}
 
 	public String getVariableStart() {
