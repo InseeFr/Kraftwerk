@@ -1,20 +1,22 @@
 package cucumber.functional_tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // Used in do_we_get_ddis
 public class DDIGetterDefinitions {
@@ -34,12 +36,12 @@ public class DDIGetterDefinitions {
 	 * Compare DDI with reference
 	 */
     @When("I try to compare the DDI named {string}")
-    public void compare_ddi(String nameDDI) throws IOException {
+    public void compare_ddi(String nameDDI) throws IOException, URISyntaxException {
 
 		File tempFile = File.createTempFile("ddi_temp", ".xml");
 		tempFile.deleteOnExit();
 		Path tempPath = Paths.get(tempFile.getAbsolutePath());
-		URL url = new URL(linkDDI);
+		URL url = new URI(linkDDI).toURL();
 		SaxonTransformer transformer = new SaxonTransformer();
 		transformer.xslTransform(url, Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
 
