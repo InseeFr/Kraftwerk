@@ -89,40 +89,39 @@ public class ParaDataUE {
 		Event previousEvent = null ;
 		
 		// iterate on paradata events
-		for (int j = 0; j < listParadataEvents.size(); j++) {
-			Event currentEvent = listParadataEvents.get(j);
+		for (Event currentEvent : listParadataEvents) {
 			initializeSessionIdentifier(session, currentEvent);
 			String idParadataObject = currentEvent.getIdParadataObject();
-			
+
 			switch (idParadataObject) {
-			case "init-session":
-				session = initializeOrChangeSession(session, previousEvent, currentEvent);
-				if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
-				}
-				break;
-			
-			case "init-orchestrator-collect" :
-				orchestrator = initializeOrChangeOrchestrator(orchestrator, previousEvent, currentEvent);
-				break;
-			case "agree-sending-modal-button-orchestrator-collect" : 
-			//validate the modal popup 
-				initOrchestratorWithSessionIfNeeded(session, orchestrator);
-				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
-					orchestrator.setInitialization(currentEvent.getTimestamp());
-				}
-				break;
-			case  "logout-close-button-orchestrator-collect"  : 
-				initOrchestratorWithSessionIfNeeded(session, orchestrator);
-				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
-				}
-				break;	
-			default:
-				break;
+				case "init-session":
+					session = initializeOrChangeSession(session, previousEvent, currentEvent);
+					if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
+					}
+					break;
+
+				case "init-orchestrator-collect":
+					orchestrator = initializeOrChangeOrchestrator(orchestrator, previousEvent, currentEvent);
+					break;
+				case "agree-sending-modal-button-orchestrator-collect":
+					//validate the modal popup
+					initOrchestratorWithSessionIfNeeded(session, orchestrator);
+					if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+						orchestrator.setInitialization(currentEvent.getTimestamp());
+					}
+					break;
+				case "logout-close-button-orchestrator-collect":
+					initOrchestratorWithSessionIfNeeded(session, orchestrator);
+					if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+					}
+					break;
+				default:
+					break;
 			}
-			
+
 			previousEvent = currentEvent;
 		}
 		Event event = listParadataEvents.get(listParadataEvents.size() - 1);
