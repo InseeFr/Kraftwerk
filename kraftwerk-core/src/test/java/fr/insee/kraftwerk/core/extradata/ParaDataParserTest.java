@@ -34,7 +34,7 @@ class ParaDataParserTest {
 		String expectedMessage = "Cannot invoke \"fr.insee.kraftwerk.core.rawdata.SurveyRawData.getIdSurveyUnits()\" because \"surveyRawData\" is null";
 		String actualMessage = exception.getMessage();
 
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 
 		//Null Paradata
 		SurveyRawData srd = new SurveyRawData();
@@ -78,27 +78,27 @@ class ParaDataParserTest {
 		paradataParser.parseParadata(paradata, srd);
 		
 		//SESSIONS
-		assertEquals(1, paradata.getParadataUE("PL1100000101").getSessions().size());
-		assertEquals(135102, paradata.getParadataUE("PL1100000101").createLengthSessionsVariable());
+		Assertions.assertEquals(1, paradata.getParadataUE("PL1100000101").getSessions().size());
+		Assertions.assertEquals(135102, paradata.getParadataUE("PL1100000101").createLengthSessionsVariable());
 
 		//ORCHESTRATORS
-		assertEquals(2, paradata.getParadataUE("PL1100000101").getOrchestrators().size());
-		assertEquals(134671, paradata.getParadataUE("PL1100000101").createLengthOrchestratorsVariable());
+		Assertions.assertEquals(2, paradata.getParadataUE("PL1100000101").getOrchestrators().size());
+		Assertions.assertEquals(134671, paradata.getParadataUE("PL1100000101").createLengthOrchestratorsVariable());
 
 		//COLLECTION_DATE
-		assertEquals("1645807741929", Long.valueOf(paradata.getParadataUE("PL1100000101").getSurveyValidationDateTimeStamp()).toString());
+		Assertions.assertEquals("1645807741929", Long.valueOf(paradata.getParadataUE("PL1100000101").getSurveyValidationDateTimeStamp()).toString());
 
 		
 		//SESSIONS
-		assertEquals(5, paradata.getParadataUE("RR100144").getSessions().size());
-		assertEquals(6058470, paradata.getParadataUE("RR100144").createLengthSessionsVariable());
+		Assertions.assertEquals(5, paradata.getParadataUE("RR100144").getSessions().size());
+		Assertions.assertEquals(6058470, paradata.getParadataUE("RR100144").createLengthSessionsVariable());
 
 		//ORCHESTRATORS
-		assertEquals(6, paradata.getParadataUE("RR100144").getOrchestrators().size());
-		assertEquals(2577505436L, paradata.getParadataUE("RR100144").createLengthOrchestratorsVariable());
+		Assertions.assertEquals(6, paradata.getParadataUE("RR100144").getOrchestrators().size());
+		Assertions.assertEquals(2577505436L, paradata.getParadataUE("RR100144").createLengthOrchestratorsVariable());
 
 		//COLLECTION_DATE
-		assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
+		Assertions.assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
 
 	}
 	

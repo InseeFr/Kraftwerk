@@ -113,8 +113,8 @@ class ParquetOutputFilesTest {
 		assertDoesNotThrow(() -> {outputFiles.writeOutputTables(metaModels);});
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
 		File f = racinePath.toFile();
-		assertTrue(f.exists());
-		assertNotEquals(0, f.length());
+		Assertions.assertTrue(f.exists());
+		Assertions.assertNotEquals(0, f.length());
 		
 //		//
 //		CSVReader reader = CsvUtils.getReader(outTestFilePath);

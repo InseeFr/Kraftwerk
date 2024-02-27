@@ -1,19 +1,16 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 class DatasetSerializerTest {
 
@@ -40,6 +37,6 @@ class DatasetSerializerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new TrevasModule());
         String res = objectMapper.writeValueAsString(ds1);
-        assertEquals(expectedJson, res);
+        Assertions.assertEquals(expectedJson, res);
     }
 }

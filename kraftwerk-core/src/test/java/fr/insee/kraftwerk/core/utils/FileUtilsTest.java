@@ -1,8 +1,12 @@
 package fr.insee.kraftwerk.core.utils;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.util.FileSystemUtils;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileUtilsTest {
 
@@ -77,12 +76,10 @@ class FileUtilsTest {
 		FileUtils.archiveInputFiles(testUserInputsFile);
 		
 		//THEN
-		assertTrue(new File(inputDirectory.toString() + "/Archive/papier").exists());
-		assertTrue(new File(inputDirectory.toString() + "/Archive/web").exists());
-		assertTrue(
-				new File(inputDirectory.toString() + "/Archive/paradata/L0000010.json").exists());
-		assertTrue(
-				new File(inputDirectory.toString() + "/Archive/suivi/reportingdata.xml").exists());
+		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/papier").exists());
+		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/web").exists());
+		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/paradata/L0000010.json").exists());
+		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/suivi/reportingdata.xml").exists());
 
 		//CLEAN
 		FileSystemUtils.deleteRecursively(inputDirectory);

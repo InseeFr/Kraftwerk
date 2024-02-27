@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ class PaperDataProcessingTest {
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 
 		//
-		assertNotNull(paperDsModified);
+		Assertions.assertNotNull(paperDsModified);
 		
 	}
 }
