@@ -101,15 +101,14 @@ public class CalculatedProcessingDefinition {
         for (int j=0; j<variableNamesList.size(); j++) {
             //
             String calculatedName = variableNamesList.get(j);
-            Object expectedValue;
-            switch (metadataModel.getVariables().getVariable(calculatedName).getType()) {
-                case STRING: expectedValue = expectedValues.get(j); break;
-                case NUMBER: expectedValue = Long.valueOf(expectedValues.get(j)); break;
-                default: throw new IllegalArgumentException(String.format(
-                        "Couldn't cast value \"%s\" defined in \"Calculated Processing\" scenario.",
-                        expectedValues.get(j)));
-            }
-            //
+            Object expectedValue = switch (metadataModel.getVariables().getVariable(calculatedName).getType()) {
+				case STRING -> expectedValues.get(j);
+				case NUMBER -> Long.valueOf(expectedValues.get(j));
+				default -> throw new IllegalArgumentException(String.format(
+						"Couldn't cast value \"%s\" defined in \"Calculated Processing\" scenario.",
+						expectedValues.get(j)));
+			};
+			//
             assertEquals(expectedValue, outDataset.getDataPoints().get(lineNumber).get(calculatedName));
         }
     }
