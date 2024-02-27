@@ -18,7 +18,7 @@ public class DataProcessingManager {
 	 * Return the data processing class adapted to the data collection tool given.
 	 *
 	 * @param dataFormat One of the DataFormat.
-	 * @param variablesMap 
+	 * @param metadataModel metadataModel
 	 *
 	 * @return One of the concrete parsers.
 	 */

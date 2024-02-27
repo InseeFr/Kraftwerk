@@ -163,7 +163,7 @@ public class ReconciliationProcessing extends DataProcessing {
 		return identifiers;
 	}
 
-	/** Return a set containing variable names that are common to each datasets in the bindings. */
+	/** Return a set containing variable names that are common to each dataset in the bindings. */
 	private Set<String> getCommonMeasures() {
 
 		List<Set<String>> variableNamesList = new ArrayList<>();

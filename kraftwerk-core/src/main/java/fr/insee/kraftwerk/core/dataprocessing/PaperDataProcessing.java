@@ -79,7 +79,7 @@ public class PaperDataProcessing extends UnimodalDataProcessing {
             vtlInstruction.append(String.format("if %s = \"1\" then \"%s\" else \"\" ",
                     latsModalityVtlName, lastModality.getValue()));
 
-            // (add closing parenthesis and ';')
+            // add closing parenthesis and ';'
             vtlInstruction.append(")".repeat(modalitiesCount - 1));
             vtlInstruction.append("];");
 
