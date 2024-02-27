@@ -79,7 +79,7 @@ public class ParaDataUE {
 	}
 
 	private Session getLastSession() {
-		return getSessions().get(getSessions().size()-1);
+		return getSessions().getLast();
 	}
 
 	public void createOrchestratorsAndSessions() {

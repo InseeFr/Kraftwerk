@@ -39,9 +39,9 @@ public class ParadataDefinitions {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
 		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
-		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);;
+		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);
 		// For now, only one file
-		String modeName = userInputs.getModes().get(0);
+		String modeName = userInputs.getModes().getFirst();
 		modeInputs = userInputs.getModeInputs(modeName);
 		// parse data
 		data = new SurveyRawData();
