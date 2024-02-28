@@ -4,8 +4,7 @@
 
 ### Added
 - Add a utility service to split large data files
-
-
+- Configure VTL execution for some specifics sequences
 
 ## 2.0.1 - [2024-02-22]
 
