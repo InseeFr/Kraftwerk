@@ -39,7 +39,7 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -56,7 +56,7 @@ public class StepByStepService extends KraftwerkService {
 			} catch (NullException e) {
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
-			
+
 			vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		}
 		
@@ -76,7 +76,7 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {

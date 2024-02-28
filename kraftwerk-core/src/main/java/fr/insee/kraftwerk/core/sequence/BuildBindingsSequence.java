@@ -15,9 +15,11 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
 
+@Log4j2
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
