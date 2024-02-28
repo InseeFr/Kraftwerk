@@ -1,13 +1,5 @@
 package fr.insee.kraftwerk.core.extradata;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.nio.file.Paths;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
@@ -15,6 +7,12 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CSVReportingDataParserTest {
 
@@ -45,8 +43,7 @@ class CSVReportingDataParserTest {
 		assertEquals("VALINT", reportingDataUE.getStates().get(2).getStateType());
 		// Check the reporting data is correctly translated in the output
 		/* à implémenter ? *//*
-		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getValue("STATE_2"));
-		assertEquals("Questionnaire démarré", questionnaire.getAnswers().getValue(Constants.LAST_STATE_NAME));*/
+		"Affectée, non visible enquêteur" et "Questionnaire démarré"*/
 	}
 
 	@Test
@@ -56,9 +53,9 @@ class CSVReportingDataParserTest {
 		String[] invalidHeaderWrongValues = new String [] {"statut", "dateInfo", "idUe2", "idContact", "nom", "prenom", "adresse2", "numeroDeLot2"};
 		String[] headerToControlWrongSize = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot", "ninth"};
 		
-		assertTrue(csvReportingDataParser.controlHeader(validHeaderToControl));
-		assertFalse(csvReportingDataParser.controlHeader(invalidHeaderWrongValues));
-		assertFalse(csvReportingDataParser.controlHeader(headerToControlWrongSize));
+		Assertions.assertTrue(csvReportingDataParser.controlHeader(validHeaderToControl));
+		Assertions.assertFalse(csvReportingDataParser.controlHeader(invalidHeaderWrongValues));
+		Assertions.assertFalse(csvReportingDataParser.controlHeader(headerToControlWrongSize));
 	}
 
 	@Test

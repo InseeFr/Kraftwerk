@@ -1,15 +1,12 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.insee.kraftwerk.core.TestConstants;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.TestConstants;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LunaticReaderTest {
 
@@ -57,13 +54,13 @@ class LunaticReaderTest {
   //Same test  with DDI [2 groups, 463 variables]
     void readVariablesFromLogX21WebLunaticFile() {
         //
-        VariablesMap variables = LunaticReader.getVariablesFromLunatic(
+        MetadataModel variables = LunaticReader.getMetadataFromLunatic(
                 lunaticSamplesPath.resolve("log2021x21_web.json"));
 
         //
         assertNotNull(variables);
         assertEquals(11,variables.getGroupsCount());
-        assertEquals(683, variables.getVariables().size());
+        assertEquals(683, variables.getVariables().getVariables().size());
        
     }
 }

@@ -1,16 +1,16 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.ErrorVariableLength;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+
+import java.util.List;
+import java.util.Map;
 
 public class SASImportScript extends ImportScript {
 
@@ -46,8 +46,8 @@ public class SASImportScript extends ImportScript {
                     shortenTableName, Constants.CSV_OUTPUTS_SEPARATOR)).append(END_LINE).append(END_LINE);
 
             // Special treatment to display the length of the variables
-            Map<String, VariablesMap> metadataVariables = tableScriptInfo.getMetadataVariables();
-            Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataVariables);
+            Map<String, MetadataModel> metadataModels = tableScriptInfo.getMetadataModels();
+            Map<String, Variable> listVariables = getAllLength(tableScriptInfo.getDataStructure(), metadataModels);
 
             // Warning about possible problem with format of variables from suggester
             script.append("    /* Warning : the actual length of these variables may be superior than the format specified in this script").append(END_LINE);
@@ -86,7 +86,7 @@ public class SASImportScript extends ImportScript {
         List<String> longNames = listVariable.entrySet().stream().
                 map(entry -> {
                     // getAllLength method is too complex
-                    // Asserts here to make sure it work as expected
+                    // Asserts here to make sure it works as expected
                     String name = entry.getKey();
                     Variable variable = entry.getValue();
                     assert name != null;

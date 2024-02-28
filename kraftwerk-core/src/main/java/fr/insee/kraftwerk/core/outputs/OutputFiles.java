@@ -1,31 +1,28 @@
 package fr.insee.kraftwerk.core.outputs;
 
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.Getter;
+
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import lombok.Getter;
-
 /**
  * Class to manage the writing of output tables.
  */
+@Getter
 public abstract class OutputFiles {
 
 	/** Final absolute path of the output folder */
-	@Getter
 	private final Path outputFolder;
-	@Getter
 	private final VtlBindings vtlBindings;
-
-	@Getter
 	private final Set<String> datasetToCreate = new HashSet<>();
 
 	/**
@@ -61,7 +58,7 @@ public abstract class OutputFiles {
 		}
 	}
 
-	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
+	public void writeImportScripts(Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) {
 		//Should be override
 	}
 
@@ -77,7 +74,7 @@ public abstract class OutputFiles {
 	 * Method to write output tables from datasets that are in the bindings.
 	 * @throws KraftwerkException 
 	 */
-	public void writeOutputTables(Map<String, VariablesMap> metadataVariables) throws KraftwerkException {
+	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 		// implemented in subclasses
 	}
 

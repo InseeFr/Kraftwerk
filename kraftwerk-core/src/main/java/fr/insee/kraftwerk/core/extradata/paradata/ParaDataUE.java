@@ -1,15 +1,11 @@
 package fr.insee.kraftwerk.core.extradata.paradata;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ParaDataUE {
 	private static final String INITIALIZATION_ONGOING = "Initialization ongoing";
@@ -60,26 +56,26 @@ public class ParaDataUE {
 	}
 
 	public long createLengthOrchestratorsVariable() {
-		return getOrchestrators().stream().mapToLong(orchestrator -> orchestrator.getDuration()).sum();
+		return getOrchestrators().stream().mapToLong(Orchestrator::getDuration).sum();
 	}
 	
 
 	public long createLengthSessionsVariable() {
-		return getSessions().stream().mapToLong(session -> session.getDuration()).sum();
+		return getSessions().stream().mapToLong(Session::getDuration).sum();
 	}
 
 	public String getVariableStart() {
-		if (getSessions().size()==0) { return "0";}
-		return Long.toString(getSessions().get(0).getInitialization());
+		if (getSessions().isEmpty()) { return "0";}
+		return Long.toString(getSessions().getFirst().getInitialization());
 	}
 	
 	public String getVariableEnd() {
-		if (getSessions().size()==0) { return "0";}
+		if (getSessions().isEmpty()) { return "0";}
 		return Long.toString(getLastSession().getTermination());
 	}
 
 	private Session getLastSession() {
-		return getSessions().get(getSessions().size()-1);
+		return getSessions().getLast();
 	}
 
 	public void createOrchestratorsAndSessions() {
@@ -93,40 +89,39 @@ public class ParaDataUE {
 		Event previousEvent = null ;
 		
 		// iterate on paradata events
-		for (int j = 0; j < listParadataEvents.size(); j++) {
-			Event currentEvent = listParadataEvents.get(j);
+		for (Event currentEvent : listParadataEvents) {
 			initializeSessionIdentifier(session, currentEvent);
 			String idParadataObject = currentEvent.getIdParadataObject();
-			
+
 			switch (idParadataObject) {
-			case "init-session":
-				session = initializeOrChangeSession(session, previousEvent, currentEvent);
-				if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
-				}
-				break;
-			
-			case "init-orchestrator-collect" :
-				orchestrator = initializeOrChangeOrchestrator(orchestrator, previousEvent, currentEvent);
-				break;
-			case "agree-sending-modal-button-orchestrator-collect" : 
-			//validate the modal popup 
-				initOrchestratorWithSessionIfNeeded(session, orchestrator);
-				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
-					orchestrator.setInitialization(currentEvent.getTimestamp());
-				}
-				break;
-			case  "logout-close-button-orchestrator-collect"  : 
-				initOrchestratorWithSessionIfNeeded(session, orchestrator);
-				if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
-					orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
-				}
-				break;	
-			default:
-				break;
+				case "init-session":
+					session = initializeOrChangeSession(session, previousEvent, currentEvent);
+					if (isOrchestratorStartBeforePreviousEvent(orchestrator, previousEvent)) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, previousEvent);
+					}
+					break;
+
+				case "init-orchestrator-collect":
+					orchestrator = initializeOrChangeOrchestrator(orchestrator, previousEvent, currentEvent);
+					break;
+				case "agree-sending-modal-button-orchestrator-collect":
+					//validate the modal popup
+					initOrchestratorWithSessionIfNeeded(session, orchestrator);
+					if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+						orchestrator.setInitialization(currentEvent.getTimestamp());
+					}
+					break;
+				case "logout-close-button-orchestrator-collect":
+					initOrchestratorWithSessionIfNeeded(session, orchestrator);
+					if (orchestrator.getInitialization() < currentEvent.getTimestamp()) {
+						orchestrator = changeCurrentOrchestrator(orchestrator, currentEvent);
+					}
+					break;
+				default:
+					break;
 			}
-			
+
 			previousEvent = currentEvent;
 		}
 		Event event = listParadataEvents.get(listParadataEvents.size() - 1);

@@ -1,14 +1,14 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
+import org.apache.parquet.io.InputFile;
+import org.apache.parquet.io.SeekableInputStream;
+
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-
-import org.apache.parquet.io.InputFile;
-import org.apache.parquet.io.SeekableInputStream;
 
 /**
  * Modified version of
@@ -101,10 +101,6 @@ public class LocalInputFile implements InputFile {
         return curPos - savPos;
       }
 
-      @Override
-      public int available() throws IOException {
-        return 0;
-      }
 
       @Override
       public void close() throws IOException {

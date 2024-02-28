@@ -1,18 +1,15 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.MalformedURLException;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import org.junit.jupiter.api.Test;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class DDIReaderTest {
 
@@ -31,7 +28,7 @@ class DDIReaderTest {
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
 	@Test
-	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -43,29 +40,29 @@ class DDIReaderTest {
 				"PERCENTAGE_EXPENSES11", "PERCENTAGE_EXPENSES101", "CLOWNING11", "CLOWNING42", "TRAVEL11", "TRAVEL46",
 				"SURVEY_COMMENT");
 
-		VariablesMap simpsonsVariables = DDIReader
-				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1));
+		MetadataModel simpsonsMetadata = DDIReader
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1));
 
 		//
-		assertNotNull(simpsonsVariables);
+		assertNotNull(simpsonsMetadata);
 		//
-		assertTrue(simpsonsVariables.hasGroup(Constants.ROOT_GROUP_NAME));
-		assertTrue(simpsonsVariables.hasGroup("FAVOURITE_CHARACTERS"));
+		assertTrue(simpsonsMetadata.hasGroup(Constants.ROOT_GROUP_NAME));
+		assertTrue(simpsonsMetadata.hasGroup("FAVOURITE_CHARACTERS"));
 		//
 		for (String variableName : expectedVariables) {
-			assertTrue(simpsonsVariables.hasVariable(variableName));
+			assertTrue(simpsonsMetadata.getVariables().hasVariable(variableName));
 		}
 		//
-		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsVariables.getVariable("SUM_EXPENSES").getGroup().getName());
-		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsVariables.getVariable("SURVEY_COMMENT").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsMetadata.getVariables().getVariable("SUM_EXPENSES").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsMetadata.getVariables().getVariable("SURVEY_COMMENT").getGroup().getName());
 		assertEquals("FAVOURITE_CHARACTERS",
-				simpsonsVariables.getVariable("FAVOURITE_CHARACTERS11").getGroup().getName());
+				simpsonsMetadata.getVariables().getVariable("FAVOURITE_CHARACTERS11").getGroup().getName());
 		assertEquals("FAVOURITE_CHARACTERS",
-				simpsonsVariables.getVariable("FAVOURITE_CHARACTERS102").getGroup().getName());
+				simpsonsMetadata.getVariables().getVariable("FAVOURITE_CHARACTERS102").getGroup().getName());
 	}
 
 	@Test
-	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException {
+	void readSimpsonsV2Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of(
 				//
@@ -81,89 +78,89 @@ class DDIReaderTest {
 				"LAST_FOOD_SHOPPING813CL", "CLOWNING11", "CLOWNING42", "TRAVEL11", "TRAVEL46", "FEELCHAREV1",
 				"FEELCHAREV4", "LEAVDURATION11", "LEAVDURATION52", "NB_CHAR", "SURVEY_COMMENT");
 
-		VariablesMap simpsonsVariables = DDIReader
-				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2));
+		MetadataModel simpsonsMetadata = DDIReader
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2));
 
 		//
-		assertNotNull(simpsonsVariables);
+		assertNotNull(simpsonsMetadata);
 		//
-		assertTrue(simpsonsVariables.hasGroup(Constants.ROOT_GROUP_NAME));
-		assertTrue(simpsonsVariables.hasGroup("FAVOURITE_CHAR"));
-		assertTrue(simpsonsVariables.hasGroup("Loop1"));
+		assertTrue(simpsonsMetadata.hasGroup(Constants.ROOT_GROUP_NAME));
+		assertTrue(simpsonsMetadata.hasGroup("FAVOURITE_CHAR"));
+		assertTrue(simpsonsMetadata.hasGroup("Loop1"));
 		//
 		for (String variableName : expectedVariables) {
-			assertTrue(simpsonsVariables.hasVariable(variableName));
+			assertTrue(simpsonsMetadata.getVariables().hasVariable(variableName));
 		}
 		//
-		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsVariables.getVariable("LAST_BROADCAST").getGroup().getName());
-		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsVariables.getVariable("SURVEY_COMMENT").getGroup().getName());
-		assertEquals("FAVOURITE_CHAR", simpsonsVariables.getVariable("SUM_EXPENSES").getGroup().getName());
-		assertEquals("FAVOURITE_CHAR", simpsonsVariables.getVariable("FAVOURITE_CHAR1").getGroup().getName());
-		assertEquals("Loop1", simpsonsVariables.getVariable("NAME_CHAR").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsMetadata.getVariables().getVariable("LAST_BROADCAST").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, simpsonsMetadata.getVariables().getVariable("SURVEY_COMMENT").getGroup().getName());
+		assertEquals("FAVOURITE_CHAR", simpsonsMetadata.getVariables().getVariable("SUM_EXPENSES").getGroup().getName());
+		assertEquals("FAVOURITE_CHAR", simpsonsMetadata.getVariables().getVariable("FAVOURITE_CHAR1").getGroup().getName());
+		assertEquals("Loop1", simpsonsMetadata.getVariables().getVariable("NAME_CHAR").getGroup().getName());
 	}
 
 	@Test
-	void readVqsWebVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsWebVariables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of("prenom", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RELATION1", "RELATION2", "RELATION3", "RELATION4", "ADRESSE",
 				"RESIDM", "NHAB");
 
-		VariablesMap vqsVariables = DDIReader
-				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB));
+		MetadataModel vqsMetadata = DDIReader
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB));
 
 		//
-		assertNotNull(vqsVariables);
+		assertNotNull(vqsMetadata);
 		//
-		assertTrue(vqsVariables.hasGroup(Constants.ROOT_GROUP_NAME));
-		assertTrue(vqsVariables.hasGroup("BOUCLEINDIV"));
+		assertTrue(vqsMetadata.hasGroup(Constants.ROOT_GROUP_NAME));
+		assertTrue(vqsMetadata.hasGroup("BOUCLEINDIV"));
 		//
 		for (String variableName : expectedVariables) {
-			assertTrue(vqsVariables.hasVariable(variableName));
+			assertTrue(vqsMetadata.getVariables().hasVariable(variableName));
 		}
 		//
-		assertEquals(Constants.ROOT_GROUP_NAME, vqsVariables.getVariable("ADRESSE").getGroup().getName());
-		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("prenom").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, vqsMetadata.getVariables().getVariable("ADRESSE").getGroup().getName());
+		assertEquals("BOUCLEINDIV", vqsMetadata.getVariables().getVariable("prenom").getGroup().getName());
 		// UCQ
-		assertTrue(vqsVariables.getVariable("ETAT_SANT") instanceof UcqVariable);
-		UcqVariable etatSant = (UcqVariable) vqsVariables.getVariable("ETAT_SANT");
+		assertInstanceOf(UcqVariable.class, vqsMetadata.getVariables().getVariable("ETAT_SANT"));
+		UcqVariable etatSant = (UcqVariable) vqsMetadata.getVariables().getVariable("ETAT_SANT");
 		assertEquals(5, etatSant.getModalities().size());
 		// MCQ
-		assertTrue(vqsVariables.getVariable("AIDREG_A") instanceof McqVariable);
-		assertTrue(vqsVariables.getVariable("AIDREG_D") instanceof McqVariable);
-		assertTrue(vqsVariables.getVariable("RELATION1") instanceof McqVariable);
-		assertTrue(vqsVariables.getVariable("RELATION4") instanceof McqVariable);
-		McqVariable aidregA = (McqVariable) vqsVariables.getVariable("AIDREG_A");
+		assertInstanceOf(McqVariable.class, vqsMetadata.getVariables().getVariable("AIDREG_A"));
+		assertInstanceOf(McqVariable.class, vqsMetadata.getVariables().getVariable("AIDREG_D"));
+		assertInstanceOf(McqVariable.class, vqsMetadata.getVariables().getVariable("RELATION1"));
+		assertInstanceOf(McqVariable.class, vqsMetadata.getVariables().getVariable("RELATION4"));
+		McqVariable aidregA = (McqVariable) vqsMetadata.getVariables().getVariable("AIDREG_A");
 		assertEquals("AIDREG", aidregA.getQuestionItemName());
 		assertEquals("1 - Oui, une aide aux activités de la vie quotidienne", aidregA.getText());
 		//
-		assertFalse(vqsVariables.getVariable("ADRESSE") instanceof McqVariable);
-		assertFalse(vqsVariables.getVariable("ADRESSE") instanceof UcqVariable);
-		assertFalse(vqsVariables.getVariable("PRENOM") instanceof McqVariable);
-		assertFalse(vqsVariables.getVariable("PRENOM") instanceof UcqVariable);
+		assertFalse(vqsMetadata.getVariables().getVariable("ADRESSE") instanceof McqVariable);
+		assertFalse(vqsMetadata.getVariables().getVariable("ADRESSE") instanceof UcqVariable);
+		assertFalse(vqsMetadata.getVariables().getVariable("PRENOM") instanceof McqVariable);
+		assertFalse(vqsMetadata.getVariables().getVariable("PRENOM") instanceof UcqVariable);
 	}
 
 	@Test
-	void readVqsPapVariables() throws MalformedURLException, KraftwerkException {
+	void readVqsPapVariables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
 		Set<String> expectedVariables = Set.of("PRENOM", "NOM", "SEXE", "DTNAIS", "ETAT_SANT", "APPRENT", "AIDREG_A",
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");
 
-		VariablesMap vqsVariables = DDIReader
-				.getVariablesFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP));
+		MetadataModel vqsMetadata = DDIReader
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP));
 
 		//
-		assertNotNull(vqsVariables);
+		assertNotNull(vqsMetadata);
 		//
-		assertTrue(vqsVariables.hasGroup(Constants.ROOT_GROUP_NAME));
-		assertTrue(vqsVariables.hasGroup("BOUCLEINDIV"));
+		assertTrue(vqsMetadata.hasGroup(Constants.ROOT_GROUP_NAME));
+		assertTrue(vqsMetadata.hasGroup("BOUCLEINDIV"));
 		//
 		for (String variableName : expectedVariables) {
-			assertTrue(vqsVariables.hasVariable(variableName));
+			assertTrue(vqsMetadata.getVariables().hasVariable(variableName));
 		}
 		//
-		assertEquals(Constants.ROOT_GROUP_NAME, vqsVariables.getVariable("NBQUEST").getGroup().getName());
-		assertEquals("BOUCLEINDIV", vqsVariables.getVariable("PRENOM").getGroup().getName());
+		assertEquals(Constants.ROOT_GROUP_NAME, vqsMetadata.getVariables().getVariable("NBQUEST").getGroup().getName());
+		assertEquals("BOUCLEINDIV", vqsMetadata.getVariables().getVariable("PRENOM").getGroup().getName());
 	}
 
 }

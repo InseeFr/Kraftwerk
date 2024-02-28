@@ -1,24 +1,23 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ReconciliationTest {
 
@@ -144,7 +143,6 @@ class ReconciliationTest {
 		//
 		assertNotNull(multimodeDataset);
 		// TODO: improve reconciliation class or see with Trevas devs how to simplify
-		//assertEquals(Set.of("ID", "LOOP", "FOO", "CAPI_SPECIFIC", "CAWI_SPECIFIC", "LOOP.FOO1", "LOOP.PAPER_SPECIFIC", Constants.MODE_VARIABLE_NAME),
-		//		multimodeDataset.getDataStructure().keySet());
+
 	}
 }

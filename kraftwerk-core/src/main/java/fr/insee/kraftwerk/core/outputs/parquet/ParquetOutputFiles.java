@@ -1,13 +1,17 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.outputs.OutputFiles;
+import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.ParquetUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Structured.Component;
+import fr.insee.vtl.model.Structured.DataPoint;
+import fr.insee.vtl.model.Structured.DataStructure;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -22,18 +26,13 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.io.OutputFile;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.outputs.OutputFiles;
-import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
-import fr.insee.kraftwerk.core.utils.ParquetUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.vtl.model.Structured.Component;
-import fr.insee.vtl.model.Structured.DataPoint;
-import fr.insee.vtl.model.Structured.DataStructure;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class to manage the writing of Parquet output tables.
@@ -46,8 +45,6 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
-	 * @param userInputs   Used to get the campaign name and to filter intermediate
-	 *                     datasets that we don't want to output.
 	 */
 	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
 		super(outDirectory, vtlBindings, modes);
@@ -56,10 +53,9 @@ public class ParquetOutputFiles extends OutputFiles {
 	
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
-	 * @throws KraftwerkException 
 	 */
 	@Override
-	public void writeOutputTables(Map<String,VariablesMap> metadataVariables) throws KraftwerkException {
+	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 
 		for (String datasetName : getDatasetToCreate()) {
 			/* Building metadata */
@@ -162,12 +158,12 @@ public class ParquetOutputFiles extends OutputFiles {
 
 
 	@Override
-	public void writeImportScripts(Map<String, VariablesMap> metadataVariables, List<KraftwerkError> errors) {
+	public void writeImportScripts(Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) {
 		// Assemble required info to write scripts
 		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : getDatasetToCreate()) {
 			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
-					getVtlBindings().getDataset(datasetName).getDataStructure(), metadataVariables);
+					getVtlBindings().getDataset(datasetName).getDataStructure(), metadataModels);
 			tableScriptInfoList.add(tableScriptInfo);
 		}
 		// Write scripts

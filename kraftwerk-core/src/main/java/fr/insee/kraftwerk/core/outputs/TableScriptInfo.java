@@ -1,28 +1,27 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import java.util.Map;
-
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.vtl.model.Structured.DataStructure;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Map;
+
 /** POJO class to store information needed to write a script for a table. */
 @AllArgsConstructor
+@Getter
 public class TableScriptInfo {
 
 	/** The name of the dataset in the destination language. */
-	@Getter
-	String tableName;
+	private String tableName;
+
 	/** The file name of the table. */
-	@Getter
-	String fileName;
+	private String fileName;
+
 	/** The data structure (containing variable names and types) of the table. */
-	@Getter
-	DataStructure dataStructure;
+	private DataStructure dataStructure;
 
 	/** The data structure (containing variable length) of the table. */
-	@Getter
-	Map<String, VariablesMap> metadataVariables;
+	private Map<String, MetadataModel> metadataModels;
 
 }

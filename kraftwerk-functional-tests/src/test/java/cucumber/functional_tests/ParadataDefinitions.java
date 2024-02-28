@@ -1,11 +1,5 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
@@ -24,6 +18,12 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.extern.log4j.Log4j2;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @Log4j2
 public class ParadataDefinitions {
 
@@ -39,16 +39,16 @@ public class ParadataDefinitions {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
 		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
-		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);;
+		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);
 		// For now, only one file
-		String modeName = userInputs.getModes().get(0);
+		String modeName = userInputs.getModes().getFirst();
 		modeInputs = userInputs.getModeInputs(modeName);
 		// parse data
 		data = new SurveyRawData();
 		data.setDataMode(modeInputs.getDataMode());
-		data.setVariablesMap(DDIReader.getVariablesFromDDI(modeInputs.getDdiUrl()));
+		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl()));
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
-		parser.parseSurveyData(modeInputs.getDataFile());
+		parser.parseSurveyData(modeInputs.getDataFile(),null);
 		// get paradata folder
 		paradataFolder = modeInputs.getParadataFolder();
 	}

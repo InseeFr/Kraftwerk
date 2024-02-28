@@ -1,44 +1,30 @@
 package fr.insee.kraftwerk.core.metadata;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import fr.insee.kraftwerk.core.Constants;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
-
 /**
  * Object class to represent a set of variables.
  * Contains a flat map and its structured equivalent.
  */
 @Log4j2
+@Getter
 public class VariablesMap {
 
     /** Map containing the variables.
      * Keys: a variable name.
      * Values: Variable. */
-	@Getter
     protected final LinkedHashMap<String, Variable> variables = new LinkedHashMap<>();
 
-    /** Map containing the groups.
-     * Keys: group name.
-     * Values: Group. */
-    protected final LinkedHashMap<String, Group> groups = new LinkedHashMap<>();
-    
-    
 
-    /** The root group is created when creating a VariablesMap instance. */
-    public VariablesMap() {
-        groups.put(Constants.ROOT_GROUP_NAME, new Group(Constants.ROOT_GROUP_NAME));
-    }
 
     /** Register a variable in the map. */
     public void putVariable(Variable variable) {
@@ -68,110 +54,9 @@ public class VariablesMap {
         return variables.keySet();
     }
     
-    public Set<String> getDistinctVariableNamesAndFullyQualifiedNames(){
-    	Set<String> set  = new HashSet<>();
-    	set.addAll(getFullyQualifiedNames());
-    	set.addAll(getVariableNames());
-    	return set;
-    }
 
-
-    /** Register a group in the map. */
-    public void putGroup(Group group) {
-        groups.put(group.getName(), group);
-    }
-    /** Return the group with given name. */
-    public Group getGroup(String groupName) {
-        return groups.get(groupName);
-    }
-    /** Return the root group. */
-    public Group getRootGroup() {
-        if (! groups.containsKey(Constants.ROOT_GROUP_NAME)) {
-            log.debug("Root group not in the variables map.");
-        }
-        return groups.get(Constants.ROOT_GROUP_NAME);
-    }
-    /** Return the reporting data group. */
-    public Group getReportingDataGroup() {
-        if (! groups.containsKey(Constants.REPORTING_DATA_GROUP_NAME)) {
-            log.debug("Reporting data group not in the variables map.");
-        }
-        return groups.get(Constants.REPORTING_DATA_GROUP_NAME);
-    }
-    /** Return the name of all groups registered in the map, including the root group. */
-    public List<String> getGroupNames() {
-        return new ArrayList<>(groups.keySet());
-    }
-    /** Return the names of all groups registered in the map, except the root group. */
-    public List<String> getSubGroupNames() {
-        return groups.keySet()
-                .stream().filter(name -> ! groups.get(name).isRoot())
-                .toList();
-    }
-    
-    /** Return the number of groups in the map (including the root group). */
-    public int getGroupsCount() {
-        return groups.size();
-    }
-
-    /** Identifiers are not represented by Variable objects, they are:
-     * - the root identifier (fixed value),
-     * - each subgroup name is also an identifier name.
-     * @return The list of all identifiers associated to the variables map. */
-    public List<String> getIdentifierNames() {
-        List<String> res = new ArrayList<>(List.of(Constants.ROOT_IDENTIFIER_NAME));
-        res.addAll(getSubGroupNames());
-        return res;
-    }
-
-    /** Return true if there is a variable under the given name. */
-    public boolean hasVariable(String variableName) {
-        return variables.containsKey(variableName);
-    }
-    /** Return true if there is a group under the given name. */
-    public boolean hasGroup(String groupName) {
-        return groups.containsKey(groupName);
-    }
-    /** Return false is there is only the root group. */
-    public boolean hasSubGroups() {
-        int size = groups.size();
-        if (size < 1) {
-            log.debug("No groups in this variables map. Should have at least the root group.");
-        }
-        return size > 1;
-    }
-
-    /** Return the fully qualified name of a variable, that is
-     * - the name of the variable if it is in the root group.
-     * - the variable name prefixed with its group and parent group names, otherwise.
-     *
-     * In the second case, the separator use is defined by Constants.METADATA_SEPARATOR. */
-    public String getFullyQualifiedName(String variableName) {
-        if (this.hasVariable(variableName) && StringUtils.isNotEmpty(variableName)) {
-
-            /* done using StringBuilder, maybe concatenate a list of strings is better
-            https://stackoverflow.com/a/523913/13425151 */
-
-            StringBuilder res = new StringBuilder(variableName);
-            Variable variable = variables.get(variableName);
-            Group group = variable.getGroup();
-            while(! group.isRoot()) {
-                res.insert(0, group.getName() + Constants.METADATA_SEPARATOR);
-                group = groups.get(group.getParentName());
-            }
-            return res.toString();
-        }
-        else {
-            log.debug(String.format( "Trying to get fully qualified name for unknown variable \"%s\". null returned.",
-                    variableName));
-            return null;
-        }
-    }
 
     /** Return the fully qualified names of all variables in the map. */
-    public Set<String> getFullyQualifiedNames() {
-        return variables.keySet().stream().map(this::getFullyQualifiedName).collect(Collectors.toSet());
-    }
 
     /** Return the variables names that belongs to the group. */
     public Set<String> getGroupVariableNames(String groupName) {
@@ -186,19 +71,25 @@ public class VariablesMap {
                 .toList();
     }
 
+
+    /** Return true if there is a variable under the given name. */
+    public boolean hasVariable(String variableName) {
+        return variables.containsKey(variableName);
+    }
+    
     /** Return true if there is a McqVariable that has the given question name in its mcqName attribute. */
     public boolean hasMcq(String questionName) {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
                 .anyMatch(mcqVariable -> // (FILTER_RESULT variables are upper case)
-                        ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName)
-                                || ((McqVariable) mcqVariable).getQuestionItemName().equalsIgnoreCase(questionName));
+                        mcqVariable.getQuestionItemName().equals(questionName)
+                                || mcqVariable.getQuestionItemName().equalsIgnoreCase(questionName));
     }
 
     public Group getMcqGroup(String questionName) {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
-                .filter(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName().equals(questionName))
+                .filter(mcqVariable -> mcqVariable.getQuestionItemName().equals(questionName))
                 .map(Variable::getGroup)
                 .findFirst().orElse(null);
     }
@@ -248,7 +139,7 @@ public class VariablesMap {
     public List<String> getUcqVariablesNames() {
         return variables.values().stream()
                 .filter(UcqVariable.class::isInstance)
-                .map(ucqVariable -> ((UcqVariable) ucqVariable).getQuestionItemName())
+                .map(ucqVariable -> ucqVariable.getQuestionItemName())
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -257,7 +148,7 @@ public class VariablesMap {
     public List<String> getMcqVariablesNames() {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
-                .map(mcqVariable -> ((McqVariable) mcqVariable).getQuestionItemName())
+                .map(mcqVariable -> mcqVariable.getQuestionItemName())
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -269,5 +160,8 @@ public class VariablesMap {
                 .map(PaperUcq.class::cast)
                 .toList();
     }
+    
+
+
 
 }

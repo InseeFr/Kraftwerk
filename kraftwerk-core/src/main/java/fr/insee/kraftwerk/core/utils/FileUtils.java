@@ -10,6 +10,8 @@ import org.springframework.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -220,10 +222,10 @@ public class FileUtils {
 	}
 
 	public static Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
-		if (userField != null && !"null".equals(userField) && !"".equals(userField)) {
+		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory.toString()));
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
 			}
 			return inputPath;
 		} else {
@@ -238,13 +240,13 @@ public class FileUtils {
 		}
 		try {
 			if (userField.startsWith("http")) {
-				return new URL(userField);
+				return new URI(userField).toURL();
 			}
 			return inputDirectory.resolve(userField).toFile().toURI().toURL();
-		} catch (MalformedURLException e) {
+		} catch (MalformedURLException | URISyntaxException e) {
 			log.error("Unable to convert URL from user input: " + userField);
 			return null;
-		}
+		} 
 	}
 	
 }

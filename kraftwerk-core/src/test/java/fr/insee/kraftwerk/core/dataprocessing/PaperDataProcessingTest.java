@@ -1,22 +1,19 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import static org.junit.Assert.assertNotNull;
+import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.vtl.model.Dataset;
+import fr.insee.vtl.model.Dataset.Role;
+import fr.insee.vtl.model.InMemoryDataset;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.vtl.model.Dataset;
-import fr.insee.vtl.model.Dataset.Role;
-import fr.insee.vtl.model.InMemoryDataset;
+import static org.junit.Assert.assertNotNull;
 
 class PaperDataProcessingTest {
 
@@ -64,22 +61,22 @@ class PaperDataProcessingTest {
 	void testPaperDataProcessing() {
 		//
 		List<KraftwerkError> errors =new ArrayList<>();
-		VariablesMap variablesMap = new VariablesMap();
-		Group rootGroup = variablesMap.getRootGroup();
-		variablesMap.putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
-		addPaperUcq(variablesMap, rootGroup, "GENDER", 2);
-		addPaperUcq(variablesMap, rootGroup, "HAPPINESS", 4);
+		MetadataModel metadataModel = new MetadataModel();
+		Group rootGroup = metadataModel.getRootGroup();
+		metadataModel.getVariables().putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
+		addPaperUcq(metadataModel.getVariables(), rootGroup, "GENDER", 2);
+		addPaperUcq(metadataModel.getVariables(), rootGroup, "HAPPINESS", 4);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", paperDataset);
 		//
-		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, variablesMap);
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, metadataModel);
 		paperDataProcessing.applyAutomatedVtlInstructions("TEST", errors);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 
 		//
-		assertNotNull(paperDsModified);
+		Assertions.assertNotNull(paperDsModified);
 		
 	}
 }

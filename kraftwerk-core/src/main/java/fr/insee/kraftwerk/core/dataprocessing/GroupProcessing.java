@@ -1,16 +1,17 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
 public class GroupProcessing extends DataProcessing{
 
-	private VariablesMap variablesMap;
+	private MetadataModel metadataModel;
 	
-    public GroupProcessing(VtlBindings vtlBindings, VariablesMap variablesMap) {
+    public GroupProcessing(VtlBindings vtlBindings, MetadataModel metadataModel) {
         super(vtlBindings);
-        this.variablesMap = variablesMap;
+        this.metadataModel = metadataModel;
     }
 
     @Override
@@ -26,17 +27,17 @@ public class GroupProcessing extends DataProcessing{
      * - CAR_COLOR -> INDIVIDUALS_LOOP.CARS_LOOP.CAR_COLOR
      * @see VariablesMap (getFullyQualifiedName method)
      * @param bindingName The name of the concerned dataset.
-     * @param objects The corresponding VariablesMap instance is expected here.
      * @return A VTL script.
      */
     @Override
     protected VtlScript generateVtlInstructions(String bindingName) {
         VtlScript vtlScript = new VtlScript();
+        VariablesMap variablesMap = metadataModel.getVariables();
 
         for (String variableName : variablesMap.getVariableNames()) {
-            if (variablesMap.getVariable(variableName).getGroup() != variablesMap.getRootGroup()) {
+            if (variablesMap.getVariable(variableName).getGroup() != metadataModel.getRootGroup()) {
                 vtlScript.add(String.format("%s := %s [rename %s to %s];",
-                        bindingName, bindingName, variableName, variablesMap.getFullyQualifiedName(variableName)));
+                        bindingName, bindingName, variableName, metadataModel.getFullyQualifiedName(variableName)));
             }
         }
 

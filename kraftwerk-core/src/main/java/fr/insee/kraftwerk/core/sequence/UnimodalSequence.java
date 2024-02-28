@@ -1,40 +1,32 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
-import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
-import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.*;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.ErrorVariableLength;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
 @NoArgsConstructor
 @Log4j2
 public class UnimodalSequence {
 
 	public void applyUnimodalSequence(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
-									  List<KraftwerkError> errors, Map<String, VariablesMap> metadataVariables) {
+									  List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels) {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		String vtlGenerate;
 
 		/* Step 2.4a : Check incoherence between expected variables' length and actual length received */
-		VariablesMap variablesMap = metadataVariables.get(dataMode);
+		VariablesMap variablesMap = metadataModels.get(dataMode).getVariables();
 		for (String variableName : variablesMap.getVariableNames()){
 			Variable variable = variablesMap.getVariable(variableName);
 			if (variable.getSasFormat() != null && variable.getExpectedLength()<variable.getMaxLengthData() && variable.getType() != VariableType.BOOLEAN){
@@ -60,12 +52,12 @@ public class UnimodalSequence {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, variablesMap).applyVtlTransformations(dataMode, null, errors);
+		vtlGenerate = new GroupProcessing(vtlBindings, metadataModels.get(dataMode)).applyVtlTransformations(dataMode, null, errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate);
 
 		/* Step 2.5 : Apply standard mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
-				vtlBindings, variablesMap);
+				vtlBindings, metadataModels.get(dataMode));
 		vtlGenerate = dataProcessing.applyVtlTransformations(
 				dataMode,
 				Path.of(Constants.VTL_FOLDER_PATH)
@@ -74,7 +66,12 @@ public class UnimodalSequence {
 				errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate);
 
-		/* Step 2.5b : Apply user specified mode-specific VTL transformations */
+		/* Step 2.5b : Apply TCM VTL transformations */
+		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(vtlBindings,metadataModels.get(dataMode) , Constants.VTL_FOLDER_PATH);
+		vtlGenerate = tcmSequencesProcessing.applyAutomatedVtlInstructions(dataMode, errors);
+		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "TCMSequenceVTL", dataMode), vtlGenerate);
+
+		/* Step 2.5c : Apply user specified mode-specific VTL transformations */
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
 				vtlGenerate);

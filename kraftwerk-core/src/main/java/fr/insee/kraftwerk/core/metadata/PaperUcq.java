@@ -4,11 +4,11 @@ import lombok.Getter;
 
 /** In paper data files, UCQ variables are split into several indicator variables,
  * that are not defined in the DDI.
- * This class is meant to store this type of variables,
+ * This class is meant to store this type of variable,
  * and link them to the corresponding UCQ variable defined in the DDI. */
+@Getter
 public class PaperUcq extends Variable {
 
-    @Getter
     String ucqName;
 
     /**

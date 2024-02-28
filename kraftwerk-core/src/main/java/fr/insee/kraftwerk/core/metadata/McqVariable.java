@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 /**
  * One multiple choice question with K modalities = K MCQ Variables.
  */
-
 @Setter
 @Getter
 @Log4j2

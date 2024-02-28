@@ -1,25 +1,23 @@
 package fr.insee.kraftwerk.core.extradata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
+import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
+import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
-import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
-import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ParaDataParserTest {
 
@@ -36,7 +34,7 @@ class ParaDataParserTest {
 		String expectedMessage = "Cannot invoke \"fr.insee.kraftwerk.core.rawdata.SurveyRawData.getIdSurveyUnits()\" because \"surveyRawData\" is null";
 		String actualMessage = exception.getMessage();
 
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 
 		//Null Paradata
 		SurveyRawData srd = new SurveyRawData();
@@ -47,7 +45,7 @@ class ParaDataParserTest {
 		expectedMessage = "Cannot invoke \"fr.insee.kraftwerk.core.extradata.paradata.Paradata.getFilepath()\" because \"paradata\" is null";
 		actualMessage = exception.getMessage();
 
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 		
 		//Empty paradata and empty SurveyRawData
 		Paradata paradata = new Paradata();
@@ -58,8 +56,8 @@ class ParaDataParserTest {
 		expectedMessage = "JSONFile not defined";
 		actualMessage = exception.getMessage();
 		int actualStatus = ((KraftwerkException) exception).getStatus();
-		assertEquals(500, actualStatus);
-		assertTrue(actualMessage.contains(expectedMessage));
+		Assertions.assertEquals(500, actualStatus);
+		Assertions.assertTrue(actualMessage.contains(expectedMessage));
 		
 		//assert that do nothng without file
 		paradata.setFilepath(Path.of(""));
@@ -70,7 +68,7 @@ class ParaDataParserTest {
 	@Test
 	void whenCorrectParadata_thenCalculatedTimeIsOk() throws NullException {
 		SurveyRawData srd = new SurveyRawData();
-		srd.setVariablesMap(new VariablesMap());
+		srd.setMetadataModel(new MetadataModel());
 
 		srd = addIdToTest(srd, "PL1100000101");
 		srd = addIdToTest(srd, "RR100144");
@@ -80,27 +78,27 @@ class ParaDataParserTest {
 		paradataParser.parseParadata(paradata, srd);
 		
 		//SESSIONS
-		assertEquals(1, paradata.getParadataUE("PL1100000101").getSessions().size());
-		assertEquals(135102, paradata.getParadataUE("PL1100000101").createLengthSessionsVariable());
+		Assertions.assertEquals(1, paradata.getParadataUE("PL1100000101").getSessions().size());
+		Assertions.assertEquals(135102, paradata.getParadataUE("PL1100000101").createLengthSessionsVariable());
 
 		//ORCHESTRATORS
-		assertEquals(2, paradata.getParadataUE("PL1100000101").getOrchestrators().size());
-		assertEquals(134671, paradata.getParadataUE("PL1100000101").createLengthOrchestratorsVariable());
+		Assertions.assertEquals(2, paradata.getParadataUE("PL1100000101").getOrchestrators().size());
+		Assertions.assertEquals(134671, paradata.getParadataUE("PL1100000101").createLengthOrchestratorsVariable());
 
 		//COLLECTION_DATE
-		assertEquals("1645807741929", Long.valueOf(paradata.getParadataUE("PL1100000101").getSurveyValidationDateTimeStamp()).toString());
+		Assertions.assertEquals("1645807741929", Long.valueOf(paradata.getParadataUE("PL1100000101").getSurveyValidationDateTimeStamp()).toString());
 
 		
 		//SESSIONS
-		assertEquals(5, paradata.getParadataUE("RR100144").getSessions().size());
-		assertEquals(6058470, paradata.getParadataUE("RR100144").createLengthSessionsVariable());
+		Assertions.assertEquals(5, paradata.getParadataUE("RR100144").getSessions().size());
+		Assertions.assertEquals(6058470, paradata.getParadataUE("RR100144").createLengthSessionsVariable());
 
 		//ORCHESTRATORS
-		assertEquals(6, paradata.getParadataUE("RR100144").getOrchestrators().size());
-		assertEquals(2577505436L, paradata.getParadataUE("RR100144").createLengthOrchestratorsVariable());
+		Assertions.assertEquals(6, paradata.getParadataUE("RR100144").getOrchestrators().size());
+		Assertions.assertEquals(2577505436L, paradata.getParadataUE("RR100144").createLengthOrchestratorsVariable());
 
 		//COLLECTION_DATE
-		assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
+		Assertions.assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
 
 	}
 	

@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
-import java.util.StringJoiner;
-
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.StringJoiner;
 
 @Setter
 @NoArgsConstructor
@@ -14,10 +15,13 @@ public class InseeSampleIdentifier {
   
   private String ssech;
   
+  @Getter
   private String le;
   
+  @Getter
   private String ec;
   
+  @Getter
   private String bs;
   
   private String noi;
@@ -33,20 +37,8 @@ public class InseeSampleIdentifier {
   public String getSsech() {
     return String.format("%02d", Integer.valueOf(Integer.parseInt(ssech)));
   }
-  
-  public String getLe() {
-    return this.le;
-  }
-  
-  public String getEc() {
-    return this.ec;
-  }
 
-    public String getBs() {
-    return this.bs;
-  }
-    
-  public String getNoi() {
+	public String getNoi() {
     return String.format("%02d", Integer.valueOf(Integer.parseInt(noi)));
   }
   

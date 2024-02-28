@@ -1,14 +1,6 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -19,6 +11,13 @@ import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Log4j2
 public class UserInputsGenesis extends UserInputs{
@@ -75,8 +74,6 @@ public class UserInputsGenesis extends UserInputs{
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
 			throw new UnknownDataFormatException(e.getMessage());
-		} catch (KraftwerkException e) {
-			throw e;
 		}
 		return null;
 	}
@@ -92,8 +89,6 @@ public class UserInputsGenesis extends UserInputs{
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
 			throw new UnknownDataFormatException(e.getMessage());
-		} catch (KraftwerkException e) {
-			throw e;
 		}
 	}
 
@@ -105,7 +100,7 @@ public class UserInputsGenesis extends UserInputs{
 		JsonNode value = node.get(field);
 		if (value != null) {
 			String text = value.asText();
-			if (!(text.equals("") || text.equals("null"))) {
+			if (!(text.isEmpty() || text.equals("null"))) {
 				return text;
 			}
 		}

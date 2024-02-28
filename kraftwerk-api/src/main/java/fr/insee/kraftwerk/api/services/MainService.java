@@ -34,7 +34,7 @@ public class MainService extends KraftwerkService {
 
 	@PutMapping(value = "/main")
 	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
-	public ResponseEntity<String> main(
+	public ResponseEntity<String> mainService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData

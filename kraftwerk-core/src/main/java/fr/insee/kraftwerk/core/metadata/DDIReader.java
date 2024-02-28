@@ -1,17 +1,9 @@
 package fr.insee.kraftwerk.core.metadata;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,10 +11,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
-import lombok.extern.log4j.Log4j2;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 @Log4j2
 public class DDIReader {
@@ -44,7 +43,7 @@ public class DDIReader {
 	 * @return The variables found in the DDI.
 	 * @throws KraftwerkException
 	 */
-	public static VariablesMap getVariablesFromDDI(URL ddiUrl) throws KraftwerkException {
+	public static MetadataModel getMetadataFromDDI(URL ddiUrl) throws KraftwerkException {
 
 		try {
 			// Path of the output 'variables.xml' temp file
@@ -54,9 +53,9 @@ public class DDIReader {
 
 			transformDDI(ddiUrl, variablesTempFilePath);
 
-			VariablesMap variablesMap = readVariables(variablesTempFilePath);
+			MetadataModel metadataModel = readVariables(variablesTempFilePath);
 			Files.delete(variablesFile.toPath());
-			return variablesMap;
+			return metadataModel;
 		}
 
 		catch (MalformedURLException e) {
@@ -93,9 +92,9 @@ public class DDIReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private static VariablesMap readVariables(Path variablesFilePath)
+	private static MetadataModel readVariables(Path variablesFilePath)
 			throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
-		VariablesMap variablesMap = new VariablesMap();
+		MetadataModel metadataModel = new MetadataModel();
 
 		// Parse
 		Element root = readXmlFile(variablesFilePath);
@@ -120,14 +119,14 @@ public class DDIReader {
 						Group group;
 						if (StringUtils.isEmpty(parentGroupName)) {
 							rootGroupName = groupName;
-							group = variablesMap.getRootGroup();
+							group = metadataModel.getRootGroup();
 						} else {
 							group = new Group(groupName, parentGroupName);
-							variablesMap.putGroup(group);
+							metadataModel.putGroup(group);
 						}
 
 						// Variables in the group
-						getVariablesInGroup(variablesMap, groupNode, group);
+						getVariablesInGroup(metadataModel.getVariables(), groupNode, group, metadataModel.getSequences());
 					
 				}
 			} catch (NullPointerException e) {
@@ -135,8 +134,8 @@ public class DDIReader {
 						((Element) groupElements.item(i)).getAttribute("name")));
 			}
 
-			for (String groupName : variablesMap.getSubGroupNames()) {
-				Group group = variablesMap.getGroup(groupName);
+			for (String groupName : metadataModel.getSubGroupNames()) {
+				Group group = metadataModel.getGroup(groupName);
 				if (group.getParentName().equals(rootGroupName)) {
 					group.setParentName(Constants.ROOT_GROUP_NAME);
 				}
@@ -147,33 +146,41 @@ public class DDIReader {
 		if (rootGroupName == null) {
 			log.debug("Failed to identify the root group while reading variables files: " + variablesFilePath);
 		}
-		return variablesMap;
+		return metadataModel;
 	}
 
 
 
-	private static void getVariablesInGroup(VariablesMap variablesMap, Node groupNode, Group group) {
+	private static void getVariablesInGroup(VariablesMap variablesMap, Node groupNode, Group group, List<Sequence> sequences) {
 		NodeList variableNodes = groupNode.getChildNodes();
 		for (int j = 0; j < variableNodes.getLength(); j++) {
 			Node variableNode = variableNodes.item(j);
 			if (nodeIsElementWithName(variableNode, "Variable")) {
-				addVariableToVariablesMap(variablesMap, group, variableNode);
+				addVariableToVariablesMap(variablesMap, group, variableNode, sequences);
 			}
 		}
 	}
 
-	private static void addVariableToVariablesMap(VariablesMap variablesMap, Group group, Node variableNode) {
+	private static void addVariableToVariablesMap(VariablesMap variablesMap, Group group, Node variableNode, List<Sequence> sequences) {
 		Element variableElement = (Element) variableNode;
 
 		// Variable name, type and size
 		String variableName = getFirstChildValue(variableElement, "Name");
 		VariableType variableType = VariableType.valueOf(getFirstChildValue(variableElement, "Format"));
 		String variableLength = getFirstChildValue(variableElement, "Size");
+		String sequenceName= getFirstChildAttribute(variableElement, "Sequence","name");
 
 		Node questionItemName = getFirstChildNode(variableElement, "QuestionItemName");
 		Node valuesElement = getFirstChildNode(variableElement, "Values");
 		Node mcqElement = getFirstChildNode(variableElement, "QGrid");
-		
+
+		if (sequenceName != null){
+			Sequence sequence = new Sequence(sequenceName);
+			if (sequences.isEmpty() || !sequences.contains(sequence)){
+				sequences.add(sequence);
+			}
+		}
+
 		if (valuesElement != null) {
 			UcqVariable variable = new UcqVariable(variableName, group, variableType, variableLength);
 			if (questionItemName != null) {
@@ -236,15 +243,25 @@ public class DDIReader {
 
 	private static String getFirstChildValue(Element variableElement, String childTagName) {
 		Node child = getFirstChildNode(variableElement, childTagName);
-		if (child == null)
+		if (child == null){
 			return null;
+		}
 		return child.getTextContent();
+	}
+
+	private static String getFirstChildAttribute(Element variableElement, String childTagName, String attribute){
+		Node child = getFirstChildNode(variableElement, childTagName);
+		if (child == null) {
+			return null;
+		}
+		return child.hasAttributes() ? child.getAttributes().getNamedItem(attribute).getTextContent() : null;
 	}
 
 	private static Node getFirstChildNode(Element variableElement, String childTagName) {
 		NodeList children = variableElement.getElementsByTagName(childTagName);
-		if (children == null)
+		if (children == null){
 			return null;
+		}
 		return children.item(0);
 	}
 
