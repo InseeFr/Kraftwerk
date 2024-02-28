@@ -50,21 +50,25 @@ public class MainProcessing {
 	@Getter
 	private Map<String, MetadataModel> metadataModels;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory) {
+	private final long limitSize;
+
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = withAllReportingData;
 		this.withDDI=withDDI;
+		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 	
-	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory, long limitSize) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = !fileByFile;
 		this.withDDI=true;
+		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
@@ -105,7 +109,6 @@ public class MainProcessing {
 
 		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
 		//In case of file-by-file processing we check the size of each file.
-		long limitSize = 419430400L;
 		if (fileByFile) {
 			for (UserInputsFile userInputs : userInputsFileList) {
 				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400 MB.", limitSize);

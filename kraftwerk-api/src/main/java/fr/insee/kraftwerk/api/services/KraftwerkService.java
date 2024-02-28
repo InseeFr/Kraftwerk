@@ -1,14 +1,6 @@
 package fr.insee.kraftwerk.api.services;
 
 
-
-import java.nio.file.Path;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
@@ -16,6 +8,12 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.nio.file.Path;
 
 @RestController
 @ApiResponses(value = {
@@ -35,7 +33,10 @@ public class KraftwerkService {
 	
 	@Value("${fr.insee.postcollecte.files}")
 	protected String defaultDirectory;
-	
+
+	@Value("${fr.insee.postcollecte.size-limit}")
+	protected long limitSize;
+
 	protected ControlInputSequence controlInputSequence ;
 	
 	@PostConstruct

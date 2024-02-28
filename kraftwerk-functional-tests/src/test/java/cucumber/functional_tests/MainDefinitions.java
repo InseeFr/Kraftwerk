@@ -105,7 +105,7 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory");
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
 		mp.runMain();
 	}
 
@@ -115,7 +115,7 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), true,
-				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString());
+				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L);
 		mp.runMain();
 	}
 
