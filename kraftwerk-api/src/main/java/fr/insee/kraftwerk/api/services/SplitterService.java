@@ -24,7 +24,7 @@ public class SplitterService extends KraftwerkService{
 			throws Exception {
 		log.info("Split XML file : " + filename + " into " + nbSU + " SU by file");
 		XMLSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU);
-		return new ResponseEntity<>("Test", HttpStatus.OK);
+		return new ResponseEntity<>("File split", HttpStatus.OK);
 	}
 
 }

@@ -111,7 +111,7 @@ public class MainProcessing {
 		//In case of file-by-file processing we check the size of each file.
 		if (fileByFile) {
 			for (UserInputsFile userInputs : userInputsFileList) {
-				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400 MB.", limitSize);
+				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400Mo.", limitSize);
 			}
 		}
 		//In case of main processing we check the folder
