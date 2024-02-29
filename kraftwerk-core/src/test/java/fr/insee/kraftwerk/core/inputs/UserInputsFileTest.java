@@ -18,7 +18,7 @@ import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 
-class UserInputsTest {
+class UserInputsFileTest {
 
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 

@@ -184,21 +184,21 @@ public class MainProcessing {
 		List<Path> files = new ArrayList<>();
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		Path dataPath = modeInputs.getDataFile();
-		if (dataPath == null)
+		if (dataPath == null){
 			log.error("Datapath is null");
-		else {
-			if (Files.isRegularFile(dataPath)) {
-				files.add(dataPath);
-			} else if (Files.isDirectory(dataPath)) {
-				try (Stream<Path> stream = Files.list(dataPath)) {
-					stream.forEach(files::add);
-				} catch (IOException e) {
-					log.error(String.format("IOException occurred when trying to list data files of folder: %s",
-							dataPath));
-				}
-			} else {
-				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			return files;
+		}
+		if (Files.isRegularFile(dataPath)) {
+			files.add(dataPath);
+		} else if (Files.isDirectory(dataPath)) {
+			try (Stream<Path> stream = Files.list(dataPath)) {
+				stream.forEach(files::add);
+			} catch (IOException e) {
+				log.error(String.format("IOException occurred when trying to list data files of folder: %s",
+						dataPath));
 			}
+		} else {
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
 		}
 		return files;
 	}
