@@ -6,6 +6,9 @@
 - Add a utility service to split large data files
 - Configure VTL execution for some specifics sequences
 
+### Fix
+- Remove json-simple dependency
+
 ## 2.0.1 - [2024-02-22]
 
 ### Added
