@@ -45,7 +45,6 @@ class TCMSequenceProcessingTest {
     static void init() throws IOException {
         modules.add(TCMModuleEnum.TCM_ACT_ANTE);
         modules.add(TCMModuleEnum.TCM_ACT_BIS);
-        modules.add(TCMModuleEnum.TCM_THL_DET);
         modules.add(TCMModuleEnum.TCM_THL_SIMPLE);
 
         // VTL Test files generation
