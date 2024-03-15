@@ -40,6 +40,7 @@ public class BuildBindingsSequence {
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		data.setDataFilePath(modeInputs.getDataFile());
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+		log.info("Parsing survey data file " + modeInputs.getDataFile().getFileName());
 		if (withDDI) {
 			parser.parseSurveyData(modeInputs.getDataFile(),kraftwerkExecutionLog);
 		} else {
