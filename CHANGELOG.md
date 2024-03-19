@@ -1,10 +1,9 @@
 # Changelog
 
-## X.X.X - not released yet
-
+## 2.0.2 [2024-03-19]
 ### Added
 - Add a utility service to split large data files
-- Configure VTL execution for some specifics sequences
+- Configure VTL execution for some specifics sequences (TCM)
 - Add outcome spotting variable with reporting data
 
 ### Fix
