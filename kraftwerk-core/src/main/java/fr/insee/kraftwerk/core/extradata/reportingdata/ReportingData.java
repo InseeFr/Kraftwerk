@@ -1,19 +1,18 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
+@Getter
 @Setter
 public class ReportingData {
-	@Getter
-    private Path filepath;
+	private Path filepath;
   
-	@Getter
-    public List<ReportingDataUE> listReportingDataUE;
+	public List<ReportingDataUE> listReportingDataUE;
   
   public ReportingData() {
     this.listReportingDataUE = new ArrayList<>();

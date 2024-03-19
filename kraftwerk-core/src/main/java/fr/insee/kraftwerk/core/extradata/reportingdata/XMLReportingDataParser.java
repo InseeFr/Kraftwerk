@@ -154,7 +154,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
   private void getIdentification(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
     Element identificationElement = surveyUnitElement.getFirstChildElement("Identification");
-    reportingDataUE.setIdentification(new Identification());
+    reportingDataUE.setIdentification(new ReportingIdentification());
     if (identificationElement == null) {
       return;
     }

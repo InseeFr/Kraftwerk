@@ -5,6 +5,7 @@
 ### Added
 - Add a utility service to split large data files
 - Configure VTL execution for some specifics sequences
+- Add outcome spotting variable with reporting data
 
 ### Fix
 - Remove json-simple dependency

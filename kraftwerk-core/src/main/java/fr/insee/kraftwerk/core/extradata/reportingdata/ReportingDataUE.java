@@ -25,7 +25,7 @@ public class ReportingDataUE {
   
   private List<ContactAttempt> contactAttempts;
 
-  private Identification identification;
+  private ReportingIdentification identification;
 
   private List<Comment> comments;
 

@@ -92,6 +92,9 @@ public abstract class ReportingDataParser {
 		Variable variableOccupant = new Variable(Constants.OCCUPANT_NAME, reportingDataGroup, VariableType.STRING,
 				"50");
 		surveyRawData.putVariable(variableOccupant);
+		Variable variableOutcomeSpotting = new Variable(Constants.OUTCOME_SPOTTING, reportingDataGroup, VariableType.STRING,
+				"50");
+		surveyRawData.putVariable(variableOutcomeSpotting);
 		for (int i = 1; i <= this.maxComments; i++) {
 			Variable variableListCommentTypes = new Variable(Constants.COMMENT_PREFIX_NAME + "_TYPE_" + i,
 					reportingGroup, VariableType.STRING, "50");
@@ -191,6 +194,9 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OCCUPANT_NAME, reportingDataUE.getIdentification().getOccupant());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.OUTCOME_SPOTTING, reportingDataUE.getIdentification().getOutcomeSpotting());
 		}
 		if (!reportingDataUE.getComments().isEmpty()) {
 			addComments(reportingDataUE, questionnaire);
@@ -249,7 +255,7 @@ public abstract class ReportingDataParser {
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 				.putValue(Constants.LAST_STATE_NAME, StateType.getStateType(
-						(reportingDataUE.getStates().get(reportingDataUE.getStates().size() - 1)).getStateType()));
+						(reportingDataUE.getStates().getLast()).getStateType()));
 	}
 
 	private void addComments(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
