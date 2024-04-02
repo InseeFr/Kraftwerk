@@ -22,4 +22,7 @@ jobs:
         run: |
           echo "New Release label detected on PR #${{ github.event.pull_request.number }}"
           echo "Version number: ${{ steps.extract_version.outputs.new_version }}"
+          
           # Mettez ici vos commandes ou scripts à exécuter
+          mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
+          mvn versions:commit
