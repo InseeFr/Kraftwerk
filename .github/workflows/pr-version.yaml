@@ -16,7 +16,9 @@ jobs:
 
       - name: Extract version number
         id: extract_version
-        run: echo "new_version=${{ github.event.pull_request.title }}" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION_NUMBER=$(echo '${{ github.event.pull_request.title }}' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "new_version=${VERSION_NUMBER}" >> $GITHUB_OUTPUT
 
       - name: Check for New Release label
         run: |
