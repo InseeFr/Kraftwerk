@@ -28,3 +28,4 @@ jobs:
           # Mettez ici vos commandes ou scripts à exécuter
           mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
           mvn versions:commit
+          git push
