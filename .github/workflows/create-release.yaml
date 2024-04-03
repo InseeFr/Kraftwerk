@@ -74,7 +74,7 @@ jobs:
         with:
           tag_name: ${{ needs.check-version.outputs.release-tag }}
           target_commitish: ${{ github.head_ref || github.ref }}
-          name: ${{  {steps.changeLogContent.outputs.TITLE1 }} 
+          name: ${{steps.changeLogContent.outputs.TITLE1 }} 
           body: ${{steps.changeLogContent.outputs.changes}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
