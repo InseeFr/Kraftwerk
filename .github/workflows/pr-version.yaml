@@ -15,7 +15,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          token: ${{secrets.YOUR_PAT }} 
       - name: Extract version number
         id: extract_version
         run: |
@@ -30,5 +29,7 @@ jobs:
           # Mettez ici vos commandes ou scripts à exécuter
           mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
           mvn versions:commit
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
           git commit -m "Update version - auto" --all
           git push
