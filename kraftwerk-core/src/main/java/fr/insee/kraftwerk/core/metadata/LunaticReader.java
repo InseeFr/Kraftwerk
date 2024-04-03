@@ -8,10 +8,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
 import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
@@ -22,6 +19,12 @@ public class LunaticReader {
 	private static final String BINDING_DEPENDENCIES = "bindingDependencies";
 	private static final String VARIABLES = "variables";
 	private static final String EXCEPTION_MESSAGE = "Unable to read Lunatic questionnaire file: ";
+	private static final String RESPONSE = "response";
+	private static final String COMPONENTS = "components";
+	private static final String COMPONENT_TYPE = "componentType";
+	private static final String VALUE = "value";
+	private static final String LABEL = "label";
+	private static final String MISSING_RESPONSE = "missingResponse";
 	private LunaticReader() {
 		throw new IllegalStateException("Utility class");
 	}
@@ -45,7 +48,7 @@ public class LunaticReader {
 			JsonNode variablesNode = rootNode.get(VARIABLES);
 			variablesNode.forEach(variableNode -> {
 				if (variableNode.get("variableType").asText().equals("CALCULATED")) {
-					String formula = isLunaticV2 ? variableNode.get("expression").get("value").asText()
+					String formula = isLunaticV2 ? variableNode.get("expression").get(VALUE).asText()
 							: variableNode.get("expression").asText();
 					CalculatedVariable calculatedVariable = new CalculatedVariable(variableNode.get("name").asText(),
 							formula);
@@ -125,24 +128,23 @@ public class LunaticReader {
 			List<String> variables = new ArrayList<>();
 			JsonNode variablesNode = rootNode.get(VARIABLES);
 			variablesNode.forEach(newVar -> variables.add(newVar.get("name").asText()));
-			JsonNode componentsNode = rootNode.get("components");
 			// Root group is created in VariablesMap constructor
 			MetadataModel metadataModel = new MetadataModel();
-			if (componentsNode.isArray()) {
-				int i = 1;
-				for (JsonNode component : componentsNode) {
-					if (component.get("componentType").asText().equals("Loop")) {
-						// No imbricated loops so the parent is the root group
-						Group group = getNewGroup(metadataModel, i);
-						i++;
-						iterateOnBindingsDependencies(variables, metadataModel.getVariables(), component, group);
-						iterateOnComponents(rootNode, variables, metadataModel, group);
-					}
-				}
-			}
+			Group rootGroup = metadataModel.getRootGroup();
+			iterateOnComponents(rootNode, variables, metadataModel, rootGroup);
 
-			// We get the root group
-			Group rootGroup = metadataModel.getGroup(metadataModel.getGroupNames().getFirst());
+			//Case of FILTER_RESULT
+			List<String> filterResultsVariables = variables.stream().filter(variable -> variable.startsWith(FILTER_RESULT_PREFIX)).toList();
+			filterResultsVariables.forEach(filterVar -> {
+
+			});
+
+			// We iterate on root components to identify variables belonging to root group
+			JsonNode rootComponents = rootNode.get(COMPONENTS);
+			for (JsonNode comp : rootComponents) {
+				addResponsesAndMissing(comp, rootGroup, variables, metadataModel);
+			}
+			// We add the remaining (not identified in any loops nor root) variables to the root group
 			variables.forEach(
 					varName -> metadataModel.getVariables().putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
 			return metadataModel;
@@ -152,46 +154,202 @@ public class LunaticReader {
 		}
 	}
 
-	private static Group getNewGroup(MetadataModel metadataModel, int i) {
-		Group group = new Group(String.format("BOUCLE%d", i), Constants.ROOT_GROUP_NAME);
-		metadataModel.putGroup(group);
-		return group;
-	}
-
-	private static Group getNewGroup(MetadataModel metadataModel, String newName) {
-		Group group = new Group(newName, Constants.ROOT_GROUP_NAME);
-		metadataModel.putGroup(group);
-		return group;
-	}
-
-	private static void iterateOnComponents(JsonNode rootNode, List<String> variables, MetadataModel metadataModel,
-											Group group) {
-		JsonNode loopComponentsNode = rootNode.get("components");
-		if (loopComponentsNode.isArray()) {
-			for (JsonNode componentInLoop : loopComponentsNode) {
-				if (componentInLoop.get("componentType").asText().equals("Loop")) {
-					Group subgroup = getNewGroup(metadataModel, group.getName().concat(componentInLoop.asText()));
-					iterateOnBindingsDependencies(variables, metadataModel.getVariables(), componentInLoop, subgroup);
-					iterateOnComponents(componentInLoop, variables, metadataModel, subgroup);
-				} else {
-					iterateOnBindingsDependencies(variables, metadataModel.getVariables(), componentInLoop, group);
+	/**
+	 * This method iterates on an array of components to extract the variables present in loops and get their group.
+	 * @param rootNode
+	 * @param variables
+	 * @param metadataModel
+	 * @param parentGroup
+	 */
+	private static void iterateOnComponents(JsonNode rootNode, List<String> variables, MetadataModel metadataModel, Group parentGroup) {
+		JsonNode componentsNode = rootNode.get(COMPONENTS);
+		if (componentsNode.isArray()) {
+			for (JsonNode component : componentsNode) {
+				if (component.get(COMPONENT_TYPE).asText().equals("Loop")) {
+					if (component.has("lines")) {
+						processPrimaryLoop(variables, metadataModel, parentGroup, component);
+					}
+					if (component.has("iterations")) {
+						Group group = processDependingLoop(variables, metadataModel, parentGroup, component);
+						iterateOnComponents(component,variables, metadataModel,group);
+					}
 				}
 			}
 		}
 	}
 
-
-	private static void iterateOnBindingsDependencies(List<String> variables, VariablesMap variablesMap,
-													  JsonNode component, Group group) {
-		if (component.has(BINDING_DEPENDENCIES)) {
-			JsonNode loopVariables = component.get(BINDING_DEPENDENCIES);
-			loopVariables.forEach(variable -> {
-				if (variables.contains(variable.asText())) {
-					variablesMap.putVariable(new Variable(variable.asText(), group, VariableType.STRING));
-					variables.remove(variable.asText());
-				}
-			});
+	/**
+	 * This method processes the primary loop and creates a group with the name of the first response
+	 * @param variables
+	 * @param metadataModel
+	 * @param parentGroup
+	 * @param component
+	 */
+	private static void processPrimaryLoop(List<String> variables, MetadataModel metadataModel, Group parentGroup, JsonNode component) {
+		JsonNode primaryComponents = component.get(COMPONENTS);
+		//We create a group only with the name of the first response
+		//Then we add all the variables found in response to the newly created group
+		String groupName = getFirstResponseName(primaryComponents);
+		log.info("Creation of group :" + groupName);
+		Group group = getNewGroup(metadataModel, groupName, parentGroup);
+		for (JsonNode primaryComponent : primaryComponents) {
+			addResponsesAndMissing(primaryComponent, group, variables, metadataModel);
 		}
+	}
+
+	/**
+	 * This method processes the loop depending on variables and creates a group with the name of loop dependencies
+	 * @param variables
+	 * @param metadataModel
+	 * @param parentGroup
+	 * @param component
+	 * @return
+	 */
+	private static Group processDependingLoop(List<String> variables, MetadataModel metadataModel, Group parentGroup, JsonNode component) {
+		JsonNode loopDependencies = component.get("loopDependencies");
+		StringBuilder groupNameBuilder = new StringBuilder(loopDependencies.get(0).asText());
+		for (int i = 1; i < loopDependencies.size(); i++) {
+			groupNameBuilder.append("_").append(loopDependencies.get(i).asText());
+		}
+		String groupName = groupNameBuilder.toString();
+		log.info("Creation of group :" + groupName);
+		Group group = getNewGroup(metadataModel, groupName, parentGroup);
+		iterateOnComponentsToFindResponses(component, variables, metadataModel, group);
+		return group;
+	}
+
+	private static String getFirstResponseName(JsonNode components){
+		for(JsonNode component : components){
+			if (component.has(RESPONSE)){
+				return component.get(RESPONSE).get("name").asText();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Adds variables to the metadata model (it infers type of variables from the component type)
+	 * Compatible with Lunatic v3+
+	 *
+	 * @param primaryComponent
+	 * @param group
+	 * @param variables
+	 * @param metadataModel
+	 */
+	private static void addResponsesAndMissing(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
+		//We read the name of the collected variables in response(s)
+		//And we deduce the variable type by looking at the component that encapsulate the variable
+		ComponentLunatic componentType = ComponentLunatic.fromJsonName(primaryComponent.get(COMPONENT_TYPE).asText());
+		String variableName="";
+		switch(componentType){
+			case ComponentLunatic.DATE_PICKER, ComponentLunatic.CHECKBOX_BOOLEAN, ComponentLunatic.INPUT, ComponentLunatic.TEXT_AREA, ComponentLunatic.SUGGESTER:
+				variableName = getVariableName(primaryComponent);
+				metadataModel.getVariables().putVariable(new Variable(variableName, group, componentType.getType()));
+				variables.remove(variableName);
+				break;
+			case ComponentLunatic.INPUT_NUMBER:
+				variableName = getVariableName(primaryComponent);
+				if (primaryComponent.get("decimals").asInt()==0){
+					metadataModel.getVariables().putVariable(new Variable(variableName, group, VariableType.INTEGER));
+					variables.remove(variableName);
+					break;
+				}
+				metadataModel.getVariables().putVariable(new Variable(variableName, group, VariableType.NUMBER));
+				variables.remove(variableName);
+				break;
+			case ComponentLunatic.DROPDOWN:
+				variableName = getVariableName(primaryComponent);
+				UcqVariable ucqVar = new UcqVariable(variableName, group, VariableType.STRING);
+				JsonNode modalities = primaryComponent.get("options");
+				for (JsonNode modality : modalities){
+					ucqVar.addModality(modality.get(VALUE).asText(), modality.get(LABEL).asText());
+				}
+				metadataModel.getVariables().putVariable(ucqVar);
+				variables.remove(variableName);
+				break;
+			case ComponentLunatic.RADIO, ComponentLunatic.CHECKBOX_ONE:
+				variableName = getVariableName(primaryComponent);
+				UcqVariable ucqVarOne = new UcqVariable(variableName, group, VariableType.STRING);
+				JsonNode modalitiesOne = primaryComponent.get("options");
+				for (JsonNode modality : modalitiesOne){
+					ucqVarOne.addModality(modality.get(VALUE).asText(), modality.get(LABEL).get(VALUE).asText());
+				}
+				metadataModel.getVariables().putVariable(ucqVarOne);
+				variables.remove(variableName);
+				break;
+			case ComponentLunatic.CHECKBOX_GROUP:
+				JsonNode responses = primaryComponent.get("responses");
+				for (JsonNode response : responses){
+					variableName = getVariableName(response);
+					McqVariable mcqVariable = new McqVariable(variableName, group, VariableType.BOOLEAN);
+					mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
+					mcqVariable.setInQuestionGrid(true);
+					//We retrieve question name from missing attribute
+					String questionNameWithMissing = primaryComponent.get(MISSING_RESPONSE).get("name").asText();
+					String questionName = "";
+					if (questionNameWithMissing.endsWith("_MISSING")) {
+						questionName = questionNameWithMissing.substring(0, questionNameWithMissing.length() - "_MISSING".length());
+					}
+					mcqVariable.setQuestionItemName(questionName);
+					metadataModel.getVariables().putVariable(mcqVariable);
+					variables.remove(variableName);
+				}
+				break;
+			case ComponentLunatic.PAIRWISE_LINKS:
+				// In we case of a pairwiseLinks component we have to iterate on the components to find the responses
+				// It is a nested component but we treat differently than the loops because it does not create a new level of information
+				iterateOnComponentsToFindResponses(primaryComponent, variables, metadataModel, group);
+				break;
+			case ComponentLunatic.TABLE:
+				iterateOnTableBody(primaryComponent, group, variables, metadataModel);
+				break;
+			case null:
+				break;
+		}
+		//We also had the missing variable if it exists (only one missing variable even if multiple responses)
+		addMissingVariable(primaryComponent, group, variables, metadataModel, variableName);
+	}
+
+	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
+		// In we case of a table component we have to iterate on the body components to find the responses
+		// The body is a nested array of arrays
+		JsonNode body = primaryComponent.get("body");
+		for(JsonNode arr : body){
+			if (arr.isArray()){
+				for (JsonNode cell : arr){
+					if (cell.has(COMPONENT_TYPE)) {
+						addResponsesAndMissing(cell, group, variables, metadataModel);
+					}
+				}
+			}
+		}
+	}
+
+	private static void addMissingVariable(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, String variableName) {
+		if (primaryComponent.has(MISSING_RESPONSE)){
+			String missingVariable = primaryComponent.get(MISSING_RESPONSE).get("name").asText();
+			metadataModel.getVariables().putVariable(new Variable(missingVariable, group, VariableType.STRING));
+			variables.remove(variableName);
+		}
+	}
+
+	private static String getVariableName(JsonNode component) {
+		return component.get(RESPONSE).get("name").asText();
+	}
+
+	private static void iterateOnComponentsToFindResponses(JsonNode node, List<String> variables, MetadataModel metadataModel, Group group) {
+		JsonNode components = node.get(COMPONENTS);
+		if (components.isArray()){
+			for (JsonNode component : components) {
+				addResponsesAndMissing(component, group, variables, metadataModel);
+			}
+		}
+	}
+
+	private static Group getNewGroup(MetadataModel metadataModel, String newName, Group parentGroup) {
+		Group group = new Group(String.format("%s_%s",Constants.LOOP_NAME_PREFIX,newName), parentGroup.getName());
+		metadataModel.putGroup(group);
+		return group;
 	}
 
 	/**
