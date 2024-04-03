@@ -10,7 +10,6 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     outputs:
-      release-version: ${{ steps.version-step.outputs.version }}
       release-tag: ${{ steps.version-step.outputs.newTag }}
     steps:
       - name: Set up JDK 21
@@ -24,11 +23,10 @@ jobs:
 
       - name: Get source version
         id: version-step
-        run: echo "version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
-             echo "newTag=v$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+        run: echo "newTag=v$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
       - name: Print source version
-        run: echo ${{ steps.version-step.outputs.version }}
+        run: echo ${{ steps.version-step.outputs.newTag }}
 
       - uses: mukunku/tag-exists-action@v1.6.0
         name: Check tag existence
@@ -40,12 +38,12 @@ jobs:
         id: check-tag
         run: |
           if [[ "${{ steps.check-tag-exists.outputs.exists }}" == "true" ]]; then
-            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.version }} already exists"
+            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.newTag }} already exists"
             exit 1
           fi
 
-          if ! [[ "${{ steps.version-step.outputs.version }}" =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
-            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.version }} is not in correct format X.Y.Z"
+          if ! [[ "${{ steps.version-step.outputs.newTag }}" =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
+            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.newTag }} is not in correct format X.Y.Z"
             exit 1
           fi
 
