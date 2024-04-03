@@ -66,7 +66,7 @@ jobs:
           FILE_PATH='CHANGELOG.md'
           TITLE1=$(sed -n '/^# /p' $FILE_PATH | awk 'NR==1')
           TITLE2=$(sed -n '/^# /p' $FILE_PATH | awk 'NR==2')
-          changes=$(sed -n "/${TITLE1}/,/${TITLE2}/{/${TITLE1}/b;/${TITLE2}/b;p;} $FILE_PATH )
+          changes=$(sed -n "/^${TITLE1}/,/^${TITLE2}/{/^${TITLE1}/b;/^${TITLE2}/b;p;}" $FILE_PATH)
           echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
           echo "changes<<EOF" >> $GITHUB_OUTPUT
 
