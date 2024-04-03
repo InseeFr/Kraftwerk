@@ -28,6 +28,7 @@ jobs:
           
           # Mettez ici vos commandes ou scripts à exécuter
           mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
+          mvn versions:set-property -Dproperty=kraftwerk.version -DnewVersion='${{ steps.extract_version.outputs.new_version }}'
           mvn versions:commit
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
