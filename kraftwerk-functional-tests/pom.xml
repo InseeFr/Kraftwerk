@@ -12,7 +12,7 @@
 	<name>Archetype - kraftwerk-tests</name>
 
 	<properties>
-		<kraftwerk.version>2.0.2</kraftwerk.version>
+		<kraftwerk.version>2.0.3</kraftwerk.version>
 	</properties>
 
 	<dependencies>
