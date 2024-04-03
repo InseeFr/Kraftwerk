@@ -1,7 +1,9 @@
 # Changelog
 
-## X.X.X - not released yet
+## 2.0.3 [2024-04-02] - Update some dependencies
 
+### Changed
+- Update some dependencies
 
 ## 2.0.2 [2024-03-19]
 ### Added
@@ -11,6 +13,7 @@
 
 ### Fix
 - Remove json-simple dependency
+- Fix files in log output
 
 ## 2.0.1 - [2024-02-22]
 
