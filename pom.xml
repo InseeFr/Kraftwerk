@@ -20,7 +20,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>7.16.1</cucumber.version>
 		<!-- Proprietes sonar -->
-		<jacoco.version>0.8.11</jacoco.version>
+		<jacoco.version>0.8.12</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
