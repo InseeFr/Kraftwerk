@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          token: ${{secrets.GITHUB_TOKEN }} 
+          token: ${{secrets.YOUR_PAT }} 
       - name: Extract version number
         id: extract_version
         run: |
