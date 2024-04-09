@@ -279,17 +279,16 @@ public class LunaticReader {
 				break;
 			case ComponentLunatic.CHECKBOX_GROUP:
 				JsonNode responses = primaryComponent.get("responses");
+				List<String> responsesName= new ArrayList<>();
+				for (JsonNode response : responses){
+					responsesName.add(getVariableName(response));
+				}
+				String questionName = findLongestCommonPrefix(responsesName);
 				for (JsonNode response : responses){
 					variableName = getVariableName(response);
 					McqVariable mcqVariable = new McqVariable(variableName, group, VariableType.BOOLEAN);
 					mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
 					mcqVariable.setInQuestionGrid(true);
-					//We retrieve question name from missing attribute
-					String questionNameWithMissing = primaryComponent.get(MISSING_RESPONSE).get("name").asText();
-					String questionName = "";
-					if (questionNameWithMissing.endsWith("_MISSING")) {
-						questionName = questionNameWithMissing.substring(0, questionNameWithMissing.length() - "_MISSING".length());
-					}
 					mcqVariable.setQuestionItemName(questionName);
 					metadataModel.getVariables().putVariable(mcqVariable);
 					variables.remove(variableName);
@@ -307,7 +306,7 @@ public class LunaticReader {
 				break;
 		}
 		//We also had the missing variable if it exists (only one missing variable even if multiple responses)
-		addMissingVariable(primaryComponent, group, variables, metadataModel, variableName);
+		addMissingVariable(primaryComponent, group, variables, metadataModel);
 	}
 
 	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
@@ -325,11 +324,11 @@ public class LunaticReader {
 		}
 	}
 
-	private static void addMissingVariable(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, String variableName) {
+	private static void addMissingVariable(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
 		if (primaryComponent.has(MISSING_RESPONSE)){
 			String missingVariable = primaryComponent.get(MISSING_RESPONSE).get("name").asText();
 			metadataModel.getVariables().putVariable(new Variable(missingVariable, group, VariableType.STRING));
-			variables.remove(variableName);
+			variables.remove(missingVariable);
 		}
 	}
 
@@ -368,6 +367,33 @@ public class LunaticReader {
 			log.error(EXCEPTION_MESSAGE + lunaticFile);
 			return null;
 		}
+	}
+
+	public static String findLongestCommonPrefix(List<String> strs) {
+		int minLength = strs.getFirst().length();
+		for(String str : strs){
+			if (str.length()<minLength){
+				minLength = str.length();
+			}
+		}
+		String result="";
+		for(int i=1;i<minLength;i++){
+			boolean isCommon=true;
+			String stringToTest = strs.getFirst().substring(0,i);
+			for (String str : strs){
+				if (!str.startsWith(stringToTest)){
+					isCommon=false;
+					break;
+				}
+			}
+			if (isCommon){
+				result = stringToTest;
+			} else {
+				break;
+			}
+		}
+
+		return result;
 	}
 
 }
