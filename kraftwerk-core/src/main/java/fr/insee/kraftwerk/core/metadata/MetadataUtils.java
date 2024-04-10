@@ -32,6 +32,8 @@ public class MetadataUtils {
 		}
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
+			// We read and store lunaticModelVersion
+            metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(modeInputs.getLunaticFile()));
 			// First we add the collected _MISSING variables
 			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile());
 			for (String missingVar : missingVars) {

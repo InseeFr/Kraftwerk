@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ public class LunaticReader {
 	private static final String VALUE = "value";
 	private static final String LABEL = "label";
 	private static final String MISSING_RESPONSE = "missingResponse";
+
 	private LunaticReader() {
 		throw new IllegalStateException("Utility class");
 	}
@@ -39,9 +42,8 @@ public class LunaticReader {
 	public static CalculatedVariables getCalculatedFromLunatic(Path lunaticFile) {
 		try {
 			JsonNode rootNode = JsonFileReader.read(lunaticFile);
-
-			String lunaticModelVersion = rootNode.get("lunaticModelVersion").toString();
-			boolean isLunaticV2 = JsonFileReader.compareVersions(lunaticModelVersion.replace("\"", ""), "2.3.0") > 0;
+			String lunaticModelVersion = rootNode.get("lunaticModelVersion").asText();
+			boolean isLunaticV2 = compareVersions(lunaticModelVersion, "2.3.0") > 0;
 
 			CalculatedVariables calculatedVariables = new CalculatedVariables();
 
@@ -114,6 +116,17 @@ public class LunaticReader {
 		}
 	}
 
+	public static String getLunaticModelVersion(Path lunaticFile){
+		try {
+			JsonNode rootNode = JsonFileReader.read(lunaticFile);
+			return rootNode.get("lunaticModelVersion").toString();
+
+		} catch (IOException e) {
+			log.error(EXCEPTION_MESSAGE + lunaticFile);
+			return "";
+		}
+	}
+
 	/**
 	 * This method extracts return the variables of a questionnaire without reading
 	 * a DDI file. It should be used only when the DDI is not available.
@@ -130,6 +143,7 @@ public class LunaticReader {
 			variablesNode.forEach(newVar -> variables.add(newVar.get("name").asText()));
 			// Root group is created in VariablesMap constructor
 			MetadataModel metadataModel = new MetadataModel();
+			metadataModel.putSpecVersions(SpecType.LUNATIC,rootNode.get("lunaticModelVersion").asText());
 			Group rootGroup = metadataModel.getRootGroup();
 			iterateOnComponents(rootNode, variables, metadataModel, rootGroup);
 
@@ -241,6 +255,7 @@ public class LunaticReader {
 		//And we deduce the variable type by looking at the component that encapsulate the variable
 		ComponentLunatic componentType = ComponentLunatic.fromJsonName(primaryComponent.get(COMPONENT_TYPE).asText());
 		String variableName="";
+		boolean isLunaticV2 = compareVersions(metadataModel.getSpecVersions().get(SpecType.LUNATIC), "2.3.0") > 0;
 		switch(componentType){
 			case ComponentLunatic.DATE_PICKER, ComponentLunatic.CHECKBOX_BOOLEAN, ComponentLunatic.INPUT, ComponentLunatic.TEXT_AREA, ComponentLunatic.SUGGESTER:
 				variableName = getVariableName(primaryComponent);
@@ -272,7 +287,11 @@ public class LunaticReader {
 				UcqVariable ucqVarOne = new UcqVariable(variableName, group, VariableType.STRING);
 				JsonNode modalitiesOne = primaryComponent.get("options");
 				for (JsonNode modality : modalitiesOne){
-					ucqVarOne.addModality(modality.get(VALUE).asText(), modality.get(LABEL).get(VALUE).asText());
+					if (isLunaticV2) {
+						ucqVarOne.addModality(modality.get(VALUE).asText(), modality.get(LABEL).get(VALUE).asText());
+						continue;
+					}
+					ucqVarOne.addModality(modality.get(VALUE).asText(), modality.get(LABEL).asText());
 				}
 				metadataModel.getVariables().putVariable(ucqVarOne);
 				variables.remove(variableName);
@@ -287,7 +306,8 @@ public class LunaticReader {
 				for (JsonNode response : responses){
 					variableName = getVariableName(response);
 					McqVariable mcqVariable = new McqVariable(variableName, group, VariableType.BOOLEAN);
-					mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
+					if (isLunaticV2) mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
+					if (!isLunaticV2) mcqVariable.setText(response.get(LABEL).asText());
 					mcqVariable.setInQuestionGrid(true);
 					mcqVariable.setQuestionItemName(questionName);
 					metadataModel.getVariables().putVariable(mcqVariable);
@@ -394,6 +414,25 @@ public class LunaticReader {
 		}
 
 		return result;
+	}
+
+	public static int compareVersions(String version1, String version2) {
+		int comparisonResult = 0;
+
+		String[] version1Splits = version1.split("\\.");
+		String[] version2Splits = version2.split("\\.");
+		int maxLengthOfVersionSplits = Math.max(version1Splits.length, version2Splits.length);
+
+		for (int i = 0; i < maxLengthOfVersionSplits; i++){
+			Integer v1 = i < version1Splits.length ? Integer.parseInt(version1Splits[i]) : 0;
+			Integer v2 = i < version2Splits.length ? Integer.parseInt(version2Splits[i]) : 0;
+			int compare = v1.compareTo(v2);
+			if (compare != 0) {
+				comparisonResult = compare;
+				break;
+			}
+		}
+		return comparisonResult;
 	}
 
 }
