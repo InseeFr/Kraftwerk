@@ -1,5 +1,26 @@
 # Changelog
 
+
+## X.X.X [Not released yet] 
+
+
+
+
+## 2.0.3 [2024-04-02] - Update some dependencies
+
+### Changed
+- Update some dependencies
+
+## 2.0.2 [2024-03-19]
+### Added
+- Add a utility service to split large data files
+- Configure VTL execution for some specifics sequences (TCM)
+- Add outcome spotting variable with reporting data
+
+### Fix
+- Remove json-simple dependency
+- Fix files in log output
+
 ## 2.0.1 - [2024-02-22]
 
 ### Added

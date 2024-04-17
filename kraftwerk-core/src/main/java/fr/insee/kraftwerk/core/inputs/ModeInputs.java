@@ -12,16 +12,17 @@ import java.nio.file.Path;
  * POJO-like class to store different files associated to a collection mode.
  */
 @Getter
+@Setter
 public class ModeInputs {
 
-    @Setter protected Path dataFile;
-    @Setter protected URL ddiUrl;
-    @Setter protected Path lunaticFile;
+    protected Path dataFile;
+    protected URL ddiUrl;
+    protected Path lunaticFile;
     protected DataFormat dataFormat;
-    @Setter protected String dataMode;
-    @Setter protected Path modeVtlFile;
-    @Setter protected Path paradataFolder;
-    @Setter protected Path reportingDataFile;
+    protected String dataMode;
+    protected Path modeVtlFile;
+    protected Path paradataFolder;
+    protected Path reportingDataFile;
 
     /**
      * Allow to specify the data format using a string argument.

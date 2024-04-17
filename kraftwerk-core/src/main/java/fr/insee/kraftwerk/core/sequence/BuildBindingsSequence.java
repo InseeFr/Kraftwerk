@@ -15,9 +15,11 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
 
+@Log4j2
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
@@ -38,6 +40,7 @@ public class BuildBindingsSequence {
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		data.setDataFilePath(modeInputs.getDataFile());
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+		log.info("Parsing survey data file " + modeInputs.getDataFile().getFileName());
 		if (withDDI) {
 			parser.parseSurveyData(modeInputs.getDataFile(),kraftwerkExecutionLog);
 		} else {

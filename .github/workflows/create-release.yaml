@@ -1,0 +1,82 @@
+name: Create tag and release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      release-tag: ${{ steps.version-step.outputs.newTag }}
+      should_run_next_job:  ${{ steps.check-tag.outputs.should_continue }}
+    steps:
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get source version
+        id: version-step
+        run: echo "newTag=v$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
+      - name: Print source version
+        run: echo ${{ steps.version-step.outputs.newTag }}
+
+      - uses: mukunku/tag-exists-action@v1.6.0
+        name: Check tag existence
+        id: check-tag-exists
+        with:
+          tag: ${{ steps.version-step.outputs.newTag }}
+
+      - name: Tag verification
+        id: check-tag
+        run: |
+          if [[ "${{ steps.check-tag-exists.outputs.exists }}" == "true" ]]; then
+            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.newTag }} already exists"
+            echo "should_continue=false" >> $GITHUB_OUTPUT
+          elif ! [[ "${{ steps.version-step.outputs.newTag }}" =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
+            echo "Nothing to tag/release, the tag ${{ steps.version-step.outputs.newTag }} is not in correct format X.Y.Z"
+            echo "should_continue=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_continue=true" >> $GITHUB_OUTPUT
+          fi
+
+  create-release:
+    needs: [ check-version ]
+    if: needs.check-version.outputs.should_run_next_job == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Get previous final release tag
+        id: previousTag
+        run: echo "previousTag=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | grep "^v[0-9]\+\.[0-9]\+\.[0-9]\+$" | tail -1)" >> $GITHUB_OUTPUT
+
+      - name: Extract content between titles
+        id: changeLogContent
+        run: |
+          FILE_PATH='CHANGELOG.md'
+          TITLE1="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==1' | sed 's/\[/\\[/g; s/\]/\\]/g' | sed 's/^## //')"
+          TITLE2="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==2' | sed 's/\[/\\[/g; s/\]/\\]/g' | sed 's/^## //')"
+          changes="$(sed -n '/^${{TITLE1}}/,/^${{TITLE2}}/{//!p}' $FILE_PATH)"
+          echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
+          echo "changes=${changes}" >> $GITHUB_OUTPUT
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check-version.outputs.release-tag }}
+          target_commitish: ${{ github.head_ref || github.ref }}
+          name: ${{steps.changeLogContent.outputs.TITLE1 }} 
+          body: ${{steps.changeLogContent.outputs.changes}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

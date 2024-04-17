@@ -41,7 +41,7 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -63,7 +63,7 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -84,7 +84,7 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = false;
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {

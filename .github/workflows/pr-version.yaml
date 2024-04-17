@@ -1,0 +1,36 @@
+name: New Release Action
+
+on:
+  pull_request:
+    branches:
+        - main
+    types: [labeled]
+
+jobs:
+  upgrade-poms:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'New Release')
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Extract version number
+        id: extract_version
+        run: |
+          VERSION_NUMBER=$(echo '${{ github.event.pull_request.title }}' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "new_version=${VERSION_NUMBER}" >> $GITHUB_OUTPUT
+
+      - name: Check for New Release label
+        run: |
+          echo "New Release label detected on PR #${{ github.event.pull_request.number }}"
+          echo "Version number: ${{ steps.extract_version.outputs.new_version }}"
+          
+          # Mettez ici vos commandes ou scripts à exécuter
+          mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
+          mvn versions:set-property -Dproperty=kraftwerk.version -DnewVersion='${{ steps.extract_version.outputs.new_version }}'
+          mvn versions:commit
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git commit -m "Update version - auto" --all
+          git push

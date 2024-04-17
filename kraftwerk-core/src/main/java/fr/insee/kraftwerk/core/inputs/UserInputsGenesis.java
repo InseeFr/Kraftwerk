@@ -26,8 +26,7 @@ public class UserInputsGenesis extends UserInputs{
 	@Setter
 	boolean hasConfigFile;
 
-	private List<Mode> modes;
-
+	private final List<Mode> modes;
 
 
 	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes) throws KraftwerkException, IOException {
@@ -109,9 +108,9 @@ public class UserInputsGenesis extends UserInputs{
 
 	/**
 	 * Find the DDI file in the folder of a campaign
-	 * @param specDirectory
+	 * @param specDirectory directory where the DDI file should be
 	 * @return Path of the DDI file
-	 * @throws IOException
+	 * @throws IOException – if an I/O error is thrown when accessing the starting file
 	 */
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
 		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().matches("ddi[\\w,\\s-]+\\.xml"))) {
@@ -122,9 +121,9 @@ public class UserInputsGenesis extends UserInputs{
 
 	/**
 	 * Find the Lunatic file in the folder of a campaign
-	 * @param specDirectory
-	 * @return Path of the DDI file
-	 * @throws IOException
+	 * @param specDirectory  directory where the Lunatic file should be
+	 * @return Path of the Lunatic file
+	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
 	 */
 	public Path findLunaticFile(Path specDirectory) throws KraftwerkException, IOException {
 		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().matches("lunatic[\\w,\\s-]+\\.json"))) {

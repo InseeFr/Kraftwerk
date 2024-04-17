@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.api.process;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
@@ -13,6 +12,7 @@ import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,21 +50,25 @@ public class MainProcessing {
 	@Getter
 	private Map<String, MetadataModel> metadataModels;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory) {
+	private final long limitSize;
+
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = withAllReportingData;
 		this.withDDI=withDDI;
+		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 	
-	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory, long limitSize) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
 		this.withAllReportingData = !fileByFile;
 		this.withDDI=true;
+		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 
@@ -103,10 +107,22 @@ public class MainProcessing {
 
 		if (fileByFile) userInputsFileList = getUserInputsFile(userInputsFile);
 
+		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
+		//In case of file-by-file processing we check the size of each file.
+		if (fileByFile) {
+			for (UserInputsFile userInputs : userInputsFileList) {
+				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400Mo.", limitSize);
+			}
+		}
+		//In case of main processing we check the folder
+		if (!fileByFile) {
+			isDataTooBig(userInputsFile,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
+		}
+
 	}
 
 	/* Step 2 : unimodal data */
-	private void unimodalProcess() throws NullException {
+	private void unimodalProcess() throws KraftwerkException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
@@ -168,23 +184,33 @@ public class MainProcessing {
 		List<Path> files = new ArrayList<>();
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		Path dataPath = modeInputs.getDataFile();
-		if (dataPath == null)
+		if (dataPath == null){
 			log.error("Datapath is null");
-		else {
-			if (Files.isRegularFile(dataPath)) {
-				files.add(dataPath);
-			} else if (Files.isDirectory(dataPath)) {
-				try (Stream<Path> stream = Files.list(dataPath)) {
-					stream.forEach(files::add);
-				} catch (IOException e) {
-					log.error(String.format("IOException occurred when trying to list data files of folder: %s",
-							dataPath));
-				}
-			} else {
-				log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			return files;
+		}
+		if (Files.isRegularFile(dataPath)) {
+			files.add(dataPath);
+		} else if (Files.isDirectory(dataPath)) {
+			try (Stream<Path> stream = Files.list(dataPath)) {
+				stream.forEach(files::add);
+			} catch (IOException e) {
+				log.error(String.format("IOException occurred when trying to list data files of folder: %s",
+						dataPath));
 			}
+		} else {
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
 		}
 		return files;
+	}
+
+	private void isDataTooBig(UserInputsFile userInputsFile, String errorMessage, long limitSize) throws KraftwerkException {
+		for (String dataMode : userInputsFile.getModeInputsMap().keySet()){
+			long dataSize = FileUtils.sizeOf(userInputsFile.getModeInputs(dataMode).getDataFile().toFile());
+			if (dataSize > limitSize) {
+				log.error("Size of data folder/file {} : {}",userInputsFile.getModeInputs(dataMode).getDataFile(), FileUtils.byteCountToDisplaySize(dataSize));
+				throw new KraftwerkException(413,errorMessage);
+			}
+		}
 	}
 
 }

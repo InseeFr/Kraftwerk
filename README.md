@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/InseeFr/Kraftwerk/badge.svg?branch=main)](https://coveralls.io/github/InseeFr/Kraftwerk?branch=main)
+
 <img align="right" src="logo/kraftwerk-logo.png" alt="Kraftwerk logo"/>
 
 # Kraftwerk
