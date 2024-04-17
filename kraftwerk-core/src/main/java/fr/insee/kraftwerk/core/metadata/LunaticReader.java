@@ -320,7 +320,7 @@ public class LunaticReader {
 				iterateOnComponentsToFindResponses(primaryComponent, variables, metadataModel, group);
 				break;
 			case ComponentLunatic.TABLE:
-				iterateOnTableBody(primaryComponent, group, variables, metadataModel);
+				iterateOnTableBody(primaryComponent, group, variables, metadataModel, isLunaticV2);
 				break;
 			case null:
 				break;
@@ -329,10 +329,10 @@ public class LunaticReader {
 		addMissingVariable(primaryComponent, group, variables, metadataModel);
 	}
 
-	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
+	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
 		// In we case of a table component we have to iterate on the body components to find the responses
 		// The body is a nested array of arrays
-		JsonNode body = primaryComponent.get("body");
+		JsonNode body = isLunaticV2 ? primaryComponent.get("body") : primaryComponent.get("cells");
 		for(JsonNode arr : body){
 			if (arr.isArray()){
 				for (JsonNode cell : arr){
