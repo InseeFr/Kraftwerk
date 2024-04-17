@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -171,10 +169,10 @@ public class LunaticReader {
 
 	/**
 	 * This method iterates on an array of components to extract the variables present in loops and get their group.
-	 * @param rootNode
-	 * @param variables
-	 * @param metadataModel
-	 * @param parentGroup
+	 * @param rootNode : node containing the components we want to iterate on
+	 * @param variables : variables list to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 * @param parentGroup : group of rootNode
 	 */
 	private static void iterateOnComponents(JsonNode rootNode, List<String> variables, MetadataModel metadataModel, Group parentGroup) {
 		JsonNode componentsNode = rootNode.get(COMPONENTS);
@@ -195,10 +193,10 @@ public class LunaticReader {
 
 	/**
 	 * This method processes the primary loop and creates a group with the name of the first response
-	 * @param variables
-	 * @param metadataModel
-	 * @param parentGroup
-	 * @param component
+	 * @param variables : variables list to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 * @param parentGroup : parent group of the loop
+	 * @param component : loop component
 	 */
 	private static void processPrimaryLoop(List<String> variables, MetadataModel metadataModel, Group parentGroup, JsonNode component) {
 		JsonNode primaryComponents = component.get(COMPONENTS);
@@ -214,11 +212,11 @@ public class LunaticReader {
 
 	/**
 	 * This method processes the loop depending on variables and creates a group with the name of loop dependencies
-	 * @param variables
-	 * @param metadataModel
-	 * @param parentGroup
-	 * @param component
-	 * @return
+	 * @param variables : variables list to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 * @param parentGroup : parent group of the loop
+	 * @param component : loop component
+	 * @return the group corresponding to the loop
 	 */
 	private static Group processDependingLoop(List<String> variables, MetadataModel metadataModel, Group parentGroup, JsonNode component) {
 		JsonNode loopDependencies = component.get("loopDependencies");
@@ -244,18 +242,18 @@ public class LunaticReader {
 
 	/**
 	 * Adds variables to the metadata model (it infers type of variables from the component type)
-	 * Compatible with Lunatic v3+
+	 * Checks Lunatic version to adapt to the different ways of writing the JSON
 	 *
-	 * @param primaryComponent
-	 * @param group
-	 * @param variables
-	 * @param metadataModel
+	 * @param primaryComponent : a component of the questionnaire
+	 * @param group : the group to which the variables belong
+	 * @param variables : list of variables to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
 	 */
 	private static void addResponsesAndMissing(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
 		//We read the name of the collected variables in response(s)
 		//And we deduce the variable type by looking at the component that encapsulate the variable
 		ComponentLunatic componentType = ComponentLunatic.fromJsonName(primaryComponent.get(COMPONENT_TYPE).asText());
-		String variableName="";
+		String variableName;
 		boolean isLunaticV2 = compareVersions(metadataModel.getSpecVersions().get(SpecType.LUNATIC), "2.3.0") > 0;
 		switch(componentType){
 			case ComponentLunatic.DATE_PICKER, ComponentLunatic.CHECKBOX_BOOLEAN, ComponentLunatic.INPUT, ComponentLunatic.TEXT_AREA, ComponentLunatic.SUGGESTER:
@@ -302,7 +300,7 @@ public class LunaticReader {
 				break;
 			case ComponentLunatic.PAIRWISE_LINKS:
 				// In we case of a pairwiseLinks component we have to iterate on the components to find the responses
-				// It is a nested component but we treat differently than the loops because it does not create a new level of information
+				// It is a nested component, but we treat it differently than the loops because it does not create a new level of information
 				iterateOnComponentsToFindResponses(primaryComponent, variables, metadataModel, group);
 				break;
 			case ComponentLunatic.TABLE:
@@ -315,9 +313,17 @@ public class LunaticReader {
 		addMissingVariable(primaryComponent, group, variables, metadataModel);
 	}
 
-	private static void processCheckboxGroup(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
+	/**
+	 * Process a checkbox group to create a boolean variable for each response
+	 * @param checkboxComponent : component representing a checkbox group
+	 * @param group : group to which the variables belong
+	 * @param variables : list of variables to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 * @param isLunaticV2 : true if the Lunatic version is 2.3 or higher
+	 */
+	private static void processCheckboxGroup(JsonNode checkboxComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
 		String variableName;
-		JsonNode responses = primaryComponent.get("responses");
+		JsonNode responses = checkboxComponent.get("responses");
 		List<String> responsesName= new ArrayList<>();
 		for (JsonNode response : responses){
 			responsesName.add(getVariableName(response));
@@ -335,10 +341,19 @@ public class LunaticReader {
 		}
 	}
 
-	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
+	/**
+	 * Iterate on the components in the body of a table to find the responses
+	 * @param tableComponent : component representing a table
+	 * @param group : group to which the variables belong
+	 * @param variables : list of variables to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 * @param isLunaticV2 : true if the Lunatic version is 2.3 or higher
+	 */
+	private static void iterateOnTableBody(JsonNode tableComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
 		// In we case of a table component we have to iterate on the body components to find the responses
 		// The body is a nested array of arrays
-		JsonNode body = isLunaticV2 ? primaryComponent.get("body") : primaryComponent.get("cells");
+		// In Lunatic 2.2 and lower the body is called cells
+		JsonNode body = isLunaticV2 ? tableComponent.get("body") : tableComponent.get("cells");
 		for(JsonNode arr : body){
 			if (arr.isArray()){
 				for (JsonNode cell : arr){
@@ -350,14 +365,26 @@ public class LunaticReader {
 		}
 	}
 
-	private static void addMissingVariable(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel) {
-		if (primaryComponent.has(MISSING_RESPONSE)){
-			String missingVariable = primaryComponent.get(MISSING_RESPONSE).get("name").asText();
+	/**
+	 * Add the missing variable defined in the component if present
+	 * @param component : a questionnaire component
+	 * @param group : group to which the variables belong
+	 * @param variables : list of variables to be completed
+	 * @param metadataModel : metadata model of the questionnaire to be completed
+	 */
+	private static void addMissingVariable(JsonNode component, Group group, List<String> variables, MetadataModel metadataModel) {
+		if (component.has(MISSING_RESPONSE)){
+			String missingVariable = component.get(MISSING_RESPONSE).get("name").asText();
 			metadataModel.getVariables().putVariable(new Variable(missingVariable, group, VariableType.STRING));
 			variables.remove(missingVariable);
 		}
 	}
 
+	/**
+	 * Get the name of the variable collected by a component
+	 * @param component : a questionnaire component
+	 * @return the name of the variable
+	 */
 	private static String getVariableName(JsonNode component) {
 		return component.get(RESPONSE).get("name").asText();
 	}
@@ -395,33 +422,46 @@ public class LunaticReader {
 		}
 	}
 
-	public static String findLongestCommonPrefix(List<String> strs) {
-		int minLength = strs.getFirst().length();
-		for(String str : strs){
+	/**
+	 * Find the common part of a list of strings that differs only at the end
+	 *
+	 * @param similarStrings : list of strings
+	 * @return the common prefix
+	 */
+	public static String findLongestCommonPrefix(List<String> similarStrings) {
+		int minLength = similarStrings.getFirst().length();
+		for(String str : similarStrings){
 			if (str.length()<minLength){
 				minLength = str.length();
 			}
 		}
-		String result="";
+		String commonPrefix="";
 		for(int i=1;i<minLength;i++){
 			boolean isCommon=true;
-			String stringToTest = strs.getFirst().substring(0,i);
-			for (String str : strs){
+			String stringToTest = similarStrings.getFirst().substring(0,i);
+			for (String str : similarStrings){
 				if (!str.startsWith(stringToTest)){
 					isCommon=false;
 					break;
 				}
 			}
 			if (isCommon){
-				result = stringToTest;
+				commonPrefix = stringToTest;
 			} else {
 				break;
 			}
 		}
 
-		return result;
+		return commonPrefix;
 	}
 
+	/**
+	 * Compare two versions of the form x.y.z
+	 *
+	 * @param version1 : version of the form x.y.z
+	 * @param version2 : version of the form x.y.z
+	 * @return 1 if version1 is greater, 0 if they are equal, -1 if version2 is greater.
+	 */
 	public static int compareVersions(String version1, String version2) {
 		int comparisonResult = 0;
 
