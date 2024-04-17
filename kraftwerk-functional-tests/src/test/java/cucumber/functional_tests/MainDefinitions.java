@@ -104,7 +104,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory");
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
 		mp.init();
 		userInputsFile=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -112,7 +112,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory");
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
 		mp.init();
 		userInputsFile=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
