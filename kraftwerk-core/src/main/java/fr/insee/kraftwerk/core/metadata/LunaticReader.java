@@ -27,6 +27,7 @@ public class LunaticReader {
 	private static final String VALUE = "value";
 	private static final String LABEL = "label";
 	private static final String MISSING_RESPONSE = "missingResponse";
+	private static final String LUNATIC_MODEL_VERSION= "lunaticModelVersion";
 
 	private LunaticReader() {
 		throw new IllegalStateException("Utility class");
@@ -42,7 +43,7 @@ public class LunaticReader {
 	public static CalculatedVariables getCalculatedFromLunatic(Path lunaticFile) {
 		try {
 			JsonNode rootNode = JsonFileReader.read(lunaticFile);
-			String lunaticModelVersion = rootNode.get("lunaticModelVersion").asText();
+			String lunaticModelVersion = rootNode.get(LUNATIC_MODEL_VERSION).asText();
 			boolean isLunaticV2 = compareVersions(lunaticModelVersion, "2.3.0") > 0;
 
 			CalculatedVariables calculatedVariables = new CalculatedVariables();
@@ -119,7 +120,7 @@ public class LunaticReader {
 	public static String getLunaticModelVersion(Path lunaticFile){
 		try {
 			JsonNode rootNode = JsonFileReader.read(lunaticFile);
-			return rootNode.get("lunaticModelVersion").toString();
+			return rootNode.get(LUNATIC_MODEL_VERSION).toString();
 
 		} catch (IOException e) {
 			log.error(EXCEPTION_MESSAGE + lunaticFile);
@@ -143,7 +144,7 @@ public class LunaticReader {
 			variablesNode.forEach(newVar -> variables.add(newVar.get("name").asText()));
 			// Root group is created in VariablesMap constructor
 			MetadataModel metadataModel = new MetadataModel();
-			metadataModel.putSpecVersions(SpecType.LUNATIC,rootNode.get("lunaticModelVersion").asText());
+			metadataModel.putSpecVersions(SpecType.LUNATIC,rootNode.get(LUNATIC_MODEL_VERSION).asText());
 			Group rootGroup = metadataModel.getRootGroup();
 			iterateOnComponents(rootNode, variables, metadataModel, rootGroup);
 
@@ -297,22 +298,7 @@ public class LunaticReader {
 				variables.remove(variableName);
 				break;
 			case ComponentLunatic.CHECKBOX_GROUP:
-				JsonNode responses = primaryComponent.get("responses");
-				List<String> responsesName= new ArrayList<>();
-				for (JsonNode response : responses){
-					responsesName.add(getVariableName(response));
-				}
-				String questionName = findLongestCommonPrefix(responsesName);
-				for (JsonNode response : responses){
-					variableName = getVariableName(response);
-					McqVariable mcqVariable = new McqVariable(variableName, group, VariableType.BOOLEAN);
-					if (isLunaticV2) mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
-					if (!isLunaticV2) mcqVariable.setText(response.get(LABEL).asText());
-					mcqVariable.setInQuestionGrid(true);
-					mcqVariable.setQuestionItemName(questionName);
-					metadataModel.getVariables().putVariable(mcqVariable);
-					variables.remove(variableName);
-				}
+				processCheckboxGroup(primaryComponent, group, variables, metadataModel, isLunaticV2);
 				break;
 			case ComponentLunatic.PAIRWISE_LINKS:
 				// In we case of a pairwiseLinks component we have to iterate on the components to find the responses
@@ -327,6 +313,26 @@ public class LunaticReader {
 		}
 		//We also had the missing variable if it exists (only one missing variable even if multiple responses)
 		addMissingVariable(primaryComponent, group, variables, metadataModel);
+	}
+
+	private static void processCheckboxGroup(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
+		String variableName;
+		JsonNode responses = primaryComponent.get("responses");
+		List<String> responsesName= new ArrayList<>();
+		for (JsonNode response : responses){
+			responsesName.add(getVariableName(response));
+		}
+		String questionName = findLongestCommonPrefix(responsesName);
+		for (JsonNode response : responses){
+			variableName = getVariableName(response);
+			McqVariable mcqVariable = new McqVariable(variableName, group, VariableType.BOOLEAN);
+			if (isLunaticV2) mcqVariable.setText(response.get(LABEL).get(VALUE).asText());
+			if (!isLunaticV2) mcqVariable.setText(response.get(LABEL).asText());
+			mcqVariable.setInQuestionGrid(true);
+			mcqVariable.setQuestionItemName(questionName);
+			metadataModel.getVariables().putVariable(mcqVariable);
+			variables.remove(variableName);
+		}
 	}
 
 	private static void iterateOnTableBody(JsonNode primaryComponent, Group group, List<String> variables, MetadataModel metadataModel, boolean isLunaticV2) {
