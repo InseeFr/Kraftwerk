@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cucumber.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -140,16 +142,18 @@ public class MainDefinitions {
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
+		writerSequence.writeOutputFiles(inDirectory, LocalDateTime.now(), vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
 		writeErrorsFile(inDirectory, errors);
 		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : "
-				+ outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+				+ executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		CSVReader csvReader = CsvUtils
 				.getReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		// Count
@@ -166,8 +170,11 @@ public class MainDefinitions {
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
 	public void check_output_root_table(int expectedLineCount, int expectedVariablesCount)
 			throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
 		CSVReader csvReader = CsvUtils
-				.getReader(outDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
+				.getReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -263,7 +270,10 @@ public class MainDefinitions {
 
 	@Then("In a file named {string} there should be a {string} field")
 	public void check_field_existence(String fileName, String fieldName) throws IOException, CsvValidationException {
-		File outputReportingDataFile = new File(outDirectory + "/" + fileName);
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		File outputReportingDataFile = new File(executionOutDirectory + "/" + fileName);
 
 		// File existence assertion
 		assertThat(outputReportingDataFile).exists().isFile().canRead();

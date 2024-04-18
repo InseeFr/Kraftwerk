@@ -55,6 +55,7 @@ public final class Constants {
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
 	public static final String REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER = "NON_AFFECTE_";
 	public static final String END_LINE = "\n";
+	public static final String OUTPUT_FOLDER_DATETIME_PATTERN = "yyyy_MM_dd_HH_mm_ss";
 
 
 	// ----- Explicit Variables Names

@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
@@ -58,7 +59,11 @@ public class ReportingDataDefinitions {
     // Existence and structure tests
     @Then("We should have a file named {string} in directory {string} with {int} reporting data fields")
     public void check_contact_attempt_file(String fileName, String directory, int expectedFieldCount) throws IOException, CsvException {
-        File outputReportingDataFile = new File(outDirectory + "/" + directory + "/" + fileName);
+        // Go to first datetime folder
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+        File outputReportingDataFile = new File(executionOutDirectory + "/" + fileName);
 
         // File existence assertion
         assertThat(outputReportingDataFile).exists().isFile().canRead();
@@ -79,7 +84,10 @@ public class ReportingDataDefinitions {
 
     @Then("We shouldn't have any reporting data file in directory {string}")
     public void check_lack_of_contact_attempt_file(String directory) {
-        File outputReportingDataFile = new File(outDirectory + "/" + directory + "/" + directory + "_REPORTINGDATA.csv");
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+        File outputReportingDataFile = new File(executionOutDirectory + "/" + directory + "_REPORTINGDATA.csv");
         assertThat(outputReportingDataFile).doesNotExist();
     }
 
@@ -87,8 +95,11 @@ public class ReportingDataDefinitions {
     // Volumetry test
     @Then("We should have {int} lines different than header in a file named {string} in directory {string}")
     public void check_reporting_data_count(int expectedCount, String fileName, String directory) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content
@@ -105,8 +116,11 @@ public class ReportingDataDefinitions {
     // Content tests
     @Then("For SurveyUnit {string} we should have {int} contact attempts with status {string} in a file named {string} in directory {string}")
     public void check_contact_attempt_content(String surveyUnitId, int expectedSpecificStatusCount, String expectedStatus, String fileName, String directory) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content
@@ -151,8 +165,11 @@ public class ReportingDataDefinitions {
 
     @Then("For SurveyUnit {string} we should have {int} contact states with status {string} in a file named {string} in directory {string}")
     public void check_contact_state_content(String surveyUnitId, int expectedSpecificStatusCount, String expectedStatus, String fileName, String directory) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content
@@ -197,8 +214,12 @@ public class ReportingDataDefinitions {
 
     @Then("In file named {string} in directory {string} we should have the date format {string} for field {string}")
     public void check_contact_attempt_date_format(String fileName, String directory, String expectedDateFormat, String fieldName) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content
@@ -238,8 +259,11 @@ public class ReportingDataDefinitions {
 
     @Then("We shouldn't have any reporting data in {string} in directory {string}")
     public void check_reporting_data_in_root_file(String fileName, String directory) throws IOException, CsvValidationException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get header
@@ -252,8 +276,11 @@ public class ReportingDataDefinitions {
 
     @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the OUTCOME_SPOTTING field")
     public void check_outcome_spotting_result(String surveyUnitId, String fileName, String directory, String expectedOutcomeSpotting) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content
@@ -298,8 +325,11 @@ public class ReportingDataDefinitions {
 
     @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the identification field")
     public void check_identification(String surveyUnitId, String fileName, String directory, String expectedValue) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         CSVReader csvReader = CsvUtils.getReader(
-                Path.of(outDirectory + "/" + directory + "/" + fileName)
+                Path.of(executionOutDirectory + "/" + fileName)
         );
 
         // Get file content

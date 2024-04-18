@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class MainProcessingGenesis {
 	private List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private UserInputsGenesis userInputs;
+	private LocalDateTime executionDateTime;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -55,6 +57,7 @@ public class MainProcessingGenesis {
 
 	public void init(String idQuestionnaire) throws KraftwerkException, IOException {
 		log.info("Kraftwerk main service started for questionnaire: " + idQuestionnaire);
+		this.executionDateTime = LocalDateTime.now();
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idQuestionnaire);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
@@ -101,7 +104,7 @@ public class MainProcessingGenesis {
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors);
 	}
 
 	/* Step 5 : Write errors */

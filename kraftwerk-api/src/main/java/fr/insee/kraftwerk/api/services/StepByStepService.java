@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,6 +200,7 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
+		LocalDateTime executionDateTime = LocalDateTime.now();
 		VtlBindings vtlBindings = new VtlBindings();
 		List<KraftwerkError> errors = new ArrayList<>();
 		// Read all bindings necessary to produce output
@@ -219,7 +221,7 @@ public class StepByStepService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}
