@@ -1,8 +1,10 @@
 # Changelog
 
 
-## X.X.X [Not released yet] 
+## X.X.X [Not released yet]
 
+### Changed
+- Output files are stored in separate execution time folders
 
 
 

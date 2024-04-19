@@ -1,9 +1,11 @@
 package fr.insee.kraftwerk.core.utils;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
@@ -54,7 +56,9 @@ public class TextFileWriter {
 	}
 
 	public static void writeLogFile(Path inDirectory, KraftwerkExecutionLog kraftwerkExecutionLog){
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory);
+		tempOutputPath = tempOutputPath.resolve(Objects.requireNonNull(new File(tempOutputPath.toString()).listFiles(File::isDirectory))[0].getName())
+				.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
