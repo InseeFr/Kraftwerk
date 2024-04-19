@@ -176,7 +176,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	 */
 	@Override
 	public String outputFileName(String datasetName) {
-		return getOutputFolder().getFileName() + "_" + datasetName + ".parquet";
+		return getOutputFolder().getParent().getFileName() + "_" + datasetName + ".parquet";
 	}
 
 }
