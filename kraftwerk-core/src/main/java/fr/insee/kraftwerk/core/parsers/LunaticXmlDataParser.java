@@ -121,6 +121,12 @@ public class LunaticXmlDataParser extends DataParser {
 	 */
 	private void readCollected(Element questionnaireNode, QuestionnaireData questionnaireData, VariablesMap variables) {
 
+		//Check collected data tag presence
+		if(questionnaireNode.getFirstChildElement("Data").getFirstChildElement(Constants.COLLECTED) == null){
+			log.warn("No collected data for survey unit " + questionnaireData.getIdentifier());
+			return;
+		}
+
 		// Xml collected variables nodes
 		Elements collectedVariablesNodes = questionnaireNode.getFirstChildElement("Data")
 				.getFirstChildElement(Constants.COLLECTED).getChildElements();

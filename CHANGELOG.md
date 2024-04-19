@@ -6,6 +6,9 @@
 ### Changed
 - Output files are stored in separate execution time folders
 
+### Fixed
+- Fixed crash when no COLLECTED tag in .xml data file
+
 
 
 ## 2.0.3 [2024-04-02] - Update some dependencies
