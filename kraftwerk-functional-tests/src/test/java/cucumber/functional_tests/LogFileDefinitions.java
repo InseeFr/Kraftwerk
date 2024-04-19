@@ -17,7 +17,8 @@ public class LogFileDefinitions {
     static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
     @Then("We should have a log file named in directory {string}")
     public void logFileExistenceCheck(String directory) throws IOException {
-        Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
         try(Stream<Path> folderStream = Files.list(executionOutDirectory)){
             Assertions.assertThat(folderStream.filter(path ->
