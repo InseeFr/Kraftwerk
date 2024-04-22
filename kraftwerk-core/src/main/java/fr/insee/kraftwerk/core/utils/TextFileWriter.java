@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
 
@@ -37,7 +38,7 @@ public class TextFileWriter {
     
 	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors) {
 		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime)
-				.resolve("errors.txt");
+				.resolve(Constants.ERRORS_FILE_NAME);
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
