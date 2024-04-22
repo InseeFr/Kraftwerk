@@ -1,15 +1,11 @@
 package fr.insee.kraftwerk.core.utils;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
