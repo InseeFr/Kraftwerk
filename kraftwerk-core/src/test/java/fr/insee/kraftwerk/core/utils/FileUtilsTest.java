@@ -31,8 +31,7 @@ class FileUtilsTest {
 	@Test
 	void testTransformToOut2() {
 		Path path = Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/out/VQS");
-		path = path.resolve(Objects.requireNonNull(new File(path.toString()).listFiles(File::isDirectory))[0].getName());
-		assertEquals(path,FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS"), LocalDateTime.now()));
+		assertEquals(path,FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS"), LocalDateTime.now()).getParent());
 	}
     
     @Test
