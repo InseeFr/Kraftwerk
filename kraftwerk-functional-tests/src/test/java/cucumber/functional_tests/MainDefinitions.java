@@ -142,8 +142,9 @@ public class MainDefinitions {
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, LocalDateTime.now(), vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
-		writeErrorsFile(inDirectory, errors);
+		LocalDateTime localDateTime = LocalDateTime.now();
+		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
+		writeErrorsFile(inDirectory, localDateTime, errors);
 		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
 	}
 
@@ -248,8 +249,8 @@ public class MainDefinitions {
 		return directoryToBeDeleted.delete();
 	}
 
-	private void writeErrorsFile(Path inDirectory, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
+	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve("errors.txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
