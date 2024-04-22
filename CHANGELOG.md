@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2.0.4 [2024-04-19]
+## 2.0.4 [2024-04-22]
 
 ### Changed
 - Output files are stored in separate execution time folders
