@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +27,13 @@ class FileUtilsTest {
         assertEquals(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/out/VQS"),
         		FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS")));
     }
+
+	@Test
+	void testTransformToOut2() {
+		Path path = Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/out/VQS");
+		path = path.resolve(Objects.requireNonNull(new File(path.toString()).listFiles(File::isDirectory))[0].getName());
+		assertEquals(path,FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS"), LocalDateTime.now()));
+	}
     
     @Test
     void archiveInputFiles_failWhenNull() {
