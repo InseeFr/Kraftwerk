@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class ParquetOutputFilesTest {
 
 	private static UserInputsFile testUserInputs;
-	private static OutputFiles outputFiles;
+	private static ParquetOutputFiles outputFiles;
 
 
 	Dataset testDataset = new InMemoryDataset(
@@ -109,7 +109,7 @@ class ParquetOutputFilesTest {
 		metaModels.put("test",metMod);
 
 		assertDoesNotThrow(() -> {outputFiles.writeOutputTables(metaModels);});
-		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
+		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.getAllOutputFileNames("RACINE").getFirst());
 		File f = racinePath.toFile();
 		Assertions.assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());

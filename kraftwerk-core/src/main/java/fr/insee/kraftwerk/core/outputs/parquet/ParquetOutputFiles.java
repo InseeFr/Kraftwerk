@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,12 +41,16 @@ import java.util.Map;
 @Slf4j
 public class ParquetOutputFiles extends OutputFiles {
 
+	public static final String PARQUET_EXTENSION = ".parquet";
 	/**
 	 * When an instance is created, the output folder is created.
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
+
+	private Map<String, Integer> nbParquetFilesbyDataset = new HashMap<>();
+
 	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
 		super(outDirectory, vtlBindings, modes);
 	}
@@ -58,6 +63,8 @@ public class ParquetOutputFiles extends OutputFiles {
 	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 
 		for (String datasetName : getDatasetToCreate()) {
+			nbParquetFilesbyDataset.putIfAbsent(datasetName,0);
+
 			/* Building metadata */
 			Schema schema =  extractSchema(getVtlBindings().getDataset(datasetName).getDataStructure());
 
@@ -69,7 +76,6 @@ public class ParquetOutputFiles extends OutputFiles {
 			Path fileToWrite = Path.of(getOutputFolder().toString(),outputFileName(datasetName));
 			OutputFile parquetOutFile = new LocalOutputFile(fileToWrite);
 
-			
 	        GenericData genericData = GenericData.get();
 	        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
 			
@@ -95,6 +101,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		                writer.write(recordData);
 		            }
 		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset == null ? 0 : dataset.size());
+					nbParquetFilesbyDataset.merge(datasetName,1, Integer::sum);
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
@@ -162,9 +169,12 @@ public class ParquetOutputFiles extends OutputFiles {
 		// Assemble required info to write scripts
 		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : getDatasetToCreate()) {
-			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
-					getVtlBindings().getDataset(datasetName).getDataStructure(), metadataModels);
-			tableScriptInfoList.add(tableScriptInfo);
+			getAllOutputFileNames(datasetName).forEach(filename -> {
+				TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, filename,
+						getVtlBindings().getDataset(datasetName).getDataStructure(), metadataModels);
+				tableScriptInfoList.add(tableScriptInfo);
+			});
+
 		}
 		// Write scripts
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_parquet.R"),
@@ -176,7 +186,21 @@ public class ParquetOutputFiles extends OutputFiles {
 	 */
 	@Override
 	public String outputFileName(String datasetName) {
-		return getOutputFolder().getParent().getFileName() + "_" + datasetName + ".parquet";
+		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
+		if (nbParquetFilesbyDataset.get(datasetName)>0) { path = path +"_"+ nbParquetFilesbyDataset.get(datasetName);}
+		return path	+ PARQUET_EXTENSION;
+	}
+
+	public List<String> getAllOutputFileNames(String datasetName) {
+		List<String> filenames = new ArrayList<>();
+		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
+		filenames.add(path	+ PARQUET_EXTENSION); // 0
+
+		for(int i = 1; i<nbParquetFilesbyDataset.get(datasetName);i++) {
+			filenames.add(path+"_"+ nbParquetFilesbyDataset.get(datasetName) + PARQUET_EXTENSION);
+		}
+
+		return filenames;
 	}
 
 }
