@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.utils;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
@@ -15,6 +16,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,6 +37,9 @@ public class FileUtils {
 	 */
 	public static Path transformToOut(Path inDirectory) {
 		return transformToOther(inDirectory, "out");
+	}
+	public static Path transformToOut(Path inDirectory, LocalDateTime localDateTime) {
+		return transformToOther(inDirectory, "out").resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)));
 	}
 	
 	/**

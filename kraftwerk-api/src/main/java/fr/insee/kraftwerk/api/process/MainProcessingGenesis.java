@@ -109,7 +109,7 @@ public class MainProcessingGenesis {
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
 	}
 
 }
