@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import lombok.extern.log4j.Log4j2;
@@ -36,8 +39,10 @@ public class TextFileWriter {
         }
     }
     
-	public static void writeErrorsFile(Path inDirectory, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
+	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors) {
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory)
+				.resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)))
+				.resolve("errors.txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
@@ -55,9 +60,9 @@ public class TextFileWriter {
 		}
 	}
 
-	public static void writeLogFile(Path inDirectory, KraftwerkExecutionLog kraftwerkExecutionLog){
+	public static void writeLogFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionLog kraftwerkExecutionLog){
 		Path tempOutputPath = FileUtils.transformToOut(inDirectory);
-		tempOutputPath = tempOutputPath.resolve(Objects.requireNonNull(new File(tempOutputPath.toString()).listFiles(File::isDirectory))[0].getName())
+		tempOutputPath = tempOutputPath.resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)))
 				.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 

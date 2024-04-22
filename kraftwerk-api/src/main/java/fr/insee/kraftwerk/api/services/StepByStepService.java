@@ -135,7 +135,7 @@ public class StepByStepService extends KraftwerkService {
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		TextFileWriter.writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -182,7 +182,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		TextFileWriter.writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
