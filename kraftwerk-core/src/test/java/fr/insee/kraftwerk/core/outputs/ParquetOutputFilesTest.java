@@ -110,6 +110,7 @@ class ParquetOutputFilesTest {
 
 		assertDoesNotThrow(() -> {outputFiles.writeOutputTables(metaModels);});
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.getAllOutputFileNames("RACINE").getFirst());
+		racinePath = racinePath.resolveSibling(racinePath.getFileName()+".parquet");
 		File f = racinePath.toFile();
 		Assertions.assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());
