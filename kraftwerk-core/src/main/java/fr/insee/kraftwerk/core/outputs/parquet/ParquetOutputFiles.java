@@ -187,7 +187,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public String outputFileName(String datasetName) {
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		if (nbParquetFilesbyDataset.get(datasetName)>0) { path = path +"_"+ nbParquetFilesbyDataset.get(datasetName);}
+		if (nbParquetFilesbyDataset.containsKey(datasetName)) { path = path +"_"+ nbParquetFilesbyDataset.get(datasetName);}
 		return path	+ PARQUET_EXTENSION;
 	}
 
