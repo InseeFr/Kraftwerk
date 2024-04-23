@@ -27,13 +27,14 @@ import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.io.OutputFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class to manage the writing of Parquet output tables.
@@ -49,7 +50,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
 
-	private Map<String, Integer> nbParquetFilesbyDataset = new HashMap<>();
+	private Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
 
 	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
 		super(outDirectory, vtlBindings, modes);
@@ -61,9 +62,9 @@ public class ParquetOutputFiles extends OutputFiles {
 	 */
 	@Override
 	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
+		nbParquetFilesbyDataset = countExistingFilesByDataset(getOutputFolder());
 
 		for (String datasetName : getDatasetToCreate()) {
-			nbParquetFilesbyDataset.putIfAbsent(datasetName,0);
 
 			/* Building metadata */
 			Schema schema =  extractSchema(getVtlBindings().getDataset(datasetName).getDataStructure());
@@ -101,7 +102,6 @@ public class ParquetOutputFiles extends OutputFiles {
 		                writer.write(recordData);
 		            }
 		            log.info("Parquet datasize for {} is : {} for {} records ",datasetName,writer.getDataSize(), dataset == null ? 0 : dataset.size());
-					nbParquetFilesbyDataset.merge(datasetName,1, Integer::sum);
 		        } catch (IOException e) {
 		        	log.error("IOException - Can't write parquet output tables :  {}", e.getMessage());
 		        	throw new KraftwerkException(500, e.getMessage());
@@ -201,6 +201,24 @@ public class ParquetOutputFiles extends OutputFiles {
 		}
 
 		return filenames;
+	}
+
+	public Map<String, Long> countExistingFilesByDataset(Path dir) throws KraftwerkException {
+		final String regex = "_([A-Za-z]+)(_[0-9]*)?(\\.|$)";
+		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+
+		try (Stream<Path> stream = Files.walk(dir)) {
+			return stream
+					.filter(Files::isRegularFile)
+					.map(Path::getFileName)
+					.map(Path::toString)
+					.filter(name -> pattern.matcher(name).matches())
+					.map(name -> pattern.matcher(name).replaceFirst("$1"))
+					.collect(Collectors.groupingBy(name -> name, Collectors.counting()));
+		} catch (IOException e) {
+			throw new KraftwerkException(500,"Cannot read outputfolder" + e.getMessage());
+		}
+
 	}
 
 }
