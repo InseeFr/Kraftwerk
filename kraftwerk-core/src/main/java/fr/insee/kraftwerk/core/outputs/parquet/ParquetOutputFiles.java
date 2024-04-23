@@ -31,8 +31,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -142,7 +144,6 @@ public class ParquetOutputFiles extends OutputFiles {
     		Class<?> type = component.getType();
     		if (String.class.equals(type)) {
     	        builder.name(component.getName()).type().nullable().stringType().noDefault();
-
     	        } else if (Long.class.equals(type)) {
         	        builder.name(component.getName()).type().nullable().longType().noDefault();
     	        } else if (Double.class.equals(type)) {
@@ -194,26 +195,26 @@ public class ParquetOutputFiles extends OutputFiles {
 	public List<String> getAllOutputFileNames(String datasetName) {
 		List<String> filenames = new ArrayList<>();
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		filenames.add(path	+ PARQUET_EXTENSION); // 0
-
-		for(int i = 1; i<nbParquetFilesbyDataset.get(datasetName);i++) {
-			filenames.add(path+"_"+ nbParquetFilesbyDataset.get(datasetName) + PARQUET_EXTENSION);
+		filenames.add(path); // 0
+		if (!nbParquetFilesbyDataset.containsKey(datasetName)) {
+			return filenames;
+		}
+		for(int i = 1; i<=nbParquetFilesbyDataset.get(datasetName);i++) {
+			filenames.add(path+"_"+ nbParquetFilesbyDataset.get(datasetName));
 		}
 
 		return filenames;
 	}
 
 	public Map<String, Long> countExistingFilesByDataset(Path dir) throws KraftwerkException {
-		final String regex = "_([A-Za-z]+)(_[0-9]*)?(\\.|$)";
-		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-
 		try (Stream<Path> stream = Files.walk(dir)) {
 			return stream
 					.filter(Files::isRegularFile)
 					.map(Path::getFileName)
 					.map(Path::toString)
-					.filter(name -> pattern.matcher(name).matches())
-					.map(name -> pattern.matcher(name).replaceFirst("$1"))
+					.filter(name -> name.contains(PARQUET_EXTENSION))
+					.filter(name -> getDatasetToCreate().stream().anyMatch(name::contains) )
+					.map(name -> getDatasetToCreate().stream().filter(name::contains).findFirst().orElse(""))
 					.collect(Collectors.groupingBy(name -> name, Collectors.counting()));
 		} catch (IOException e) {
 			throw new KraftwerkException(500,"Cannot read outputfolder" + e.getMessage());
