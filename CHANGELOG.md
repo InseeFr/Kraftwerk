@@ -1,5 +1,9 @@
 # Changelog
 
+## X.X.X [not released yet]
+
+### Changed
+- Parquet files are numbered and then merged in the import script
 
 ## 2.0.4 [2024-04-22]
 
