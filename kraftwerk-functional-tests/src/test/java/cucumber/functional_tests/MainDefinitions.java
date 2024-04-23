@@ -34,9 +34,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static cucumber.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Main example
@@ -108,6 +110,18 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp.runMain();
+	}
+
+	@When("We launch main service 2 times")
+	public void launch_main_2() throws KraftwerkException, InterruptedException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp.runMain();
+		await().atMost(2, TimeUnit.SECONDS);
+		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
 		mp.runMain();
 	}
 
@@ -250,7 +264,7 @@ public class MainDefinitions {
 	}
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve("errors.txt");
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
