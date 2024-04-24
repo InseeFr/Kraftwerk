@@ -18,7 +18,6 @@
 - Fixed crash when no COLLECTED tag in .xml data file
 
 
-
 ## 2.0.3 [2024-04-02] - Update some dependencies
 
 ### Changed
