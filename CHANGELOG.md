@@ -5,6 +5,10 @@
 ### Changed
 - Parquet files are numbered and then merged in the import script
 
+### Fixed
+- Log and error files are created with output files
+- Rolling logs
+
 ## 2.0.4 [2024-04-22]
 
 ### Changed
