@@ -103,6 +103,10 @@
 					<groupId>org.xerial.snappy</groupId>
 					<artifactId>snappy-java</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-compress</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -150,6 +154,10 @@
 					<groupId>org.apache.kerby</groupId>
 					<artifactId>kerb-core</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-compress</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -190,7 +198,16 @@
 					<groupId>com.google.inject</groupId>
 					<artifactId>guice</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-compress</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.26.1</version>
 		</dependency>
 	</dependencies>
 
