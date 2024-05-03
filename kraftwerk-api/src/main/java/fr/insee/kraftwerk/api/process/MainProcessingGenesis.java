@@ -69,21 +69,24 @@ public class MainProcessingGenesis {
 		}
 	}
 
-	public void runMain(String idQuestionnaire) throws KraftwerkException, IOException {
+	public void runMain(String idCampaign) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
-		init(idQuestionnaire);
-		List <SurveyUnitId> ids = client.getSurveyUnitIds(idQuestionnaire);
-		List <List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
-		for (List<SurveyUnitId> listId : listIds) {
-			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(idQuestionnaire, listId);
-			log.info("Number of documents retrieved from database : {}", suLatest.size());
-			vtlBindings = new VtlBindings();
-			unimodalProcess(suLatest);
-			multimodalProcess();
-			outputFileWriter();
-			writeErrors();
-		}
+		init(idCampaign);
+		List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
+		questionnaireModelIds.forEach(questionnaireId -> {
+			List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
+			List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
+			for (List<SurveyUnitId> listId : listIds) {
+				List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
+				log.info("Number of documents retrieved from database : {}", suLatest.size());
+				vtlBindings = new VtlBindings();
+				unimodalProcess(suLatest);
+				multimodalProcess();
+				outputFileWriter();
+				writeErrors();
+			}
+		});
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {

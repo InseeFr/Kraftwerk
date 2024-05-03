@@ -1,9 +1,9 @@
 package fr.insee.kraftwerk.api.client;
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
+import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -57,4 +57,10 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
+    public List<String> getQuestionnaireModelIds(String idCampaign) {
+		String url = String.format("%s/response/get-idQuestionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+
+	}
 }
