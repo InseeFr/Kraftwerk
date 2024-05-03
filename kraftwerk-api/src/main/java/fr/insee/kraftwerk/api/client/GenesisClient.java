@@ -58,7 +58,7 @@ public class GenesisClient {
 	}
 
     public List<String> getQuestionnaireModelIds(String idCampaign) {
-		String url = String.format("%s/response/get-idQuestionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
+		String url = String.format("%s/response/get-questionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 
