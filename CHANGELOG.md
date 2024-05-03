@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.7 [2024-05-03] - Hotfix configure genesis
+
+### Fixed
+- Add property to configure Genesis
+- Fix encoding for properties
+
+
 ## 2.0.6 [2024-05-03] - Hotfix genesis endpoint
 
 ### Fixed
