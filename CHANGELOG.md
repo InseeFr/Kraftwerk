@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.6 [2024-05-03] - Hotfix genesis endpoint
+
+### Fixed
+- Pass idQuestionnaire param as body for genesis service
+- Fix CVE >8
+
+### Added
+- Prepare dockerfile
+
 ## 2.0.5 [2024-04-24] - Numbered parquet files and fix logs
 
 ### Changed
