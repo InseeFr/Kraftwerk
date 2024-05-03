@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.8 [2024-05-03] - Fix id for genesis 
+
+### Fixed
+- Genesis uses questionnaireModelId since Kraftwerk used idCampaign. Now the first step is to get questionnaireMOdelIds from idCampaigne to loop.
+
 ## 2.0.7 [2024-05-03] - Hotfix configure genesis
 
 ### Fixed
