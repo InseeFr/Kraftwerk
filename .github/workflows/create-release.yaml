@@ -83,9 +83,9 @@ jobs:
               fi
               if [[ $inprogress == true ]] ;
               then
-                  changes+=$line 
+                  changes+=$line+"  " 
               fi
-          done < FILE_PATH
+          done < $FILE_PATH
           echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
           echo "changes=${changes}" >> $GITHUB_OUTPUT
 
