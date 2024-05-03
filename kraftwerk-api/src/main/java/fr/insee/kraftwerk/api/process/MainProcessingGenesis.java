@@ -74,20 +74,20 @@ public class MainProcessingGenesis {
 		int batchSize = 1000;
 		init(idCampaign);
 		List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
-		questionnaireModelIds.forEach(questionnaireId -> {
-			List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
-			List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
-			for (List<SurveyUnitId> listId : listIds) {
-				List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
-				log.info("Number of documents retrieved from database : {}", suLatest.size());
-				vtlBindings = new VtlBindings();
-				unimodalProcess(suLatest);
-				multimodalProcess();
-				outputFileWriter();
-				writeErrors();
-			}
-		});
-	}
+        for (String questionnaireId : questionnaireModelIds) {
+            List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
+            List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
+            for (List<SurveyUnitId> listId : listIds) {
+                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
+                log.info("Number of documents retrieved from database : {}", suLatest.size());
+                vtlBindings = new VtlBindings();
+                unimodalProcess(suLatest);
+                multimodalProcess();
+                outputFileWriter();
+                writeErrors();
+            }
+        }
+    }
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
