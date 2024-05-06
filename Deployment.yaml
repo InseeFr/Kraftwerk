@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Kraftwerk
+spec:
+  selector:
+    matchLabels:
+      app: Kraftwerk
+  template:
+    metadata:
+      labels:
+        app: Kraftwerk
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: Kraftwerk
+          image: gitlab-registry.insee.fr/sic/traitements-post-collecte/deployment/kraftwerk-deployment:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: "600Mi"
+              cpu: "500m"
+            requests:
+              memory: "1Mi"
+              cpu: "10m"
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
