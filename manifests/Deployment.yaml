@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Kraftwerk
+  name: kraftwerk
 spec:
   selector:
     matchLabels:
-      app: Kraftwerk
+      app: kraftwerk
   template:
     metadata:
       labels:
-        app: Kraftwerk
+        app: kraftwerk
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: Kraftwerk
-          image: gitlab-registry.insee.fr/sic/traitements-post-collecte/deployment/kraftwerk-deployment:latest
+        - name: kraftwerk
+          image: gitlab-registry.insee.fr:443/sic/traitements-post-collecte/deployment/kraftwerk-deployment:latest
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false

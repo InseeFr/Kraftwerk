@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kraftwerk-ingress
+  namespace:
+  labels:
+    name: kraftwerk
+spec:
+  tls:
+    - hosts:
+        - api-transformation-post-collecte.dev.kube.insee.fr
+  rules:
+    - host: api-transformation-post-collecte.dev.kube.insee.fr
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: kraftwerk
+                port:
+                  number: 8080

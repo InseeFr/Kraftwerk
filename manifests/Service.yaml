@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kraftwerk
+spec:
+  selector:
+    app: kraftwerk
+  ports:
+    - port: 8080
+      targetPort: 8080
