@@ -37,5 +37,5 @@ jobs:
       uses: advanced-security/maven-dependency-submission-action@5d0f9011b55d6268922128af45275986303459c3
 
     - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.3
+      uses: coverallsapp/github-action@v2.3.0
             
