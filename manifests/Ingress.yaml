@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kraftwerk_ingress
+  name: kraftwerk-ingress
   namespace:
   labels:
-    name: kraftwerk
+    name: kraftwerk-ingress
 spec:
   tls:
     - hosts:
@@ -17,6 +17,6 @@ spec:
             path: "/"
             backend:
               service:
-                name: kraftwerk
+                name: kraftwerk-service
                 port:
                   number: 8080

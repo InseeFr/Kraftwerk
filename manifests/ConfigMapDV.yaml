@@ -2,13 +2,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kraftwerk-config-dv
-  namespace: default
 data:
-  fr.insee.postcollecte.files: C:\\Users\\QDIBYS\\Documents\\Kraftwerk_folder
+  fr.insee.postcollecte.files: /storage/data
   logging.level.root: INFO
   logging.level.fr.insee.kraftwerk: INFO
-  logging.file.name: C:\\Users\\QDIBYS\\Documents\\Kraftwerk_folder\\log\\kraftwerk.log
-  logging.pattern.rolling-file-name: C:\\Users\\QDIBYS\\Documents\\Kraftwerk_folder\\log\\kraftwerk-%d{yyyy-MM-dd}.%i.log
+  logging.file.name: /storage/log/kraftwerk.log
+  logging.pattern.rolling-file-name:  /storage/log/kraftwerk-%d{yyyy-MM-dd}.%i.log
   fr.insee.postcollecte.genesis.api.url: http://api-reponses-enquetes.dev.kube.insee.fr
 
-  server.port: 8080
+  server.port: '8080'

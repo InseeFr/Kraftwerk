@@ -1,9 +1,9 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kraftwerk_deployment
+  name: kraftwerk-deployment
 spec:
+  replicas: 1 #TODO Set to 3 with helm
   selector:
     matchLabels:
       app: kraftwerk
@@ -14,7 +14,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: kraftwerk_container
+        - name: kraftwerk-container
           image: gitlab-registry.insee.fr:443/sic/traitements-post-collecte/deployment/kraftwerk-deployment:latest
           imagePullPolicy: Always
           securityContext:
@@ -37,22 +37,33 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /actuator/health/liveness
-              port: http
+              port: 8080
               scheme: HTTP
-            initialDelaySeconds: 15
-            periodSeconds: 10
+            initialDelaySeconds: 45
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           readinessProbe:
             failureThreshold: 3
             httpGet:
               path: /actuator/health/readiness
-              port: http
+              port: 8080
               scheme: HTTP
-            initialDelaySeconds: 15
-            periodSeconds: 10
+            initialDelaySeconds: 45
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           envFrom:
             - configMapRef:
                 name: kraftwerk-config-dv
+          volumeMounts:
+            - mountPath: /tmp/
+              name: kraftwerk-temp-volume
+            - mountPath: /storage/
+              name: kraftwerk-volume
+      volumes:
+        - name: kraftwerk-temp-volume
+          emptyDir : {}
+        - name: kraftwerk-volume
+          persistentVolumeClaim:
+            claimName: kraftwerk-pvc
