@@ -10,7 +10,11 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
-import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -55,17 +59,17 @@ public class MainProcessingGenesis {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 	}
 
-	public void init(String idQuestionnaire) throws KraftwerkException, IOException {
-		log.info("Kraftwerk main service started for questionnaire: " + idQuestionnaire);
+	public void init(String idCampaign) throws KraftwerkException, IOException {
+		log.info("Kraftwerk main service started for campaign: " + idCampaign);
 		this.executionDateTime = LocalDateTime.now();
-		inDirectory = controlInputSequenceGenesis.getInDirectory(idQuestionnaire);
+		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idQuestionnaire));
+		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign));
 		if (!userInputs.getModes().isEmpty()) {
 			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap());
 		} else {
-			log.error("No source found for questionnaire " + idQuestionnaire);
+			log.error("No source found for campaign " + idCampaign);
 		}
 	}
 
