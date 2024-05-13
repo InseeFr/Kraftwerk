@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kraftwerk-ingress
+  name: kraftwerk_ingress
   namespace:
   labels:
     name: kraftwerk

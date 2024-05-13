@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kraftwerk
+  name: kraftwerk_deployment
 spec:
   selector:
     matchLabels:
@@ -14,7 +14,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: kraftwerk
+        - name: kraftwerk_container
           image: gitlab-registry.insee.fr:443/sic/traitements-post-collecte/deployment/kraftwerk-deployment:latest
           imagePullPolicy: Always
           securityContext:
@@ -53,3 +53,6 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
+          envFrom:
+            - configMapRef:
+                name: kraftwerk-config-dv

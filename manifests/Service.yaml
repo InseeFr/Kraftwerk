@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kraftwerk
+  name: kraftwerk_service
 spec:
   selector:
     app: kraftwerk
