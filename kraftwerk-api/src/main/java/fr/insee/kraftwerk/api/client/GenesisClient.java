@@ -1,5 +1,8 @@
 package fr.insee.kraftwerk.api.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
@@ -36,8 +39,8 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-	public List<Mode> getModes(String idQuestionnaire) {
-		String url = String.format("%s/response/get-modes/by-questionnaire?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
+	public List<Mode> getModes(String idCampaign) {
+		String url = String.format("%s/response/get-modes/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
 		ResponseEntity<String[]> response = restTemplate.exchange(url, HttpMethod.GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
@@ -57,10 +60,10 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-    public List<String> getQuestionnaireModelIds(String idCampaign) {
+    public List<String> getQuestionnaireModelIds(String idCampaign) throws JsonProcessingException {
 		String url = String.format("%s/response/get-questionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
-
+		ObjectMapper objectMapper = new ObjectMapper();
+		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
 	}
 }
