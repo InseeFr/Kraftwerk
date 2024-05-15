@@ -98,17 +98,17 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.idQuestionnaire}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idQuestionnaire) {
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties);
 		try {
 			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory));
-			mpGenesis.runMain(idQuestionnaire);
+			mpGenesis.runMain(idCampaign);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(idQuestionnaire);
+		return ResponseEntity.ok(idCampaign);
 	}
 
 
