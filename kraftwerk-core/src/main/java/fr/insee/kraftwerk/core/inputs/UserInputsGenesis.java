@@ -109,7 +109,7 @@ public class UserInputsGenesis extends UserInputs{
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
 		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("ddi[\\w,\\s-]+\\.xml"))) {
 			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No DDI file found in " + specDirectory.toString()));
+					.orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + specDirectory.toString()));
 		}
 	}
 
@@ -122,7 +122,7 @@ public class UserInputsGenesis extends UserInputs{
 	public Path findLunaticFile(Path specDirectory) throws KraftwerkException, IOException {
 		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("lunatic[\\w,\\s-]+\\.json"))) {
 			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No Lunatic file found in " + specDirectory.toString()));
+					.orElseThrow(() -> new KraftwerkException(404, "No Lunatic file (lunatic*.xml) found in " + specDirectory.toString()));
 		}
 	}
 }
