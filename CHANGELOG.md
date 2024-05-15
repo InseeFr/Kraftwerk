@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.9 [2024-05-16] - Fix genesis calls
+### Added
+- Error 204 when no data in Genesis database when using the Genesis endpoint
+
+### Changed
+- Kraftwerk now get modes from Genesis by campaign
+- Kraftwerk genesis endpoint now uses idCampaign like the other endpoints 
+- Changed some error message to be more explicit
+
+### Fixed
+- Fix crash when empty reporting data file
+- Genesis response not parsed from JSON when calling on get QuestionnaireModelIds endpoint
+
 ## 2.0.8 [2024-05-03] - Fix id for genesis 
 
 ### Fixed
