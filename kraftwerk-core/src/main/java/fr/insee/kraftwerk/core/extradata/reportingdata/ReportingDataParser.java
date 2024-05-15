@@ -272,19 +272,28 @@ public abstract class ReportingDataParser {
 	}
 
 	private ContactAttempt getLastContactAttempt(ReportingDataUE reportingDataUE) {
-		return reportingDataUE.getContactAttempts().get(reportingDataUE.getContactAttempts().size() - 1);
+		return reportingDataUE.getContactAttempts().getLast();
 	}
 
 	public int countMaxStates(ReportingData reportingData) {
+		if(reportingData.getListReportingDataUE().isEmpty()){
+			return 0;
+		}
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getStates().size()).max().getAsInt();
 	}
 
 	public int countMaxAttempts(ReportingData reportingData) {
+		if(reportingData.getListReportingDataUE().isEmpty()){
+			return 0;
+		}
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getContactAttempts().size()).max()
 				.getAsInt();
 	}
 
 	public int countMaxComments(ReportingData reportingData) {
+		if(reportingData.getListReportingDataUE().isEmpty()){
+			return 0;
+		}
 		return reportingData.getListReportingDataUE().stream().mapToInt(ue -> ue.getComments().size()).max().getAsInt();
 	}
 }
