@@ -36,8 +36,8 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-	public List<Mode> getModes(String idQuestionnaire) {
-		String url = String.format("%s/response/get-modes/by-questionnaire?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
+	public List<Mode> getModes(String idCampaign) {
+		String url = String.format("%s/response/get-modes/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
 		ResponseEntity<String[]> response = restTemplate.exchange(url, HttpMethod.GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));

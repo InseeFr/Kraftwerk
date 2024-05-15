@@ -8,8 +8,6 @@ import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -22,12 +20,9 @@ import java.util.stream.Stream;
 @Log4j2
 public class UserInputsGenesis extends UserInputs{
 
-	@Getter
-	@Setter
-	boolean hasConfigFile;
+	private final boolean hasConfigFile;
 
 	private final List<Mode> modes;
-
 
 	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes) throws KraftwerkException, IOException {
 		super(inputDirectory);
@@ -37,28 +32,41 @@ public class UserInputsGenesis extends UserInputs{
 	}
 
 	private void computeInputs() throws KraftwerkException, IOException {
-		for (Mode mode : modes) {
-			ModeInputs modeInputs = new ModeInputs();
-			modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toFile().toURI().toURL());
-			modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
-			modeInputs.setDataMode(mode.name());
-			if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
-				modeInputs.setDataFormat("LUNATIC_XML");
-			} else {
-				// Not implemented yet
-				modeInputs.setDataFormat("OTHER");
-			}
-			if (isHasConfigFile()) {
-				modeInputs.setModeVtlFile(getModeVtlFile(mode));
-			}
-			modeInputsMap.put(mode.name(), modeInputs);
-		}
-		if (isHasConfigFile()) {
-			readUserInputs();
-		}
+        UserInputsFile userInputsFile;
+		if(hasConfigFile){
+            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory);
+            modeInputsMap = userInputsFile.getModeInputsMap();
+		}else{
+            for (Mode mode : modes) {
+                ModeInputs modeInputs = getModeInputs(mode);
+                modeInputsMap.put(mode.name(), modeInputs);
+            }
+        }
 	}
 
-	private Path getModeVtlFile(Mode mode) throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
+    /**
+     * Look for mode inputs without a configuration file
+     * @param mode mode to get inputs from
+     * @return a ModeInputs object
+     */
+    private ModeInputs getModeInputs(Mode mode) throws KraftwerkException, IOException {
+        ModeInputs modeInputs = new ModeInputs();
+        modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toFile().toURI().toURL());
+        modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
+        modeInputs.setDataMode(mode.name());
+        if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
+            modeInputs.setDataFormat("LUNATIC_XML");
+        } else {
+            // Not implemented yet
+            modeInputs.setDataFormat("OTHER");
+        }
+        if (hasConfigFile) {
+            modeInputs.setModeVtlFile(getModeVtlFile(mode));
+        }
+        return modeInputs;
+    }
+
+    private Path getModeVtlFile(Mode mode) throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
 		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
 		try {
 			JsonNode userInputs = JsonFileReader.read(userInputFile);
@@ -75,20 +83,6 @@ public class UserInputsGenesis extends UserInputs{
 			throw new UnknownDataFormatException(e.getMessage());
 		}
 		return null;
-	}
-
-	private void readUserInputs() throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
-		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
-		try {
-			JsonNode userInputs = JsonFileReader.read(userInputFile);
-			vtlReconciliationFile = FileUtils.convertToPath(readField(userInputs, "reconciliation_specifications"),inputDirectory);
-			vtlTransformationsFile = FileUtils.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
-			vtlInformationLevelsFile = FileUtils.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
-
-		} catch (IOException e) {
-			log.error("Unable to read user input file: {} , {}", userInputFile, e);
-			throw new UnknownDataFormatException(e.getMessage());
-		}
 	}
 
 	public List<String> getModes() {
@@ -113,7 +107,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * @throws IOException – if an I/O error is thrown when accessing the starting file
 	 */
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().matches("ddi[\\w,\\s-]+\\.xml"))) {
+		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("ddi[\\w,\\s-]+\\.xml"))) {
 			return files.findFirst()
 					.orElseThrow(() -> new KraftwerkException(404, "No DDI file found in " + specDirectory.toString()));
 		}
@@ -126,7 +120,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
 	 */
 	public Path findLunaticFile(Path specDirectory) throws KraftwerkException, IOException {
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().matches("lunatic[\\w,\\s-]+\\.json"))) {
+		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("lunatic[\\w,\\s-]+\\.json"))) {
 			return files.findFirst()
 					.orElseThrow(() -> new KraftwerkException(404, "No Lunatic file found in " + specDirectory.toString()));
 		}
