@@ -160,4 +160,12 @@ class XMLReportingDataParserTest {
 		assertEquals(5, xMLReportingDataParser.countMaxStates(reportingData)); //remove double
 	}
 
+	@Test
+	void maxTest_noData() {
+		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+		ReportingData reportingData = new ReportingData();
+		assertEquals(0, xMLReportingDataParser.countMaxStates(reportingData));
+		assertEquals(0, xMLReportingDataParser.countMaxAttempts(reportingData));
+		assertEquals(0, xMLReportingDataParser.countMaxComments(reportingData));
+	}
 }
