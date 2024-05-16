@@ -78,6 +78,9 @@ public class MainProcessingGenesis {
 		int batchSize = 1000;
 		init(idCampaign);
 		List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
+		if(questionnaireModelIds.isEmpty()){
+			throw new KraftwerkException(204, null);
+		}
         for (String questionnaireId : questionnaireModelIds) {
             List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
             List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
