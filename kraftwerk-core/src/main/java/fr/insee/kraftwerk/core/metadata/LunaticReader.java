@@ -146,12 +146,6 @@ public class LunaticReader {
 			Group rootGroup = metadataModel.getRootGroup();
 			iterateOnComponents(rootNode, variables, metadataModel, rootGroup);
 
-			//Case of FILTER_RESULT
-			List<String> filterResultsVariables = variables.stream().filter(variable -> variable.startsWith(FILTER_RESULT_PREFIX)).toList();
-			filterResultsVariables.forEach(filterVar -> {
-
-			});
-
 			// We iterate on root components to identify variables belonging to root group
 			JsonNode rootComponents = rootNode.get(COMPONENTS);
 			for (JsonNode comp : rootComponents) {
