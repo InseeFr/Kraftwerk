@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class MainProcessing {
 	private VtlBindings vtlBindings = new VtlBindings();
 	private KraftwerkExecutionLog kraftwerkExecutionLog;
 	private List<KraftwerkError> errors = new ArrayList<>();
+	private LocalDateTime executionDateTime;
 	
 	/**
 	 * Map by mode
@@ -96,6 +98,7 @@ public class MainProcessing {
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
 		kraftwerkExecutionLog = new KraftwerkExecutionLog(); //Init logger
+		this.executionDateTime = LocalDateTime.now();
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
@@ -126,7 +129,7 @@ public class MainProcessing {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI,kraftwerkExecutionLog);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels);
 		}
@@ -141,17 +144,17 @@ public class MainProcessing {
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, kraftwerkExecutionLog);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, kraftwerkExecutionLog);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
 	}
 
 
 	/* Step 6 : Write log */
-	private void writeLog() {TextFileWriter.writeLogFile(inDirectory,kraftwerkExecutionLog);}
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionLog);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();

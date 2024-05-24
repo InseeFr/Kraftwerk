@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class WriterSequence {
 
-	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) throws KraftwerkException {
-		writeOutputFiles(inDirectory,vtlBindings,modeInputsMap,metadataModels,errors,null);
+	public void writeOutputFiles(Path inDirectory,LocalDateTime executionDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) throws KraftwerkException {
+		writeOutputFiles(inDirectory,executionDateTime,vtlBindings,modeInputsMap,metadataModels,errors,null);
 	}
 
-	public void writeOutputFiles(Path inDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
-		Path outDirectory = FileUtils.transformToOut(inDirectory);
+	public void writeOutputFiles(Path inDirectory, LocalDateTime localDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
+		Path outDirectory = FileUtils.transformToOut(inDirectory,localDateTime);
 		/* Step 4.1 : write csv output tables */
 		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()),kraftwerkExecutionLog);
 		csvOutputFiles.writeOutputTables(metadataModels);

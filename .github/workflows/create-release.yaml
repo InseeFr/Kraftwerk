@@ -66,9 +66,26 @@ jobs:
         id: changeLogContent
         run: |
           FILE_PATH='CHANGELOG.md'
-          TITLE1="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==1' | sed 's/\[/\\[/g; s/\]/\\]/g' | sed 's/^## //')"
-          TITLE2="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==2' | sed 's/\[/\\[/g; s/\]/\\]/g' | sed 's/^## //')"
-          changes="$(sed -n '/^${{TITLE1}}/,/^${{TITLE2}}/{//!p}' $FILE_PATH)"
+          TITLE1="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==1' | sed 's/^## //')"
+          TITLE2="$(sed -n '/^## [0-9]/{p;}' $FILE_PATH | awk 'NR==2' | sed 's/^## //')"
+          inprogress=false
+          while read line; do
+              if [[ $line == "## "* ]] ;
+              then
+                  if [[ $inprogress == true ]] ;
+                  then
+                      # new block encountered, stop
+                      break
+                  else
+                      # change block encounter, begin writing change block
+                      inprogress=true
+                  fi
+              fi
+              if [[ $inprogress == true ]] ;
+              then
+                  changes+=$line'  \n' 
+              fi
+          done < $FILE_PATH
           echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
           echo "changes=${changes}" >> $GITHUB_OUTPUT
 

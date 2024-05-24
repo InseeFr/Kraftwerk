@@ -1,5 +1,6 @@
 package cucumber.functional_tests;
 
+import fr.insee.kraftwerk.core.Constants;
 import io.cucumber.java.en.Then;
 import org.assertj.core.api.Assertions;
 
@@ -13,23 +14,22 @@ import java.util.stream.Stream;
 
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 
-public class LogFileDefinitions {
+public class ErrorFileDefinitions {
     static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
-    @Then("We should have a log file in directory {string}")
-    public void logFileExistenceCheck(String directory) throws IOException {
+    @Then("We should have a error file in directory {string}")
+    public void errorFileExistenceCheck(String directory) throws IOException {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
         try(Stream<Path> folderStream = Files.list(executionOutDirectory)){
             Assertions.assertThat(folderStream.filter(path ->
-                    path.getFileName().toString().startsWith(directory + "_LOG_")
+                    path.getFileName().toString().equals(Constants.ERRORS_FILE_NAME)
             )).isNotEmpty();
         }
-
     }
 
-    @Then("We should have log files for each execution in directory {string}")
-    public void logFilesExistenceCheck(String directory) throws IOException {
+    @Then("We should have error files for each execution in directory {string}")
+    public void errorFilesExistenceCheck(String directory) throws IOException {
         Path surveyOutDirectory = outDirectory.resolve(directory);
         File surveyOutDirectoryFile = surveyOutDirectory.toFile();
 
@@ -38,7 +38,7 @@ public class LogFileDefinitions {
 
             try (Stream<Path> folderStream = Files.list(executionOutDirectory)) {
                 Assertions.assertThat(folderStream.filter(path ->
-                        path.getFileName().toString().startsWith(directory + "_LOG_")
+                        path.getFileName().toString().equals(Constants.ERRORS_FILE_NAME)
                 )).isNotEmpty();
             }
         }

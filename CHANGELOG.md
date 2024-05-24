@@ -1,9 +1,55 @@
 # Changelog
 
+## 2.0.9 [2024-05-16] - Fix genesis calls
+### Added
+- Error 204 when no data in Genesis database when using the Genesis endpoint
 
-## X.X.X [Not released yet] 
+### Changed
+- Kraftwerk now get modes from Genesis by campaign
+- Kraftwerk genesis endpoint now uses idCampaign like the other endpoints 
+- Changed some error message to be more explicit
+
+### Fixed
+- Fix crash when empty reporting data file
+- Genesis response not parsed from JSON when calling on get QuestionnaireModelIds endpoint
+
+## 2.0.8 [2024-05-03] - Fix id for genesis 
+
+### Fixed
+- Genesis uses questionnaireModelId since Kraftwerk used idCampaign. Now the first step is to get questionnaireMOdelIds from idCampaigne to loop.
+
+## 2.0.7 [2024-05-03] - Hotfix configure genesis
+
+### Fixed
+- Add property to configure Genesis
+- Fix encoding for properties
 
 
+## 2.0.6 [2024-05-03] - Hotfix genesis endpoint
+
+### Fixed
+- Pass idQuestionnaire param as body for genesis service
+- Fix CVE >8
+
+### Added
+- Prepare dockerfile
+
+## 2.0.5 [2024-04-24] - Numbered parquet files and fix logs
+
+### Changed
+- Parquet files are numbered and then merged in the import script
+
+### Fixed
+- Log and error files are created with output files
+- Rolling logs
+
+## 2.0.4 [2024-04-22]
+
+### Changed
+- Output files are stored in separate execution time folders
+
+### Fixed
+- Fixed crash when no COLLECTED tag in .xml data file
 
 
 ## 2.0.3 [2024-04-02] - Update some dependencies

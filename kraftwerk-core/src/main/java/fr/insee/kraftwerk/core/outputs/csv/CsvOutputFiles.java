@@ -74,7 +74,7 @@ public class CsvOutputFiles extends OutputFiles {
 	 */
 	@Override
 	public String outputFileName(String datasetName) {
-		return getOutputFolder().getFileName() + "_" + datasetName + ".csv";
+		return getOutputFolder().getParent().getFileName() + "_" + datasetName + ".csv";
 	}
 
 }

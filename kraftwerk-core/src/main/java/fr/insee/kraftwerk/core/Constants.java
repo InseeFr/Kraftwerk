@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public final class Constants {
 
-	private Constants() {}
+    private Constants() {}
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
@@ -56,6 +56,8 @@ public final class Constants {
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
 	public static final String REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER = "NON_AFFECTE_";
 	public static final String END_LINE = "\n";
+	public static final String OUTPUT_FOLDER_DATETIME_PATTERN = "yyyy_MM_dd_HH_mm_ss";
+	public static final String ERRORS_FILE_NAME = "errors.txt";
 
 
 	// ----- Explicit Variables Names

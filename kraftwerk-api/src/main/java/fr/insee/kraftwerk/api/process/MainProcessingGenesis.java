@@ -10,7 +10,11 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
-import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -22,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +42,7 @@ public class MainProcessingGenesis {
 	private List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private UserInputsGenesis userInputs;
+	private LocalDateTime executionDateTime;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -53,35 +59,42 @@ public class MainProcessingGenesis {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 	}
 
-	public void init(String idQuestionnaire) throws KraftwerkException, IOException {
-		log.info("Kraftwerk main service started for questionnaire: " + idQuestionnaire);
-		inDirectory = controlInputSequenceGenesis.getInDirectory(idQuestionnaire);
+	public void init(String idCampaign) throws KraftwerkException, IOException {
+		log.info("Kraftwerk main service started for campaign: " + idCampaign);
+		this.executionDateTime = LocalDateTime.now();
+		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idQuestionnaire));
+		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign));
 		if (!userInputs.getModes().isEmpty()) {
 			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap());
 		} else {
-			log.error("No source found for questionnaire " + idQuestionnaire);
+			log.error("No source found for campaign " + idCampaign);
 		}
 	}
 
-	public void runMain(String idQuestionnaire) throws KraftwerkException, IOException {
+	public void runMain(String idCampaign) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
-		init(idQuestionnaire);
-		List <SurveyUnitId> ids = client.getSurveyUnitIds(idQuestionnaire);
-		List <List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
-		for (List<SurveyUnitId> listId : listIds) {
-			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(idQuestionnaire, listId);
-			log.info("Number of documents retrieved from database : {}", suLatest.size());
-			vtlBindings = new VtlBindings();
-			unimodalProcess(suLatest);
-			multimodalProcess();
-			outputFileWriter();
-			writeErrors();
+		init(idCampaign);
+		List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
+		if(questionnaireModelIds.isEmpty()){
+			throw new KraftwerkException(204, null);
 		}
-	}
+        for (String questionnaireId : questionnaireModelIds) {
+            List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
+            List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
+            for (List<SurveyUnitId> listId : listIds) {
+                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
+                log.info("Number of documents retrieved from database : {}", suLatest.size());
+                vtlBindings = new VtlBindings();
+                unimodalProcess(suLatest);
+                multimodalProcess();
+                outputFileWriter();
+                writeErrors();
+            }
+        }
+    }
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
@@ -101,12 +114,12 @@ public class MainProcessingGenesis {
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
 	}
 
 }

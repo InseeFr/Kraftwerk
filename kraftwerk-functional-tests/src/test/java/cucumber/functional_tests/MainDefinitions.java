@@ -30,13 +30,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static cucumber.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Main example
@@ -127,6 +131,18 @@ public class MainDefinitions {
 		mp.runMain();
 	}
 
+	@When("We launch main service 2 times")
+	public void launch_main_2() throws KraftwerkException, InterruptedException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp.runMain();
+		await().atMost(2, TimeUnit.SECONDS);
+		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp.runMain();
+	}
+
 	@When("Step 1 : We launch main service file by file")
 	public void launch_main_filebyfile() throws KraftwerkException {
 		// We clean the output and the temp directory
@@ -158,16 +174,19 @@ public class MainDefinitions {
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
-		writeErrorsFile(inDirectory, errors);
+		LocalDateTime localDateTime = LocalDateTime.now();
+		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
+		writeErrorsFile(inDirectory, localDateTime, errors);
 		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputsFile.getModes());
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : "
-				+ outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+				+ executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		CSVReader csvReader = CsvUtils
 				.getReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		// Count
@@ -184,8 +203,11 @@ public class MainDefinitions {
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
 	public void check_output_root_table(int expectedLineCount, int expectedVariablesCount)
 			throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
 		CSVReader csvReader = CsvUtils
-				.getReader(outDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
+				.getReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -259,8 +281,8 @@ public class MainDefinitions {
 		return directoryToBeDeleted.delete();
 	}
 
-	private void writeErrorsFile(Path inDirectory, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory).resolve("errors.txt");
+	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
+		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
 		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
@@ -281,7 +303,10 @@ public class MainDefinitions {
 
 	@Then("In a file named {string} there should be a {string} field")
 	public void check_field_existence(String fileName, String fieldName) throws IOException, CsvValidationException {
-		File outputReportingDataFile = new File(outDirectory + "/" + fileName);
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		File outputReportingDataFile = new File(executionOutDirectory + "/" + fileName);
 
 		// File existence assertion
 		assertThat(outputReportingDataFile).exists().isFile().canRead();

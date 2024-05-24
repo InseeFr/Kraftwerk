@@ -124,4 +124,19 @@ class LunaticXmlDataParserTest {
 		}
 	}
 
+	@Test
+	void parseLunaticXml_noCollected() throws NullException {
+		//Given
+		SurveyRawData data = new SurveyRawData("TEST");
+		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
+		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-3.xml");
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+
+		//When
+		parser.parseSurveyData(dataPath,null);
+
+		//Then
+		assertEquals(1, data.getQuestionnairesCount());
+	}
+
 }

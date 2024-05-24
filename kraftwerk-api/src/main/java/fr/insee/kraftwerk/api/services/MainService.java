@@ -2,8 +2,13 @@ package fr.insee.kraftwerk.api.services;
 
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.io.IOException;
 
@@ -98,17 +97,18 @@ public class MainService extends KraftwerkService {
 
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
-	public ResponseEntity<String> mainGenesis(@RequestParam("idQuestionnaire") String idQuestionnaire) {
+	public ResponseEntity<String> mainGenesis(
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties);
 		try {
 			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory));
-			mpGenesis.runMain(idQuestionnaire);
+			mpGenesis.runMain(idCampaign);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(idQuestionnaire);
+		return ResponseEntity.ok(idCampaign);
 	}
 
 
