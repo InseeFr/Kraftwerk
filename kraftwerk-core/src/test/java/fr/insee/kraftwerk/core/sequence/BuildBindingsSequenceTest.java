@@ -7,12 +7,15 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -23,7 +26,7 @@ class BuildBindingsSequenceTest {
 
 
 	@Test
-	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
+	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException, SQLException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
@@ -37,13 +40,15 @@ class BuildBindingsSequenceTest {
 		MetadataModel metadata = null;
 		
 		//THEN
-		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
-		
+		try(Statement database = SqlUtils.openConnection().createStatement()){
+			assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null,database));
+		}
+
 	}
 	
 	@ParameterizedTest
 	@CsvSource({"true,true", "true,false", "false,false", "false,true"})
-	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException {
+	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException, SQLException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
@@ -57,7 +62,9 @@ class BuildBindingsSequenceTest {
 
 		//WHEN
 		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi,null));
+		try(Statement database = SqlUtils.openConnection().createStatement()) {
+			assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null,database));
+		}
 	}
 	
 	

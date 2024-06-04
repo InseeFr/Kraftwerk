@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -18,6 +19,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
+import java.sql.Statement;
 
 @Log4j2
 public class BuildBindingsSequence {
@@ -30,7 +32,7 @@ public class BuildBindingsSequence {
 		this.withAllReportingData = withAllReportingData;
 	}
 
-	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog, Statement database) throws KraftwerkException {
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
@@ -51,7 +53,7 @@ public class BuildBindingsSequence {
 		parseParadata(modeInputs, data);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(modeInputs, data);
+		parseReportingData(modeInputs, data, database);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -67,7 +69,7 @@ public class BuildBindingsSequence {
 		}
 	}
 
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
+	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data, Statement database) throws KraftwerkException {
 		Path reportingDataFile = modeInputs.getReportingDataFile();
 		if (reportingDataFile != null) {
 			ReportingData reportingData = new ReportingData(reportingDataFile);
@@ -77,7 +79,7 @@ public class BuildBindingsSequence {
 
 			} else if (reportingDataFile.toString().contains(".csv")) {
 					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
+					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData,database);
 			}
 		}
 	}

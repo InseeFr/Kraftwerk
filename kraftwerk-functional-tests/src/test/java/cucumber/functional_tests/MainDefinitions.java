@@ -1,33 +1,41 @@
 package cucumber.functional_tests;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
+
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
-import io.cucumber.java.Before;
+import io.cucumber.java.AfterAll;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +55,6 @@ public class MainDefinitions {
 	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
-	String userInputFileName = Constants.USER_INPUT_FILE;
 	UserInputsFile userInputs;
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
@@ -58,10 +65,12 @@ public class MainDefinitions {
 
 	VtlExecute vtlExecute = new VtlExecute();
 	List<KraftwerkError> errors = new ArrayList<>();
+	static Statement database;
 
-	@Before
-	public void clean() throws KraftwerkException {
+	@BeforeAll
+	public static void clean() throws KraftwerkException, SQLException {
 		FileUtils.deleteDirectory(outDirectory);
+		database = SqlUtils.openConnection().createStatement();
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -136,12 +145,12 @@ public class MainDefinitions {
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws NullException {
+	public void unimodal_treatments() throws KraftwerkException {
 		metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
+			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null,database);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
 		}
@@ -150,16 +159,16 @@ public class MainDefinitions {
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, database);
 	}
 
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		LocalDateTime localDateTime = LocalDateTime.now();
-		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
+		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, database);
 		writeErrorsFile(inDirectory, localDateTime, errors);
-		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
+		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), database);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -169,8 +178,7 @@ public class MainDefinitions {
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : "
 				+ executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
-		CSVReader csvReader = CsvUtils
-				.getReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+		CSVReader csvReader = getCSVReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		// Count
 		int lineCount = 0;
 		while ((csvReader.readNext()) != null) {
@@ -188,8 +196,7 @@ public class MainDefinitions {
 		// Go to first datetime folder
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-		CSVReader csvReader = CsvUtils
-				.getReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
+		CSVReader csvReader = getCSVReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -212,7 +219,7 @@ public class MainDefinitions {
 	@Then("Step 6 : We check if we have {int} variables")
 	public void count_variables_in_root_tables(int expectedVariablesCount) throws CsvValidationException, IOException {
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = CsvUtils.getReader(
+		CSVReader csvReader = getCSVReader(
 				outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
 		// get header
 		String[] header = csvReader.readNext();
@@ -232,8 +239,7 @@ public class MainDefinitions {
 			tableName = Constants.ROOT_GROUP_NAME;
 
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = CsvUtils
-				.getReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
+		CSVReader csvReader = getCSVReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
 		// get header
 		String[] header = csvReader.readNext();
 		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
@@ -253,14 +259,14 @@ public class MainDefinitions {
 		assertEquals(expectedValue, value);
 	}
 
-	boolean deleteDirectory(File directoryToBeDeleted) {
+	void deleteDirectory(File directoryToBeDeleted) {
 		File[] allContents = directoryToBeDeleted.listFiles();
 		if (allContents != null) {
 			for (File file : allContents) {
 				deleteDirectory(file);
 			}
 		}
-		return directoryToBeDeleted.delete();
+		directoryToBeDeleted.delete();
 	}
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
@@ -293,7 +299,7 @@ public class MainDefinitions {
 		// File existence assertion
 		assertThat(outputReportingDataFile).exists().isFile().canRead();
 
-		CSVReader csvReader = CsvUtils.getReader(
+		CSVReader csvReader = getCSVReader(
 				outputReportingDataFile.toPath()
 		);
 
@@ -316,5 +322,24 @@ public class MainDefinitions {
 			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
 
 		Files.deleteIfExists(bkpPath);
+	}
+
+
+	@AfterAll
+	public static void openConnection() throws SQLException {
+		database.getConnection().close();
+	}
+
+	//CSV Utilities
+	public CSVReader getCSVReader(Path filePath) throws IOException {
+		CSVParser parser = new CSVParserBuilder()
+				.withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+				//.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
+				//.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
+				.build();
+		return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+				//.withSkipLines(1) // (uncomment to ignore header)
+				.withCSVParser(parser)
+				.build();
 	}
 }

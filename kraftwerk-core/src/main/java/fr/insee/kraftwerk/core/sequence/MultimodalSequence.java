@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -13,14 +14,15 @@ import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class MultimodalSequence {
-	
-	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels) {
+
+	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels, Statement database){
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
@@ -46,7 +48,8 @@ public class MultimodalSequence {
 				userInputs.getVtlInformationLevelsFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
 
-
+		/* Step 3.4 : Convert VTL datasets into SQL tables for export */
+		SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database);
 
 	}
 

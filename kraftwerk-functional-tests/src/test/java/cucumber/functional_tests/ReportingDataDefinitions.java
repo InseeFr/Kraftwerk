@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -18,14 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
 import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import io.cucumber.java.en.Then;
 
 
@@ -68,7 +72,7 @@ public class ReportingDataDefinitions {
         // File existence assertion
         assertThat(outputReportingDataFile).exists().isFile().canRead();
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 outputReportingDataFile.toPath()
         );
 
@@ -98,7 +102,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -119,7 +123,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -168,7 +172,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -218,7 +222,7 @@ public class ReportingDataDefinitions {
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -262,7 +266,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -279,7 +283,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -328,7 +332,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -358,5 +362,17 @@ public class ReportingDataDefinitions {
             i++;
         }
         assertThat(identificationContent).isEqualTo(expectedValue);
+    }
+
+    public static CSVReader getReader(Path filePath) throws IOException {
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+                //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
+                //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
+                .build();
+        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+                //.withSkipLines(1) // (uncomment to ignore header)
+                .withCSVParser(parser)
+                .build();
     }
 }

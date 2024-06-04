@@ -1,4 +1,6 @@
 # Changelog
+## 2.1.0 [TODO] - DuckDB implementation for output
+### Changed
 
 ## 2.0.9 [2024-05-16] - Fix genesis calls
 ### Added

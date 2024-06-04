@@ -27,6 +27,16 @@
 			<version>${kraftwerk.version}</version>
 			<classifier>app-to-import</classifier>
 		</dependency>
+
+		<!-- CSV -->
+		<!-- OpenCSV -->
+		<!--
+		https://www.geeksforgeeks.org/writing-a-csv-file-in-java-using-opencsv/ -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.9</version>
+		</dependency>
 	</dependencies>
 
 	<build>

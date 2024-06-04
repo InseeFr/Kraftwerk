@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -21,6 +22,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database) throws KraftwerkException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -72,7 +74,7 @@ public class BuildBindingsSequenceGenesis {
 		parseParadata(dataMode, data, inDirectory);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, inDirectory);
+		parseReportingData(dataMode, data, inDirectory,database);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -89,7 +91,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, Statement database) throws KraftwerkException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		File reportingDataFolder = reportingDataFile.toFile();
 		if (reportingDataFolder.exists()) {
@@ -102,7 +104,7 @@ public class BuildBindingsSequenceGenesis {
 
 				} else if (file.contains(".csv")) {
 					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-					cSVReportingDataParser.parseReportingData(reportingData, data, true);
+					cSVReportingDataParser.parseReportingData(reportingData, data, true,database);
 				}
 			}
 		}

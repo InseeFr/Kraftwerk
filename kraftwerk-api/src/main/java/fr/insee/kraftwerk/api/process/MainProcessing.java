@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -17,6 +18,8 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +29,14 @@ import java.util.stream.Stream;
 @Log4j2
 public class MainProcessing {
 
-	private ControlInputSequence controlInputSequence;
-	private boolean fileByFile;
-	private boolean withAllReportingData;
-	private boolean withDDI;
+	private final ControlInputSequence controlInputSequence;
+	private final boolean fileByFile;
+	private final boolean withAllReportingData;
+	private final boolean withDDI;
 
 
 	/* SPECIFIC VARIABLES */
-	private String inDirectoryParam;
+	private final String inDirectoryParam;
 	@Getter
 	private Path inDirectory;
 	
@@ -43,8 +46,13 @@ public class MainProcessing {
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
 	private KraftwerkExecutionLog kraftwerkExecutionLog;
-	private List<KraftwerkError> errors = new ArrayList<>();
+	private final List<KraftwerkError> errors = new ArrayList<>();
 	private LocalDateTime executionDateTime;
+
+	/**
+	 * DuckDb database Statement used for this MainProcessing
+	 */
+	private Statement database;
 	
 	/**
 	 * Map by mode
@@ -77,28 +85,36 @@ public class MainProcessing {
 
 	public void runMain() throws KraftwerkException {
 		init();
-		if (Boolean.TRUE.equals(fileByFile)) { //iterate on files
-			for (UserInputsFile userFile : userInputsFileList) {
-				this.userInputsFile = userFile;
-				vtlBindings = new VtlBindings();
+		//Try with ressources to close database when done
+		try(Statement trydatabase = SqlUtils.openConnection().createStatement()) {
+			this.database = trydatabase;
+			if (Boolean.TRUE.equals(fileByFile)) { //iterate on files
+				for (UserInputsFile userFile : userInputsFileList) {
+					this.userInputsFile = userFile;
+					vtlBindings = new VtlBindings();
+					unimodalProcess();
+					multimodalProcess();
+					outputFileWriter();
+				}
+			} else {
 				unimodalProcess();
 				multimodalProcess();
 				outputFileWriter();
 			}
-		} else {
-			unimodalProcess();
-			multimodalProcess();
-			outputFileWriter();
+			writeErrors();
+			kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+			writeLog();
+		}catch (SQLException e){
+			log.error(e.toString());
+			throw new KraftwerkException(500,"SQL error");
 		}
-		writeErrors();
-		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
-		writeLog();
 	}
 
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
 		kraftwerkExecutionLog = new KraftwerkExecutionLog(); //Init logger
 		this.executionDateTime = LocalDateTime.now();
+
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
@@ -107,7 +123,7 @@ public class MainProcessing {
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		if (withDDI) metadataModels = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		if (!withDDI) metadataModels = MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
-	
+
 		if (fileByFile) userInputsFileList = getUserInputsFile(userInputsFile);
 
 		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
@@ -129,22 +145,22 @@ public class MainProcessing {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog, database);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
-	private void multimodalProcess() {
+	private void multimodalProcess(){
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, database);
 	}
 
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, kraftwerkExecutionLog);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database);
 	}
 
 	/* Step 5 : Write errors */
