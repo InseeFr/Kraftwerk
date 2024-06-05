@@ -6,7 +6,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,13 +15,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 public class SqlUtils {
@@ -37,8 +35,8 @@ public class SqlUtils {
     public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement) {
         try {
             createOutputSQLTables(statement, vtlBindings);
-        } catch (Exception e) {
-            log.error(e.toString());
+        } catch (SQLException e) {
+            log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
         }
     }
 
@@ -61,13 +59,11 @@ public class SqlUtils {
             StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE %s (", datasetName));
 
             //Column order map to use in INSERT VALUES statement
-            List<String> schemaOrder = new ArrayList<>();
+            List<String> schemaOrder = extractColumnsOrder(datasetName, vtlBindings);
 
-            for (String columnName : sqlSchema.keySet()) {
+            for (String columnName : schemaOrder) {
                 createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
                 createTableQuery.append(", ");
-
-                schemaOrder.add(columnName);
             }
 
             //Remove last delimiter and replace by ")"
@@ -75,10 +71,43 @@ public class SqlUtils {
             createTableQuery.append(")");
 
             statement.execute(createTableQuery.toString());
-            //TODO Save query
+            //TODO Save query to file
 
             insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
         }
+    }
+
+    private static Map<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
+        //Deduplicate column names by case
+        Set<String> deduplicatedColumns = new HashSet<>();
+        for(Structured.Component component : structure.values()) {
+            deduplicatedColumns.add(component.getName().toLowerCase());
+        }
+
+        Map<String, VariableType> schema = new HashMap<>();
+        for (Structured.Component component : structure.values()) {
+            VariableType type = VariableType.getTypeFromJavaClass(component.getType());
+            if (type != null){
+                //If column not added yet
+                if(deduplicatedColumns.contains(component.getName().toLowerCase())){
+                    schema.put(component.getName(), type);
+                    deduplicatedColumns.remove(component.getName().toLowerCase());
+                }
+            } else {
+                log.warn("Cannot export variable {} to SQL, unrecognized type", component.getName());
+            }
+        }
+        return schema;
+    }
+
+    private static List<String> extractColumnsOrder(String datasetName, VtlBindings vtlBindings){
+        List<String> columnsOrder = new ArrayList<>();
+        Dataset dataset = vtlBindings.getDataset(datasetName);
+        for(Structured.Component component : dataset.getDataStructure().values()){
+            columnsOrder.add(component.getName());
+        }
+
+        return columnsOrder;
     }
 
     /**
@@ -99,12 +128,9 @@ public class SqlUtils {
         for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
             insertDataQuery.append("(");
             for (String columnName : schemaOrder) {
-                //Get VTL dataset column name from SQL lowercase column name
-                String vtlcolumnname = getVtlcolumnname(dataRow, columnName);
-
-                String data = dataRow.get(vtlcolumnname) == null ? "null" : dataRow.get(vtlcolumnname).toString();
-                if (schema.get(columnName).equals(VariableType.STRING) && dataRow.get(vtlcolumnname) != null) {
-                    data = String.format("$$%s$$", data); //Surround with single quotes if string
+                String data = dataRow.get(columnName) == null ? "null" : dataRow.get(columnName).toString();
+                if (schema.get(columnName).equals(VariableType.STRING) && dataRow.get(columnName) != null) {
+                    data = String.format("$$%s$$", data); //Surround with dollar quotes if string
                 }
                 insertDataQuery.append(data).append(",");
             }
@@ -115,24 +141,6 @@ public class SqlUtils {
         insertDataQuery.append("COMMIT;");
         //TODO save query
         statement.execute(insertDataQuery.toString());
-    }
-
-    private static String getVtlcolumnname(Map<String, Object> dataRow, String columnName) {
-        Optional<String> optional = dataRow.keySet().stream().filter(s -> s.toLowerCase().equals(columnName)).findFirst();
-        return optional.orElse(null);
-    }
-
-    private static Map<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
-        Map<String, VariableType> schema = new HashMap<>();
-        for (Structured.Component component : structure.values()) {
-            VariableType type = VariableType.getTypeFromJavaClass(component.getType());
-            if (type != null) {
-                schema.put(component.getName().toLowerCase(), type);
-            } else {
-                log.warn("Cannot export variable {} to SQL, unrecognized type", component.getName());
-            }
-        }
-        return schema;
     }
 
     /**
@@ -191,6 +199,7 @@ public class SqlUtils {
      * Connect to DuckDB and retrieve column names of a table
      *
      * @param tableName name of table to retrieve column names
+     * @param statement database connection
      * @return data table column names
      * @throws SQLException if SQL error
      */
@@ -200,10 +209,12 @@ public class SqlUtils {
 
     /**
      * Connect to DuckDB and import CSV file in a table named after the file
-     *
+     * @param statement database connection
      * @param filePath path of the file to import into duckdb
      */
     public static void readCsvFile(Statement statement, Path filePath) throws SQLException {
         statement.execute(String.format("CREATE TABLE %s AS FROM read_csv('%s')", filePath.getFileName().toString().split("\\.")[0], filePath));
     }
+
+    //TODO read parquet
 }

@@ -1,17 +1,22 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -21,6 +26,7 @@ import java.util.Map;
 /**
  * Class to manage the writing of CSV output tables.
  */
+@Slf4j
 public class CsvOutputFiles extends OutputFiles {
 	private final KraftwerkExecutionLog kraftwerkExecutionLog;
 
@@ -48,14 +54,49 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			File outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toFile();
 			try {
-				Files.deleteIfExists(outputFile.toPath());
-				//Data export
-				this.getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT CSV)", datasetName, outputFile.getAbsolutePath()));
+				//Get column names
+				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
+				if(columnNames.isEmpty()){
+					log.warn("dataset {} is empty !", datasetName);
+					return;
+				}
 
-				//Count rows for functionnal log
+				//Create file with double quotes header
+				StringBuilder headerBuilder = new StringBuilder();
+				for (String stringColumnName : columnNames) {
+					headerBuilder.append(String.format("\"%s\"", stringColumnName)).append(Constants.CSV_OUTPUTS_SEPARATOR);
+				}
+				headerBuilder.deleteCharAt(headerBuilder.length()-1);
+				headerBuilder.append("\n");
+				Files.write(outputFile.toPath(), headerBuilder.toString().getBytes());
+
+				//Data export into temp file
+				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
+				//Double quote values parameter
+				exportCsvQuery.append(", FORCE_QUOTE(");
+				for (String stringColumnName : columnNames) {
+					exportCsvQuery.append(String.format("'%s',", stringColumnName));
+				}
+				//Remove last ","
+				exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
+				exportCsvQuery.append("))");
+				this.getDatabase().execute(exportCsvQuery.toString());
+
+				//Merge data file with header file
+				//Read line by line to avoid memory waste
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(outputFile.toPath().toAbsolutePath() + "data"))){
+					String line = bufferedReader.readLine();
+					while(line != null){
+						Files.write(outputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
+						line = bufferedReader.readLine();
+					}
+				}
+				Files.deleteIfExists(Path.of(outputFile.toPath().toAbsolutePath() + "data"));
+
+				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
 					try(ResultSet countResult = this.getDatabase().executeQuery("SELECT COUNT(*) FROM " + datasetName)){
-                        assert kraftwerkExecutionLog != null; // Assert because of IDE warning
+                        assert kraftwerkExecutionLog != null; // Assert because IDE warning
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}

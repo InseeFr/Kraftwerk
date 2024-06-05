@@ -278,7 +278,7 @@ public class ReportingDataDefinitions {
         assertThat(header).doesNotContainAnyElementsOf(Arrays.asList(reportingDataFields));
     }
 
-    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the OUTCOME_SPOTTING field")
+    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the outcome_spotting field")
     public void check_outcome_spotting_result(String surveyUnitId, String fileName, String directory, String expectedOutcomeSpotting) throws IOException, CsvException {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
@@ -295,7 +295,7 @@ public class ReportingDataDefinitions {
         String[] header = content.get(0);
 
         // OUTCOME_SPOTTING field existence assertion
-        assertThat(header).contains("OUTCOME_SPOTTING");
+        assertThat(header).contains("outcome_spotting");
 
         // Fetch concerned survey unit line from file
         String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
@@ -307,7 +307,7 @@ public class ReportingDataDefinitions {
         int i = 0;
         String outcomeSpottingContent = null;
         for (String element : concernedLine) {
-            if (header[i].equals("OUTCOME_SPOTTING")) {
+            if (header[i].equals("outcome_spotting")) {
                 outcomeSpottingContent = element;
                 break;
             }
