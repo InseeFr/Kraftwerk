@@ -181,10 +181,14 @@ public class MainDefinitions {
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
 		// Go to first datetime folder
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
 		// Get reader to read the root table written in outputs
-		System.out.println("Check output file path : "
-				+ executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
-		CSVReader csvReader = getCSVReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
 		// Count
 		int lineCount = 0;
 		while ((csvReader.readNext()) != null) {
@@ -241,9 +245,16 @@ public class MainDefinitions {
 
 	@Then("Step 6 : We check if we have {int} variables")
 	public void count_variables_in_root_tables(int expectedVariablesCount) throws CsvValidationException, IOException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = getCSVReader(
-				outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -364,5 +375,25 @@ public class MainDefinitions {
 				//.withSkipLines(1) // (uncomment to ignore header)
 				.withCSVParser(parser)
 				.build();
+	}
+
+	@Then("We check if there is only one header")
+	public void uniqueHeaderCheck() throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
+		// Get reader to read the root table written in outputs
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
+		// get header
+		String[] header = csvReader.readNext();
+		String[] line;
+		while((line = csvReader.readNext()) != null){
+			Assertions.assertThat(line).isNotEqualTo(header);
+		}
 	}
 }

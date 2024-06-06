@@ -52,16 +52,26 @@ public class SqlUtils {
      */
     private static void createOutputSQLTables(Statement statement, VtlBindings vtlBindings) throws SQLException {
         for (String datasetName : vtlBindings.getDatasetNames()) {
+            //Variables types map
             Map<String, VariableType> sqlSchema = extractSqlSchema(vtlBindings.getDataset(datasetName).getDataStructure());
-
+            //Skip if no variable
             if (sqlSchema.isEmpty()) {
                 log.warn("Empty schema for dataset {}", datasetName);
                 return;
             }
-            StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
 
             //Column order map to use in INSERT VALUES statement
             List<String> schemaOrder = extractColumnsOrder(vtlBindings.getDataset(datasetName));
+
+            //Skip CREATE if table already exists (ex: file-by-file)
+            List<String> tableNames = getTableNames(statement);
+            if(tableNames.contains(datasetName)){
+                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
+                return;
+            }
+
+            //CREATE query building
+            StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
 
             for (String columnName : schemaOrder) {
                 createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
@@ -72,6 +82,7 @@ public class SqlUtils {
             createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
             createTableQuery.append(")");
 
+            //Execute query
             log.debug("SQL Query : {}", createTableQuery);
             statement.execute(createTableQuery.toString());
 
@@ -118,6 +129,20 @@ public class SqlUtils {
         }
 
         return columnsOrder;
+    }
+
+    /**
+     * Get all table names from database
+     * @param statement database statement
+     * @return list of table names
+     */
+    public static List<String> getTableNames(Statement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery("SHOW TABLES");
+        List<String> tableNames = new ArrayList<>();
+        while (resultSet.next()) {
+            tableNames.add(resultSet.getString("name"));
+        }
+        return tableNames;
     }
 
     /**

@@ -52,7 +52,7 @@ public class PaperDataParser extends DataParser {
 			 */
 
 			// Variables
-			List<String> header = SqlUtils.getColumnNames(database, String.valueOf(filePath.getFileName()));
+			List<String> header = SqlUtils.getColumnNames(database, String.valueOf(filePath.getFileName().toString().split("\\.")[0]));
 			VariablesMap variables = data.getMetadataModel().getVariables();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
 			for (int j = 1; j < header.size(); j++) {
@@ -87,7 +87,7 @@ public class PaperDataParser extends DataParser {
 			 */
 
 			// Survey answers
-			ResultSet resultSet = SqlUtils.getAllData(database, String.valueOf(filePath.getFileName()));
+			ResultSet resultSet = SqlUtils.getAllData(database, String.valueOf(filePath.getFileName()).split("\\.")[0]);
 			while (resultSet.next()) {
 				QuestionnaireData questionnaireData = new QuestionnaireData();
 				GroupInstance answers = questionnaireData.getAnswers();

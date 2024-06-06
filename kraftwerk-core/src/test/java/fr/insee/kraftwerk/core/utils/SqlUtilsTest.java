@@ -18,7 +18,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,17 +59,13 @@ class SqlUtilsTest {
 
             //Then
             //1 table / dataset
-            ResultSet resultSet = testDatabaseStatement.executeQuery("SHOW TABLES");
-            List<String> tableNames = new ArrayList<>();
-            while (resultSet.next()) {
-                tableNames.add(resultSet.getString("name"));
-            }
+            List<String> tableNames = SqlUtils.getTableNames(testDatabaseStatement);
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 Assertions.assertThat(tableNames).contains(datasetName);
             }
 
             //Table has data
-            resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
+            ResultSet resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
             Assertions.assertThat(resultSet.next()).isTrue();
         }
     }
@@ -142,6 +137,21 @@ class SqlUtilsTest {
             Assertions.assertThat(resultSet.getString("teststring1")).isEqualTo("test1");
             Assertions.assertThat(resultSet.getString("teststring2")).isEqualTo("test2");
             Assertions.assertThat(resultSet.getInt("testint1")).isEqualTo(1);
+        }
+    }
+
+    @Test
+    void getTableNamesTest() throws SQLException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //Given
+            testDatabaseStatement.execute("CREATE TABLE testtable1(testint1 INT, teststring1 NVARCHAR)");
+            testDatabaseStatement.execute("CREATE TABLE testtable2(testint2 INT, teststring2 NVARCHAR)");
+
+            //When
+            List<String> tableNames = SqlUtils.getTableNames(testDatabaseStatement);
+
+            //Then
+            Assertions.assertThat(tableNames).contains("testtable1","testtable2");
         }
     }
 
