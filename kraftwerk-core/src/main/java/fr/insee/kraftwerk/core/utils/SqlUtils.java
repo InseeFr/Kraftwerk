@@ -31,6 +31,8 @@ public class SqlUtils {
 
     /**
      * Convert vtl bindings to SQL DuckDB tables for further export
+     * @param vtlBindings vtl bindings to send into database
+     * @param statement statement associated to database
      */
     public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement) {
         try {
@@ -56,10 +58,10 @@ public class SqlUtils {
                 log.warn("Empty schema for dataset {}", datasetName);
                 return;
             }
-            StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE %s (", datasetName));
+            StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
 
             //Column order map to use in INSERT VALUES statement
-            List<String> schemaOrder = extractColumnsOrder(datasetName, vtlBindings);
+            List<String> schemaOrder = extractColumnsOrder(vtlBindings.getDataset(datasetName));
 
             for (String columnName : schemaOrder) {
                 createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
@@ -70,13 +72,18 @@ public class SqlUtils {
             createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
             createTableQuery.append(")");
 
+            log.debug("SQL Query : {}", createTableQuery);
             statement.execute(createTableQuery.toString());
-            //TODO Save query to file
 
             insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
         }
     }
 
+    /**
+     * Extract variable types from a dataset
+     * @param structure the structure of the dataset
+     * @return a (variable name,type) map
+     */
     private static Map<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
         //Deduplicate column names by case
         Set<String> deduplicatedColumns = new HashSet<>();
@@ -100,9 +107,12 @@ public class SqlUtils {
         return schema;
     }
 
-    private static List<String> extractColumnsOrder(String datasetName, VtlBindings vtlBindings){
+    /**
+     * Extract columns order from a VTL dataset
+     * @return a list of columns names in the right order
+     */
+    private static List<String> extractColumnsOrder(Dataset dataset){
         List<String> columnsOrder = new ArrayList<>();
-        Dataset dataset = vtlBindings.getDataset(datasetName);
         for(Structured.Component component : dataset.getDataStructure().values()){
             columnsOrder.add(component.getName());
         }
@@ -122,7 +132,7 @@ public class SqlUtils {
             return;
         }
         StringBuilder insertDataQuery = new StringBuilder("BEGIN TRANSACTION;\n");
-        insertDataQuery.append(String.format("INSERT INTO %s VALUES ", datasetName));
+        insertDataQuery.append(String.format("INSERT INTO \"%s\" VALUES ", datasetName));
 
         //For each row of the dataset
         for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
@@ -139,7 +149,7 @@ public class SqlUtils {
         }
         insertDataQuery.delete(insertDataQuery.length() - 1, insertDataQuery.length()).append(";"); //Replace last "," by ";"
         insertDataQuery.append("COMMIT;");
-        //TODO save query
+        log.debug("SQL Query : {}", insertDataQuery);
         statement.execute(insertDataQuery.toString());
     }
 
@@ -187,7 +197,7 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static List<String> getColumnNames(Statement statement, String tableName) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE %s", tableName));
+        ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName));
         List<String> columnNames = new ArrayList<>();
         while (resultSet.next()) {
             columnNames.add(resultSet.getString("column_name"));
@@ -204,7 +214,7 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static ResultSet getAllData(Statement statement, String tableName) throws SQLException {
-        return statement.executeQuery(String.format("SELECT * FROM %s", tableName));
+        return statement.executeQuery(String.format("SELECT * FROM \"%s\"", tableName));
     }
 
     /**
@@ -213,8 +223,16 @@ public class SqlUtils {
      * @param filePath path of the file to import into duckdb
      */
     public static void readCsvFile(Statement statement, Path filePath) throws SQLException {
-        statement.execute(String.format("CREATE TABLE %s AS FROM read_csv('%s')", filePath.getFileName().toString().split("\\.")[0], filePath));
+        statement.execute(String.format("CREATE TABLE '%s' AS SELECT * FROM read_csv('%s')", filePath.getFileName().toString().split("\\.")[0], filePath));
     }
 
-    //TODO read parquet
+    /**
+     * Connect to DuckDB and import PARQUET file in a table named after the file
+     * @param statement database connection
+     * @param filePath path of the file to import into duckdb
+     */
+    public static void readParquetFile(Statement statement, Path filePath) throws SQLException {
+        statement.execute(String.format("CREATE TABLE '%s' AS SELECT * FROM read_parquet('%s')", filePath.getFileName().toString().split("\\.")[0], filePath));
+    }
+
 }

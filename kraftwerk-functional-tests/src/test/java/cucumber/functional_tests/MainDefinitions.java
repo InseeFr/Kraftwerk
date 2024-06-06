@@ -19,12 +19,12 @@ import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.FileReader;
@@ -34,6 +34,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -62,15 +64,13 @@ public class MainDefinitions {
 	Map<String, MetadataModel> metadataModelMap;
 
 	private ControlInputSequence controlInputSequence;
-
-	VtlExecute vtlExecute = new VtlExecute();
 	List<KraftwerkError> errors = new ArrayList<>();
-	static Statement database;
+	static Connection database;
 
 	@BeforeAll
 	public static void clean() throws KraftwerkException, SQLException {
 		FileUtils.deleteDirectory(outDirectory);
-		database = SqlUtils.openConnection().createStatement();
+		database = SqlUtils.openConnection();
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -145,30 +145,36 @@ public class MainDefinitions {
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws KraftwerkException {
-		metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null,database);
-			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
+	public void unimodal_treatments() throws KraftwerkException, SQLException {
+		try (Statement statement = database.createStatement()) {
+			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
+			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+				boolean withDDI = true;
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null, statement);
+				UnimodalSequence unimodal = new UnimodalSequence();
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
+			}
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() {
-		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, database);
+	public void aggregate_datasets() throws SQLException {
+		try (Statement statement = database.createStatement()) {
+			MultimodalSequence multimodalSequence = new MultimodalSequence();
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, statement);
+		}
 	}
 
 	@When("Step 4 : We export the final version")
-	public void export_results() throws KraftwerkException {
-		WriterSequence writerSequence = new WriterSequence();
-		LocalDateTime localDateTime = LocalDateTime.now();
-		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, database);
-		writeErrorsFile(inDirectory, localDateTime, errors);
-		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), database);
+	public void export_results() throws KraftwerkException, SQLException {
+		try (Statement statement = database.createStatement()) {
+			WriterSequence writerSequence = new WriterSequence();
+			LocalDateTime localDateTime = LocalDateTime.now();
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, statement);
+			writeErrorsFile(inDirectory, localDateTime, errors);
+			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement);
+		}
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -191,12 +197,10 @@ public class MainDefinitions {
 	}
 
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
-	public void check_output_root_table(int expectedLineCount, int expectedVariablesCount)
-			throws IOException, CsvValidationException {
-		// Go to first datetime folder
+	public void check_csv_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-		CSVReader csvReader = getCSVReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -214,6 +218,25 @@ public class MainDefinitions {
 		assertEquals(expectedVariablesCount, variableCount);
 		assertEquals(expectedLineCount, lineCount);
 
+	}
+
+	@Then("Step 2 : We check root parquet output file has {int} lines and {int} variables")
+	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+
+			String tableName = filePath.getFileName().toString().split("\\.")[0];
+
+			// Count number of variables
+			Assertions.assertThat(SqlUtils.getColumnNames(statement,tableName)).hasSize(expectedVariablesCount);
+
+			// Count lines
+			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+		}
 	}
 
 	@Then("Step 6 : We check if we have {int} variables")
@@ -326,8 +349,8 @@ public class MainDefinitions {
 
 
 	@AfterAll
-	public static void openConnection() throws SQLException {
-		database.getConnection().close();
+	public static void closeConnection() throws SQLException {
+		database.close();
 	}
 
 	//CSV Utilities

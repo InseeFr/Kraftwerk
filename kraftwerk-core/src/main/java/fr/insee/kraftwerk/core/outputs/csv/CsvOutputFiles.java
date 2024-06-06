@@ -14,10 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,10 +102,10 @@ public class CsvOutputFiles extends OutputFiles {
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
-			} catch (Exception e) {
+			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}
-		}
+        }
 	}
 
 	@Override

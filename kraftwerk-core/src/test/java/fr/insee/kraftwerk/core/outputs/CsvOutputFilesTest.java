@@ -4,14 +4,25 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.metadata.Group;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,6 +42,7 @@ class CsvOutputFilesTest {
 
 	private static UserInputsFile testUserInputsFile;
 	private static OutputFiles outputFiles;
+	private static Connection database;
 
 	Dataset fooDataset = new InMemoryDataset(List.of(),
 			List.of(new Structured.Component("FOO", String.class, Dataset.Role.IDENTIFIER)));
@@ -53,7 +65,9 @@ class CsvOutputFilesTest {
 			vtlBindings.put("LOOP", fooDataset);
 			vtlBindings.put("FROM_USER", fooDataset);
 			//
-			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes(), SqlUtils.openConnection().createStatement());
+			database = SqlUtils.openConnection();
+			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database.createStatement());
+			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes(), database.createStatement());
 		});
 	}
 
@@ -71,8 +85,31 @@ class CsvOutputFilesTest {
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
 	}
 
+	@Test
+	@Order(3)
+	void testWriteCsv() throws KraftwerkException, SQLException {
+		FileUtils.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+
+		Map<String, MetadataModel> metaModels = new HashMap<>();
+		MetadataModel metMod = new MetadataModel();
+		Group group = new Group("test","RACINE");
+		metMod.getVariables().putVariable(new Variable("ID",group, VariableType.STRING));
+		metMod.getVariables().putVariable(new Variable("ID2",group, VariableType.STRING));
+		metMod.getVariables().putVariable(new Variable("FOO_STR",group, VariableType.STRING));
+		metMod.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
+		metaModels.put("test",metMod);
+
+		outputFiles.writeOutputTables(metaModels);
+
+		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
+		racinePath = racinePath.resolveSibling(racinePath.getFileName());
+		File f = racinePath.toFile();
+		Assertions.assertTrue(f.exists());
+		Assertions.assertNotEquals(0, f.length());
+	}
+
 	@AfterAll
     static void closeConnection() throws SQLException {
-		outputFiles.getDatabase().getConnection().close();
+		database.close();
 	}
 }
