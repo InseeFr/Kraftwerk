@@ -1,6 +1,15 @@
 # Changelog
 ## 2.1.0 [TODO] - DuckDB implementation for output
+### Added
+- Transfer Vtl datasets into DuckDB before output step
+- SQL util class for SQL operations
+
 ### Changed
+- (File-by-file) Kraftwerk now exports only one .parquet file
+- Output is now made from DuckDB instead of VTL dataset
+
+### Removed
+- Avro
 
 ## 2.0.9 [2024-05-16] - Fix genesis calls
 ### Added

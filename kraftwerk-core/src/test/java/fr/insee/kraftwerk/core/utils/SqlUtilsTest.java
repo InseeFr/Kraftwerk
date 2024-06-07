@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -81,6 +82,34 @@ class SqlUtilsTest {
 
             //Then
             Assertions.assertThat(columnNames).containsExactly("testint", "teststring");
+        }
+    }
+
+    @Test
+    void getBooleanColumnNamesTest() throws SQLException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()){
+            //Given
+            testDatabaseStatement.execute("CREATE TABLE columnnamestesttable(testint INT, teststring NVARCHAR, testbool BOOLEAN)");
+
+            //When
+            List<String> columnNames = SqlUtils.getColumnNames(testDatabaseStatement, "columnnamestesttable", VariableType.BOOLEAN);
+
+            //Then
+            Assertions.assertThat(columnNames).containsExactly("testbool");
+        }
+    }
+
+    @Test
+    void getStringColumnNamesTest() throws SQLException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()){
+            //Given
+            testDatabaseStatement.execute("CREATE TABLE columnnamestesttable(testint INT, teststring NVARCHAR, testbool BOOLEAN, teststring2 NVARCHAR)");
+
+            //When
+            List<String> columnNames = SqlUtils.getColumnNames(testDatabaseStatement, "columnnamestesttable", VariableType.STRING);
+
+            //Then
+            Assertions.assertThat(columnNames).containsExactly("teststring", "teststring2");
         }
     }
 

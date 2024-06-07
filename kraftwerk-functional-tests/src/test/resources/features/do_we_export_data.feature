@@ -5,6 +5,7 @@ Feature: Do we save correctly all data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
     Then Step 2 : We check root output file has <ExpectedLineCount> lines and <ExpectedDataFieldCount> variables
+    Then We check if the CSV format is correct
 
     Examples:
     # Parameters :

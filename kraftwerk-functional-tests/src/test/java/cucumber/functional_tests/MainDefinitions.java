@@ -26,6 +26,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -358,12 +359,6 @@ public class MainDefinitions {
 		Files.deleteIfExists(bkpPath);
 	}
 
-
-	@AfterAll
-	public static void closeConnection() throws SQLException {
-		database.close();
-	}
-
 	//CSV Utilities
 	public CSVReader getCSVReader(Path filePath) throws IOException {
 		CSVParser parser = new CSVParserBuilder()
@@ -395,5 +390,55 @@ public class MainDefinitions {
 		while((line = csvReader.readNext()) != null){
 			Assertions.assertThat(line).isNotEqualTo(header);
 		}
+	}
+
+    @Then("We check if the CSV format is correct")
+    public void checkCSV() throws IOException {
+		//The CSV format rules is the following :
+		//for booleans : 0 for false, 1 for true
+		//ALL data must be between double quotes
+
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
+		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
+			String line = bufferedReader.readLine();
+			//Check header
+			String[] header = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+			//Check if line is split correctly
+			Assertions.assertThat(header).hasSizeGreaterThan(1);
+			for(String headerElement : header){
+				//Check if element is between double quotes
+				Assertions.assertThat(headerElement.charAt(0)).isEqualTo('"');
+				Assertions.assertThat(headerElement.charAt(headerElement.length()-1)).isEqualTo('"');
+			}
+
+			//Check content
+			while(line != null){
+				String[] lineelements = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+				//Check if line is split correctly
+				Assertions.assertThat(lineelements).hasSizeGreaterThan(1);
+				//Check if no "true" or "false"
+				Assertions.assertThat(lineelements).doesNotContain("\"false\"","\"true\"");
+				for(String lineelement : lineelements){
+					//Check if value is between double quotes
+					//If value is NULL, must still be between double quotes
+					Assertions.assertThat(lineelement).isNotEmpty();
+					Assertions.assertThat(lineelement.charAt(0)).isEqualTo('"');
+					Assertions.assertThat(lineelement.charAt(lineelement.length()-1)).isEqualTo('"');
+				}
+				line = bufferedReader.readLine();
+			}
+		}
+    }
+
+
+	@AfterAll
+	public static void closeConnection() throws SQLException {
+		database.close();
 	}
 }

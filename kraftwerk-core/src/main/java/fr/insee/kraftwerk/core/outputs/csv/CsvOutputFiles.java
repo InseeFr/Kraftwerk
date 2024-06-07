@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
@@ -58,19 +59,19 @@ public class CsvOutputFiles extends OutputFiles {
 			try {
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
+
 				if(columnNames.isEmpty()){
 					log.warn("dataset {} is empty !", datasetName);
 					return;
 				}
 
+				//Get boolean columns names
+				List<String> boolColumnNames = SqlUtils.getColumnNames(getDatabase(), datasetName, VariableType.BOOLEAN);
+				//Get indexes of boolean columns
+				List<Integer> boolColumnIndexes = new ArrayList<>();
+
 				//Create file with double quotes header
-				StringBuilder headerBuilder = new StringBuilder();
-				for (String stringColumnName : columnNames) {
-					headerBuilder.append(String.format("\"%s\"", stringColumnName)).append(Constants.CSV_OUTPUTS_SEPARATOR);
-				}
-				headerBuilder.deleteCharAt(headerBuilder.length()-1);
-				headerBuilder.append("\n");
-				Files.write(outputFile.toPath(), headerBuilder.toString().getBytes());
+				Files.write(outputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
 				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
@@ -84,11 +85,17 @@ public class CsvOutputFiles extends OutputFiles {
 				exportCsvQuery.append("))");
 				this.getDatabase().execute(exportCsvQuery.toString());
 
+				//Apply csv format transformations
+
 				//Merge data file with header file
 				//Read line by line to avoid memory waste
 				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(outputFile.toPath().toAbsolutePath() + "data"))){
 					String line = bufferedReader.readLine();
 					while(line != null){
+						//Apply transformations to elements
+						line = applyNullTransformation(line);
+						line = applyBooleanTransformations(line, boolColumnIndexes);
+
 						Files.write(outputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
 						line = bufferedReader.readLine();
 					}
@@ -106,6 +113,53 @@ public class CsvOutputFiles extends OutputFiles {
 				throw new KraftwerkException(500, e.toString());
 			}
         }
+	}
+
+	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+		StringBuilder headerBuilder = new StringBuilder();
+		for (String columnName : columnNames) {
+			headerBuilder.append(String.format("\"%s\"", columnName)).append(Constants.CSV_OUTPUTS_SEPARATOR);
+			if(boolColumnNames.contains(columnName)){
+				boolColumnIndexes.add(columnNames.indexOf(columnName));
+			}
+		}
+		headerBuilder.deleteCharAt(headerBuilder.length()-1);
+		headerBuilder.append("\n");
+		return headerBuilder.toString();
+	}
+
+	private static String applyBooleanTransformations(String csvLine, List<Integer> boolColumnIndexes) {
+		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+		//change "true" or "false" by "1" or "0"
+		for (int elementIndex : boolColumnIndexes) {
+			lineElements[elementIndex] = lineElements[elementIndex].replace("false", "0").replace("true", "1");
+		}
+		//Rebuild csv line
+		StringBuilder transformedCsvLine = new StringBuilder();
+		for (String csvElement : lineElements) {
+			if (!transformedCsvLine.toString().isEmpty()) {
+				transformedCsvLine.append(Constants.CSV_OUTPUTS_SEPARATOR);
+			}
+
+			transformedCsvLine.append(csvElement);
+		}
+		return transformedCsvLine.toString();
+	}
+
+	private String applyNullTransformation(String csvLine) {
+		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+		//Rebuild string by replacing empty values by ""
+		StringBuilder transformedCsvLine = new StringBuilder();
+		for (String csvElement : lineElements) {
+			if (!transformedCsvLine.toString().isEmpty()) {
+				transformedCsvLine.append(Constants.CSV_OUTPUTS_SEPARATOR);
+			}
+			if(csvElement.isEmpty()){
+				csvElement = "\"\"";
+			}
+			transformedCsvLine.append(csvElement);
+		}
+		return transformedCsvLine.toString();
 	}
 
 	@Override

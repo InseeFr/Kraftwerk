@@ -231,6 +231,22 @@ public class SqlUtils {
     }
 
     /**
+     * Connect to DuckDB and retrieve column names of a table with a specific type
+     *
+     * @param tableName name of table to retrieve column names
+     * @return table columns names
+     * @throws SQLException if SQL error
+     */
+    public static List<String> getColumnNames(Statement statement, String tableName, VariableType variableType) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM (DESCRIBE \"%s\") WHERE column_type = '%s'", tableName, variableType.getSqlType()));
+        List<String> columnNames = new ArrayList<>();
+        while (resultSet.next()) {
+            columnNames.add(resultSet.getString("column_name"));
+        }
+        return columnNames;
+    }
+
+    /**
      * Connect to DuckDB and retrieve column names of a table
      *
      * @param tableName name of table to retrieve column names
