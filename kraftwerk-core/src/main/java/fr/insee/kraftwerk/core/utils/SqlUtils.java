@@ -165,7 +165,8 @@ public class SqlUtils {
             for (String columnName : schemaOrder) {
                 String data = dataRow.get(columnName) == null ? "null" : dataRow.get(columnName).toString();
                 if (schema.get(columnName).equals(VariableType.STRING) && dataRow.get(columnName) != null) {
-                    data = String.format("$$%s$$", data); //Surround with dollar quotes if string
+                    //Surround with dollar quotes if string + remove possible problematic character(s)
+                    data = String.format("$$%s$$", data).replace("\n","");
                 }
                 insertDataQuery.append(data).append(",");
             }

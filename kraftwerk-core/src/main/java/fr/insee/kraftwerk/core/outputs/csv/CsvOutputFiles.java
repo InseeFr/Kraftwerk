@@ -128,38 +128,35 @@ public class CsvOutputFiles extends OutputFiles {
 		return headerBuilder.toString();
 	}
 
-	private static String applyBooleanTransformations(String csvLine, List<Integer> boolColumnIndexes) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+	/**
+	 * replaces false/true by 0/1 in a line
+	 * @param csvLine line to transform
+	 * @param boolColumnIndexes indexes of booleans values to change
+	 * @return the transformed line
+	 */
+	private String applyBooleanTransformations(String csvLine, List<Integer> boolColumnIndexes) {
+		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
 		//change "true" or "false" by "1" or "0"
 		for (int elementIndex : boolColumnIndexes) {
 			lineElements[elementIndex] = lineElements[elementIndex].replace("false", "0").replace("true", "1");
 		}
 		//Rebuild csv line
-		StringBuilder transformedCsvLine = new StringBuilder();
-		for (String csvElement : lineElements) {
-			if (!transformedCsvLine.toString().isEmpty()) {
-				transformedCsvLine.append(Constants.CSV_OUTPUTS_SEPARATOR);
-			}
-
-			transformedCsvLine.append(csvElement);
-		}
-		return transformedCsvLine.toString();
+		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
 	}
 
+	/**
+	 * Changes null values to "" in a line
+	 * @param csvLine line to transform
+	 * @return the transformed line
+	 */
 	private String applyNullTransformation(String csvLine) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
-		//Rebuild string by replacing empty values by ""
-		StringBuilder transformedCsvLine = new StringBuilder();
-		for (String csvElement : lineElements) {
-			if (!transformedCsvLine.toString().isEmpty()) {
-				transformedCsvLine.append(Constants.CSV_OUTPUTS_SEPARATOR);
+		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
+		for (int i = 0; i < lineElements.length; i++) {
+			if (lineElements[i].isEmpty()) {
+				lineElements[i] = "\"\"";
 			}
-			if(csvElement.isEmpty()){
-				csvElement = "\"\"";
-			}
-			transformedCsvLine.append(csvElement);
 		}
-		return transformedCsvLine.toString();
+		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
 	}
 
 	@Override
