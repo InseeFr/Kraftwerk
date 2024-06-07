@@ -252,6 +252,15 @@ public class SqlUtils {
     }
 
     /**
+     * Connect to DuckDB and import CSV file in a table named after the file with a custom delimiter
+     * @param statement database connection
+     * @param filePath path of the file to import into duckdb
+     */
+    public static void readCsvFile(Statement statement, Path filePath, String delimiter) throws SQLException {
+        statement.execute(String.format("CREATE TABLE '%s' AS SELECT * FROM read_csv('%s', delim = '%s')", filePath.getFileName().toString().split("\\.")[0], filePath, delimiter));
+    }
+
+    /**
      * Connect to DuckDB and import PARQUET file in a table named after the file
      * @param statement database connection
      * @param filePath path of the file to import into duckdb

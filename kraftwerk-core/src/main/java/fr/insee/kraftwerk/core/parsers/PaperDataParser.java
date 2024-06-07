@@ -45,7 +45,7 @@ public class PaperDataParser extends DataParser {
 				log.error("Failed connection to duckdb");
 				return;
 			}
-			SqlUtils.readCsvFile(database, filePath);
+			SqlUtils.readCsvFile(database, filePath, Constants.CSV_PAPER_DATA_SEPARATOR);
 			/*
 			 * We first map the variables in the header (first line) of the CSV file to the
 			 * variables of the data object. (Column 0 is the identifier).
@@ -55,7 +55,7 @@ public class PaperDataParser extends DataParser {
 			List<String> header = SqlUtils.getColumnNames(database, String.valueOf(filePath.getFileName().toString().split("\\.")[0]));
 			VariablesMap variables = data.getMetadataModel().getVariables();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
-			for (int j = 1; j < header.size(); j++) {
+			for (int j = 0; j < header.size(); j++) {
 				String variableName = header.get(j);
 				// If the variable name is in the DDI we map it directly
 				if (variables.hasVariable(variableName)) {
@@ -93,17 +93,16 @@ public class PaperDataParser extends DataParser {
 				GroupInstance answers = questionnaireData.getAnswers();
 
 				// Identifiers
-				String rowIdentifier = resultSet.getString(0);
+				String rowIdentifier = header.getFirst();
 				String[] rowIdentifiers = rowIdentifier.split(Constants.PAPER_IDENTIFIER_SEPARATOR);
-				questionnaireData.setIdentifier(rowIdentifiers[0]);
-				data.getIdSurveyUnits().add(rowIdentifiers[0]);
+				questionnaireData.setIdentifier(resultSet.getString(rowIdentifiers[0]));
+				data.getIdSurveyUnits().add(resultSet.getString(rowIdentifiers[0]));
 
 				if (rowIdentifiers.length >= 1) {
-
 					// Read variables values
-					for ( Map.Entry<Integer, String> entry : csvVariablesMap.entrySet()) {
+					for (Map.Entry<Integer, String> entry : csvVariablesMap.entrySet()) {
 						// Get the value
-						String value = resultSet.getString(entry.getKey());
+						String value = resultSet.getString(entry.getKey() + 1);
 
 						// Get the variable
 						String variableName = entry.getValue();
@@ -111,9 +110,9 @@ public class PaperDataParser extends DataParser {
 						// Put the value
 						if (variable.getGroup().isRoot()) {
 							answers.putValue(variableName, value);
-						} else if (rowIdentifiers.length > 1) {
+						} else if (header.size() > 1) {
 							answers.putValue(variableName, value);
-							String subGroupId = rowIdentifiers[1];
+							String subGroupId = header.get(1);
 							String groupName = variable.getGroupName();
 							answers.getSubGroup(groupName).putValue(value, variableName,
 									createGroupId(groupName, subGroupId));
