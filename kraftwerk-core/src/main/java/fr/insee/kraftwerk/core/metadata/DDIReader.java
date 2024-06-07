@@ -114,6 +114,13 @@ public class DDIReader {
 
 						String groupName = groupElement.getAttribute("name");
 						String parentGroupName = groupElement.getAttribute("parent");
+						// To be normalized later : we don't want to create a group of variables for pairwise links.
+						// Pairwise links scope are the individuals
+						if (groupName.equals(Constants.PAIRWISE_GROUP_NAME)){
+							// Instead we assign temporarily the variables inside pairwise links group to the root group
+							getVariablesInGroup(metadataModel.getVariables(), groupNode, metadataModel.getRootGroup(), metadataModel.getSequences());
+							continue;
+						}
 
 						// Store the group
 						Group group;
