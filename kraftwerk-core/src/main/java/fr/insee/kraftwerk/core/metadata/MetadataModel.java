@@ -21,6 +21,8 @@ public class MetadataModel {
     private LinkedHashMap<String, Group> groups  = new LinkedHashMap<>();
 	
     private List<Sequence> sequences = new ArrayList<>();
+
+    private HashMap<SpecType,String> specVersions = new HashMap<>();
 	
 	
     /** The root group is created when creating a MetadataModel instance. */
@@ -82,6 +84,9 @@ public class MetadataModel {
         return groups.containsKey(groupName);
     }
 
+    public void putSpecVersions(SpecType specType, String lunaticModelVersion) {
+        specVersions.put(specType, lunaticModelVersion);
+    }
 
     /** Return the fully qualified name of a variable, that is
      * - the name of the variable if it is in the root group.

@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
@@ -104,14 +105,30 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputs = controlInputSequence.getUserInputs(inDirectory);
+		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
+		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
 		vtlBindings = new VtlBindings();
+	}
+
+	@When("Step 1 : We initialize metadata model with lunatic specification only")
+	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
+		mp.init();
+		userInputsFile=mp.getUserInputsFile();
+		metadataModelMap=mp.getMetadataModels();
+	}
+
+	@When("Step 1 : We initialize metadata model with DDI specification only")
+	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
+		mp.init();
+		userInputsFile=mp.getUserInputsFile();
+		metadataModelMap=mp.getMetadataModels();
 	}
 
 	@When("Step 1 : We launch main service")

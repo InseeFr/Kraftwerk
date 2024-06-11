@@ -51,6 +51,7 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "IdUE";
+	public static final String LOOP_NAME_PREFIX = "BOUCLE";
 	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
 	public static final String REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER = "NON_AFFECTE_";
@@ -123,6 +124,7 @@ public final class Constants {
 	public static final String BOUCLE_PRENOMS = "BOUCLE_PRENOMS";
 	public static final String LIEN = "LIEN_";
 	public static final String LIENS = "LIENS";
+	public static final String PAIRWISE_GROUP_NAME = "LIENS";
 	public static final String SAME_AXIS_VALUE = "0";
 	public static final String NO_PAIRWISE_VALUE = "99";
 	

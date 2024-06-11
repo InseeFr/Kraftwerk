@@ -193,9 +193,9 @@ public class ParadataParser {
 				VariableType.INTEGER, "3.");
 		Variable variableDateCollecteBrute = new Variable(
 				Constants.SURVEY_VALIDATION_DATE_NAME + Constants.PARADATA_TIMESTAMP_SUFFIX,
-				rootGroup, VariableType.STRING, "3.");
+				rootGroup, VariableType.STRING, "3");
 		Variable variableDateCollecte = new Variable(Constants.SURVEY_VALIDATION_DATE_NAME, rootGroup,
-				VariableType.STRING, "3.");
+				VariableType.STRING, "3");
 
 		// Add variables to map : some variables are calculated but not used
 		// (variableDuree,variableDureeBrute, variableNbOrch)
