@@ -57,36 +57,31 @@ public class SqlUtils {
             //Skip if no variable
             if (sqlSchema.isEmpty()) {
                 log.warn("Empty schema for dataset {}", datasetName);
-                return;
-            }
+            } else {
+                //Column order map to use in INSERT VALUES statement
+                List<String> schemaOrder = extractColumnsOrder(vtlBindings.getDataset(datasetName));
 
-            //Column order map to use in INSERT VALUES statement
-            List<String> schemaOrder = extractColumnsOrder(vtlBindings.getDataset(datasetName));
+                //Skip CREATE if table already exists (ex: file-by-file)
+                List<String> tableNames = getTableNames(statement);
+                if (!tableNames.contains(datasetName)) {
+                    //CREATE query building
+                    StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
 
-            //Skip CREATE if table already exists (ex: file-by-file)
-            List<String> tableNames = getTableNames(statement);
-            if(tableNames.contains(datasetName)){
+                    for (String columnName : schemaOrder) {
+                        createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
+                        createTableQuery.append(", ");
+                    }
+
+                    //Remove last delimiter and replace by ")"
+                    createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
+                    createTableQuery.append(")");
+
+                    //Execute query
+                    log.debug("SQL Query : {}", createTableQuery);
+                    statement.execute(createTableQuery.toString());
+                }
                 insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
-                return;
             }
-
-            //CREATE query building
-            StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
-
-            for (String columnName : schemaOrder) {
-                createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
-                createTableQuery.append(", ");
-            }
-
-            //Remove last delimiter and replace by ")"
-            createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
-            createTableQuery.append(")");
-
-            //Execute query
-            log.debug("SQL Query : {}", createTableQuery);
-            statement.execute(createTableQuery.toString());
-
-            insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
         }
     }
 

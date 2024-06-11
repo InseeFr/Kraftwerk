@@ -225,10 +225,53 @@ public class MainDefinitions {
 
 	}
 
+	@Then("Step 2 : We check {string} output file has {int} lines and {int} variables")
+	public void check_csv_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
+		// get header
+		String[] header = csvReader.readNext();
+		// Count
+		int variableCount = header.length;
+
+		// Count
+		int lineCount = 1;
+		while ((csvReader.readNext()) != null) {
+			lineCount++;
+		}
+
+		// Close reader
+		csvReader.close();
+		// Test
+		assertEquals(expectedVariablesCount, variableCount);
+		assertEquals(expectedLineCount, lineCount);
+
+	}
+
 	@Then("Step 2 : We check root parquet output file has {int} lines and {int} variables")
 	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+
+			String tableName = filePath.getFileName().toString().split("\\.")[0];
+
+			// Count number of variables
+			Assertions.assertThat(SqlUtils.getColumnNames(statement,tableName)).hasSize(expectedVariablesCount);
+
+			// Count lines
+			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+		}
+	}
+
+	@Then("We check {string} parquet output file has {int} lines and {int} variables")
+	public void check_parquet_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".parquet");
 		try (Statement statement = database.createStatement()) {
 			SqlUtils.readParquetFile(statement, filePath);
 
