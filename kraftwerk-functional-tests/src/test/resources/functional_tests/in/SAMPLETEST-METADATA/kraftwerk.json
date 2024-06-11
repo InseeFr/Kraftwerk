@@ -1,0 +1,26 @@
+{
+ 
+  "campaign": "TIC-2024-X04",  
+ 
+  "survey_data": [
+    {
+      "data_mode": "TEL",
+	  "data_file": "data",
+	  "DDI_file": "ddi-tic-2024-x04-tel.xml",
+	  "lunatic_file": "tic2024x04_tel.json",
+	  "data_format": "LUNATIC_XML",
+	  "paradata_folder": "",
+	  "reporting_data_file": "campaign.20240311153539.extract.xml",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}

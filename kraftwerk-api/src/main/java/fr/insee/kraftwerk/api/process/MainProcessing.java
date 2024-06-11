@@ -107,7 +107,7 @@ public class MainProcessing {
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		if (withDDI) metadataModels = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		if (!withDDI) metadataModels = MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
-	
+
 		if (fileByFile) userInputsFileList = getUserInputsFile(userInputsFile);
 
 		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
