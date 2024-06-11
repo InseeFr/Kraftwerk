@@ -22,6 +22,7 @@ import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.BeforeAll;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -105,13 +106,13 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+		userInputs = controlInputSequence.getUserInputs(inDirectory);
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
+		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
 		vtlBindings = new VtlBindings();
 	}
 
@@ -119,7 +120,7 @@ public class MainDefinitions {
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
 		mp.init();
-		userInputsFile=mp.getUserInputsFile();
+		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
 	}
 
@@ -127,7 +128,7 @@ public class MainDefinitions {
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
 		mp.init();
-		userInputsFile=mp.getUserInputsFile();
+		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
 	}
 
@@ -417,6 +418,21 @@ public class MainDefinitions {
 			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
 
 		Files.deleteIfExists(bkpPath);
+	}
+
+
+	@Then("We should have a metadata model with {int} variables")
+	public void check_variables_count(int nbVariablesExpected) throws IOException, CsvValidationException {
+		String mode = userInputs.getModes().getFirst();
+		int nbVariables = metadataModelMap.get(mode).getVariables().getVariables().size();
+		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
+	}
+
+	@And("We should have {int} of type STRING")
+	public void check_string_variables_count(int nbStringVariablesExpected) throws IOException, CsvValidationException {
+		String mode = userInputs.getModes().getFirst();
+		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
+		assertThat(nbStringVariables).isEqualTo(nbStringVariablesExpected);
 	}
 
 	//CSV Utilities
