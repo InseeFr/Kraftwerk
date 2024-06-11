@@ -122,6 +122,7 @@ public final class Constants {
 	public static final String BOUCLE_PRENOMS = "BOUCLE_PRENOMS";
 	public static final String LIEN = "LIEN_";
 	public static final String LIENS = "LIENS";
+	public static final String PAIRWISE_GROUP_NAME = "LIENS";
 	public static final String SAME_AXIS_VALUE = "0";
 	public static final String NO_PAIRWISE_VALUE = "99";
 	
