@@ -253,7 +253,7 @@ public class MainDefinitions {
 	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
-		try (Statement statement = database.createStatement()) {
+		try (Statement statement = SqlUtils.openConnection().createStatement()) {
 			SqlUtils.readParquetFile(statement, filePath);
 
 			String tableName = filePath.getFileName().toString().split("\\.")[0];
