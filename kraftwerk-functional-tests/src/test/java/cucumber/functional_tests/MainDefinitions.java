@@ -170,7 +170,7 @@ public class MainDefinitions {
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null, statement);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
 				UnimodalSequence unimodal = new UnimodalSequence();
 				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
 			}
@@ -178,9 +178,11 @@ public class MainDefinitions {
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets(){
-			MultimodalSequence multimodalSequence = new MultimodalSequence();
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
+	public void aggregate_datasets() throws SQLException {
+		MultimodalSequence multimodalSequence = new MultimodalSequence();
+		try (Statement statement = database.createStatement()) {
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, statement);
+		}
 	}
 
 	@When("Step 4 : We export the final version")

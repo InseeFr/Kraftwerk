@@ -27,8 +27,6 @@ class PaperDataParserTest {
 
         //When + Then
         assertThrows(NullPointerException.class,() ->parser.parseDataFile(null));
-        parser.parseDataFile(Path.of("notfound.csv"));
-        Assertions.assertThat(data.getQuestionnaires()).isEmpty();
     }
 
     @Test

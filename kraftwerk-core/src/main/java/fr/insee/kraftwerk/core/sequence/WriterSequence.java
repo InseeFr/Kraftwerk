@@ -8,7 +8,6 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
@@ -26,8 +25,6 @@ public class WriterSequence {
 	public void writeOutputFiles(Path inDirectory,LocalDateTime executionDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, Statement database) throws KraftwerkException {
 		Path outDirectory = FileUtils.transformToOut(inDirectory,executionDateTime);
 
-		/* Step 4.1: Convert VTL datasets into SQL tables for export */
-		SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database);
 		writeCsvFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, null, database);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, database);
 	}

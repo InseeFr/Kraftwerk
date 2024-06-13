@@ -7,15 +7,12 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.file.Path;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -26,7 +23,7 @@ class BuildBindingsSequenceTest {
 
 
 	@Test
-	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException, SQLException {
+	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
@@ -40,15 +37,13 @@ class BuildBindingsSequenceTest {
 		MetadataModel metadata = null;
 		
 		//THEN
-		try(Statement database = SqlUtils.openConnection().createStatement()){
-			assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null,database));
-		}
+		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
 
 	}
 	
 	@ParameterizedTest
 	@CsvSource({"true,true", "true,false", "false,false", "false,true"})
-	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException, SQLException {
+	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
@@ -60,12 +55,7 @@ class BuildBindingsSequenceTest {
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));
 
-		//WHEN
-		//THEN
-		try(Statement database = SqlUtils.openConnection().createStatement()) {
-			assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null,database));
-		}
+		//WHEN + THEN
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null));
 	}
-	
-	
 }

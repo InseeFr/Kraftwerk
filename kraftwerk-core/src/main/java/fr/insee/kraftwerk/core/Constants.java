@@ -42,7 +42,7 @@ public final class Constants {
 	// ----- Parameters from properties
 	public static final String METADATA_SEPARATOR = ".";
 	public static final String PAPER_IDENTIFIER_SEPARATOR = "_"; //TODO: get it from properties
-	public static final String CSV_PAPER_DATA_SEPARATOR = "#"; //TODO: get it from properties
+	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
 	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
 	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
 	@Getter

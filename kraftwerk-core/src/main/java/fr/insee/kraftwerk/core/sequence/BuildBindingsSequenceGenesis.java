@@ -74,7 +74,7 @@ public class BuildBindingsSequenceGenesis {
 		parseParadata(dataMode, data, inDirectory);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, inDirectory,database);
+		parseReportingData(dataMode, data, inDirectory);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -91,7 +91,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, Statement database) throws KraftwerkException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory) throws KraftwerkException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		File reportingDataFolder = reportingDataFile.toFile();
 		if (reportingDataFolder.exists()) {
@@ -104,7 +104,7 @@ public class BuildBindingsSequenceGenesis {
 
 				} else if (file.contains(".csv")) {
 					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
-					cSVReportingDataParser.parseReportingData(reportingData, data, true,database);
+					cSVReportingDataParser.parseReportingData(reportingData, data, true);
 				}
 			}
 		}

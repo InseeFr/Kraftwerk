@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,6 @@ public class MainProcessing {
 	private final List<KraftwerkError> errors = new ArrayList<>();
 	private LocalDateTime executionDateTime;
 
-	private Path databasePath;
 	
 	/**
 	 * Map by mode
@@ -85,31 +83,26 @@ public class MainProcessing {
 	public void runMain() throws KraftwerkException {
 		init();
 		//iterate on file(s)
-		for (UserInputsFile userFile : userInputsFileList) {
-			this.userInputsFile = userFile;
-			vtlBindings = new VtlBindings();
-			try (Connection readDatabaseConnection = SqlUtils.openConnection()) {
-				Statement readDatabase = readDatabaseConnection.createStatement();
-				unimodalProcess(readDatabase);
-			} catch (SQLException e) {
-				log.error(e.toString());
-				throw new KraftwerkException(500, "SQL error on reading");
-			}
-			multimodalProcess();
-			try (Connection writeDatabaseConnection = SqlUtils.openConnection(databasePath)) {
-				if(writeDatabaseConnection == null){
-					throw new KraftwerkException(500, "Error during database creation");
+		try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
+			for (UserInputsFile userFile : userInputsFileList) {
+				this.userInputsFile = userFile;
+				vtlBindings = new VtlBindings();
+				unimodalProcess();
+				try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
+					multimodalProcess(writeDatabase);
 				}
-				Statement writeDatabase = writeDatabaseConnection.createStatement();
-				outputFileWriter(writeDatabase);
-			} catch (SQLException e) {
-				log.error(e.toString());
-				throw new KraftwerkException(500, "SQL error on writing");
 			}
-        }
-		writeErrors();
-		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
-		writeLog();
+			//Export from database
+			try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
+				outputFileWriter(writeDatabase);
+			}
+			writeErrors();
+			kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+			writeLog();
+		} catch (SQLException e) {
+			log.error(e.toString());
+			throw new KraftwerkException(500, "SQL Error");
+		}
 	}
 
 	/* Step 1 : Init */
@@ -118,9 +111,6 @@ public class MainProcessing {
 		this.executionDateTime = LocalDateTime.now();
 
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
-
-		Path tmpDirectory = fr.insee.kraftwerk.core.utils.FileUtils.transformToTemp(inDirectory);
-		this.databasePath = tmpDirectory.resolve(Path.of( executionDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd_hhmmssSSS"))+".duckdb"));
 
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
@@ -147,20 +137,20 @@ public class MainProcessing {
 	}
 
 	/* Step 2 : unimodal data */
-	private void unimodalProcess(Statement database) throws KraftwerkException {
+	private void unimodalProcess() throws KraftwerkException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog, database);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
-	private void multimodalProcess(){
+	private void multimodalProcess(Statement database){
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, database);
 	}
 
 	/* Step 4 : Write output files */

@@ -64,6 +64,16 @@
 		<!-- jackson -->
 		<!-- (imported with Trevas) -->
 
+		<!-- CSV -->
+		<!-- OpenCSV -->
+		<!--
+		https://www.geeksforgeeks.org/writing-a-csv-file-in-java-using-opencsv/ -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.9</version>
+		</dependency>
+
 		<!-- VTL 2 with Trevas -->
 		<!-- https://mvnrepository.com/artifact/fr.insee.trevas/vtl-engine -->
 		<dependency>
@@ -89,7 +99,7 @@
 		</dependency>
 
 
-		<!-- CSV/PARQUET -->
+		<!-- DUCKDB -->
 		<dependency>
 			<groupId>org.duckdb</groupId>
 			<artifactId>duckdb_jdbc</artifactId>

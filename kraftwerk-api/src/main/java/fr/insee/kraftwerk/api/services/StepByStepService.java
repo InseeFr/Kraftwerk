@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -54,12 +55,10 @@ public class StepByStepService extends KraftwerkService {
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
-			try (Statement database = SqlUtils.openConnection().createStatement()){
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null, database);
-			} catch (KraftwerkException e) {
+			try{
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null);
+			} catch (KraftwerkException e){
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-			} catch (SQLException e){
-				throw new KraftwerkException(500,"SQL error");
 			}
 
 			vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
@@ -90,12 +89,10 @@ public class StepByStepService extends KraftwerkService {
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		try (Statement database = SqlUtils.openConnection().createStatement()){
-			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null,database);
+		try{
+			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (SQLException e){
-			throw new KraftwerkException(500,"SQL error");
 		}
 
         VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
@@ -181,8 +178,12 @@ public class StepByStepService extends KraftwerkService {
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 
 		//Process
-		MultimodalSequence multimodalSequence = new MultimodalSequence();
-			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
+		try(Connection database = SqlUtils.openConnection()) {
+			MultimodalSequence multimodalSequence = new MultimodalSequence();
+			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, database.createStatement());
+		}catch (SQLException e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
