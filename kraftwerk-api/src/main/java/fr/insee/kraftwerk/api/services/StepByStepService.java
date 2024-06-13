@@ -182,11 +182,7 @@ public class StepByStepService extends KraftwerkService {
 
 		//Process
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		try (Statement database = SqlUtils.openConnection().createStatement()){
-			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, database);
-		}catch (SQLException e){
-			return ResponseEntity.status(500).body(e.toString());
-		}
+			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {

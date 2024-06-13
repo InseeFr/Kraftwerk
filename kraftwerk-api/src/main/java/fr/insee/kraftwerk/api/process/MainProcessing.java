@@ -18,9 +18,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +51,7 @@ public class MainProcessing {
 	private final List<KraftwerkError> errors = new ArrayList<>();
 	private LocalDateTime executionDateTime;
 
-	/**
-	 * DuckDb database Statement used for this MainProcessing
-	 */
-	private Statement database;
+	private Path databasePath;
 	
 	/**
 	 * Map by mode
@@ -85,29 +84,32 @@ public class MainProcessing {
 
 	public void runMain() throws KraftwerkException {
 		init();
-		//Try with ressources to close database when done
-		try(Statement trydatabase = SqlUtils.openConnection().createStatement()) {
-			this.database = trydatabase;
-			if (Boolean.TRUE.equals(fileByFile)) { //iterate on files
-				for (UserInputsFile userFile : userInputsFileList) {
-					this.userInputsFile = userFile;
-					vtlBindings = new VtlBindings();
-					unimodalProcess();
-					multimodalProcess();
-					outputFileWriter();
-				}
-			} else {
-				unimodalProcess();
-				multimodalProcess();
-				outputFileWriter();
+		//iterate on file(s)
+		for (UserInputsFile userFile : userInputsFileList) {
+			this.userInputsFile = userFile;
+			vtlBindings = new VtlBindings();
+			try (Connection readDatabaseConnection = SqlUtils.openConnection()) {
+				Statement readDatabase = readDatabaseConnection.createStatement();
+				unimodalProcess(readDatabase);
+			} catch (SQLException e) {
+				log.error(e.toString());
+				throw new KraftwerkException(500, "SQL error on reading");
 			}
-			writeErrors();
-			kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
-			writeLog();
-		}catch (SQLException e){
-			log.error(e.toString());
-			throw new KraftwerkException(500,"SQL error");
-		}
+			multimodalProcess();
+			try (Connection writeDatabaseConnection = SqlUtils.openConnection(databasePath)) {
+				if(writeDatabaseConnection == null){
+					throw new KraftwerkException(500, "Error during database creation");
+				}
+				Statement writeDatabase = writeDatabaseConnection.createStatement();
+				outputFileWriter(writeDatabase);
+			} catch (SQLException e) {
+				log.error(e.toString());
+				throw new KraftwerkException(500, "SQL error on writing");
+			}
+        }
+		writeErrors();
+		kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+		writeLog();
 	}
 
 	/* Step 1 : Init */
@@ -117,31 +119,35 @@ public class MainProcessing {
 
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
+		Path tmpDirectory = fr.insee.kraftwerk.core.utils.FileUtils.transformToTemp(inDirectory);
+		this.databasePath = tmpDirectory.resolve(Path.of( executionDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd_hhmmssSSS"))+".duckdb"));
+
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
-		if (withDDI) metadataModels = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		if (!withDDI) metadataModels = MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
 
-		if (fileByFile) userInputsFileList = getUserInputsFile(userInputsFile);
+		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap()) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
+
+		userInputsFileList = getUserInputsFile(userInputsFile, fileByFile);
 
 		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
 		//In case of file-by-file processing we check the size of each file.
-		if (fileByFile) {
+		if (Boolean.TRUE.equals(fileByFile)) {
 			for (UserInputsFile userInputs : userInputsFileList) {
 				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400Mo.", limitSize);
 			}
-		}
-		//In case of main processing we check the folder
-		if (!fileByFile) {
+		}else{
+			//In case of main processing we check the folder
 			isDataTooBig(userInputsFile,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
 		}
+
+
 
 	}
 
 	/* Step 2 : unimodal data */
-	private void unimodalProcess() throws KraftwerkException {
+	private void unimodalProcess(Statement database) throws KraftwerkException {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
@@ -154,11 +160,11 @@ public class MainProcessing {
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess(){
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, database);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels);
 	}
 
 	/* Step 4 : Write output files */
-	private void outputFileWriter() throws KraftwerkException {
+	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database);
 	}
@@ -172,29 +178,33 @@ public class MainProcessing {
 	/* Step 6 : Write log */
 	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionLog);}
 
-	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source) throws KraftwerkException {
+	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source, boolean fileByFile) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();
-		for (String dataMode : source.getModeInputsMap().keySet()) {
-			List<Path> dataFiles = getFilesToProcess(source, dataMode);
-			for (Path dataFile : dataFiles) {
-				UserInputsFile currentFileInputs = new UserInputsFile(source.getUserInputFile(),source.getUserInputFile().getParent());
-				currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
-				currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
-				currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
-				currentFileInputs.setMultimodeDatasetName(source.getMultimodeDatasetName());
-				ModeInputs sourceModeInputs = source.getModeInputs(dataMode);
-				ModeInputs currentFileModeInputs = new ModeInputs();
-				currentFileModeInputs.setDataFile(dataFile);
-				currentFileModeInputs.setDdiUrl(sourceModeInputs.getDdiUrl());
-				currentFileModeInputs.setLunaticFile(sourceModeInputs.getLunaticFile());
-				currentFileModeInputs.setDataFormat(sourceModeInputs.getDataFormat().toString());
-				currentFileModeInputs.setDataMode(sourceModeInputs.getDataMode());
-				currentFileModeInputs.setModeVtlFile(sourceModeInputs.getModeVtlFile());
-				currentFileModeInputs.setParadataFolder(sourceModeInputs.getParadataFolder());
-				currentFileModeInputs.setReportingDataFile(sourceModeInputs.getReportingDataFile());
-				currentFileInputs.getModeInputsMap().put(dataMode, currentFileModeInputs);
-				userInputsFileList.add(currentFileInputs);
+		if(Boolean.TRUE.equals(fileByFile)){
+			for (String dataMode : source.getModeInputsMap().keySet()) {
+				List<Path> dataFiles = getFilesToProcess(source, dataMode);
+				for (Path dataFile : dataFiles) {
+					UserInputsFile currentFileInputs = new UserInputsFile(source.getUserInputFile(), source.getUserInputFile().getParent());
+					currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
+					currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
+					currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
+					currentFileInputs.setMultimodeDatasetName(source.getMultimodeDatasetName());
+					ModeInputs sourceModeInputs = source.getModeInputs(dataMode);
+					ModeInputs currentFileModeInputs = new ModeInputs();
+					currentFileModeInputs.setDataFile(dataFile);
+					currentFileModeInputs.setDdiUrl(sourceModeInputs.getDdiUrl());
+					currentFileModeInputs.setLunaticFile(sourceModeInputs.getLunaticFile());
+					currentFileModeInputs.setDataFormat(sourceModeInputs.getDataFormat().toString());
+					currentFileModeInputs.setDataMode(sourceModeInputs.getDataMode());
+					currentFileModeInputs.setModeVtlFile(sourceModeInputs.getModeVtlFile());
+					currentFileModeInputs.setParadataFolder(sourceModeInputs.getParadataFolder());
+					currentFileModeInputs.setReportingDataFile(sourceModeInputs.getReportingDataFile());
+					currentFileInputs.getModeInputsMap().put(dataMode, currentFileModeInputs);
+					userInputsFileList.add(currentFileInputs);
+				}
 			}
+		}else{
+			userInputsFileList.add(source);
 		}
 		return userInputsFileList;
 	}

@@ -118,7 +118,7 @@ public class MainProcessingGenesis {
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, database);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels);
 	}
 
 	/* Step 4 : Write output files */

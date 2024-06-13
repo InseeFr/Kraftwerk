@@ -142,7 +142,7 @@ public class MainDefinitions {
 	}
 
 	@When("We launch main service 2 times")
-	public void launch_main_2() throws KraftwerkException, InterruptedException {
+	public void launch_main_2() throws KraftwerkException {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
@@ -178,11 +178,9 @@ public class MainDefinitions {
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() throws SQLException {
-		try (Statement statement = database.createStatement()) {
+	public void aggregate_datasets(){
 			MultimodalSequence multimodalSequence = new MultimodalSequence();
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, statement);
-		}
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
 	}
 
 	@When("Step 4 : We export the final version")
@@ -268,7 +266,7 @@ public class MainDefinitions {
 	}
 
 	@Then("Step 2 : We check root parquet output file has {int} lines and {int} variables")
-	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
+	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
 		try (Statement statement = SqlUtils.openConnection().createStatement()) {

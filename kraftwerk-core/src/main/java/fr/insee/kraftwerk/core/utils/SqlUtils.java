@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
+import org.duckdb.DuckDBConnection;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,7 +81,7 @@ public class SqlUtils {
                     log.debug("SQL Query : {}", createTableQuery);
                     statement.execute(createTableQuery.toString());
                 }
-                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema, schemaOrder);
+                insertDataIntoTable(statement.getConnection(), datasetName, vtlBindings.getDataset(datasetName), schemaOrder);
             }
         }
     }
@@ -141,37 +142,28 @@ public class SqlUtils {
     }
 
     /**
-     * INSERT queries into a specific table
+     * insert data into table associated with dataset
      *
-     * @param statement DuckDB connection
+     * @param databaseConnection DuckDB connection
      * @param dataset   dataset to convert
-     * @param schema    schema of the table
+     * @param schemaOrder column names in order
      */
-    private static void insertDataIntoTable(Statement statement, String datasetName, Dataset dataset, Map<String, VariableType> schema, List<String> schemaOrder) throws SQLException {
+    private static void insertDataIntoTable(Connection databaseConnection, String datasetName, Dataset dataset, List<String> schemaOrder) throws SQLException {
         if (dataset.getDataAsMap().isEmpty()) {
             return;
         }
-        StringBuilder insertDataQuery = new StringBuilder("BEGIN TRANSACTION;\n");
-        insertDataQuery.append(String.format("INSERT INTO \"%s\" VALUES ", datasetName));
 
-        //For each row of the dataset
-        for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
-            insertDataQuery.append("(");
-            for (String columnName : schemaOrder) {
-                String data = dataRow.get(columnName) == null ? "null" : dataRow.get(columnName).toString();
-                if (schema.get(columnName).equals(VariableType.STRING) && dataRow.get(columnName) != null) {
-                    //Surround with dollar quotes if string + remove possible problematic character(s)
-                    data = String.format("$$%s$$", data).replace("\n","");
+        DuckDBConnection duckDBConnection = (DuckDBConnection) databaseConnection;
+        try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
+            for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
+                appender.beginRow();
+                for (String columnName : schemaOrder) {
+                    String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
+                    appender.append(data);
                 }
-                insertDataQuery.append(data).append(",");
+                appender.endRow();
             }
-            insertDataQuery.delete(insertDataQuery.length() - 1, insertDataQuery.length());
-            insertDataQuery.append("),");
         }
-        insertDataQuery.delete(insertDataQuery.length() - 1, insertDataQuery.length()).append(";"); //Replace last "," by ";"
-        insertDataQuery.append("COMMIT;");
-        log.debug("SQL Query : {}", insertDataQuery);
-        statement.execute(insertDataQuery.toString());
     }
 
     /**
@@ -189,15 +181,33 @@ public class SqlUtils {
      * @param databaseFilePath path of the databae
      * @return a Statement object associated to this connection
      */
-    public static Connection openConnection(Path databaseFilePath) throws SQLException {
-        try {
-            Files.createDirectories(Path.of("duckdb/"));
-            return DriverManager.getConnection(Constants.DUCKDB_URL + databaseFilePath);
-        } catch (IOException e) {
-            log.error("IO error during file duckdb connection !");
-            log.error(e.toString());
-            return null;
+    public static Connection openConnection(Path databaseFilePath){
+        int trycount = 0;
+        while(true) {
+            try {
+                Files.createDirectories(databaseFilePath.getParent());
+                return DriverManager.getConnection(Constants.DUCKDB_URL + "/" + databaseFilePath.toAbsolutePath().subpath(0, databaseFilePath.toAbsolutePath().getNameCount()));
+            } catch (SQLException e) {
+                try {
+                    if (trycount < Constants.DB_CONNECTION_TRY_COUNT) {
+                        trycount++;
+                        log.warn(e.toString());
+                        log.warn("Waiting 2s and retry....");
+                        Thread.sleep(2000);
+                    }else{
+                        log.error("Still failing after {} tries !", Constants.DB_CONNECTION_TRY_COUNT);
+                        log.error(e.toString());
+                        break;
+                    }
+                }catch (InterruptedException ie){
+                    log.error("InterruptedException");
+                    Thread.currentThread().interrupt();
+                }
+            } catch (IOException e){
+                log.error(e.toString());
+            }
         }
+        return null;
     }
 
     /**

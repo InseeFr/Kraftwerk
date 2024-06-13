@@ -60,6 +60,8 @@ public final class Constants {
 	public static final String ERRORS_FILE_NAME = "errors.txt";
 	public static final String DUCKDB_URL = "jdbc:duckdb:";
 
+	public static final int DB_CONNECTION_TRY_COUNT = 10;
+
 
 	// ----- Explicit Variables Names
 	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
