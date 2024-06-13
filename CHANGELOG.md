@@ -1,5 +1,5 @@
 # Changelog
-## 2.1.0 [TODO] - DuckDB implementation for output
+## 2.2.0 [TODO] - DuckDB implementation for output
 ### Added
 - Transfer Vtl datasets into DuckDB before output step
 - SQL util class for SQL operations
@@ -10,6 +10,15 @@
 
 ### Removed
 - Avro
+- 
+## 2.1.0 [2024-06-11] - Change Lunatic reader
+### Changed
+- Refactor of Lunatic reader
+
+### Fixed
+- SAS import script : bad format on two STRING variables
+- New pairwise link group (from new DDI model) is ignored
+- Improve quality of code
 
 ## 2.0.9 [2024-05-16] - Fix genesis calls
 ### Added
