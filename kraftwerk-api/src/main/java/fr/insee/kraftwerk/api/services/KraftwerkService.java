@@ -47,7 +47,7 @@ public class KraftwerkService {
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 	
-	protected ResponseEntity<String> archive(String inDirectoryParam) {
+	public ResponseEntity<String> archive(String inDirectoryParam) {
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
