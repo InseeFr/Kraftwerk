@@ -4,4 +4,5 @@ COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-
 
 EXPOSE 8080
 
+#Docker run without additionnal params to use REST API mode, add batch parameters to use batch mode
 ENTRYPOINT ["java","-jar","/kraftwerk.jar"]
