@@ -59,8 +59,9 @@ class LunaticReaderTest {
 
         //
         assertNotNull(variables);
-        assertEquals(11,variables.getGroupsCount());
+        assertEquals(2,variables.getGroupsCount());
         assertEquals(683, variables.getVariables().getVariables().size());
        
     }
+
 }

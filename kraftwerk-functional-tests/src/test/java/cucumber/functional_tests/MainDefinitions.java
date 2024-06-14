@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
+import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
@@ -18,6 +19,7 @@ import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -48,7 +50,7 @@ public class MainDefinitions {
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	String userInputFileName = Constants.USER_INPUT_FILE;
-	UserInputsFile userInputs;
+	UserInputsFile userInputsFile;
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
@@ -94,14 +96,30 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputs = controlInputSequence.getUserInputs(inDirectory);
+		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
+		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
 		vtlBindings = new VtlBindings();
+	}
+
+	@When("Step 1 : We initialize metadata model with lunatic specification only")
+	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
+		mp.init();
+		userInputsFile=mp.getUserInputsFile();
+		metadataModelMap=mp.getMetadataModels();
+	}
+
+	@When("Step 1 : We initialize metadata model with DDI specification only")
+	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
+		mp.init();
+		userInputsFile=mp.getUserInputsFile();
+		metadataModelMap=mp.getMetadataModels();
 	}
 
 	@When("Step 1 : We launch main service")
@@ -137,29 +155,29 @@ public class MainDefinitions {
 
 	@When("Step 2 : We get each unimodal dataset")
 	public void unimodal_treatments() throws NullException {
-		metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+		metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
-		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
+			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap);
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
 	}
 
 	@When("Step 4 : We export the final version")
 	public void export_results() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		LocalDateTime localDateTime = LocalDateTime.now();
-		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors);
+		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
 		writeErrorsFile(inDirectory, localDateTime, errors);
-		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes());
+		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputsFile.getModes());
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -316,5 +334,19 @@ public class MainDefinitions {
 			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
 
 		Files.deleteIfExists(bkpPath);
+	}
+
+	@Then("We should have a metadata model with {int} variables")
+	public void check_variables_count(int nbVariablesExpected) throws IOException, CsvValidationException {
+		String mode = userInputsFile.getModes().getFirst();
+		int nbVariables = metadataModelMap.get(mode).getVariables().getVariables().size();
+		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
+	}
+
+	@And("We should have {int} of type STRING")
+	public void check_string_variables_count(int nbStringVariablesExpected) throws IOException, CsvValidationException {
+		String mode = userInputsFile.getModes().getFirst();
+		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
+		assertThat(nbStringVariables).isEqualTo(nbStringVariablesExpected);
 	}
 }
