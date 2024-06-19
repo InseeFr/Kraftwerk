@@ -4,7 +4,7 @@ package fr.insee.kraftwerk.api.services;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
@@ -41,13 +41,15 @@ public class KraftwerkService {
 	
 	@PostConstruct
 	public void initializeWithProperties() {
+
+
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
 	}
 	
-	public ResponseEntity<String> archive(String inDirectoryParam) {
+	public ResponseEntity<String> archive(String inDirectoryParam, FileUtilsInterface fileUtilsInterface) {
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
@@ -56,19 +58,19 @@ public class KraftwerkService {
 		}
 		
 		/* Step 4.3 : move kraftwerk.json to a secondary folder */
-		FileUtils.renameInputFile(inDirectory);
+		fileUtilsInterface.renameInputFile(inDirectory);
 
 		/* Step 4.4 : move differential data to a secondary folder */
 		try {
-			FileUtils.archiveInputFiles(controlInputSequence.getUserInputs(inDirectory));
+			fileUtilsInterface.archiveInputFiles(controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface));
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		
 		//delete temp directory
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory);
+		Path tempOutputPath = FileUtilsInterface.transformToTemp(inDirectory);
 		try {
-			FileUtils.deleteDirectory(tempOutputPath);
+			fileUtilsInterface.deleteDirectory(tempOutputPath);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}

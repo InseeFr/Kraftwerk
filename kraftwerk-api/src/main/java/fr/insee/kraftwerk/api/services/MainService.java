@@ -6,6 +6,8 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +42,9 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -48,7 +52,7 @@ public class MainService extends KraftwerkService {
 		}
 
 		/* Step 4.3- 4.4 : Archive */
-		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam,fileUtilsInterface);
 
 		return ResponseEntity.ok(inDirectoryParam);
 	}
@@ -62,14 +66,16 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 			/* Step 4.3- 4.4 : Archive */
-		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam, fileUtilsInterface);
 
 		return ResponseEntity.ok(inDirectoryParam);
 	}
@@ -83,14 +89,16 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = false;
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 			/* Step 4.3- 4.4 : Archive */
-		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam);
+		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam, fileUtilsInterface);
 
 		return ResponseEntity.ok(inDirectoryParam);
 	}
@@ -99,7 +107,9 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
-		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
+
 		try {
 			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory));
 			mpGenesis.runMain(idCampaign);

@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,8 @@ class CsvOutputFilesTest {
 	private static UserInputsFile testUserInputsFile;
 	private static OutputFiles outputFiles;
 
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 	Dataset fooDataset = new InMemoryDataset(List.of(),
 			List.of(new Structured.Component("FOO", String.class, Dataset.Role.IDENTIFIER)));
 
@@ -40,7 +44,7 @@ class CsvOutputFilesTest {
 			//
 			testUserInputsFile = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"), fileUtilsInterface);
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputsFile.getModes()) {

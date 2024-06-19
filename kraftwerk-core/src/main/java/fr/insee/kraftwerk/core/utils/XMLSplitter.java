@@ -22,7 +22,7 @@ public class XMLSplitter {
 
 	public static void split(String inputfolder, String xmlfile, String outputFolder, String condition, int nbElementsByFile) throws XMLStreamException, IOException {
 
-		FileUtils.createDirectoryIfNotExist(Paths.get(outputFolder));
+		FileSystemImpl.createDirectoryIfNotExist(Paths.get(outputFolder));
 		String xmlResource = inputfolder + xmlfile;
 		List<XMLEvent> header = getHeader(xmlResource, condition);
 

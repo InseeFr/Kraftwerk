@@ -1,12 +1,11 @@
 package fr.insee.kraftwerk.core.utils;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,53 +15,23 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Log4j2
-public class FileUtils {
-
-	private FileUtils(){
-		throw new IllegalStateException("Utility class");
-	}
+@NoArgsConstructor
+public class FileSystemImpl implements FileUtilsInterface{
 
 	private static final String ARCHIVE = "Archive";
-	
-	/**
-	 * Change /some/path/in/campaign-name to /some/path/out/campaign-name
-	 */
-	public static Path transformToOut(Path inDirectory) {
-		return transformToOther(inDirectory, "out");
-	}
-	public static Path transformToOut(Path inDirectory, LocalDateTime localDateTime) {
-		return transformToOther(inDirectory, "out").resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)));
-	}
-	
-	/**
-	 * Change /some/path/in/campaign-name to /some/path/temp/campaign-name
-	 */
-	public static Path transformToTemp(Path inDirectory) {
-		return transformToOther(inDirectory, "temp");
-	}
-
-	/**
-	 * Change /some/path/in/campaign-name to /some/path/__other__/campaign-name
-	 */
-	private static Path transformToOther(Path inDirectory, String other) {
-		return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve(other)
-				: transformToOther(inDirectory.getParent(),other).resolve(inDirectory.getFileName());
-	}
 	
 
 	
 	/**
 	 * Move the input file to another directory to archive it
 	 */
-	public static void renameInputFile(Path inDirectory) {
+	public void renameInputFile(Path inDirectory) {
 
 		File file = inDirectory.resolve("kraftwerk.json").toFile();
 		String fileWithTime = "kraftwerk-" + DateUtils.getCurrentTimeStamp() + ".json";
@@ -81,7 +50,7 @@ public class FileUtils {
 		}
 	}
 
-	public static void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException {
+	public void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException {
 		//
 		Path inputFolder = userInputsFile.getInputDirectory();
 		String[] directories = inputFolder.toString().split(Pattern.quote(File.separator));
@@ -105,7 +74,7 @@ public class FileUtils {
 	 * @param modeInputs
 	 * @throws KraftwerkException
 	 */
-	private static void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs)
+	private void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs)
 			throws KraftwerkException {
 		if (modeInputs.getReportingDataFile() != null) {
 			moveDirectory(modeInputs.getReportingDataFile().toFile(), inputFolder.resolve(ARCHIVE)
@@ -120,7 +89,7 @@ public class FileUtils {
 	 * @param modeInputs
 	 * @throws KraftwerkException
 	 */
-	private static void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs)
+	private void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs)
 			throws KraftwerkException {
 		if (modeInputs.getParadataFolder() != null) {
 			moveDirectory(modeInputs.getParadataFolder().toFile(), inputFolder.resolve(ARCHIVE)
@@ -128,7 +97,7 @@ public class FileUtils {
 		}
 	}
 
-	private static void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs)
+	private void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs)
 			throws KraftwerkException {
 		Path dataPath = modeInputs.getDataFile();
 		Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
@@ -145,13 +114,13 @@ public class FileUtils {
 		}
 	}
 
-	private static void createArchiveDirectoryIfNotExists(Path inputFolder) {
+	private void createArchiveDirectoryIfNotExists(Path inputFolder) {
 		if (!Files.exists(inputFolder.resolve(ARCHIVE))) {
 			inputFolder.resolve(ARCHIVE).toFile().mkdir();
 		}
 	}
 
-	private static void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
+	private void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
 		try {
 			Files.move(dataPath, newDataPath);
 		} catch (IOException e) {
@@ -160,7 +129,7 @@ public class FileUtils {
 	}
 
 
-	private static void moveDirectory(File sourceFile, File destFile) throws KraftwerkException {
+	private void moveDirectory(File sourceFile, File destFile) throws KraftwerkException {
 		if (sourceFile.isDirectory()) {
 			File[] files = sourceFile.listFiles();
 			assert files != null : "List of files in sourceFile is null";
@@ -179,7 +148,7 @@ public class FileUtils {
 		}
 	}
 	
-	private static String getRoot(Path path, String campaignName) {
+	private String getRoot(Path path, String campaignName) {
 		String[] directories = path.toString().split(Pattern.quote(File.separator));
 		int campaignIndex = Arrays.asList(directories).indexOf(campaignName);
 		String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex + 1, directories.length);
@@ -193,9 +162,9 @@ public class FileUtils {
 	}
 	
 	
-	public static void deleteDirectory(Path directoryPath) throws KraftwerkException {
+	public void deleteDirectory(Path directoryPath) throws KraftwerkException {
 		try {
-			FileSystemUtils.deleteRecursively(directoryPath);
+			org.springframework.util.FileSystemUtils.deleteRecursively(directoryPath);
 		} catch (IOException e) {
 			throw new KraftwerkException(500, "IOException when deleting temp folder : "+e.getMessage());
 		}
@@ -206,16 +175,16 @@ public class FileUtils {
 	 * @param dir
 	 * @return
 	 */
-	public static List<String> listFiles(String dir) {
+	public List<String> listFiles(String dir) {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
 				.map(File::getName)
 				.toList();
 	}
 	
-	public static Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
-		createDirectoryIfNotExist(FileUtils.transformToTemp(userInputs.getInputDirectory()));
-		return FileUtils.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
+	public Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
+		createDirectoryIfNotExist(FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()));
+		return FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
 	}
 	
 	public static void createDirectoryIfNotExist(Path path) {
@@ -227,7 +196,7 @@ public class FileUtils {
 		}
 	}
 
-	public static Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
+	public Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
 		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
 			Path inputPath = inputDirectory.resolve(userField);
 			if (!new File(inputPath.toUri()).exists()) {
@@ -239,7 +208,7 @@ public class FileUtils {
 		}
 	}
 
-	public static URL convertToUrl(String userField, Path inputDirectory) {
+	public URL convertToUrl(String userField, Path inputDirectory) {
 		if (userField == null) {
 			log.debug("null value out of method that reads DDI field (should not happen).");
 			return null;
@@ -254,5 +223,4 @@ public class FileUtils {
 			return null;
 		} 
 	}
-	
 }

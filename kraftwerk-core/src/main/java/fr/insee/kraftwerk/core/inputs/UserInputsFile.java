@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,8 +28,8 @@ public class UserInputsFile extends UserInputs {
 
 	private final Set<String> mandatoryFields = Set.of("survey_data", "data_mode", "data_file", "data_format", "multimode_dataset_name");
 
-	public UserInputsFile(Path userConfigFile, Path inputDirectory) throws KraftwerkException {
-		super(inputDirectory);
+	public UserInputsFile(Path userConfigFile, Path inputDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		super(inputDirectory,fileUtilsInterface);
 		this.userInputFile = userConfigFile;
 		readUserInputs();
 	}
@@ -46,13 +46,13 @@ public class UserInputsFile extends UserInputs {
 				String dataFolder = readField(fileNode, "data_file");
 				String paradataFolder = readField(fileNode, "paradata_folder");
 				String reportingFolder = readField(fileNode, "reporting_data_file");
-				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : FileUtils.convertToPath(dataFolder,inputDirectory);
-				URL ddiFile = FileUtils.convertToUrl(readField(fileNode, "DDI_file"),inputDirectory);
-				Path lunaticFile = FileUtils.convertToPath(readField(fileNode, "lunatic_file"),inputDirectory);
+				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : fileUtilsInterface.convertToPath(dataFolder,inputDirectory);
+				URL ddiFile = fileUtilsInterface.convertToUrl(readField(fileNode, "DDI_file"),inputDirectory);
+				Path lunaticFile = fileUtilsInterface.convertToPath(readField(fileNode, "lunatic_file"),inputDirectory);
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : FileUtils.convertToPath(paradataFolder,inputDirectory);
-				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : FileUtils.convertToPath(reportingFolder,inputDirectory);
-				Path vtlFile = FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
+				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : fileUtilsInterface.convertToPath(paradataFolder,inputDirectory);
+				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : fileUtilsInterface.convertToPath(reportingFolder,inputDirectory);
+				Path vtlFile = fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataPath);
 				modeInputs.setDdiUrl(ddiFile);
@@ -65,9 +65,9 @@ public class UserInputsFile extends UserInputs {
 			}
 			//
 			multimodeDatasetName = readField(userInputs, "multimode_dataset_name");
-			vtlReconciliationFile = FileUtils.convertToPath(readField(userInputs, "reconciliation_specifications"),inputDirectory);
-			vtlTransformationsFile = FileUtils.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
-			vtlInformationLevelsFile = FileUtils.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
+			vtlReconciliationFile = fileUtilsInterface.convertToPath(readField(userInputs, "reconciliation_specifications"),inputDirectory);
+			vtlTransformationsFile = fileUtilsInterface.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
+			vtlInformationLevelsFile = fileUtilsInterface.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
 
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);

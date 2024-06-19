@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.inputs;
 
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +18,11 @@ public class UserInputs {
 	protected Path vtlTransformationsFile;
 	protected Path vtlInformationLevelsFile;
 	protected String multimodeDatasetName;
+	protected FileUtilsInterface fileUtilsInterface;
 
-	public UserInputs(Path inputDirectory) {
+	public UserInputs(Path inputDirectory, FileUtilsInterface fileUtilsInterface) {
 		this.inputDirectory = inputDirectory;
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 	public ModeInputs getModeInputs(String modeName) {
 		return modeInputsMap.get(modeName);

@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 
@@ -40,7 +40,7 @@ public abstract class OutputFiles {
 
 	/** Create output folder if doesn't exist. */
 	private void createOutputFolder() {
-		FileUtils.createDirectoryIfNotExist(outputFolder);
+		FileSystemImpl.createDirectoryIfNotExist(outputFolder);
 	}
 
 	/** See getOutputDatasetNames doc. */

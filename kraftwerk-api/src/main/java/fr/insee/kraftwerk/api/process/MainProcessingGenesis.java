@@ -15,6 +15,7 @@ import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class MainProcessingGenesis {
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
+	private FileUtilsInterface fileUtilsInterface;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -55,8 +57,9 @@ public class MainProcessingGenesis {
 
 	private GenesisClient client;
 
-	public MainProcessingGenesis(ConfigProperties config) {
+	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface) {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public void init(String idCampaign) throws KraftwerkException, IOException {
@@ -65,7 +68,7 @@ public class MainProcessingGenesis {
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign));
+		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign), fileUtilsInterface);
 		if (!userInputs.getModes().isEmpty()) {
 			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap());
 		} else {
@@ -99,16 +102,16 @@ public class MainProcessingGenesis {
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory, fileUtilsInterface);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, fileUtilsInterface);
 	}
 
 	/* Step 4 : Write output files */

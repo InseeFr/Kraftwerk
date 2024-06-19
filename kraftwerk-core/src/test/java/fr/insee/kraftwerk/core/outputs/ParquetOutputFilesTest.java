@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.exceptions.CsvException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
@@ -9,7 +8,8 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -38,6 +37,7 @@ class ParquetOutputFilesTest {
 
 	private static UserInputsFile testUserInputs;
 	private static ParquetOutputFiles outputFiles;
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 
 	Dataset testDataset = new InMemoryDataset(
@@ -61,7 +61,7 @@ class ParquetOutputFilesTest {
 			//
 			testUserInputs = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"), fileUtilsInterface);
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
@@ -93,11 +93,11 @@ class ParquetOutputFilesTest {
 	
 	@Test
 	@Order(3)
-	void writeParquetFromDatasetTest() throws IOException, CsvException {
+	void writeParquetFromDatasetTest(){
 
 		// Clean the existing file
 //		Files.deleteIfExists(outputFiles.getOutputFolder());
-		FileUtils.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+		FileSystemImpl.createDirectoryIfNotExist(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metMod = new MetadataModel();
@@ -115,21 +115,5 @@ class ParquetOutputFilesTest {
 		Assertions.assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());
 
-	}
-	
-	
-	
-	
-	
-
-	
-	boolean deleteDirectory(File directoryToBeDeleted) {
-	    File[] allContents = directoryToBeDeleted.listFiles();
-	    if (allContents != null) {
-	        for (File file : allContents) {
-	            deleteDirectory(file);
-	        }
-	    }
-	    return directoryToBeDeleted.delete();
 	}
 }

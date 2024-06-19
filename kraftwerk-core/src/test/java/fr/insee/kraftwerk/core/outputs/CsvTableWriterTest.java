@@ -9,7 +9,7 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.csv.CsvTableWriter;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -64,7 +64,7 @@ class CsvTableWriterTest {
 	void writeCsvFromDatasetTest() throws IOException, CsvException {
 		// Clean the existing file
 		Files.deleteIfExists(outTestFilePath);
-		FileUtils.createDirectoryIfNotExist(outTestFilePath.getParent());
+		FileSystemImpl.createDirectoryIfNotExist(outTestFilePath.getParent());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metadataModel = new MetadataModel();

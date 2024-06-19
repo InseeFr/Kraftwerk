@@ -9,7 +9,8 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,9 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -77,7 +80,9 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -107,6 +112,8 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
 		//Read data in JSON file
 		Path inDirectory;
 		try {
@@ -116,7 +123,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -124,13 +131,13 @@ public class StepByStepService extends KraftwerkService {
 		List<KraftwerkError> errors = new ArrayList<>();
 
 		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
-		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
+		vtlReaderSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
-		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap);
+		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 		
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
@@ -148,6 +155,8 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
 		//Read data in JSON file
 		Path inDirectory;
 		try {
@@ -157,7 +166,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -169,14 +178,14 @@ public class StepByStepService extends KraftwerkService {
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
-			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
+			vtlReaderWriterSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 
 		//Process
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
@@ -194,6 +203,8 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
@@ -204,8 +215,8 @@ public class StepByStepService extends KraftwerkService {
 		VtlBindings vtlBindings = new VtlBindings();
 		List<KraftwerkError> errors = new ArrayList<>();
 		// Read all bindings necessary to produce output
-		String path = FileUtils.transformToTemp(inDirectory).toString();
-		List<String> fileNames = FileUtils.listFiles(path);
+		String path = FileUtilsInterface.transformToTemp(inDirectory).toString();
+		List<String> fileNames = fileUtilsInterface.listFiles(path);
 		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).toList();
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
@@ -216,7 +227,7 @@ public class StepByStepService extends KraftwerkService {
 		WriterSequence writerSequence = new WriterSequence();
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -227,14 +238,13 @@ public class StepByStepService extends KraftwerkService {
 	}
 
 
-	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
 	public ResponseEntity<String> archiveService(
-			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
-			{
-		return archive(inDirectoryParam);
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
 
+		return archive(inDirectoryParam, fileUtilsInterface);
 	}
 
 

@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,17 +55,17 @@ public class KraftwerkBatch implements CommandLineRunner {
 
             //Run kraftwerk
             if(kraftwerkServiceType == KraftwerkServiceType.GENESIS){
-                MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties);
+                MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new FileSystemImpl());
                 mainProcessingGenesis.runMain(inDirectory);
             }else{
-                MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize);
+                MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new FileSystemImpl());
                 mainProcessing.runMain();
             }
 
             //Archive
             if(Boolean.TRUE.equals(archiveAtEnd)){
                 KraftwerkService kraftwerkService = new KraftwerkService();
-                kraftwerkService.archive(inDirectory);
+                kraftwerkService.archive(inDirectory, new FileSystemImpl());
             }
 
             System.exit(0);

@@ -37,9 +37,9 @@ public class TextFileWriter {
     }
     
 	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime)
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime)
 				.resolve(Constants.ERRORS_FILE_NAME);
-		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+		FileSystemImpl.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
 		if (!errors.isEmpty()) {
@@ -57,9 +57,9 @@ public class TextFileWriter {
 	}
 
 	public static void writeLogFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionLog kraftwerkExecutionLog){
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime);
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime);
 		tempOutputPath = tempOutputPath.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
-		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+		FileSystemImpl.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		try (FileWriter myWriter = new FileWriter(tempOutputPath.toFile(),true)){
 			myWriter.write(kraftwerkExecutionLog.getFormattedString());

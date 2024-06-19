@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -19,8 +20,8 @@ public class ControlInputSequence {
 		this.defaultDirectory = defaultDirectory;
 	}
 
-	public UserInputsFile getUserInputs(Path inDirectory) throws KraftwerkException {
-		return new UserInputsFile(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory);
+	public UserInputsFile getUserInputs(Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		return new UserInputsFile(inDirectory.resolve(Constants.USER_INPUT_FILE), inDirectory, fileUtilsInterface);
 	}
 
 	public Path getInDirectory(String inDirectoryParam) throws KraftwerkException {

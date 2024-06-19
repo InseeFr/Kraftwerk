@@ -7,6 +7,8 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class BuildBindingsSequenceTest {
 	
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 
 
 	@Test
@@ -27,7 +31,7 @@ class BuildBindingsSequenceTest {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
-				inputSamplesDirectory);
+				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
 		boolean withAllReportingData = false;
@@ -47,7 +51,7 @@ class BuildBindingsSequenceTest {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
-				inputSamplesDirectory);
+				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
 		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);

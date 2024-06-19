@@ -5,8 +5,8 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,29 +14,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FileUtilsTest {
+class FileSystemImplTest {
+	private static FileUtilsInterface fileUtilsInterface;
+
+	@BeforeAll
+    static void init(){
+		fileUtilsInterface = new FileSystemImpl();
+	}
 
     
     @Test
     void testTransformToOut() {
         assertEquals(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/out/VQS"),
-        		FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS")));
+				FileUtilsInterface.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS")));
     }
 
 	@Test
 	void testTransformToOut2() {
 		Path path = Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/out/VQS");
-		assertEquals(path,FileUtils.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS"), LocalDateTime.now()).getParent());
+		assertEquals(path, FileUtilsInterface.transformToOut(Paths.get("C://Users/in/Kraftwerk/src/test/resources/functional_tests/in/VQS"), LocalDateTime.now()).getParent());
 	}
     
     @Test
     void archiveInputFiles_failWhenNull() {
-		assertThrows(NullPointerException.class, () -> FileUtils.archiveInputFiles(null));
+		assertThrows(NullPointerException.class, () -> fileUtilsInterface.archiveInputFiles(null));
     }  
     
     
@@ -46,7 +51,7 @@ class FileUtilsTest {
 		//GIVEN
 		String campaignName = "move_files";
 		Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName, "execute");
-		FileSystemUtils.deleteRecursively(inputDirectory);
+		org.springframework.util.FileSystemUtils.deleteRecursively(inputDirectory);
 		Files.createDirectories(inputDirectory);
 		Files.copy(Path.of(TestConstants.UNIT_TESTS_DIRECTORY, campaignName,"move_files.json"), 
 				Path.of(inputDirectory.toString(),"move_files.json"));
@@ -77,11 +82,11 @@ class FileUtilsTest {
 		new File(Constants.getResourceAbsolutePath(paradataDirectory +"/L0000009.json")).createNewFile();
 		new File(Constants.getResourceAbsolutePath(paradataDirectory +"/L0000010.json")).createNewFile();
 
-		UserInputsFile testUserInputsFile = new UserInputsFile(Path.of(inputDirectory.toString(), "move_files.json"),inputDirectory);
+		UserInputsFile testUserInputsFile = new UserInputsFile(Path.of(inputDirectory.toString(), "move_files.json"),inputDirectory, fileUtilsInterface);
 
 
 		//WHEN
-		FileUtils.archiveInputFiles(testUserInputsFile);
+		fileUtilsInterface.archiveInputFiles(testUserInputsFile);
 		
 		//THEN
 		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/papier").exists());
@@ -90,7 +95,7 @@ class FileUtilsTest {
 		Assertions.assertTrue(new File(inputDirectory.toString() + "/Archive/suivi/reportingdata.xml").exists());
 
 		//CLEAN
-		FileSystemUtils.deleteRecursively(inputDirectory);
+		org.springframework.util.FileSystemUtils.deleteRecursively(inputDirectory);
 	}
 
 

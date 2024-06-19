@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
@@ -118,7 +118,7 @@ public class VtlExecute {
      * @param jsonOutFile Path to write the output json file.
      * */
     public void writeJsonDataset(String bindingName, Path jsonOutFile, VtlBindings bindings) {
-    	FileUtils.createDirectoryIfNotExist(jsonOutFile.getParent());
+    	FileSystemImpl.createDirectoryIfNotExist(jsonOutFile.getParent());
     	
     	//Write file    	
         if (bindings.containsKey(bindingName)) {

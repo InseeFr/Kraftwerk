@@ -15,7 +15,8 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.Before;
@@ -63,7 +64,8 @@ public class MainDefinitions {
 
 	@Before
 	public void clean() throws KraftwerkException {
-		FileUtils.deleteDirectory(outDirectory);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+		fileUtilsInterface.deleteDirectory(outDirectory);
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -96,19 +98,19 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+		userInputsFile = controlInputSequence.getUserInputs(inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
+		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
 		userInputsFile=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -116,7 +118,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
 		userInputsFile=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -127,7 +129,7 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
@@ -136,10 +138,10 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 		await().atMost(2, TimeUnit.SECONDS);
-		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
@@ -149,7 +151,7 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), true,
-				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L);
+				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
@@ -161,14 +163,14 @@ public class MainDefinitions {
 			boolean withDDI = true;
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap);
+			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
 	}
 
 	@When("Step 4 : We export the final version")
@@ -282,8 +284,8 @@ public class MainDefinitions {
 	}
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
-		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
+		FileSystemImpl.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
 		if (!errors.isEmpty()) {

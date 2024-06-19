@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -45,6 +46,7 @@ public class MainProcessing {
 	private KraftwerkExecutionLog kraftwerkExecutionLog;
 	private List<KraftwerkError> errors = new ArrayList<>();
 	private LocalDateTime executionDateTime;
+	private FileUtilsInterface fileUtilsInterface;
 	
 	/**
 	 * Map by mode
@@ -54,7 +56,7 @@ public class MainProcessing {
 
 	private final long limitSize;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
@@ -62,9 +64,10 @@ public class MainProcessing {
 		this.withDDI=withDDI;
 		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 	
-	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory, long limitSize) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
@@ -72,6 +75,7 @@ public class MainProcessing {
 		this.withDDI=true;
 		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 
@@ -104,7 +108,7 @@ public class MainProcessing {
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: " + campaignName);
 
-		userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+		userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		if (withDDI) metadataModels = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 		if (!withDDI) metadataModels = MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
 
@@ -131,14 +135,14 @@ public class MainProcessing {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels);
+			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, fileUtilsInterface);
 	}
 
 	/* Step 4 : Write output files */
@@ -161,7 +165,7 @@ public class MainProcessing {
 		for (String dataMode : source.getModeInputsMap().keySet()) {
 			List<Path> dataFiles = getFilesToProcess(source, dataMode);
 			for (Path dataFile : dataFiles) {
-				UserInputsFile currentFileInputs = new UserInputsFile(source.getUserInputFile(),source.getUserInputFile().getParent());
+				UserInputsFile currentFileInputs = new UserInputsFile(source.getUserInputFile(),source.getUserInputFile().getParent(), source.getFileUtilsInterface());
 				currentFileInputs.setVtlReconciliationFile(source.getVtlReconciliationFile());
 				currentFileInputs.setVtlInformationLevelsFile(source.getVtlInformationLevelsFile());
 				currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());

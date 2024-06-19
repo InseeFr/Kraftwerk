@@ -15,7 +15,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
@@ -32,7 +32,7 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -72,7 +72,7 @@ public class BuildBindingsSequenceGenesis {
 		parseParadata(dataMode, data, inDirectory);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, inDirectory);
+		parseReportingData(dataMode, data, inDirectory, fileUtilsInterface);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -89,11 +89,11 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		File reportingDataFolder = reportingDataFile.toFile();
 		if (reportingDataFolder.exists()) {
-			List<String> listFiles = FileUtils.listFiles(reportingDataFile.toString());
+			List<String> listFiles = fileUtilsInterface.listFiles(reportingDataFile.toString());
 			for (String file : listFiles) {
 				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
 				if (file.contains(".xml")) {

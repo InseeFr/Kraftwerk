@@ -6,7 +6,7 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.extern.log4j.Log4j2;
 
@@ -24,8 +24,8 @@ public class UserInputsGenesis extends UserInputs{
 
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes) throws KraftwerkException, IOException {
-		super(inputDirectory);
+	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, IOException {
+		super(inputDirectory, fileUtilsInterface);
 		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
 		computeInputs();
@@ -34,7 +34,7 @@ public class UserInputsGenesis extends UserInputs{
 	private void computeInputs() throws KraftwerkException, IOException {
         UserInputsFile userInputsFile;
 		if(hasConfigFile){
-            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory);
+            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory, fileUtilsInterface);
             modeInputsMap = userInputsFile.getModeInputsMap();
 		}else{
             for (Mode mode : modes) {
@@ -75,7 +75,7 @@ public class UserInputsGenesis extends UserInputs{
 				String dataMode = readField(fileNode, "data_mode");
 				if (dataMode == null) {break;}
 				if (dataMode.equals(mode.name())) {
-					return FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
+					return fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				}
 			}
 		} catch (IOException e) {

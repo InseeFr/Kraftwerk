@@ -13,6 +13,8 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,13 +35,14 @@ public class ParadataDefinitions {
 	String userInputFileName = Constants.USER_INPUT_FILE;
 	ModeInputs modeInputs;
 	private ControlInputSequence controlInputSequence;
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Given("We read data from input named {string}")
 	public void launch_all_steps(String campaignName) throws KraftwerkException {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
 		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
-		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);
+		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory, fileUtilsInterface);
 		// For now, only one file
 		String modeName = userInputs.getModes().getFirst();
 		modeInputs = userInputs.getModeInputs(modeName);

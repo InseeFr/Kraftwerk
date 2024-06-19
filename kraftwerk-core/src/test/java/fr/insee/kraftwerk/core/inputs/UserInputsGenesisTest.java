@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
+import fr.insee.kraftwerk.core.utils.FileSystemImpl;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ class UserInputsGenesisTest {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 
-		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes);
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl());
 		//
 		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
 		assertNotNull(modeInputs.getDdiUrl());
