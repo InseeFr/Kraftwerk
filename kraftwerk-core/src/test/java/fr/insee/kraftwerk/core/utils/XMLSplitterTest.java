@@ -1,6 +1,8 @@
 package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -12,7 +12,7 @@ import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;

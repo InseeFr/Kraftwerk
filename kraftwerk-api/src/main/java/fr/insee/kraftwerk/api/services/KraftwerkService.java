@@ -4,7 +4,7 @@ package fr.insee.kraftwerk.api.services;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;

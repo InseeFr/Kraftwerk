@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 

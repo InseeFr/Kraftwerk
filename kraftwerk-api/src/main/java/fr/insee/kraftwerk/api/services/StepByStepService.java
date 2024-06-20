@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.services;
 
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
@@ -9,13 +10,16 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +35,16 @@ import java.util.Map;
 @RestController
 @Tag(name = "${tag.stepbystep}")
 public class StepByStepService extends KraftwerkService {
+	MinioConfig minioConfig;
+	MinioClient minioClient;
+
+	@Autowired
+	public StepByStepService(MinioConfig minioConfig) {
+		this.minioConfig = minioConfig;
+		if(minioConfig.isEnable()){
+			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+		}
+	}
 
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
@@ -41,7 +55,12 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -80,7 +99,12 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -112,7 +136,12 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		//Read data in JSON file
 		Path inDirectory;
@@ -155,7 +184,12 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		//Read data in JSON file
 		Path inDirectory;
@@ -203,7 +237,12 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) throws KraftwerkException {
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		Path inDirectory;
 		try {
@@ -242,7 +281,12 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
 	public ResponseEntity<String> archiveService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		return archive(inDirectoryParam, fileUtilsInterface);
 	}

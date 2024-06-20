@@ -6,7 +6,7 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.JsonFileReader;
 import lombok.extern.log4j.Log4j2;
 

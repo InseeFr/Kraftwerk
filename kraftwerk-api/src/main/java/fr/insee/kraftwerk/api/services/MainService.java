@@ -2,12 +2,15 @@ package fr.insee.kraftwerk.api.services;
 
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,10 +30,16 @@ import java.io.IOException;
 public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;
+	MinioConfig minioConfig;
+	MinioClient minioClient;
 
 	@Autowired
-	public MainService(ConfigProperties configProperties) {
+	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
 		this.configProperties = configProperties;
+		this.minioConfig = minioConfig;
+		if(minioConfig.isEnable()){
+			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+		}
 	}
 
 	@PutMapping(value = "/main")
@@ -42,7 +51,12 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -66,7 +80,12 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -89,7 +108,12 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = false;
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -107,7 +131,13 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
-		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(); //TODO Minio if kube
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
 
 		try {

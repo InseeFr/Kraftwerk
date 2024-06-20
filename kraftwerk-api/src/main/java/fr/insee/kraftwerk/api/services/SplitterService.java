@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "${tag.splitter}")
 @Log4j2
 public class SplitterService extends KraftwerkService{
-
+//TODO add MinIO support
 	@Operation(summary = "Split a XML file into smaller ones")
 	@PutMapping(path = "/split/lunatic-xml")
 	public ResponseEntity<Object> saveResponsesFromXmlFile(@RequestParam("inputFolder") String inputFolder,

@@ -10,8 +10,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

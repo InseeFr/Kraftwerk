@@ -15,7 +15,7 @@ import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;

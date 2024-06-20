@@ -1,10 +1,12 @@
 package fr.insee.kraftwerk.api.batch;
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,18 +16,25 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class KraftwerkBatch implements CommandLineRunner {
-    @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties) {
-        this.configProperties = configProperties;
-    }
 
     ConfigProperties configProperties;
+    MinioConfig minioConfig;
+    MinioClient minioClient;
 
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
 
     @Value("${fr.insee.postcollecte.size-limit}")
     protected long limitSize;
+
+    @Autowired
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig) {
+        this.configProperties = configProperties;
+        this.minioConfig = minioConfig;
+        if(minioConfig.isEnable()){
+            minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+        }
+    }
 
     @Override
     public void run(String... args) throws Exception{
@@ -55,17 +64,17 @@ public class KraftwerkBatch implements CommandLineRunner {
 
             //Run kraftwerk
             if(kraftwerkServiceType == KraftwerkServiceType.GENESIS){
-                MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new FileSystemImpl());
+                MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new MinioImpl(minioClient, minioConfig.getBucketName()));
                 mainProcessingGenesis.runMain(inDirectory);
             }else{
-                MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new FileSystemImpl());
+                MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
                 mainProcessing.runMain();
             }
 
             //Archive
             if(Boolean.TRUE.equals(archiveAtEnd)){
                 KraftwerkService kraftwerkService = new KraftwerkService();
-                kraftwerkService.archive(inDirectory, new FileSystemImpl());
+                kraftwerkService.archive(inDirectory, new MinioImpl(minioClient, minioConfig.getBucketName()));
             }
 
             System.exit(0);

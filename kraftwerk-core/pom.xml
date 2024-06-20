@@ -225,6 +225,13 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.26.2</version>
 		</dependency>
+
+		<!-- S3 -->
+		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<version>8.5.10</version>
+		</dependency>
 	</dependencies>
 
 </project>

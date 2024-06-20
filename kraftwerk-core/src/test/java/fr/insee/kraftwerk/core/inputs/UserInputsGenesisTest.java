@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

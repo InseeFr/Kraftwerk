@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 

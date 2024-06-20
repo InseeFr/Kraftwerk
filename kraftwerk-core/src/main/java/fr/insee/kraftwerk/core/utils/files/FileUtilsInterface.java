@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.utils;
+package fr.insee.kraftwerk.core.utils.files;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;

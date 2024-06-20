@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.utils;
 
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+
 import javax.xml.stream.*;
 import javax.xml.stream.events.EndDocument;
 import javax.xml.stream.events.StartDocument;

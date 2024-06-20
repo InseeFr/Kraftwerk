@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import fr.insee.kraftwerk.core.utils.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.Getter;
 import lombok.Setter;
 

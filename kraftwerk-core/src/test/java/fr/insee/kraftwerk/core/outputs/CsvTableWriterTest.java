@@ -9,7 +9,7 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.csv.CsvTableWriter;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
-import fr.insee.kraftwerk.core.utils.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
