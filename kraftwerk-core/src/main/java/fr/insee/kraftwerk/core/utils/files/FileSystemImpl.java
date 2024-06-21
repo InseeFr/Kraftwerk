@@ -176,7 +176,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	}
 
 	/**
-	 * List the files in the directory
+	 * List the file names in the directory
 	 * @param dir
 	 * @return
 	 */
@@ -185,6 +185,14 @@ public class FileSystemImpl implements FileUtilsInterface{
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
 				.map(File::getName)
+				.toList();
+	}
+
+	@Override
+	public List<String> listFilePaths(String dir) {
+		return Stream.of(new File(dir).listFiles())
+				.filter(file -> !file.isDirectory())
+				.map(File::getAbsolutePath)
 				.toList();
 	}
 
@@ -236,11 +244,14 @@ public class FileSystemImpl implements FileUtilsInterface{
 	@Override
 	@Nullable
 	public Boolean isDirectory(String path) {
+		File file = new File(path);
+		if(file.isDirectory()){
+			return true;
+		}
 		if(!Files.isRegularFile(Path.of(path))){
 			return null;
 		}
-		File file = new File(path);
-		return file.isDirectory();
+		return false;
 	}
 
 	@Override

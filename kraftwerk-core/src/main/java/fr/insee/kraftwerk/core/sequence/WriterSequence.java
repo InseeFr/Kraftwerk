@@ -23,9 +23,9 @@ import java.util.Map;
 public class WriterSequence {
 
 	public void writeOutputFiles(Path inDirectory,LocalDateTime executionDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, Statement database) throws KraftwerkException {
-		Path outDirectory = FileUtils.transformToOut(inDirectory,executionDateTime);
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
 
-		writeCsvFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, null, database);
+		writeOutputFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, null, database);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, database);
 	}
 

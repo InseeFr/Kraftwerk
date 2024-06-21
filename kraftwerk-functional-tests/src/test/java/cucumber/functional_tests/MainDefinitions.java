@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -17,10 +18,8 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
@@ -110,13 +109,13 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputsFile = controlInputSequence.getUserInputs(inDirectory, new FileSystemImpl());
+		userInputs = controlInputSequence.getUserInputs(inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputsFile = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory, new FileSystemImpl());
+		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 

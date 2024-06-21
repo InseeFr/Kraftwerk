@@ -145,6 +145,11 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     @Override
+    public List<String> listFilePaths(String dir) {
+        return listFiles(dir);
+    }
+
+    @Override
     public Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
         return FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
     }
@@ -177,7 +182,22 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public Boolean isDirectory(String path){
-        return path.endsWith("/") || path.endsWith("\\");
+        try {
+            //List files of parent to check if directory
+            Iterable<Result<Item>> results = minioClient.listObjects(
+                    ListObjectsArgs.builder().bucket(bucketName).prefix(Path.of(path).getParent().toString()).recursive(true).build());
+
+            for (Result<Item> result : results) {
+                if(result.get().objectName().equals(Path.of(path).getFileName().toString())){
+                    return result.get().isDir();
+                }
+            }
+            log.warn("S3 File or folder {} not found in {}", Path.of(path).getFileName().toString(), Path.of(path).getParent().toString());
+            return null;
+        } catch (Exception e) {
+            log.error(e.toString());
+            return null;
+        }
     }
 
     @Override

@@ -199,6 +199,7 @@ public class MainProcessing {
 		return userInputsFileList;
 	}
 
+	//TODO FIX HERE
 	private static List<Path> getFilesToProcess(UserInputsFile userInputsFile, String dataMode) {
 		List<Path> files = new ArrayList<>();
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
@@ -211,8 +212,8 @@ public class MainProcessing {
 			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
 			return files;
 		}
-		if(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString())){
-			for(String path : userInputsFile.getFileUtilsInterface().listFiles(dataPath.toString())){
+		if(Boolean.TRUE.equals(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString()))){
+			for(String path : userInputsFile.getFileUtilsInterface().listFilePaths(dataPath.toString())){
 				files.add(Path.of(path));
 			}
 		}else{

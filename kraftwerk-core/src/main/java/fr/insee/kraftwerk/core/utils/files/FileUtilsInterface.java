@@ -44,6 +44,8 @@ public interface FileUtilsInterface {
 
     List<String> listFiles(String dir);
 
+    List<String> listFilePaths(String dir);
+
     Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset);
 
     Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;

@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -38,7 +39,8 @@ class SqlUtilsTest {
             //Given
             UserInputsFile testUserInputsFile = new UserInputsFile(
                     Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"));
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"),
+                    new FileSystemImpl());
             VtlBindings vtlBindings = new VtlBindings();
             Dataset testDataset = new InMemoryDataset(List.of(),
                     List.of(new Structured.Component("TestString", String.class, Dataset.Role.IDENTIFIER)));

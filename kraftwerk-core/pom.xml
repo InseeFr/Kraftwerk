@@ -102,6 +102,7 @@
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
 			<version>8.5.10</version>
+		</dependency>
 
 
 		<!-- DUCKDB -->
@@ -111,5 +112,4 @@
 			<version>0.10.3</version>
 		</dependency>
 	</dependencies>
-
 </project>

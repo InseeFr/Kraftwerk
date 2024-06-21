@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -21,7 +23,6 @@ import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
-import fr.insee.kraftwerk.core.utils.FileUtils;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -91,8 +92,8 @@ class CsvOutputFilesTest {
 
 	@Test
 	@Order(3)
-	void testWriteCsv() throws KraftwerkException, SQLException {
-		FileUtils.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+	void testWriteCsv() throws KraftwerkException, IOException {
+		Files.createDirectories(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metMod = new MetadataModel();
