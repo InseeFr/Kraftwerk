@@ -7,7 +7,9 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -16,6 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -228,5 +231,31 @@ public class FileSystemImpl implements FileUtilsInterface{
 			log.error("Unable to convert URL from user input: " + userField);
 			return null;
 		} 
+	}
+
+	@Override
+	@Nullable
+	public Boolean isDirectory(String path) {
+		if(!Files.isRegularFile(Path.of(path))){
+			return null;
+		}
+		File file = new File(path);
+		return file.isDirectory();
+	}
+
+	@Override
+	public long getSizeOf(String path) {
+		File file = new File(path);
+		return FileUtils.sizeOf(file);
+	}
+
+	@Override
+	public void writeFile(String path, String toWrite, boolean replace) {
+		StandardOpenOption standardOpenOption = replace ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+		try {
+			Files.write(Path.of(path), toWrite.getBytes(), standardOpenOption);
+		}catch (IOException e){
+			log.error(e.toString());
+		}
 	}
 }

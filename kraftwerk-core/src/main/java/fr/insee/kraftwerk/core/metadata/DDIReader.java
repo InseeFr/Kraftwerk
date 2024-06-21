@@ -54,6 +54,7 @@ public class DDIReader {
 			transformDDI(ddiUrl, variablesTempFilePath);
 
 			MetadataModel metadataModel = readVariables(variablesTempFilePath);
+			//TODO change to use interface
 			Files.delete(variablesFile.toPath());
 			return metadataModel;
 		}

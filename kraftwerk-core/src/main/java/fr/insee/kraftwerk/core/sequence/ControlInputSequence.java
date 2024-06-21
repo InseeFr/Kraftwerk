@@ -30,7 +30,8 @@ public class ControlInputSequence {
 		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
 		return inDirectory;
 	}
-	
+
+	//TODO Change to interface
 	private boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
 		if (Files.exists(userInputFile)) {

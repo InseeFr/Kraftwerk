@@ -41,6 +41,7 @@ public class LocalOutputFile implements OutputFile {
 
     public LocalPositionOutputStream(int buffer, StandardOpenOption... openOption) throws IOException {
       stream = new BufferedOutputStream(Files.newOutputStream(path, openOption), buffer);
+      //TODO Change to interface
     }
 
     @Override

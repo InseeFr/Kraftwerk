@@ -35,7 +35,7 @@ public class ParadataParser {
 			throw new NullException("JSONFile not defined");
 
 		if (!filePath.toString().contentEquals("")) {
-
+//TODO Change to interface
 			// Get all filepaths for each ParadataUE
 			try (Stream<Path> walk = Files.walk(filePath)) {
 				List<Path> listFilePaths = walk.filter(Files::isRegularFile)

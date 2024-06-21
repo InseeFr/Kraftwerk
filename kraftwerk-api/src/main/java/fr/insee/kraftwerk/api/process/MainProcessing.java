@@ -13,16 +13,12 @@ import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Log4j2
 public class MainProcessing {
@@ -195,26 +191,25 @@ public class MainProcessing {
 			log.error("Datapath is null");
 			return files;
 		}
-		if (Files.isRegularFile(dataPath)) {
-			files.add(dataPath);
-		} else if (Files.isDirectory(dataPath)) {
-			try (Stream<Path> stream = Files.list(dataPath)) {
-				stream.forEach(files::add);
-			} catch (IOException e) {
-				log.error(String.format("IOException occurred when trying to list data files of folder: %s",
-						dataPath));
-			}
-		} else {
+		if(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString()) == null){
 			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			return files;
+		}
+		if(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString())){
+			for(String path : userInputsFile.getFileUtilsInterface().listFiles(dataPath.toString())){
+				files.add(Path.of(path));
+			}
+		}else{
+			files.add(dataPath);
 		}
 		return files;
 	}
 
 	private void isDataTooBig(UserInputsFile userInputsFile, String errorMessage, long limitSize) throws KraftwerkException {
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()){
-			long dataSize = FileUtils.sizeOf(userInputsFile.getModeInputs(dataMode).getDataFile().toFile());
+			long dataSize = userInputsFile.getFileUtilsInterface().getSizeOf(userInputsFile.getModeInputs(dataMode).getDataFile().toString());
 			if (dataSize > limitSize) {
-				log.error("Size of data folder/file {} : {}",userInputsFile.getModeInputs(dataMode).getDataFile(), FileUtils.byteCountToDisplaySize(dataSize));
+				log.error("Size of data folder/file {} : {}",userInputsFile.getModeInputs(dataMode).getDataFile(), dataSize);
 				throw new KraftwerkException(413,errorMessage);
 			}
 		}

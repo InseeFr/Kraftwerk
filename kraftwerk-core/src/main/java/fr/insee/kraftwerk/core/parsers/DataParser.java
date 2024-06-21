@@ -42,6 +42,7 @@ public abstract class DataParser {
 			log.error(DATAPATH_IS_NULL);
 			throw new NullException(DATAPATH_IS_NULL);
 		}
+		//TODO change to use interface
 		if (Files.isRegularFile(dataPath)) {
 			parseDataFile(dataPath);
 			if(kraftwerkExecutionLog != null) {

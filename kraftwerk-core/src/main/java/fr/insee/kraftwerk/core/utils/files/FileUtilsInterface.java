@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 
+import javax.annotation.Nullable;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -48,4 +49,21 @@ public interface FileUtilsInterface {
     Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;
 
     URL convertToUrl(String userField, Path inputDirectory);
+
+    /**
+     *
+     * @param path path of file
+     * @return true if directory, false if file, null if neither
+     */
+    @Nullable
+    Boolean isDirectory(String path);
+
+    /**
+     *
+     * @param path path of file
+     * @return size of file
+     */
+    long getSizeOf(String path);
+
+    void writeFile(String path, String toWrite, boolean replace);
 }

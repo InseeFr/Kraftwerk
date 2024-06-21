@@ -107,6 +107,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * @throws IOException – if an I/O error is thrown when accessing the starting file
 	 */
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
+		//TODO Change to interface
 		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("ddi[\\w,\\s-]+\\.xml"))) {
 			return files.findFirst()
 					.orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + specDirectory.toString()));

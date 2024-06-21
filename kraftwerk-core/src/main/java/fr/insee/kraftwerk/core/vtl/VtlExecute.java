@@ -67,7 +67,7 @@ public class VtlExecute {
         Path tempDataset = Paths.get(tempDatasetPath);
 
 		try {
-			Files.delete(tempDataset);
+			Files.delete(tempDataset); //TODO Change to use interface
             log.debug("File {} deleted",tempDatasetPath);
         } catch (IOException e) {
             log.debug("Impossible to delete file {}",tempDatasetPath);

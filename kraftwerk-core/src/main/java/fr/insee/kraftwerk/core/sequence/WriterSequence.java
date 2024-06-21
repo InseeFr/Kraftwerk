@@ -30,7 +30,7 @@ public class WriterSequence {
 		/* Step 4.1 : write csv output tables */
 		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()),kraftwerkExecutionLog);
 		csvOutputFiles.writeOutputTables(metadataModels);
-
+//TODO change to use interface
 		/* Step 4.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, errors);
 		

@@ -14,11 +14,13 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -173,6 +175,29 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
+    @Override
+    public Boolean isDirectory(String path){
+        return path.endsWith("/") || path.endsWith("\\");
+    }
+
+    @Override
+    public long getSizeOf(String path) {
+        try {
+            StatObjectResponse objectStat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(path).build());
+            return objectStat.size();
+        }catch (Exception e){
+            log.error(e.toString());
+            return 0;
+        }
+    }
+
+    @Override
+    public void writeFile(String path, String toWrite, boolean replace) {
+        InputStream inputStream = new ByteArrayInputStream(toWrite.getBytes());
+        writeFileOnMinio(path, inputStream, toWrite.length());
+    }
+
+
     //Utilities
 
     private InputStream readFile(String minioPath) {
@@ -184,7 +209,7 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
-    private void writeFile(String minioPath, InputStream inputStream, int fileSize) {
+    private void writeFileOnMinio(String minioPath, InputStream inputStream, int fileSize) {
         try {
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath).build());
         } catch (Exception e) {
@@ -245,9 +270,5 @@ public class MinioImpl implements FileUtilsInterface {
             log.error(e.toString());
             return false;
         }
-    }
-
-    private boolean isDirectory(String path){
-        return path.endsWith("/") || path.endsWith("\\");
     }
 }

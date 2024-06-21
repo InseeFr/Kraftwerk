@@ -30,6 +30,7 @@ public class ControlInputSequenceGenesis {
 
 	private boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
+		//TODO change to use interface
 		if (Files.exists(userInputFile)) {
 			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
 		} else {
