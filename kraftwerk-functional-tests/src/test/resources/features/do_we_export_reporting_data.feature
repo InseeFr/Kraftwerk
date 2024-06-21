@@ -13,9 +13,9 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding IdUE
 
     |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |76                                |
-    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |76                                |
-    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |32                                |
+    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
+    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
+    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
 
 
 
@@ -127,7 +127,7 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the OUTCOME_SPOTTING field
+    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
 
     Examples:
     # Parameters :

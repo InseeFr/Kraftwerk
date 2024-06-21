@@ -17,10 +17,10 @@ import fr.insee.kraftwerk.core.Constants;
 
 /** Encapsulate org.opencsv features that we use in Kraftwerk. */
 public class CsvUtils {
-	
-	private CsvUtils() {
-		//Utility class
-	}
+
+    private CsvUtils() {
+        //Utility class
+    }
 
     public static CSVReader getReader(Path filePath) throws IOException {
         CSVParser parser = new CSVParserBuilder()

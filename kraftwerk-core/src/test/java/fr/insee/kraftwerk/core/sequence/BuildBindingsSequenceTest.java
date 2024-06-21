@@ -38,7 +38,7 @@ class BuildBindingsSequenceTest {
 		
 		//THEN
 		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
-		
+
 	}
 	
 	@ParameterizedTest
@@ -55,10 +55,7 @@ class BuildBindingsSequenceTest {
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));
 
-		//WHEN
-		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi,null));
+		//WHEN + THEN
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null));
 	}
-	
-	
 }

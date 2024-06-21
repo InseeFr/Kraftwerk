@@ -58,6 +58,9 @@ public final class Constants {
 	public static final String END_LINE = "\n";
 	public static final String OUTPUT_FOLDER_DATETIME_PATTERN = "yyyy_MM_dd_HH_mm_ss";
 	public static final String ERRORS_FILE_NAME = "errors.txt";
+	public static final String DUCKDB_URL = "jdbc:duckdb:";
+
+	public static final int DB_CONNECTION_TRY_COUNT = 10;
 
 
 	// ----- Explicit Variables Names

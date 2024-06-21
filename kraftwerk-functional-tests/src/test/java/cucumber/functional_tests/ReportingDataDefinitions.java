@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -18,14 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
 import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
-import fr.insee.kraftwerk.core.utils.CsvUtils;
 import io.cucumber.java.en.Then;
 
 
@@ -68,7 +72,7 @@ public class ReportingDataDefinitions {
         // File existence assertion
         assertThat(outputReportingDataFile).exists().isFile().canRead();
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 outputReportingDataFile.toPath()
         );
 
@@ -98,7 +102,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -119,7 +123,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -168,7 +172,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -218,7 +222,7 @@ public class ReportingDataDefinitions {
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -262,7 +266,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -274,12 +278,12 @@ public class ReportingDataDefinitions {
         assertThat(header).doesNotContainAnyElementsOf(Arrays.asList(reportingDataFields));
     }
 
-    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the OUTCOME_SPOTTING field")
+    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the outcome_spotting field")
     public void check_outcome_spotting_result(String surveyUnitId, String fileName, String directory, String expectedOutcomeSpotting) throws IOException, CsvException {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -291,7 +295,7 @@ public class ReportingDataDefinitions {
         String[] header = content.get(0);
 
         // OUTCOME_SPOTTING field existence assertion
-        assertThat(header).contains("OUTCOME_SPOTTING");
+        assertThat(header).contains("outcome_spotting");
 
         // Fetch concerned survey unit line from file
         String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
@@ -303,7 +307,7 @@ public class ReportingDataDefinitions {
         int i = 0;
         String outcomeSpottingContent = null;
         for (String element : concernedLine) {
-            if (header[i].equals("OUTCOME_SPOTTING")) {
+            if (header[i].equals("outcome_spotting")) {
                 outcomeSpottingContent = element;
                 break;
             }
@@ -328,7 +332,7 @@ public class ReportingDataDefinitions {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-        CSVReader csvReader = CsvUtils.getReader(
+        CSVReader csvReader = getReader(
                 Path.of(executionOutDirectory + "/" + fileName)
         );
 
@@ -358,5 +362,17 @@ public class ReportingDataDefinitions {
             i++;
         }
         assertThat(identificationContent).isEqualTo(expectedValue);
+    }
+
+    public static CSVReader getReader(Path filePath) throws IOException {
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+                //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
+                //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
+                .build();
+        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+                //.withSkipLines(1) // (uncomment to ignore header)
+                .withCSVParser(parser)
+                .build();
     }
 }
