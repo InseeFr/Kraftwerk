@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -30,7 +31,7 @@ public class BuildBindingsSequence {
 		this.withAllReportingData = withAllReportingData;
 	}
 
-	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
@@ -67,7 +68,7 @@ public class BuildBindingsSequence {
 		}
 	}
 
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
+	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
 		Path reportingDataFile = modeInputs.getReportingDataFile();
 		if (reportingDataFile != null) {
 			ReportingData reportingData = new ReportingData(reportingDataFile);

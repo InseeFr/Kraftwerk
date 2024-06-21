@@ -39,7 +39,7 @@ public class PaperDataParser extends DataParser {
 
 	/**
 	 * Parser constructor.
-	 * 
+	 *
 	 * @param data The SurveyRawData to be filled by the parseSurveyData method. The
 	 *             variables must have been previously set.
 	 */
@@ -49,7 +49,7 @@ public class PaperDataParser extends DataParser {
 
 	/**
 	 * Instantiate a CSVReader.
-	 * 
+	 *
 	 * @param filePath Path to the CSV file.
 	 */
 	private void readCsvFile(Path filePath) {
@@ -92,7 +92,7 @@ public class PaperDataParser extends DataParser {
 			String[] header = csvReader.readNext();
 			VariablesMap variables = data.getMetadataModel().getVariables();
 			Map<Integer, String> csvVariablesMap = new HashMap<>();
-			for (int j = 1; j < header.length; j++) {
+			for (int j = 0; j < header.length; j++) {
 				String variableName = header[j];
 				// If the variable name is in the DDI we map it directly
 				if (variables.hasVariable(variableName)) {

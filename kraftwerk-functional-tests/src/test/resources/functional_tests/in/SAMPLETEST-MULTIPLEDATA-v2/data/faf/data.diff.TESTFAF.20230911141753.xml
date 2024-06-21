@@ -1,0 +1,4393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+  <Id>SAMPLETEST</Id>
+  <Label>Enquête Test</Label>
+  <SurveyUnits>
+    <SurveyUnit>
+      <Id>0000007</Id>
+      <QuestionnaireModelId>CDV2023X01_queenv2</QuestionnaireModelId>
+      <Data>
+        <COLLECTED>
+          <QUART_NOTE>
+            <COLLECTED type="string">9</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_NOTE>
+          <T_NBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL2>
+          <T_NBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL1>
+          <FINA_LOG>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_LOG>
+          <T_NATION1>
+            <COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION1>
+          <QUART_OUV>
+            <COLLECTED type="string">c'est paradisiaque</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_OUV>
+          <T_ACTIVANTEB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTEB>
+          <REMARQUES>
+            <COLLECTED type="string">excellente enquête</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </REMARQUES>
+          <T_SITUAEU>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUAEU>
+          <QUART_AVANTAGE71>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE71>
+          <AVIS41>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS41>
+          <T_PAYSNAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PAYSNAIS>
+          <QUART_PB41>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB41>
+          <T_LOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGCO>
+          <T_TRAVAIL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TRAVAIL>
+          <T_GARDE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GARDE>
+          <T_ANNAISS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANNAISS>
+          <T_AACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM>
+          <T_TPP>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TPP>
+          <RECYCLE>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </RECYCLE>
+          <T_ANBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL2>
+          <T_ANBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL1>
+          <T_ACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_SOC>
+          <T_ACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_COM>
+          <T_FFCLA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCLA>
+          <T_FFVAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFVAC>
+          <T_ACTIV>
+            <COLLECTED>
+              <COLLECTED type="string">999_999</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIV>
+          <T_PCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAF>
+          <AVIS51>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS51>
+          <T_VEUF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_VEUF>
+          <FINA_GEN>
+            <COLLECTED type="string">6</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_GEN>
+          <T_APCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAF>
+          <T_NATION4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION4>
+          <T_PCLCAH>
+            <COLLECTED>
+              <COLLECTED type="string">5278</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAH>
+          <T_NATION3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION3>
+          <QUART_PB51>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB51>
+          <LOYER>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER>
+          <T_APCLCAH>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAH>
+          <T_NATION2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION2>
+          <T_SANTGEN>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SANTGEN>
+          <LOYER_MENS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER_MENS>
+          <T_FFDIPLCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAIR>
+          <T_AACTIV>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIV>
+          <T_UNLOG>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_UNLOG>
+          <T_CONTAC>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CONTAC>
+          <T_FFLIEU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFLIEU>
+          <QUART_AVANTAGE61>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE61>
+          <T_ACTIVANTE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTE>
+          <T_FFTYPFORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFTYPFORM>
+          <T_LNAIS>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LNAIS>
+          <DEMNAIS>
+            <COLLECTED type="number">8</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEMNAIS>
+          <T_AACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVCLAIR>
+          <T_GALI>
+            <COLLECTED>
+              <COLLECTED type="string">3</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GALI>
+          <T_STCPUB>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STCPUB>
+          <T_QPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_QPRCR>
+          <QUART_PB61>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB61>
+          <AVIS21>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS21>
+          <T_EMMENAGE>
+            <COLLECTED type="number">2021</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_EMMENAGE>
+          <DIF_AUTRE>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AUTRE>
+          <NRJ_TRAV_LOC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_LOC>
+          <T_DATENAIS>
+            <COLLECTED>
+              <COLLECTED type="string">1925-07-07</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DATENAIS>
+          <T_NATIONETR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATIONETR>
+          <QUART_AVANTAGE51>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE51>
+          <QPRCU>
+            <COLLECTED>
+              <COLLECTED type="string">6</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QPRCU>
+          <T_ACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="string">8</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM>
+          <T_COMNAIS>
+            <COLLECTED>
+              <COLLECTED type="string">2548020201</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_COMNAIS>
+          <T_MAJLOGENQ>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGENQ>
+          <T_MAJLOGAUT1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT1>
+          <T_MAJLOGAUT2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT2>
+          <T_SEXE>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SEXE>
+          <DIF_DEPELEC>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_DEPELEC>
+          <AVIS31>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS31>
+          <QUART_PB71>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB71>
+          <T_FFNIVA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVA>
+          <VOITURE>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </VOITURE>
+          <T_FFNIVB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVB>
+          <DIF_MONTANT>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MONTANT>
+          <T_MINLOGENQ1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ1>
+          <T_FFNIVC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVC>
+          <T_NBSALA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALA>
+          <T_MINLOGENQ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ2>
+          <COND_LOG>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </COND_LOG>
+          <T_MINLOGENQ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ3>
+          <T_MINLOGENQ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ4>
+          <T_MINLOGENQ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ5>
+          <LIENS>
+            <COLLECTED>
+              <COLLECTED>
+                <COLLECTED type="null" />
+              </COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LIENS>
+          <T_NBSALETAB>
+            <COLLECTED>
+              <COLLECTED type="string">5</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETAB>
+          <QUART_AVANTAGE41>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE41>
+          <DIF_AIDE>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AIDE>
+          <T_FFDIPL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPL>
+          <T_TYPLOG>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOG>
+          <QUART_PB81>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB81>
+          <T_SURFTR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFTR>
+          <DEPELEC>
+            <COLLECTED type="number">500</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEPELEC>
+          <T_ENCADR>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ENCADR>
+          <QUART_AVANTAGE31>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE31>
+          <T_DORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DORM>
+          <AIDE_VOIS>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS>
+          <ANCONSTR_TR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR_TR>
+          <T_FFDIPLCLAA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAA>
+          <QUART_PB11>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB11>
+          <T_FFDIPLCLAB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAB>
+          <T_PCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCACLAIR>
+          <T_FF>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FF>
+          <NRJ_TRAV_PROP>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_PROP>
+          <T_STOL>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOL>
+          <T_AQPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCR>
+          <T_STOP>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOP>
+          <ENVIRONNEMNT>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ENVIRONNEMNT>
+          <AVIS11>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS11>
+          <T_AQPRCU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCU>
+          <T_STOC>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOC>
+          <QUART_AVANTAGE21>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE21>
+          <DIF_MOND>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MOND>
+          <T_AACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_SOC>
+          <QUART_PB21>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB21>
+          <HM2>
+            <COLLECTED>
+              <COLLECTED type="string">10:00</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM2>
+          <HM1>
+            <COLLECTED type="string">09:35</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM1>
+          <HM4>
+            <COLLECTED type="string">10:45</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM4>
+          <HM3>
+            <COLLECTED type="string">10:12</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM3>
+          <HM6>
+            <COLLECTED type="string">11:45</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM6>
+          <T_NHAB>
+            <COLLECTED type="number">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NHAB>
+          <HM5>
+            <COLLECTED type="string">10:58</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM5>
+          <T_TYPLOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOGCO>
+          <DIF_FACTURE>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_FACTURE>
+          <QUART_AVANTAGE11>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE11>
+          <T_FFBAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFBAC>
+          <T_NBEMP>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBEMP>
+          <AIDE_VOIS2>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS2>
+          <T_DURLOG>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DURLOG>
+          <T_NBPARL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBPARL>
+          <NRJ_TRAV_FU>
+            <COLLECTED type="string">4</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_FU>
+          <T_FFCAP>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCAP>
+          <T_MINLOGAUT>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGAUT>
+          <QUART_PB31>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB31>
+          <T_ASTCPUB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ASTCPUB>
+          <T_FFCONC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCONC>
+          <QUART_DEV3>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV3>
+          <QUART_DEV4>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV4>
+          <T_PRENOM>
+            <COLLECTED>
+              <COLLECTED type="string">TestPrenom4</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PRENOM>
+          <QUART_DEV1>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV1>
+          <QUART_DEV2>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV2>
+          <T_GRDIPC>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPC>
+          <CHOIX_LOG2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG2>
+          <T_SITUCONJ8>
+            <COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ8>
+          <CHOIX_LOG3>
+            <COLLECTED type="boolean">true</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG3>
+          <T_APCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCACLAIR>
+          <T_GRDIPA>
+            <COLLECTED>
+              <COLLECTED type="string">8</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPA>
+          <CHOIX_LOG4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG4>
+          <T_SITUCONJ6>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ6>
+          <DIF_QUARTIER>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_QUARTIER>
+          <QUART_AVANTAGE81>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE81>
+          <T_GRDIPB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPB>
+          <CHOIX_LOG5>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG5>
+          <T_LOGPROPRI>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGPROPRI>
+          <T_SITUCONJ7>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ7>
+          <T_AACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_COM>
+          <T_SITUCONJ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ4>
+          <T_SITUCONJ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ5>
+          <T_SITUCONJ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ2>
+          <CHOIX_LOG1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG1>
+          <T_SITUCONJ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ3>
+          <T_CHRON>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CHRON>
+          <T_ACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="string">statistique</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVCLAIR>
+          <ANCONSTR>
+            <COLLECTED type="number">1948</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR>
+          <T_SITUCONJ1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ1>
+          <T_NPIECES>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NPIECES>
+          <T_NBSALETABA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETABA>
+          <T_SURFACE>
+            <COLLECTED type="number">60</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFACE>
+          <CHOIX_LOG6>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG6>
+          <CHOIX_LOG7>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG7>
+          <CHOIX_LOG8>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG8>
+        </COLLECTED>
+        <CALCULATED />
+        <EXTERNAL>
+          <ADR_EXT type="string">7 rue du test 75007 Paris</ADR_EXT>
+        </EXTERNAL>
+      </Data>
+    </SurveyUnit>
+    <SurveyUnit>
+      <Id>0000008</Id>
+      <QuestionnaireModelId>CDV2023X01_queenv2</QuestionnaireModelId>
+      <Data>
+        <COLLECTED>
+          <QUART_NOTE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_NOTE>
+          <T_NBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL2>
+          <T_NBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL1>
+          <FINA_LOG>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_LOG>
+          <T_NATION1>
+            <COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION1>
+          <QUART_OUV>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_OUV>
+          <T_ACTIVANTEB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTEB>
+          <REMARQUES>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </REMARQUES>
+          <T_SITUAEU>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUAEU>
+          <QUART_AVANTAGE71>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE71>
+          <AVIS41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS41>
+          <T_PAYSNAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PAYSNAIS>
+          <QUART_PB41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB41>
+          <T_LOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGCO>
+          <T_TRAVAIL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TRAVAIL>
+          <T_GARDE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GARDE>
+          <T_ANNAISS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANNAISS>
+          <T_AACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM>
+          <T_TPP>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TPP>
+          <RECYCLE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </RECYCLE>
+          <T_ANBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL2>
+          <T_ANBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL1>
+          <T_ACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_SOC>
+          <T_ACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_COM>
+          <T_FFCLA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCLA>
+          <T_FFVAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFVAC>
+          <T_ACTIV>
+            <COLLECTED>
+              <COLLECTED type="string">999_999</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIV>
+          <T_PCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAF>
+          <AVIS51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS51>
+          <T_VEUF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_VEUF>
+          <FINA_GEN>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_GEN>
+          <T_APCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAF>
+          <T_NATION4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION4>
+          <T_PCLCAH>
+            <COLLECTED>
+              <COLLECTED type="string">593</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAH>
+          <T_NATION3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION3>
+          <QUART_PB51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB51>
+          <LOYER>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER>
+          <T_APCLCAH>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAH>
+          <T_NATION2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION2>
+          <T_SANTGEN>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SANTGEN>
+          <LOYER_MENS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER_MENS>
+          <T_FFDIPLCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAIR>
+          <T_AACTIV>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIV>
+          <T_UNLOG>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_UNLOG>
+          <T_CONTAC>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CONTAC>
+          <T_FFLIEU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFLIEU>
+          <QUART_AVANTAGE61>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE61>
+          <T_ACTIVANTE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTE>
+          <T_FFTYPFORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFTYPFORM>
+          <T_LNAIS>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LNAIS>
+          <DEMNAIS>
+            <COLLECTED type="number">8</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEMNAIS>
+          <T_AACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVCLAIR>
+          <T_GALI>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GALI>
+          <T_STCPUB>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STCPUB>
+          <T_QPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_QPRCR>
+          <QUART_PB61>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB61>
+          <AVIS21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS21>
+          <T_EMMENAGE>
+            <COLLECTED type="number">2022</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_EMMENAGE>
+          <DIF_AUTRE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AUTRE>
+          <NRJ_TRAV_LOC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_LOC>
+          <T_DATENAIS>
+            <COLLECTED>
+              <COLLECTED type="string">1975-08-01</COLLECTED>
+              <COLLECTED type="string">1975-08-02</COLLECTED>
+              <COLLECTED type="string">2005-08-03</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DATENAIS>
+          <T_NATIONETR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATIONETR>
+          <QUART_AVANTAGE51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE51>
+          <QPRCU>
+            <COLLECTED>
+              <COLLECTED type="string">6</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QPRCU>
+          <T_ACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="string">8</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM>
+          <T_COMNAIS>
+            <COLLECTED>
+              <COLLECTED type="string">2505600001</COLLECTED>
+              <COLLECTED type="string">3919800001</COLLECTED>
+              <COLLECTED type="string">3936500001</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_COMNAIS>
+          <T_MAJLOGENQ>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGENQ>
+          <T_MAJLOGAUT1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT1>
+          <T_MAJLOGAUT2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT2>
+          <T_SEXE>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SEXE>
+          <DIF_DEPELEC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_DEPELEC>
+          <AVIS31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS31>
+          <QUART_PB71>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB71>
+          <T_FFNIVA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVA>
+          <VOITURE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </VOITURE>
+          <T_FFNIVB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVB>
+          <DIF_MONTANT>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MONTANT>
+          <T_MINLOGENQ1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ1>
+          <T_FFNIVC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVC>
+          <T_NBSALA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALA>
+          <T_MINLOGENQ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ2>
+          <COND_LOG>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </COND_LOG>
+          <T_MINLOGENQ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ3>
+          <T_MINLOGENQ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ4>
+          <T_MINLOGENQ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ5>
+          <LIENS>
+            <COLLECTED>
+              <COLLECTED>
+                <COLLECTED type="null" />
+                <COLLECTED type="string">1</COLLECTED>
+                <COLLECTED type="string">3</COLLECTED>
+              </COLLECTED>
+              <COLLECTED>
+                <COLLECTED type="string">1</COLLECTED>
+                <COLLECTED type="null" />
+                <COLLECTED type="string">3</COLLECTED>
+              </COLLECTED>
+              <COLLECTED>
+                <COLLECTED type="string">2</COLLECTED>
+                <COLLECTED type="string">2</COLLECTED>
+                <COLLECTED type="null" />
+              </COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LIENS>
+          <T_NBSALETAB>
+            <COLLECTED>
+              <COLLECTED type="string">5</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETAB>
+          <QUART_AVANTAGE41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE41>
+          <DIF_AIDE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AIDE>
+          <T_FFDIPL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPL>
+          <T_TYPLOG>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOG>
+          <QUART_PB81>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB81>
+          <T_SURFTR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFTR>
+          <DEPELEC>
+            <COLLECTED type="number">800</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEPELEC>
+          <T_ENCADR>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ENCADR>
+          <QUART_AVANTAGE31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE31>
+          <T_DORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DORM>
+          <AIDE_VOIS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS>
+          <ANCONSTR_TR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR_TR>
+          <T_FFDIPLCLAA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAA>
+          <QUART_PB11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB11>
+          <T_FFDIPLCLAB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAB>
+          <T_PCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCACLAIR>
+          <T_FF>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FF>
+          <NRJ_TRAV_PROP>
+            <COLLECTED type="string">2</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_PROP>
+          <T_STOL>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOL>
+          <T_AQPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCR>
+          <T_STOP>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOP>
+          <ENVIRONNEMNT>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ENVIRONNEMNT>
+          <AVIS11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS11>
+          <T_AQPRCU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCU>
+          <T_STOC>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOC>
+          <QUART_AVANTAGE21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE21>
+          <DIF_MOND>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MOND>
+          <T_AACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_SOC>
+          <QUART_PB21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB21>
+          <HM2>
+            <COLLECTED>
+              <COLLECTED type="string">10:02</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM2>
+          <HM1>
+            <COLLECTED type="string">14:01</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM1>
+          <HM4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM4>
+          <HM3>
+            <COLLECTED type="string">15:00</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM3>
+          <HM6>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM6>
+          <T_NHAB>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NHAB>
+          <HM5>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM5>
+          <T_TYPLOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOGCO>
+          <DIF_FACTURE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_FACTURE>
+          <QUART_AVANTAGE11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE11>
+          <T_FFBAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFBAC>
+          <T_NBEMP>
+            <COLLECTED>
+              <COLLECTED type="string">1</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBEMP>
+          <AIDE_VOIS2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS2>
+          <T_DURLOG>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DURLOG>
+          <T_NBPARL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="string">2</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBPARL>
+          <NRJ_TRAV_FU>
+            <COLLECTED type="string">4</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_FU>
+          <T_FFCAP>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCAP>
+          <T_MINLOGAUT>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGAUT>
+          <QUART_PB31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB31>
+          <T_ASTCPUB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ASTCPUB>
+          <T_FFCONC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCONC>
+          <QUART_DEV3>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV3>
+          <QUART_DEV4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV4>
+          <T_PRENOM>
+            <COLLECTED>
+              <COLLECTED type="string">TestPrenom81</COLLECTED>
+              <COLLECTED type="string">TestPrenom82</COLLECTED>
+              <COLLECTED type="string">TestPrenom83</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PRENOM>
+          <QUART_DEV1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV1>
+          <QUART_DEV2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV2>
+          <T_GRDIPC>
+            <COLLECTED>
+              <COLLECTED type="string">2</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPC>
+          <CHOIX_LOG2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG2>
+          <T_SITUCONJ8>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ8>
+          <CHOIX_LOG3>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG3>
+          <T_APCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCACLAIR>
+          <T_GRDIPA>
+            <COLLECTED>
+              <COLLECTED type="string">8</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPA>
+          <CHOIX_LOG4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG4>
+          <T_SITUCONJ6>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ6>
+          <DIF_QUARTIER>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_QUARTIER>
+          <QUART_AVANTAGE81>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE81>
+          <T_GRDIPB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPB>
+          <CHOIX_LOG5>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG5>
+          <T_LOGPROPRI>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGPROPRI>
+          <T_SITUCONJ7>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ7>
+          <T_AACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_COM>
+          <T_SITUCONJ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ4>
+          <T_SITUCONJ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ5>
+          <T_SITUCONJ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ2>
+          <CHOIX_LOG1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG1>
+          <T_SITUCONJ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ3>
+          <T_CHRON>
+            <COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CHRON>
+          <T_ACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="string">administration</COLLECTED>
+              <COLLECTED type="null" />
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVCLAIR>
+          <ANCONSTR>
+            <COLLECTED type="number">2022</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR>
+          <T_SITUCONJ1>
+            <COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+              <COLLECTED type="boolean">true</COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ1>
+          <T_NPIECES>
+            <COLLECTED type="number">5</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NPIECES>
+          <T_NBSALETABA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETABA>
+          <T_SURFACE>
+            <COLLECTED type="number">80</COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFACE>
+          <CHOIX_LOG6>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG6>
+          <CHOIX_LOG7>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG7>
+          <CHOIX_LOG8>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG8>
+        </COLLECTED>
+        <CALCULATED />
+        <EXTERNAL>
+          <ADR_EXT type="string">8 rue du test 75008 Paris</ADR_EXT>
+        </EXTERNAL>
+      </Data>
+    </SurveyUnit>
+    <SurveyUnit>
+      <Id>0000009</Id>
+      <QuestionnaireModelId>CDV2023X01_queenv2</QuestionnaireModelId>
+      <Data>
+        <COLLECTED>
+          <QUART_NOTE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_NOTE>
+          <T_NBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL2>
+          <T_NBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSAL1>
+          <FINA_LOG>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_LOG>
+          <T_NATION1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION1>
+          <QUART_OUV>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_OUV>
+          <T_ACTIVANTEB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTEB>
+          <REMARQUES>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </REMARQUES>
+          <T_SITUAEU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUAEU>
+          <QUART_AVANTAGE71>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE71>
+          <AVIS41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS41>
+          <T_PAYSNAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PAYSNAIS>
+          <QUART_PB41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB41>
+          <T_LOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGCO>
+          <T_TRAVAIL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TRAVAIL>
+          <T_GARDE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GARDE>
+          <T_ANNAISS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANNAISS>
+          <T_AACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM>
+          <T_TPP>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TPP>
+          <RECYCLE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </RECYCLE>
+          <T_ANBSAL2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL2>
+          <T_ANBSAL1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ANBSAL1>
+          <T_ACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_SOC>
+          <T_ACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM_COM>
+          <T_FFCLA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCLA>
+          <T_FFVAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFVAC>
+          <T_ACTIV>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIV>
+          <T_PCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAF>
+          <AVIS51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS51>
+          <T_VEUF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_VEUF>
+          <FINA_GEN>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </FINA_GEN>
+          <T_APCLCAF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAF>
+          <T_NATION4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION4>
+          <T_PCLCAH>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCAH>
+          <T_NATION3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION3>
+          <QUART_PB51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB51>
+          <LOYER>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER>
+          <T_APCLCAH>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCAH>
+          <T_NATION2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATION2>
+          <T_SANTGEN>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SANTGEN>
+          <LOYER_MENS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LOYER_MENS>
+          <T_FFDIPLCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAIR>
+          <T_AACTIV>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIV>
+          <T_UNLOG>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_UNLOG>
+          <T_CONTAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CONTAC>
+          <T_FFLIEU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFLIEU>
+          <QUART_AVANTAGE61>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE61>
+          <T_ACTIVANTE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVANTE>
+          <T_FFTYPFORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFTYPFORM>
+          <T_LNAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LNAIS>
+          <DEMNAIS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEMNAIS>
+          <T_AACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVCLAIR>
+          <T_GALI>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GALI>
+          <T_STCPUB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STCPUB>
+          <T_QPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_QPRCR>
+          <QUART_PB61>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB61>
+          <AVIS21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS21>
+          <T_EMMENAGE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_EMMENAGE>
+          <DIF_AUTRE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AUTRE>
+          <NRJ_TRAV_LOC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_LOC>
+          <T_DATENAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DATENAIS>
+          <T_NATIONETR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NATIONETR>
+          <QUART_AVANTAGE51>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE51>
+          <QPRCU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QPRCU>
+          <T_ACTIVDOM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVDOM>
+          <T_COMNAIS>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_COMNAIS>
+          <T_MAJLOGENQ>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGENQ>
+          <T_MAJLOGAUT1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT1>
+          <T_MAJLOGAUT2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MAJLOGAUT2>
+          <T_SEXE>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SEXE>
+          <DIF_DEPELEC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_DEPELEC>
+          <AVIS31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS31>
+          <QUART_PB71>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB71>
+          <T_FFNIVA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVA>
+          <VOITURE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </VOITURE>
+          <T_FFNIVB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVB>
+          <DIF_MONTANT>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MONTANT>
+          <T_MINLOGENQ1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ1>
+          <T_FFNIVC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFNIVC>
+          <T_NBSALA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALA>
+          <T_MINLOGENQ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ2>
+          <COND_LOG>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </COND_LOG>
+          <T_MINLOGENQ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ3>
+          <T_MINLOGENQ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ4>
+          <T_MINLOGENQ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGENQ5>
+          <LIENS>
+            <COLLECTED>
+              <COLLECTED>
+                <COLLECTED type="null" />
+              </COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </LIENS>
+          <T_NBSALETAB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETAB>
+          <QUART_AVANTAGE41>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE41>
+          <DIF_AIDE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_AIDE>
+          <T_FFDIPL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPL>
+          <T_TYPLOG>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOG>
+          <QUART_PB81>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB81>
+          <T_SURFTR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFTR>
+          <DEPELEC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DEPELEC>
+          <T_ENCADR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ENCADR>
+          <QUART_AVANTAGE31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE31>
+          <T_DORM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DORM>
+          <AIDE_VOIS>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS>
+          <ANCONSTR_TR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR_TR>
+          <T_FFDIPLCLAA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAA>
+          <QUART_PB11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB11>
+          <T_FFDIPLCLAB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFDIPLCLAB>
+          <T_PCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PCLCACLAIR>
+          <T_FF>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FF>
+          <NRJ_TRAV_PROP>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_PROP>
+          <T_STOL>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOL>
+          <T_AQPRCR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCR>
+          <T_STOP>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOP>
+          <ENVIRONNEMNT>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ENVIRONNEMNT>
+          <AVIS11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AVIS11>
+          <T_AQPRCU>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AQPRCU>
+          <T_STOC>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_STOC>
+          <QUART_AVANTAGE21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE21>
+          <DIF_MOND>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_MOND>
+          <T_AACTIVDOM_SOC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_SOC>
+          <QUART_PB21>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB21>
+          <HM2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM2>
+          <HM1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM1>
+          <HM4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM4>
+          <HM3>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM3>
+          <HM6>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM6>
+          <T_NHAB>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NHAB>
+          <HM5>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </HM5>
+          <T_TYPLOGCO>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_TYPLOGCO>
+          <DIF_FACTURE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_FACTURE>
+          <QUART_AVANTAGE11>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE11>
+          <T_FFBAC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFBAC>
+          <T_NBEMP>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBEMP>
+          <AIDE_VOIS2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </AIDE_VOIS2>
+          <T_DURLOG>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_DURLOG>
+          <T_NBPARL>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBPARL>
+          <NRJ_TRAV_FU>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </NRJ_TRAV_FU>
+          <T_FFCAP>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCAP>
+          <T_MINLOGAUT>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_MINLOGAUT>
+          <QUART_PB31>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_PB31>
+          <T_ASTCPUB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ASTCPUB>
+          <T_FFCONC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_FFCONC>
+          <QUART_DEV3>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV3>
+          <QUART_DEV4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV4>
+          <T_PRENOM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_PRENOM>
+          <QUART_DEV1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV1>
+          <QUART_DEV2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_DEV2>
+          <T_GRDIPC>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPC>
+          <CHOIX_LOG2>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG2>
+          <T_SITUCONJ8>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ8>
+          <CHOIX_LOG3>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG3>
+          <T_APCLCACLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_APCLCACLAIR>
+          <T_GRDIPA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPA>
+          <CHOIX_LOG4>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG4>
+          <T_SITUCONJ6>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ6>
+          <DIF_QUARTIER>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </DIF_QUARTIER>
+          <QUART_AVANTAGE81>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </QUART_AVANTAGE81>
+          <T_GRDIPB>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_GRDIPB>
+          <CHOIX_LOG5>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG5>
+          <T_LOGPROPRI>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_LOGPROPRI>
+          <T_SITUCONJ7>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ7>
+          <T_AACTIVDOM_COM>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_AACTIVDOM_COM>
+          <T_SITUCONJ4>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ4>
+          <T_SITUCONJ5>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ5>
+          <T_SITUCONJ2>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ2>
+          <CHOIX_LOG1>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG1>
+          <T_SITUCONJ3>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ3>
+          <T_CHRON>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_CHRON>
+          <T_ACTIVCLAIR>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_ACTIVCLAIR>
+          <ANCONSTR>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </ANCONSTR>
+          <T_SITUCONJ1>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SITUCONJ1>
+          <T_NPIECES>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NPIECES>
+          <T_NBSALETABA>
+            <COLLECTED>
+              <COLLECTED type="null" />
+            </COLLECTED>
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_NBSALETABA>
+          <T_SURFACE>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </T_SURFACE>
+          <CHOIX_LOG6>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG6>
+          <CHOIX_LOG7>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG7>
+          <CHOIX_LOG8>
+            <COLLECTED type="null" />
+            <EDITED type="null" />
+            <INPUTED type="null" />
+            <FORCED type="null" />
+            <PREVIOUS type="null" />
+          </CHOIX_LOG8>
+        </COLLECTED>
+        <CALCULATED />
+        <EXTERNAL>
+          <ADR_EXT type="string">9 rue du test 75009 Paris</ADR_EXT>
+        </EXTERNAL>
+      </Data>
+    </SurveyUnit>
+  </SurveyUnits>
+</Campaign>

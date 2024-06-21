@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CSVReportingDataParserTest {
 
 	@Test
-	 void parseReportingDataTest() {
+	void parseReportingDataTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -37,7 +37,7 @@ class CSVReportingDataParserTest {
 				.orElse(null);
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
-		
+
 		assertEquals("INITLA", reportingDataUE.getStates().get(0).getStateType());
 		assertEquals("PARTIELINT", reportingDataUE.getStates().get(1).getStateType());
 		assertEquals("VALINT", reportingDataUE.getStates().get(2).getStateType());
@@ -52,7 +52,7 @@ class CSVReportingDataParserTest {
 		String[] validHeaderToControl = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot"};
 		String[] invalidHeaderWrongValues = new String [] {"statut", "dateInfo", "idUe2", "idContact", "nom", "prenom", "adresse2", "numeroDeLot2"};
 		String[] headerToControlWrongSize = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot", "ninth"};
-		
+
 		Assertions.assertTrue(csvReportingDataParser.controlHeader(validHeaderToControl));
 		Assertions.assertFalse(csvReportingDataParser.controlHeader(invalidHeaderWrongValues));
 		Assertions.assertFalse(csvReportingDataParser.controlHeader(headerToControlWrongSize));
@@ -65,7 +65,7 @@ class CSVReportingDataParserTest {
 		assertEquals(1566544132, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));
 		assertEquals(1111111111, csvReportingDataParser.convertToTimestamp("18/03/2005 02:58:31"));
 		assertEquals(1, csvReportingDataParser.convertToTimestamp("01/01/1970 01:00:01"));
-		
+
 	}
 
 }

@@ -1,12 +1,15 @@
 package cucumber.functional_tests;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
+
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -17,20 +20,30 @@ import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.CsvUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.kraftwerk.core.vtl.VtlExecute;
-import io.cucumber.java.Before;
+import io.cucumber.java.AfterAll;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.assertj.core.api.Assertions;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,22 +63,21 @@ public class MainDefinitions {
 	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
-	String userInputFileName = Constants.USER_INPUT_FILE;
-	UserInputsFile userInputsFile;
+	UserInputsFile userInputs;
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
 	Map<String, MetadataModel> metadataModelMap;
 
 	private ControlInputSequence controlInputSequence;
-
-	VtlExecute vtlExecute = new VtlExecute();
 	List<KraftwerkError> errors = new ArrayList<>();
+	static Connection database;
 
-	@Before
-	public void clean() throws KraftwerkException {
+	@BeforeAll
+	public static void clean() throws KraftwerkException, SQLException {
 		FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 		fileUtilsInterface.deleteDirectory(outDirectory);
+		database = SqlUtils.openConnection();
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -112,7 +124,7 @@ public class MainDefinitions {
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
-		userInputsFile=mp.getUserInputsFile();
+		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
 	}
 
@@ -120,7 +132,7 @@ public class MainDefinitions {
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
-		userInputsFile=mp.getUserInputsFile();
+		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
 	}
 
@@ -134,7 +146,7 @@ public class MainDefinitions {
 	}
 
 	@When("We launch main service 2 times")
-	public void launch_main_2() throws KraftwerkException, InterruptedException {
+	public void launch_main_2() throws KraftwerkException {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
@@ -156,41 +168,50 @@ public class MainDefinitions {
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws NullException {
-		metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
-		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
-			boolean withDDI = true;
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI,null);
-			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+	public void unimodal_treatments() throws KraftwerkException, SQLException, NullException {
+		try (Statement statement = database.createStatement()) {
+			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
+			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
+				boolean withDDI = true;
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
+				UnimodalSequence unimodal = new UnimodalSequence();
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+			}
 		}
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() {
+	public void aggregate_datasets() throws SQLException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+		try (Statement statement = database.createStatement()) {
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, statement, new FileSystemImpl());
+		}
 	}
 
 	@When("Step 4 : We export the final version")
-	public void export_results() throws KraftwerkException {
-		WriterSequence writerSequence = new WriterSequence();
-		LocalDateTime localDateTime = LocalDateTime.now();
-		writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
-		writeErrorsFile(inDirectory, localDateTime, errors);
-		outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputsFile.getModes());
+	public void export_results() throws KraftwerkException, SQLException {
+		try (Statement statement = database.createStatement()) {
+			WriterSequence writerSequence = new WriterSequence();
+			LocalDateTime localDateTime = LocalDateTime.now();
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, statement);
+			writeErrorsFile(inDirectory, localDateTime, errors);
+			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement);
+		}
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
 		// Go to first datetime folder
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
 		// Get reader to read the root table written in outputs
-		System.out.println("Check output file path : "
-				+ executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
-		CSVReader csvReader = CsvUtils
-				.getReader(outDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
 		// Count
 		int lineCount = 0;
 		while ((csvReader.readNext()) != null) {
@@ -203,13 +224,10 @@ public class MainDefinitions {
 	}
 
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
-	public void check_output_root_table(int expectedLineCount, int expectedVariablesCount)
-			throws IOException, CsvValidationException {
-		// Go to first datetime folder
+	public void check_csv_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-		CSVReader csvReader = CsvUtils
-				.getReader(executionOutDirectory.resolve(executionOutDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -229,11 +247,80 @@ public class MainDefinitions {
 
 	}
 
+	@Then("Step 2 : We check {string} output file has {int} lines and {int} variables")
+	public void check_csv_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
+		// get header
+		String[] header = csvReader.readNext();
+		// Count
+		int variableCount = header.length;
+
+		// Count
+		int lineCount = 1;
+		while ((csvReader.readNext()) != null) {
+			lineCount++;
+		}
+
+		// Close reader
+		csvReader.close();
+		// Test
+		assertEquals(expectedVariablesCount, variableCount);
+		assertEquals(expectedLineCount, lineCount);
+
+	}
+
+	@Then("Step 2 : We check root parquet output file has {int} lines and {int} variables")
+	public void check_parquet_output_root_table(int expectedLineCount, int expectedVariablesCount) throws SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
+		try (Statement statement = SqlUtils.openConnection().createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+
+			String tableName = filePath.getFileName().toString().split("\\.")[0];
+
+			// Count number of variables
+			Assertions.assertThat(SqlUtils.getColumnNames(statement,tableName)).hasSize(expectedVariablesCount);
+
+			// Count lines
+			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+		}
+	}
+
+	@Then("We check {string} parquet output file has {int} lines and {int} variables")
+	public void check_parquet_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".parquet");
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+
+			String tableName = filePath.getFileName().toString().split("\\.")[0];
+
+			// Count number of variables
+			Assertions.assertThat(SqlUtils.getColumnNames(statement,tableName)).hasSize(expectedVariablesCount);
+
+			// Count lines
+			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+		}
+	}
+
 	@Then("Step 6 : We check if we have {int} variables")
 	public void count_variables_in_root_tables(int expectedVariablesCount) throws CsvValidationException, IOException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = CsvUtils.getReader(
-				outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME)));
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
 		// get header
 		String[] header = csvReader.readNext();
 		// Count
@@ -252,8 +339,7 @@ public class MainDefinitions {
 			tableName = Constants.ROOT_GROUP_NAME;
 
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = CsvUtils
-				.getReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
+		CSVReader csvReader = getCSVReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
 		// get header
 		String[] header = csvReader.readNext();
 		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
@@ -273,14 +359,14 @@ public class MainDefinitions {
 		assertEquals(expectedValue, value);
 	}
 
-	boolean deleteDirectory(File directoryToBeDeleted) {
+	void deleteDirectory(File directoryToBeDeleted) {
 		File[] allContents = directoryToBeDeleted.listFiles();
 		if (allContents != null) {
 			for (File file : allContents) {
 				deleteDirectory(file);
 			}
 		}
-		return directoryToBeDeleted.delete();
+		directoryToBeDeleted.delete();
 	}
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
@@ -313,7 +399,7 @@ public class MainDefinitions {
 		// File existence assertion
 		assertThat(outputReportingDataFile).exists().isFile().canRead();
 
-		CSVReader csvReader = CsvUtils.getReader(
+		CSVReader csvReader = getCSVReader(
 				outputReportingDataFile.toPath()
 		);
 
@@ -338,17 +424,101 @@ public class MainDefinitions {
 		Files.deleteIfExists(bkpPath);
 	}
 
+
 	@Then("We should have a metadata model with {int} variables")
 	public void check_variables_count(int nbVariablesExpected) throws IOException, CsvValidationException {
-		String mode = userInputsFile.getModes().getFirst();
+		String mode = userInputs.getModes().getFirst();
 		int nbVariables = metadataModelMap.get(mode).getVariables().getVariables().size();
 		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
 	}
 
 	@And("We should have {int} of type STRING")
 	public void check_string_variables_count(int nbStringVariablesExpected) throws IOException, CsvValidationException {
-		String mode = userInputsFile.getModes().getFirst();
+		String mode = userInputs.getModes().getFirst();
 		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
 		assertThat(nbStringVariables).isEqualTo(nbStringVariablesExpected);
+	}
+
+	//CSV Utilities
+	public CSVReader getCSVReader(Path filePath) throws IOException {
+		CSVParser parser = new CSVParserBuilder()
+				.withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+				//.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
+				//.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
+				.build();
+		return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+				//.withSkipLines(1) // (uncomment to ignore header)
+				.withCSVParser(parser)
+				.build();
+	}
+
+	@Then("We check if there is only one header")
+	public void uniqueHeaderCheck() throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
+		// Get reader to read the root table written in outputs
+		System.out.println("Check output file path : " + filePath);
+		CSVReader csvReader = getCSVReader(filePath);
+		// get header
+		String[] header = csvReader.readNext();
+		String[] line;
+		while((line = csvReader.readNext()) != null){
+			Assertions.assertThat(line).isNotEqualTo(header);
+		}
+	}
+
+    @Then("We check if the CSV format is correct")
+    public void checkCSV() throws IOException {
+		//The CSV format rules is the following :
+		//for booleans : 0 for false, 1 for true
+		//ALL data must be between double quotes
+
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Path filePath = outputFiles == null ?
+				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+
+		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
+			String line = bufferedReader.readLine();
+			//Check header
+			String[] header = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+			//Check if line is split correctly
+			Assertions.assertThat(header).hasSizeGreaterThan(1);
+			for(String headerElement : header){
+				//Check if element is between double quotes
+				Assertions.assertThat(headerElement.charAt(0)).isEqualTo('"');
+				Assertions.assertThat(headerElement.charAt(headerElement.length()-1)).isEqualTo('"');
+			}
+
+			//Check content
+			while(line != null){
+				String[] lineelements = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
+				//Check if line is split correctly
+				Assertions.assertThat(lineelements).hasSizeGreaterThan(1);
+				//Check if no "true" or "false"
+				Assertions.assertThat(lineelements).doesNotContain("\"false\"","\"true\"");
+				for(String lineelement : lineelements){
+					//Check if value is between double quotes
+					//If value is NULL, must still be between double quotes
+					Assertions.assertThat(lineelement).isNotEmpty();
+					Assertions.assertThat(lineelement.charAt(0)).isEqualTo('"');
+					Assertions.assertThat(lineelement.charAt(lineelement.length()-1)).isEqualTo('"');
+				}
+				line = bufferedReader.readLine();
+			}
+		}
+    }
+
+
+	@AfterAll
+	public static void closeConnection() throws SQLException {
+		database.close();
 	}
 }

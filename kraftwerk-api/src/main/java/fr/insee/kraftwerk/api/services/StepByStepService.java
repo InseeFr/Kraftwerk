@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -13,6 +12,7 @@ import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.minio.MinioClient;
@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -74,9 +77,9 @@ public class StepByStepService extends KraftwerkService {
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
-			try {
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null );
-			} catch (NullException e) {
+			try{
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null);
+			} catch (KraftwerkException e){
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 
@@ -95,7 +98,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -115,13 +118,13 @@ public class StepByStepService extends KraftwerkService {
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		try {
+		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null);
-		} catch (NullException e) {
+		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+
+        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
@@ -218,8 +221,12 @@ public class StepByStepService extends KraftwerkService {
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
 
 		//Process
-		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
+		try(Connection database = SqlUtils.openConnection()) {
+			MultimodalSequence multimodalSequence = new MultimodalSequence();
+			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, database.createStatement(), fileUtilsInterface);
+		}catch (SQLException e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
@@ -236,7 +243,7 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
-			) throws KraftwerkException {
+			) throws KraftwerkException, SQLException {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(minioConfig.isEnable())){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
@@ -271,7 +278,9 @@ public class StepByStepService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
+		try (Statement database = SqlUtils.openConnection().createStatement()) {
+			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, database);
+		}
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}

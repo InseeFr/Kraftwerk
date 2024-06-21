@@ -7,8 +7,10 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +20,14 @@ import java.util.Set;
  * Class to manage the writing of output tables.
  */
 @Getter
+@Slf4j
 public abstract class OutputFiles {
 
 	/** Final absolute path of the output folder */
 	private final Path outputFolder;
 	private final VtlBindings vtlBindings;
 	private final Set<String> datasetToCreate = new HashSet<>();
+	private final Statement database;
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -31,11 +35,12 @@ public abstract class OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes) {
+	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database) {
 		this.vtlBindings = vtlBindings;
 		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
 		createOutputFolder();
+		this.database = database;
 	}
 
 	/** Create output folder if doesn't exist. */
@@ -72,8 +77,7 @@ public abstract class OutputFiles {
 
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
-	 * @throws KraftwerkException 
-	 */
+     */
 	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 		// implemented in subclasses
 	}

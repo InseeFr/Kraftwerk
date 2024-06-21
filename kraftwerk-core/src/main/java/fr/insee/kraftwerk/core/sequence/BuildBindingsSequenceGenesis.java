@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -21,6 +22,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -89,7 +91,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		File reportingDataFolder = reportingDataFile.toFile();
 		if (reportingDataFolder.exists()) {
