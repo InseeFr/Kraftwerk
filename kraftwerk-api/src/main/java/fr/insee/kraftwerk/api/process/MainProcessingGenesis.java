@@ -46,7 +46,7 @@ public class MainProcessingGenesis {
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
-	private FileUtilsInterface fileUtilsInterface;
+	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
 
 	/* SPECIFIC VARIABLES */
@@ -73,7 +73,7 @@ public class MainProcessingGenesis {
 		//We build userInputs for the given questionnaire
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign), fileUtilsInterface);
 		if (!userInputs.getModes().isEmpty()) {
-			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap());
+			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface);
 		} else {
 			log.error("No source found for campaign " + idCampaign);
 		}
@@ -110,9 +110,9 @@ public class MainProcessingGenesis {
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
-		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
+		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory, database, fileUtilsInterface);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory, database);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
 		}
@@ -127,12 +127,12 @@ public class MainProcessingGenesis {
 	/* Step 4 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, database);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, database, fileUtilsInterface);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
 	}
 
 }

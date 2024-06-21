@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XMLSplitter {
+	//TODO Make it work with MinIO
 
 	// We use StAX in this class to deal with memory issues on huge XML files
 	private XMLSplitter() {

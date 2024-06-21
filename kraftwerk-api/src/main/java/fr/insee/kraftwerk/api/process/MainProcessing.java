@@ -46,7 +46,7 @@ public class MainProcessing {
 	private KraftwerkExecutionLog kraftwerkExecutionLog;
 	private final List<KraftwerkError> errors = new ArrayList<>();
 	private LocalDateTime executionDateTime;
-	private FileUtilsInterface fileUtilsInterface;
+	private final FileUtilsInterface fileUtilsInterface;
 
 	
 	/**
@@ -64,7 +64,7 @@ public class MainProcessing {
 		this.withAllReportingData = withAllReportingData;
 		this.withDDI=withDDI;
 		this.limitSize = limitSize;
-		controlInputSequence = new ControlInputSequence(defaultDirectory);
+		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 	
@@ -75,7 +75,7 @@ public class MainProcessing {
 		this.withAllReportingData = !fileByFile;
 		this.withDDI=true;
 		this.limitSize = limitSize;
-		controlInputSequence = new ControlInputSequence(defaultDirectory);
+		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
@@ -117,7 +117,7 @@ public class MainProcessing {
 
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 
-		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap()) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
+		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
 
 		userInputsFileList = getUserInputsFile(userInputsFile, fileByFile);
 
@@ -138,7 +138,7 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws KraftwerkException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
@@ -156,17 +156,17 @@ public class MainProcessing {
 	/* Step 4 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database, fileUtilsInterface);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
 	}
 
 
 	/* Step 6 : Write log */
-	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionLog);}
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionLog, fileUtilsInterface);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source, boolean fileByFile) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();
@@ -199,7 +199,6 @@ public class MainProcessing {
 		return userInputsFileList;
 	}
 
-	//TODO FIX HERE
 	private static List<Path> getFilesToProcess(UserInputsFile userInputsFile, String dataMode) {
 		List<Path> files = new ArrayList<>();
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);

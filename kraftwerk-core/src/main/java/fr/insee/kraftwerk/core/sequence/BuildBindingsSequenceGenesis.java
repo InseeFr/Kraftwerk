@@ -29,12 +29,14 @@ import java.util.Map;
 public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
+	FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequenceGenesis() {
-		vtlExecute = new VtlExecute();
+	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface) {
+		vtlExecute = new VtlExecute(fileUtilsInterface);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database) throws KraftwerkException, NullException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -71,7 +73,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 
 		/* Step 2.2 : Get paradata for the survey */
-		parseParadata(dataMode, data, inDirectory);
+		parseParadata(dataMode, data, inDirectory, fileUtilsInterface);
 
 		/* Step 2.3 : Get reportingData for the survey */
 		parseReportingData(dataMode, data, inDirectory, fileUtilsInterface);
@@ -81,11 +83,11 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
 		Path paraDataPath = inDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
 		File paradataFolder = paraDataPath.toFile();
 		if (paradataFolder.exists()) {
-			ParadataParser paraDataParser = new ParadataParser();
+			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
 		}
@@ -99,11 +101,11 @@ public class BuildBindingsSequenceGenesis {
 			for (String file : listFiles) {
 				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
 				if (file.contains(".xml")) {
-					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 					xMLReportingDataParser.parseReportingData(reportingData, data, true);
 
 				} else if (file.contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
+					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 					cSVReportingDataParser.parseReportingData(reportingData, data, true);
 				}
 			}

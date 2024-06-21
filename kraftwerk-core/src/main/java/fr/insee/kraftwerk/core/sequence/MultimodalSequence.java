@@ -26,27 +26,27 @@ public class MultimodalSequence {
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
+		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
 		String vtlGenerate = reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlReconciliationFile(), errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataModels);
+		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataModels, fileUtilsInterface);
 		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
-		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings);
+		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings, fileUtilsInterface);
 		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlTransformationsFile(), errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.3 : create datasets on each information level (i.e. each group) */
-		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings);
+		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
 		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlInformationLevelsFile(), errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.4: Convert VTL datasets into SQL tables for export */
 		SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database);

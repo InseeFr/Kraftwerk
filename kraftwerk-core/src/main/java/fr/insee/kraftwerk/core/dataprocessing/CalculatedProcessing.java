@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -18,8 +19,8 @@ public class CalculatedProcessing extends DataProcessing {
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
     private CalculatedVariables calculatedVariables;
 
-    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables) {
-        super(vtlBindings);
+    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
         this.calculatedVariables = calculatedVariables;
     }
 

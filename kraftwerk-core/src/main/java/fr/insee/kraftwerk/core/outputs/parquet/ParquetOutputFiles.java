@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,17 +29,20 @@ import java.util.stream.Stream;
 public class ParquetOutputFiles extends OutputFiles {
 
 	public static final String PARQUET_EXTENSION = ".parquet";
+
+	private final Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
+
 	/**
 	 * When an instance is created, the output folder is created.
-	 * 
+	 *
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
+	 * @param modes list of modes names
+	 * @param databaseConnection connection to duckDb database
+	 * @param fileUtilsInterface file interface to use (file system or minio)
 	 */
-
-	private Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
-
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement databaseConnection) {
-		super(outDirectory, vtlBindings, modes, databaseConnection);
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement databaseConnection, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, databaseConnection, fileUtilsInterface);
 	}
 
 	
@@ -53,6 +57,7 @@ public class ParquetOutputFiles extends OutputFiles {
 				Files.deleteIfExists(outputFile.toPath());
 				//Data export
 				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, outputFile.getAbsolutePath()));
+				//TODO export to minio
 
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
@@ -75,7 +80,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		}
 		// Write scripts
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_parquet.R"),
-				new RImportScript(tableScriptInfoList).generateScript());
+				new RImportScript(tableScriptInfoList).generateScript(), this.getFileUtilsInterface());
 	}
 
 	/**

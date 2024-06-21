@@ -36,7 +36,7 @@ class BuildBindingsSequenceTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		boolean withAllReportingData = false;
 		boolean withDdi = true;	
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
 		//WHEN 
 		MetadataModel metadata = null;
 		
@@ -54,7 +54,7 @@ class BuildBindingsSequenceTest {
 				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
         MetadataModel capiMetadata = new MetadataModel();
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));

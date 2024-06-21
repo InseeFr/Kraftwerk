@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
@@ -36,14 +37,16 @@ public class VtlExecute {
     private final ObjectMapper mapper;
     /** Engine that will execute VTL instructions */
     private final ScriptEngine engine;
+    private final FileUtilsInterface fileUtilsInterface;
 
 
-    public VtlExecute(){
+    public VtlExecute(FileUtilsInterface fileUtilsInterface){
         mapper = new ObjectMapper();
         mapper.registerModule(new TrevasModule());
         // Engine
         engine = new ScriptEngineManager()
                 .getEngineByName("vtl");
+        this.fileUtilsInterface = fileUtilsInterface;
     }
     
     /**
@@ -67,7 +70,7 @@ public class VtlExecute {
         Path tempDataset = Paths.get(tempDatasetPath);
 
 		try {
-			Files.delete(tempDataset); //TODO Change to use interface
+			Files.delete(tempDataset);
             log.debug("File {} deleted",tempDatasetPath);
         } catch (IOException e) {
             log.debug("Impossible to delete file {}",tempDatasetPath);
@@ -123,7 +126,7 @@ public class VtlExecute {
     	//Write file    	
         if (bindings.containsKey(bindingName)) {
             try {
-                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)));
+                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)), fileUtilsInterface);
             } catch (JsonProcessingException e) {
                 log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
             }

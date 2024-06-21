@@ -5,6 +5,8 @@ import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.vtl.model.Dataset;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class VtlJsonDatasetWriterTest {
 
 	private VtlBindings vtlBindings;
-	
-	VtlExecute vtlExecute = new VtlExecute();
+
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	@BeforeEach
 	public void initVtlBindings() {

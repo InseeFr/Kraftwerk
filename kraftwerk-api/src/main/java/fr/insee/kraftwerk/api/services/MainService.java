@@ -30,12 +30,12 @@ import java.io.IOException;
 public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;
-	MinioConfig minioConfig;
 	MinioClient minioClient;
 
 	@Autowired
 	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
-		this.configProperties = configProperties;
+        super(minioConfig);
+        this.configProperties = configProperties;
 		this.minioConfig = minioConfig;
 		if(minioConfig.isEnable()){
 			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
@@ -141,7 +141,7 @@ public class MainService extends KraftwerkService {
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
 
 		try {
-			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory));
+			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory, fileUtilsInterface));
 			mpGenesis.runMain(idCampaign);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());

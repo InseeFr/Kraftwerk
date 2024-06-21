@@ -14,10 +14,12 @@ import lombok.extern.log4j.Log4j2;
 public class ControlInputSequence {
 	
 	String defaultDirectory;
+	FileUtilsInterface fileUtilsInterface;
 
-	public ControlInputSequence(String defaultDirectory) {
+	public ControlInputSequence(String defaultDirectory, FileUtilsInterface fileUtilsInterface) {
 		super();
 		this.defaultDirectory = defaultDirectory;
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public UserInputsFile getUserInputs(Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
@@ -31,10 +33,9 @@ public class ControlInputSequence {
 		return inDirectory;
 	}
 
-	//TODO Change to interface
 	private boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-		if (Files.exists(userInputFile)) {
+		if (fileUtilsInterface.isFileExists(userInputFile.toString())) {
 			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
 		} else {
 			log.info("No configuration file found in campaign folder: " + inDirectory);

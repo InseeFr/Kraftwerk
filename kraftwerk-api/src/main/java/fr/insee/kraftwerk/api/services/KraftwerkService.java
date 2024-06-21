@@ -1,14 +1,19 @@
 package fr.insee.kraftwerk.api.services;
 
 
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,16 +42,29 @@ public class KraftwerkService {
 	@Value("${fr.insee.postcollecte.size-limit}")
 	protected long limitSize;
 
+	MinioConfig minioConfig;
+
+
 	protected ControlInputSequence controlInputSequence ;
+
+	@Autowired
+	public KraftwerkService(MinioConfig minioConfig){
+		this.minioConfig = minioConfig;
+	}
 	
 	@PostConstruct
 	public void initializeWithProperties() {
-
-
+		FileUtilsInterface fileUtilsInterface;
+		if(minioConfig.isEnable()){
+			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
-		controlInputSequence = new ControlInputSequence(defaultDirectory);
+		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
 	}
 	
 	public ResponseEntity<String> archive(String inDirectoryParam, FileUtilsInterface fileUtilsInterface) {

@@ -1,11 +1,13 @@
 package fr.insee.kraftwerk.core.utils;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Path;
 
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -26,10 +28,10 @@ public class TextFileReader {
      * @return
      * The content of the file in a string.
      */
-    public static String readFromPath(Path filePath){
-        try {
-            FileReader fileReader = new FileReader(filePath.toFile());
-            return readTextContent(fileReader);
+    public static String readFromPath(Path filePath, FileUtilsInterface fileUtilsInterface){
+        try (InputStream inputStream = fileUtilsInterface.readFile(filePath.toString())){
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            return readTextContent(inputStreamReader);
         }
         catch (IOException e) {
             log.warn(String.format("Unable to read the text file %s.", filePath), e);
@@ -37,14 +39,14 @@ public class TextFileReader {
         }
     }
 
-    public static String readTextContent(Reader fileReader) throws IOException {
-        BufferedReader br = new BufferedReader(fileReader);
+    public static String readTextContent(Reader inputStreamReader) throws IOException {
+        BufferedReader br = new BufferedReader(inputStreamReader);
         StringBuilder content = new StringBuilder();
         String line;
         while ((line = br.readLine()) != null) {
             content.append(line);
         }
-        fileReader.close();
+        inputStreamReader.close();
         br.close();
         return content.toString();
     }

@@ -41,7 +41,7 @@ public class ParadataDefinitions {
 	public void launch_all_steps(String campaignName) throws KraftwerkException {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
-		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
+		controlInputSequence = new ControlInputSequence(campaignDirectory.toString(), new FileSystemImpl());
 		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory, fileUtilsInterface);
 		// For now, only one file
 		String modeName = userInputs.getModes().getFirst();
@@ -49,8 +49,8 @@ public class ParadataDefinitions {
 		// parse data
 		data = new SurveyRawData();
 		data.setDataMode(modeInputs.getDataMode());
-		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl()));
-		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface));
+		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data, fileUtilsInterface);
 		parser.parseSurveyData(modeInputs.getDataFile(),null);
 		// get paradata folder
 		paradataFolder = modeInputs.getParadataFolder();
@@ -60,7 +60,7 @@ public class ParadataDefinitions {
 	public void collect_paradata_test() throws NullException {
 		if (modeInputs.getParadataFolder() != null
 				&& !modeInputs.getParadataFolder().toString().contentEquals("")) {
-			ParadataParser paraDataParser = new ParadataParser();
+			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			paradata = new Paradata(paradataFolder);
 			paraDataParser.parseParadata(paradata, data);
 			paradata.getListParadataUE().get(0).getEvents().stream().forEach(e -> log.debug(e.getTimestamp() + ","+ e.getIdParadataObject()));

@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.metadata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.LinkedHashMap;
@@ -16,19 +17,19 @@ public class MetadataUtilsGenesis {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Map<String, MetadataModel> getMetadata(Map<String, ModeInputs> modeInputsMap) throws KraftwerkException {
+	public static Map<String, MetadataModel> getMetadata(Map<String, ModeInputs> modeInputsMap, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
 		for (Map.Entry<String, ModeInputs> entry : modeInputsMap.entrySet()) {
 			String k = entry.getKey();
 			ModeInputs v = entry.getValue();
-			putToMetadataVariable(k, v, metadataModels);
+			putToMetadataVariable(k, v, metadataModels, fileUtilsInterface);
 		}
 		return metadataModels;
 	}
 
-	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, MetadataModel> metadataModels ) throws KraftwerkException {
+	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		// Step 1 : we add the variables read in the DDI
-		MetadataModel metadataModel = DDIReader.getMetadataFromDDI(modeInputsGenesis.getDdiUrl());
+		MetadataModel metadataModel = DDIReader.getMetadataFromDDI(modeInputsGenesis.getDdiUrl(), fileUtilsInterface);
 
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputsGenesis.getLunaticFile() != null) {

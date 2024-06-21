@@ -76,7 +76,7 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("FROM_USER", testDataset);
 			//
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase);
-			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase);
+			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase, fileUtilsInterface);
 		});
 	}
 

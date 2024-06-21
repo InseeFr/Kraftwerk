@@ -5,6 +5,8 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -25,8 +27,8 @@ class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
 	private List<KraftwerkError> errors;
-
-	VtlExecute vtlExecute = new VtlExecute();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	Dataset ds1 = new InMemoryDataset(
 			List.of(

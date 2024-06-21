@@ -38,12 +38,12 @@ import java.util.Map;
 @RestController
 @Tag(name = "${tag.stepbystep}")
 public class StepByStepService extends KraftwerkService {
-	MinioConfig minioConfig;
 	MinioClient minioClient;
 
 	@Autowired
 	public StepByStepService(MinioConfig minioConfig) {
-		this.minioConfig = minioConfig;
+		super(minioConfig);
+		//TODO warn if enable null
 		if(minioConfig.isEnable()){
 			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 		}
@@ -73,8 +73,8 @@ public class StepByStepService extends KraftwerkService {
 		}
 				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
 			try{
@@ -117,14 +117,14 @@ public class StepByStepService extends KraftwerkService {
 		}
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
 		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 
-        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
@@ -162,19 +162,19 @@ public class StepByStepService extends KraftwerkService {
 		VtlBindings vtlBindings = new VtlBindings();
 		List<KraftwerkError> errors = new ArrayList<>();
 
-		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlReaderSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
 		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 		
 		//Write technical outputs
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -210,7 +210,7 @@ public class StepByStepService extends KraftwerkService {
 		List<KraftwerkError> errors = new ArrayList<>();
 
 
-		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence();
+		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
@@ -218,7 +218,7 @@ public class StepByStepService extends KraftwerkService {
 			vtlReaderWriterSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 
 		//Process
 		try(Connection database = SqlUtils.openConnection()) {
@@ -232,7 +232,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -267,7 +267,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
-			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
@@ -277,9 +277,9 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		try (Statement database = SqlUtils.openConnection().createStatement()) {
-			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, database);
+			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, database, fileUtilsInterface);
 		}
 		return ResponseEntity.ok(inDirectoryParam);
 

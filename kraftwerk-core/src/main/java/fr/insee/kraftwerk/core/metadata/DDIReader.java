@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.metadata;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -43,7 +45,7 @@ public class DDIReader {
 	 * @return The variables found in the DDI.
 	 * @throws KraftwerkException
 	 */
-	public static MetadataModel getMetadataFromDDI(URL ddiUrl) throws KraftwerkException {
+	public static MetadataModel getMetadataFromDDI(URL ddiUrl, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 
 		try {
 			// Path of the output 'variables.xml' temp file
@@ -53,8 +55,7 @@ public class DDIReader {
 
 			transformDDI(ddiUrl, variablesTempFilePath);
 
-			MetadataModel metadataModel = readVariables(variablesTempFilePath);
-			//TODO change to use interface
+			MetadataModel metadataModel = readVariables(variablesTempFilePath, fileUtilsInterface);
 			Files.delete(variablesFile.toPath());
 			return metadataModel;
 		}
@@ -93,12 +94,12 @@ public class DDIReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private static MetadataModel readVariables(Path variablesFilePath)
+	private static MetadataModel readVariables(Path variablesFilePath, FileUtilsInterface fileUtilsInterface)
 			throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
 		MetadataModel metadataModel = new MetadataModel();
 
 		// Parse
-		Element root = readXmlFile(variablesFilePath);
+		Element root = readXmlFile(variablesFilePath, fileUtilsInterface);
 
 		// Get XML groups
 		NodeList groupElements = root.getChildNodes();
@@ -231,10 +232,8 @@ public class DDIReader {
 	private static boolean nodeIsElementWithName(Node groupNode, String name) {
 		return name.equals(groupNode.getNodeName()) && groupNode.getNodeType() == Node.ELEMENT_NODE;
 	}
-
-	private static Element readXmlFile(Path variablesFilePath)
+	private static Element readXmlFile(Path variablesFilePath, FileUtilsInterface fileUtilsInterface)
 			throws ParserConfigurationException, SAXException, IOException, KraftwerkException {
-		File file = variablesFilePath.toFile();
 		System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
 				"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -242,11 +241,12 @@ public class DDIReader {
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.parse(file);
-		if (document == null)
-			throw new KraftwerkException(500, "Can't read DDI - DDI is null");
-
-		return document.getDocumentElement();
+		try(InputStream inputStream = fileUtilsInterface.readFile(variablesFilePath.toString())){
+			Document document = builder.parse(inputStream);
+			if (document == null)
+				throw new KraftwerkException(500, "Can't read DDI - DDI is null");
+			return document.getDocumentElement();
+		}
 	}
 
 	private static String getFirstChildValue(Element variableElement, String childTagName) {

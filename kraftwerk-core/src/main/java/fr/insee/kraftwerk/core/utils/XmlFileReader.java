@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.core.utils;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -18,12 +19,19 @@ import nu.xom.ValidityException;
 public class XmlFileReader {
 
     private boolean xsdValidation = false;
+    private final FileUtilsInterface fileUtilsInterface;
+
+    public XmlFileReader(FileUtilsInterface fileUtilsInterface) {
+        this.fileUtilsInterface = fileUtilsInterface;
+    }
 
     public Document readXmlFile(Path filePath) {
-        try {
-            File file = filePath.toFile();
+        try (InputStream inputStream = fileUtilsInterface.readFile(filePath.toString())){
+            if(inputStream == null){
+                return null;
+            }
             Builder parser = new Builder(xsdValidation);
-            return parser.build(file);
+            return parser.build(inputStream);
         } catch (ValidityException ex) {
             log.warn("XSD validation error.", ex);
             log.warn("See following INFO log for details.");

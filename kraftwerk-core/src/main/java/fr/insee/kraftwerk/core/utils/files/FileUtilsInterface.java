@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 
 import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public interface FileUtilsInterface {
+    //TODO organize this
     static Path transformToOut(Path inDirectory) {
         return transformToOther(inDirectory, "out");
     }
@@ -42,6 +44,7 @@ public interface FileUtilsInterface {
 
     void deleteDirectory(Path directoryPath) throws KraftwerkException;
 
+    //TODO change to listFilesNames
     List<String> listFiles(String dir);
 
     List<String> listFilePaths(String dir);
@@ -67,5 +70,23 @@ public interface FileUtilsInterface {
      */
     long getSizeOf(String path);
 
+    /**
+     * Write a file in the path
+     * @param path path of the file
+     * @param toWrite String to write
+     * @param replace true if overwrite, false if append
+     */
     void writeFile(String path, String toWrite, boolean replace);
+
+    /**
+     * Find the file in the folder of a campaign
+     * @param directory directory where the file should be
+     * @param fileRegex regex of the file to match
+     * @return Path of the DDI file
+     * @throws KraftwerkException if no file found
+     */
+    String findFile(String directory, String fileRegex) throws KraftwerkException;
+    InputStream readFile(String path);
+
+    boolean isFileExists(String path);
 }

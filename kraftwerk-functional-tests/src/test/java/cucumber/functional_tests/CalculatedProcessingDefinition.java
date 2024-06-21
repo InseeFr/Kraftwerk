@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -43,7 +44,7 @@ public class CalculatedProcessingDefinition {
     private Dataset outDataset;
     private List<String> variableNamesList;
 	
-	VtlExecute vtlExecute = new VtlExecute();
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
     List<KraftwerkError> errors = new ArrayList<>();
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
@@ -64,11 +65,11 @@ public class CalculatedProcessingDefinition {
         this.dataMode = dataMode;
         //
         metadataModel = DDIReader.getMetadataFromDDI(
-                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
+                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")), new FileSystemImpl());
         //
         SurveyRawData data = new SurveyRawData();
         data.setMetadataModel(metadataModel);
-        DataParser parser = new LunaticXmlDataParser(data);
+        DataParser parser = new LunaticXmlDataParser(data, new FileSystemImpl());
         parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")),null);
         //
         vtlBindings = new VtlBindings();
@@ -80,7 +81,7 @@ public class CalculatedProcessingDefinition {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")));
-        DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables);
+        DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl());
         calculatedProcessing.applyVtlTransformations("TEST", null,errors);
         //
         outDataset = vtlBindings.getDataset("TEST");

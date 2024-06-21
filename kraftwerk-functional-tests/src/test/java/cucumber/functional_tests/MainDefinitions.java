@@ -86,7 +86,7 @@ public class MainDefinitions {
 		this.campaignName = campaignDirectoryName;
 		inDirectory = inDirectory.resolve(campaignName);
 		outDirectory = outDirectory.resolve(campaignName);
-		controlInputSequence = new ControlInputSequence(inDirectory.toString());
+		controlInputSequence = new ControlInputSequence(inDirectory.toString(), new FileSystemImpl());
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
@@ -169,8 +169,8 @@ public class MainDefinitions {
 	@When("Step 2 : We get each unimodal dataset")
 	public void unimodal_treatments() throws KraftwerkException, SQLException, NullException {
 		try (Statement statement = database.createStatement()) {
-			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
+			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl());
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl());
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
@@ -193,9 +193,9 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, statement);
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, statement, new FileSystemImpl());
 			writeErrorsFile(inDirectory, localDateTime, errors);
-			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement);
+			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl());
 		}
 	}
 

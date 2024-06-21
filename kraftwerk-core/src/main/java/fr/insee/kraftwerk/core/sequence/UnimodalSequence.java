@@ -42,39 +42,39 @@ public class UnimodalSequence {
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(modeInputs.getLunaticFile());
-			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables);
+			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, fileUtilsInterface);
 			vtlGenerate = calculatedProcessing.applyCalculatedVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 			TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CalculatedProcessing", dataMode),
-					vtlGenerate);
+					vtlGenerate, fileUtilsInterface);
 
 		} else {
 			log.info(String.format("No Lunatic questionnaire file for mode \"%s\". Calculated variables will not be evaluated", dataMode));
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, metadataModels.get(dataMode)).applyVtlTransformations(dataMode, null, errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate);
+		vtlGenerate = new GroupProcessing(vtlBindings, metadataModels.get(dataMode), fileUtilsInterface).applyVtlTransformations(dataMode, null, errors);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate, fileUtilsInterface);
 
 		/* Step 2.5 : Apply standard mode-specific VTL transformations */
 		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
-				vtlBindings, metadataModels.get(dataMode));
+				vtlBindings, metadataModels.get(dataMode), fileUtilsInterface);
 		vtlGenerate = dataProcessing.applyVtlTransformations(
 				dataMode,
 				Path.of(Constants.VTL_FOLDER_PATH)
 						.resolve("unimode")
 						.resolve(dataMode+".vtl"),
 				errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate, fileUtilsInterface);
 
 		/* Step 2.5b : Apply TCM VTL transformations */
-		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(vtlBindings,metadataModels.get(dataMode) , Constants.VTL_FOLDER_PATH);
+		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(vtlBindings,metadataModels.get(dataMode) , Constants.VTL_FOLDER_PATH, fileUtilsInterface);
 		vtlGenerate = tcmSequencesProcessing.applyAutomatedVtlInstructions(dataMode, errors);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "TCMSequenceVTL", dataMode), vtlGenerate);
+		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "TCMSequenceVTL", dataMode), vtlGenerate, fileUtilsInterface);
 
 		/* Step 2.5c : Apply user specified mode-specific VTL transformations */
 		vtlGenerate = dataProcessing.applyVtlTransformations(dataMode, modeInputs.getModeVtlFile(), errors);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, dataProcessing.getStepName(), dataMode),
-				vtlGenerate);
+				vtlGenerate, fileUtilsInterface);
 
 	}
 

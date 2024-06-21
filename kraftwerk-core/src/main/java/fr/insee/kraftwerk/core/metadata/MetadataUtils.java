@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.metadata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.LinkedHashMap;
@@ -16,17 +17,17 @@ public class MetadataUtils {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Map<String, MetadataModel> getMetadata(Map<String, ModeInputs> modeInputsMap){
+	public static Map<String, MetadataModel> getMetadata(Map<String, ModeInputs> modeInputsMap, FileUtilsInterface fileUtilsInterface){
 		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
-		modeInputsMap.forEach((k, v) -> putToMetadataModels(k,v,metadataModels));
+		modeInputsMap.forEach((k, v) -> putToMetadataModels(k,v,metadataModels, fileUtilsInterface));
 		return metadataModels;
 	}
 
-	private static void putToMetadataModels(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels ) {
+	private static void putToMetadataModels(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
 		// Step 1 : we add the variables read in the DDI
 		MetadataModel metadataModel = new MetadataModel();
 		try {
-			metadataModel = DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl());
+			metadataModel = DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			log.error(e.getMessage());
 		}

@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +18,7 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -25,15 +26,14 @@ public class CSVReportingDataParser extends ReportingDataParser {
 
 	private CSVReader csvReader;
 
+	public CSVReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+		super(fileUtilsInterface);
+	}
+
 	public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
 		Path filePath = reportingData.getFilepath();
-		try{
-			readFile(filePath);
-		} catch (NullPointerException e) {
-			throw new NullException();
-		}
-
-		try {
+		try(InputStream inputStream = fileUtilsInterface.readFile(filePath.toString())){
+			readFile(inputStream);
 			String[] header = this.csvReader.readNext();
 			if (controlHeader(header)) {
 				String[] nextRecord;
@@ -56,7 +56,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 					reportingDataUE.addState(state);
 					reportingData.addReportingDataUE(reportingDataUE);
 				}
-				integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
+				integrateReportingDataIntoUE(data, reportingData, withAllReportingData, fileUtilsInterface);
 			} else {
 				log.error("Following CSV file is malformed : {}", filePath);
 			}
@@ -95,14 +95,10 @@ public class CSVReportingDataParser extends ReportingDataParser {
 				&& header[6].contentEquals("adresse") && header[7].contentEquals("numeroDeLot"));
 	}
 
-	private void readFile(Path filePath) {
-		try {
-			FileReader filereader = new FileReader(filePath.toString());
-			this.csvReader = new CSVReader(filereader);
-			CSVParser parser = (new CSVParserBuilder()).withSeparator(',').build();
-			this.csvReader = (new CSVReaderBuilder(filereader)).withCSVParser(parser).build();
-		} catch (FileNotFoundException e) {
-			log.error("Unable to find the file {}, FileNotFoundException {}", filePath, e);
-		}
+	private void readFile(InputStream inputStream) {
+		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		this.csvReader = new CSVReader(inputStreamReader);
+		CSVParser parser = (new CSVParserBuilder()).withSeparator(',').build();
+		this.csvReader = (new CSVReaderBuilder(inputStreamReader)).withCSVParser(parser).build();
 	}
 }

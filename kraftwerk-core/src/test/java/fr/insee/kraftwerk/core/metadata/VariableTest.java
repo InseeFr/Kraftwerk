@@ -3,6 +3,8 @@ package fr.insee.kraftwerk.core.metadata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
@@ -19,6 +21,7 @@ class VariableTest {
 	static final String DDI_SIMPSONS_V2 = "ddi-simpsons-v2.xml";
 	static final String DDI_VQS_WEB = "vqs-2021-x00-xforms-ddi.xml";
 	static final String DDI_VQS_PAP = "vqs-2021-x00-fo-ddi.xml";
+	static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Test
 	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
@@ -34,7 +37,7 @@ class VariableTest {
 				"SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1));
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1), fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -72,7 +75,7 @@ class VariableTest {
 				"FEELCHAREV4", "LEAVDURATION11", "LEAVDURATION52", "NB_CHAR", "SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2));
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2), fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -100,7 +103,7 @@ class VariableTest {
 				"RESIDM", "NHAB");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB));
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB), fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);
@@ -140,7 +143,7 @@ class VariableTest {
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP));
+				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP), fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);

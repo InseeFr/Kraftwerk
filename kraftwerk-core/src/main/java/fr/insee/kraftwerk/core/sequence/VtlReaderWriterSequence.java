@@ -14,9 +14,12 @@ public class VtlReaderWriterSequence {
 	VtlExecute vtlExecute;
 	private static final String JSON = ".json";
 
+	FileUtilsInterface fileUtilsInterface;
 
-	public VtlReaderWriterSequence() {
-		vtlExecute = new VtlExecute();
+
+	public VtlReaderWriterSequence(FileUtilsInterface fileUtilsInterface) {
+		vtlExecute = new VtlExecute(fileUtilsInterface);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {

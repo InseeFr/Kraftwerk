@@ -72,7 +72,7 @@ class CsvOutputFilesTest {
 			//
 			database = SqlUtils.openConnection();
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database.createStatement());
-			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes(), database.createStatement());
+			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes(), database.createStatement(), fileUtilsInterface);
 		});
 	}
 

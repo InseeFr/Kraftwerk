@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.XmlFileReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -33,8 +34,8 @@ public class LunaticXmlDataParser extends DataParser {
 	 * @param data The SurveyRawData to be filled by the parseSurveyData method. The
 	 *             variables must have been previously set.
 	 */
-	public LunaticXmlDataParser(SurveyRawData data) {
-		super(data);
+	public LunaticXmlDataParser(SurveyRawData data, FileUtilsInterface fileUtilsInterface) {
+		super(data, fileUtilsInterface);
 	}
 
 	/**
@@ -44,7 +45,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 * @return The parsed document.
 	 */
 	private Document readXmlFile(Path filePath) {
-		XmlFileReader xmlFileReader = new XmlFileReader();
+		XmlFileReader xmlFileReader = new XmlFileReader(fileUtilsInterface);
 		Document document = xmlFileReader.readXmlFile(filePath);
 		if (document == null) {
 			log.warn("Failed to parse Lunatic answers file: " + filePath);

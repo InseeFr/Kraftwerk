@@ -6,6 +6,8 @@ import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
@@ -27,6 +29,7 @@ class CalculatedProcessingTest {
     private static MetadataModel fooMetadataModel;
     private static VtlBindings vtlBindings;
     private static List<KraftwerkError> errors;
+    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @BeforeAll
     static void setFooCalculated() {
@@ -52,7 +55,7 @@ class CalculatedProcessingTest {
     @Test
     void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
         VtlScript vtlScript = processing.generateVtlInstructions("TEST");
 
         //
@@ -68,7 +71,7 @@ class CalculatedProcessingTest {
         //
         VtlBindings vtlBindings = getVtlBindings();
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
         processing.applyAutomatedVtlInstructions("TEST", errors);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");

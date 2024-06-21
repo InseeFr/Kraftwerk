@@ -1,12 +1,13 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
 public class MultimodeTransformations extends DataProcessing {
 
-    public MultimodeTransformations(VtlBindings vtlBindings) {
-        super(vtlBindings);
+    public MultimodeTransformations(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
     }
 
     @Override

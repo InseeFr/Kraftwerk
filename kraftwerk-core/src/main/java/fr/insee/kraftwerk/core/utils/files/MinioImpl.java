@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,13 +43,14 @@ public class MinioImpl implements FileUtilsInterface {
     MinioClient minioClient;
     String bucketName;
 
+    // Interface methods
 
     @Override
     public void renameInputFile(Path inDirectory) {
         String file1MinioPathString = inDirectory.resolve("/kraftwerk.json").toString();
         String fileWithTime = "kraftwerk-" + DateUtils.getCurrentTimeStamp() + ".json";
         String file2MinioPathString = inDirectory.resolve(fileWithTime).toString();
-        if (isObjectExist(file2MinioPathString)) {
+        if (isFileExists(file2MinioPathString)) {
             log.warn(String.format("Trying to rename '%s' to '%s', but second file already exists.", Path.of(file1MinioPathString).getFileName(), Path.of(file2MinioPathString).getFileName()));
             log.warn("Timestamped input file will be over-written.");
             deleteFile(file2MinioPathString);
@@ -70,50 +72,6 @@ public class MinioImpl implements FileUtilsInterface {
             archiveParadata(inputFolder, campaignName, modeInputs);
             archiveReportingData(inputFolder, campaignName, modeInputs);
         }
-    }
-
-    private void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs) {
-        Path dataPath = modeInputs.getDataFile();
-        Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
-
-        if (!isDirectory(dataPath.toString())) {
-            moveFile(dataPath.toString(), newDataPath.toString());
-        } else {
-            moveDirectory(dataPath.toString(), newDataPath.toString());
-        }
-    }
-
-    /**
-     * If paradata, we move the paradata folder
-     */
-    private void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs){
-        if (modeInputs.getParadataFolder() != null) {
-            moveDirectory(modeInputs.getParadataFolder().toString(), inputFolder.resolve(ARCHIVE)
-                    .resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toString());
-        }
-    }
-
-    /**
-     *  If reporting data, we move reporting data files
-     */
-    private void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs){
-        if (modeInputs.getReportingDataFile() != null) {
-            moveDirectory(modeInputs.getReportingDataFile().toString(), inputFolder.resolve(ARCHIVE)
-                    .resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toString());
-        }
-    }
-
-    private String getRoot(Path path, String campaignName) {
-        String[] directories = path.toString().split(Pattern.quote(File.separator));
-        int campaignIndex = Arrays.asList(directories).indexOf(campaignName);
-        String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex + 1, directories.length);
-        StringBuilder result = new StringBuilder();
-        String sep = "";
-        for (String directory : newDirectories) {
-            result.append(sep).append(directory);
-            sep = File.separator;
-        }
-        return result.toString();
     }
 
     @Override
@@ -217,10 +175,13 @@ public class MinioImpl implements FileUtilsInterface {
         writeFileOnMinio(path, inputStream, toWrite.length());
     }
 
+    @Override
+    public String findFile(String directory, String fileRegex) throws KraftwerkException {
+        return null; //TODO faire ça
+    }
 
-    //Utilities
-
-    private InputStream readFile(String minioPath) {
+    @Override
+    public InputStream readFile(String minioPath) {
         try {
             return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(minioPath).build());
         } catch (Exception e) {
@@ -228,6 +189,21 @@ public class MinioImpl implements FileUtilsInterface {
             return null;
         }
     }
+
+    @Override
+    public boolean isFileExists(String objectPath) {
+        try {
+            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectPath).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            return false;
+        } catch (Exception e) {
+            log.error(e.toString());
+            return false;
+        }
+    }
+
+    //Utilities
 
     private void writeFileOnMinio(String minioPath, InputStream inputStream, int fileSize) {
         try {
@@ -280,15 +256,49 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
-    private boolean isObjectExist(String objectPath) {
-        try {
-            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectPath).build());
-            return true;
-        } catch (ErrorResponseException e) {
-            return false;
-        } catch (Exception e) {
-            log.error(e.toString());
-            return false;
+
+
+    private void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs) {
+        Path dataPath = modeInputs.getDataFile();
+        Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
+
+        if (!isDirectory(dataPath.toString())) {
+            moveFile(dataPath.toString(), newDataPath.toString());
+        } else {
+            moveDirectory(dataPath.toString(), newDataPath.toString());
         }
+    }
+
+    /**
+     * If paradata, we move the paradata folder
+     */
+    private void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs){
+        if (modeInputs.getParadataFolder() != null) {
+            moveDirectory(modeInputs.getParadataFolder().toString(), inputFolder.resolve(ARCHIVE)
+                    .resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toString());
+        }
+    }
+
+    /**
+     *  If reporting data, we move reporting data files
+     */
+    private void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs){
+        if (modeInputs.getReportingDataFile() != null) {
+            moveDirectory(modeInputs.getReportingDataFile().toString(), inputFolder.resolve(ARCHIVE)
+                    .resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toString());
+        }
+    }
+
+    private String getRoot(Path path, String campaignName) {
+        String[] directories = path.toString().split(Pattern.quote(File.separator));
+        int campaignIndex = Arrays.asList(directories).indexOf(campaignName);
+        String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex + 1, directories.length);
+        StringBuilder result = new StringBuilder();
+        String sep = "";
+        for (String directory : newDirectories) {
+            result.append(sep).append(directory);
+            sep = File.separator;
+        }
+        return result.toString();
     }
 }

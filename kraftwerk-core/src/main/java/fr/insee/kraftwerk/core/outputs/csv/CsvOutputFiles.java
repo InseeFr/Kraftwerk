@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +40,12 @@ public class CsvOutputFiles extends OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database) {
-		super(outDirectory, vtlBindings, modes, database);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 		this.kraftwerkExecutionLog = null;
 	}
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionLog kraftwerkExecutionLog, List<String> modes, Statement database) {
-		super(outDirectory, vtlBindings, modes, database);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionLog kraftwerkExecutionLog, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 		this.kraftwerkExecutionLog = kraftwerkExecutionLog;
 	}
 
@@ -109,6 +110,8 @@ public class CsvOutputFiles extends OutputFiles {
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
+
+				//TODO export to minio
 			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}
@@ -170,9 +173,9 @@ public class CsvOutputFiles extends OutputFiles {
 		}
 		// Write scripts
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_with_data_table.R"),
-				new RImportScript(tableScriptInfoList).generateScript());
+				new RImportScript(tableScriptInfoList).generateScript(), getFileUtilsInterface());
 		TextFileWriter.writeFile(getOutputFolder().resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList,errors).generateScript());
+				new SASImportScript(tableScriptInfoList,errors).generateScript(), getFileUtilsInterface());
 	}
 
 	/**

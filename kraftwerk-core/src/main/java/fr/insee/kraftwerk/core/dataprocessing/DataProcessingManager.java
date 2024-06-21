@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.log4j.Log4j2;
 
@@ -22,17 +23,17 @@ public class DataProcessingManager {
 	 *
 	 * @return One of the concrete parsers.
 	 */
-	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat, VtlBindings vtlBindings, MetadataModel metadataModel) {
+	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat, VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface) {
 		UnimodalDataProcessing dataProcessing = null;
 		switch (dataFormat) {
 		case XFORMS:
-			dataProcessing = new XformsDataProcessing(vtlBindings, metadataModel);
+			dataProcessing = new XformsDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
 			break;
 		case PAPER:
-			dataProcessing = new PaperDataProcessing(vtlBindings, metadataModel);
+			dataProcessing = new PaperDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
 			break;
 		case LUNATIC_XML , LUNATIC_JSON:
-			dataProcessing = new LunaticDataProcessing(vtlBindings, metadataModel);
+			dataProcessing = new LunaticDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
 			break;
 		default:
 			log.warn("Unknown data collection tool, null returned.");

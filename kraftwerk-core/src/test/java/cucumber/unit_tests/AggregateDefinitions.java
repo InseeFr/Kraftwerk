@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
@@ -25,7 +26,7 @@ public class AggregateDefinitions {
 
 	public List<KraftwerkError> errors = new ArrayList<>();
 	
-	VtlExecute vtlExecute = new VtlExecute();
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset){
@@ -35,9 +36,9 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakeCawiData, firstDataset, vtlBindings);
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel(), new FileSystemImpl());
 		groupProcessing.applyVtlTransformations(firstDataset, null,errors);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel());
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel(), new FileSystemImpl());
 		groupProcessing2.applyVtlTransformations(secondDataset, null,errors);
 
 		//
@@ -47,7 +48,7 @@ public class AggregateDefinitions {
 
 	@When("I try to aggregate the bindings")
 	public void collect_variables() {
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings);
+		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl());
 		reconciliationProcessing.applyVtlTransformations(
 				"MULTIMODE", null,errors);
 	}

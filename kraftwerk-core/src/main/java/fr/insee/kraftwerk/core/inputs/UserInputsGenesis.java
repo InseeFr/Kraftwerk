@@ -106,12 +106,8 @@ public class UserInputsGenesis extends UserInputs{
 	 * @return Path of the DDI file
 	 * @throws IOException – if an I/O error is thrown when accessing the starting file
 	 */
-	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
-		//TODO Change to interface
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("ddi[\\w,\\s-]+\\.xml"))) {
-			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + specDirectory.toString()));
-		}
+	public Path findDDIFile(Path specDirectory) throws KraftwerkException {
+		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.DDI_FILE_REGEX));
 	}
 
 	/**
@@ -120,10 +116,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * @return Path of the Lunatic file
 	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
 	 */
-	public Path findLunaticFile(Path specDirectory) throws KraftwerkException, IOException {
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("lunatic[\\w,\\s-]+\\.json"))) {
-			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No Lunatic file (lunatic*.xml) found in " + specDirectory.toString()));
-		}
+	public Path findLunaticFile(Path specDirectory) throws KraftwerkException {
+		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.LUNATIC_FILE_REGEX));
 	}
 }
