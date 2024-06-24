@@ -56,8 +56,10 @@ public class CsvOutputFiles extends OutputFiles {
 	@Override
 	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
-			File outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toFile();
 			try {
+				//Temporary file
+				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
 
@@ -72,10 +74,10 @@ public class CsvOutputFiles extends OutputFiles {
 				List<Integer> boolColumnIndexes = new ArrayList<>();
 
 				//Create file with double quotes header
-				Files.write(outputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+				Files.write(tmpOutputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
+				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, tmpOutputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
 				//Double quote values parameter
 				exportCsvQuery.append(", FORCE_QUOTE(");
 				for (String stringColumnName : columnNames) {
@@ -90,18 +92,21 @@ public class CsvOutputFiles extends OutputFiles {
 
 				//Merge data file with header file
 				//Read line by line to avoid memory waste
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(outputFile.toPath().toAbsolutePath() + "data"))){
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"))){
 					String line = bufferedReader.readLine();
 					while(line != null){
 						//Apply transformations to elements
 						line = applyNullTransformation(line);
 						line = applyBooleanTransformations(line, boolColumnIndexes);
 
-						Files.write(outputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
+						Files.write(tmpOutputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
 						line = bufferedReader.readLine();
 					}
 				}
-				Files.deleteIfExists(Path.of(outputFile.toPath().toAbsolutePath() + "data"));
+				Files.deleteIfExists(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"));
+
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
@@ -110,8 +115,6 @@ public class CsvOutputFiles extends OutputFiles {
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
-
-				//TODO export to minio
 			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}

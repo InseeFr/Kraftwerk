@@ -89,4 +89,20 @@ public interface FileUtilsInterface {
     InputStream readFile(String path);
 
     boolean isFileExists(String path);
+
+    /**
+     * Move file from source to destination (depends of the file system)
+     * @param srcPath source path
+     * @param dstPath destination path
+     * @throws KraftwerkException
+     */
+    void moveFile(String srcPath, String dstPath) throws KraftwerkException;
+
+    /**
+     * Move file from local file system to another path
+     * @param fileSystemPath local path
+     * @param dstPath destination path
+     * @throws KraftwerkException
+     */
+    void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException;
 }

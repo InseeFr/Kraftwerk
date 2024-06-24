@@ -1,7 +1,12 @@
 package fr.insee.kraftwerk.api.services;
 
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileSystemType;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
+import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "${tag.splitter}")
 @Log4j2
 public class SplitterService extends KraftwerkService{
-//TODO add MinIO support
 
 	@Autowired
 	public SplitterService(MinioConfig minioConfig) {
@@ -28,10 +32,17 @@ public class SplitterService extends KraftwerkService{
 	public ResponseEntity<Object> saveResponsesFromXmlFile(@RequestParam("inputFolder") String inputFolder,
 														   @RequestParam("outputFolder") String outputFolder,
 														   @RequestParam("filename") String filename,
-														   @RequestParam("nbResponsesByFile") int nbSU)
+														   @RequestParam("nbResponsesByFile") int nbSU,
+														   @RequestParam("fileSystemType") FileSystemType fileSystemType)
 			throws Exception {
-		log.info("Split XML file : " + filename + " into " + nbSU + " SU by file");
-		XmlSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU);
+		log.info("Split XML file : " + filename + " into " + nbSU + " SU by file using " +
+				(fileSystemType.equals(FileSystemType.MINIO) ? "Minio" : "OS file system"));
+
+		FileUtilsInterface fileUtilsInterface = fileSystemType.equals(FileSystemType.MINIO) ?
+				new MinioImpl(MinioClient.builder().credentials(minioConfig.getAccessKey(),minioConfig.getSecretKey()).endpoint(minioConfig.getEndpoint()).build(), minioConfig.getBucketName()) :
+				new FileSystemImpl();
+
+		XmlSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU, fileUtilsInterface);
 		return new ResponseEntity<>("File split", HttpStatus.OK);
 	}
 

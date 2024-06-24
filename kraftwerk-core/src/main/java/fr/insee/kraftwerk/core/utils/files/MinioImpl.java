@@ -21,11 +21,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +54,11 @@ public class MinioImpl implements FileUtilsInterface {
             log.warn("Timestamped input file will be over-written.");
             deleteFile(file2MinioPathString);
         }
-        moveFile(file1MinioPathString, file2MinioPathString);
+        try {
+            moveFile(file1MinioPathString, file2MinioPathString);
+        }catch (Exception e){
+            log.error(e.toString());
+        }
     }
 
     @Override
@@ -200,9 +206,33 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
+    @Override
+    public void moveFile(String srcMinioPath, String dstMinioPath) throws KraftwerkException {
+        try {
+            copyFile(srcMinioPath, dstMinioPath);
+            deleteFile(srcMinioPath);
+        } catch (Exception e) {
+            throw new KraftwerkException(500, "Can't move file " + srcMinioPath + " to " + dstMinioPath);
+        }
+    }
+
+    @Override
+    public void moveFile(Path fileSystemPath, String dstMinioPath) throws KraftwerkException {
+        try (InputStream inputStream = new FileInputStream(fileSystemPath.toFile())){
+            writeFileOnMinio(dstMinioPath, inputStream, Files.size(fileSystemPath));
+        } catch (Exception e) {
+            throw new KraftwerkException(500, "Can't move file " + fileSystemPath + " to " + dstMinioPath);
+        }
+        try {
+            Files.deleteIfExists(fileSystemPath);
+        }catch (Exception e) {
+            log.error("Error during file system file deletion : " + e);
+        }
+    }
+
     //Utilities
 
-    private void writeFileOnMinio(String minioPath, InputStream inputStream, int fileSize) {
+    private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize) {
         try {
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath).build());
         } catch (Exception e) {
@@ -214,15 +244,6 @@ public class MinioImpl implements FileUtilsInterface {
         try {
             CopySource copySource = CopySource.builder().bucket(bucketName).object(srcMinioPath).build();
             minioClient.copyObject(CopyObjectArgs.builder().bucket(bucketName).object(dstMinioPath).source(copySource).build());
-        } catch (Exception e) {
-            log.error(e.toString());
-        }
-    }
-
-    private void moveFile(String srcMinioPath, String dstMinioPath) {
-        try {
-            copyFile(srcMinioPath, dstMinioPath);
-            deleteFile(srcMinioPath);
         } catch (Exception e) {
             log.error(e.toString());
         }
@@ -255,7 +276,7 @@ public class MinioImpl implements FileUtilsInterface {
 
 
 
-    private void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs) {
+    private void archiveData(Path inputFolder, String campaignName, ModeInputs modeInputs) throws KraftwerkException{
         Path dataPath = modeInputs.getDataFile();
         Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
 

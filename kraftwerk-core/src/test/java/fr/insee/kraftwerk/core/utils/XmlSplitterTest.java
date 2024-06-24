@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileSystemType;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,7 +44,7 @@ class XmlSplitterTest {
 			}
 		}
 		XmlSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
-				outDirectory,"SurveyUnit",2);
+				outDirectory,"SurveyUnit",2, new FileSystemImpl());
 	}
 
 	@Test

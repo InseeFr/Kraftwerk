@@ -69,7 +69,6 @@ public abstract class DataProcessing {
     }
 
     protected void applyUserVtlInstructions(Path userVtlInstructionsPath, List<KraftwerkError> errors){
-        //TODO change to interface
         String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath, fileUtilsInterface);
         log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));

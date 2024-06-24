@@ -52,12 +52,16 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
-			File outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toFile();
 			try {
-				Files.deleteIfExists(outputFile.toPath());
+				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+
+				Files.deleteIfExists(tmpOutputFile.toPath());
 				//Data export
-				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, outputFile.getAbsolutePath()));
-				//TODO export to minio
+				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile.getAbsolutePath()));
+
+
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());

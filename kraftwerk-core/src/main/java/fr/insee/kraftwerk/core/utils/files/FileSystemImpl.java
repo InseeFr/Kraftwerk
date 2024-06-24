@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
@@ -89,6 +90,8 @@ public class FileSystemImpl implements FileUtilsInterface{
 	 */
 	@Override
 	public List<String> listFiles(String dir) {
+		File dirFile = new File(dir);
+
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
 				.map(File::getName)
@@ -169,6 +172,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 
 	@Override
 	public void writeFile(String path, String toWrite, boolean replace) {
+		createDirectoryIfNotExist(Path.of(path));
 		StandardOpenOption standardOpenOption = replace || !isFileExists(path) ? StandardOpenOption.CREATE : StandardOpenOption.APPEND;
 		try {
 			Files.write(Path.of(path), toWrite.getBytes(), standardOpenOption);
@@ -221,6 +225,22 @@ public class FileSystemImpl implements FileUtilsInterface{
 		}
 	}
 
+	@Override
+	public void moveFile(String srcPath, String dstPath) throws KraftwerkException {
+		try {
+			createDirectoryIfNotExist(Path.of(dstPath).getParent());
+			Files.move(Path.of(srcPath), Path.of(dstPath), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new KraftwerkException(500, "Can't move file " + srcPath + " to " + dstPath);
+		}
+	}
+
+	@Override
+	public void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException {
+		//Same than other moveFile
+		moveFile(fileSystemPath.toString(), dstPath);
+	}
+
 	/**
 	 * If paradata, we move the paradata folder
 	 * @param inputFolder
@@ -245,7 +265,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 			new File(newDataPath.getParent().toString()).mkdirs();
 		}
 		if (Files.isRegularFile(dataPath)) {
-			moveFile(dataPath, newDataPath);
+			moveFile(dataPath.toString(), newDataPath.toString());
 		} else if (Files.isDirectory(dataPath)) {
 			moveDirectory(dataPath.toFile(),newDataPath.toFile());
 		} else {
@@ -256,14 +276,6 @@ public class FileSystemImpl implements FileUtilsInterface{
 	private void createArchiveDirectoryIfNotExists(Path inputFolder) {
 		if (!Files.exists(inputFolder.resolve(ARCHIVE))) {
 			inputFolder.resolve(ARCHIVE).toFile().mkdir();
-		}
-	}
-
-	private void moveFile(Path dataPath, Path newDataPath) throws KraftwerkException {
-		try {
-			Files.move(dataPath, newDataPath);
-		} catch (IOException e) {
-			throw new KraftwerkException(500, "Can't move file " + dataPath + " to " + newDataPath);
 		}
 	}
 

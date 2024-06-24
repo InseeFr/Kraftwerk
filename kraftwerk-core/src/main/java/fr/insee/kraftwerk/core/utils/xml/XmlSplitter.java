@@ -1,73 +1,78 @@
 package fr.insee.kraftwerk.core.utils.xml;
 
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.EndDocument;
 import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class XmlSplitter {
-	//TODO Make it work with MinIO
 
 	// We use StAX in this class to deal with memory issues on huge XML files
 	private XmlSplitter() {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static void split(String inputfolder, String xmlfile, String outputFolder, String condition, int nbElementsByFile) throws XMLStreamException, IOException {
-
-		FileSystemImpl.createDirectoryIfNotExist(Paths.get(outputFolder));
+	public static void split(String inputfolder, String xmlfile, String outputFolder, String condition, int nbElementsByFile, FileUtilsInterface fileUtilsInterface) throws XMLStreamException, IOException, KraftwerkException {
 		String xmlResource = inputfolder + xmlfile;
-		List<XMLEvent> header = getHeader(xmlResource, condition);
+		List<XMLEvent> header = getHeader(xmlResource, condition, fileUtilsInterface);
 
 		XMLEventFactory xef = XMLEventFactory.newFactory();
 		XMLInputFactory xif = XMLInputFactory.newInstance();
 		xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 		xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-		XMLEventReader xer = xif.createXMLEventReader(new FileReader(xmlResource));
-		StartElement rootStartElement = xer.nextTag().asStartElement();
-		StartDocument startDocument = xef.createStartDocument();
-		EndDocument endDocument = xef.createEndDocument();
 
-		XMLOutputFactory xof = XMLOutputFactory.newFactory();
-		int fileCount = 1;
-		while(xer.hasNext() && !xer.peek().isEndDocument()) {
-			XMLEvent xmlEvent = xer.nextEvent();
+		try (InputStream inputStream = fileUtilsInterface.readFile(xmlResource)) {
+			XMLEventReader xer = xif.createXMLEventReader(inputStream);
+			StartElement rootStartElement = xer.nextTag().asStartElement();
+			StartDocument startDocument = xef.createStartDocument();
+			EndDocument endDocument = xef.createEndDocument();
 
-			if (isStartElementWithName(condition, xmlEvent)) {
-				// Create a file for the fragment, the name is derived from the value of the id attribute
-				FileWriter fileWriter = new FileWriter(outputFolder + "split" + fileCount + ".xml");
+			XMLOutputFactory xof = XMLOutputFactory.newFactory();
+			int fileCount = 1;
+			while (xer.hasNext() && !xer.peek().isEndDocument()) {
+				XMLEvent xmlEvent = xer.nextEvent();
 
-				// A StAX XMLEventWriter will be used to write the XML fragment
-				XMLEventWriter xew = xof.createXMLEventWriter(fileWriter);
-				xew.add(startDocument);
+				if (isStartElementWithName(condition, xmlEvent)) {
+					// Create a temp file for the fragment, the name is derived from the value of the id attribute
+					String tempFileName = "split" + fileCount;
+					File tempFile = File.createTempFile(outputFolder + tempFileName,null);
+					FileWriter fileWriter = new FileWriter(tempFile);
 
-				// Add the elements which are common to all split files
-				addHeadersToNewFile(header, xew);
+					// A StAX XMLEventWriter will be used to write the XML fragment
+					XMLEventWriter xew = xof.createXMLEventWriter(fileWriter);
+					xew.add(startDocument);
 
-				// Write the XMLEvents that are part of SurveyUnit element
-				xew.add(xmlEvent);
-				xmlEvent = xer.nextEvent();
-				int nbResponses = 1;
-				// We loop until we reach the end tag Survey units indicating the near end of the document
-				iterateOnSurveyUnits(condition, nbElementsByFile, xer, xmlEvent, xew, nbResponses);
+					// Add the elements which are common to all split files
+					addHeadersToNewFile(header, xew);
 
-				// Write the file, close everything we opened and update the file's counter
-				xew.add(xef.createEndElement(rootStartElement.getName(), null));
-				xew.add(endDocument);
-				fileWriter.close();
+					// Write the XMLEvents that are part of SurveyUnit element
+					xew.add(xmlEvent);
+					xmlEvent = xer.nextEvent();
+					int nbResponses = 1;
+					// We loop until we reach the end tag Survey units indicating the near end of the document
+					iterateOnSurveyUnits(condition, nbElementsByFile, xer, xmlEvent, xew, nbResponses);
 
-				fileCount++;
+					// Write the file, close everything we opened and
+					xew.add(xef.createEndElement(rootStartElement.getName(), null));
+					xew.add(endDocument);
+					fileWriter.close();
 
+					//Move to outputFolder
+					fileUtilsInterface.moveFile(tempFile.getAbsolutePath(), outputFolder + "/" + tempFileName + ".xml");
+
+					//Update the file's counter
+					fileCount++;
+				}
 			}
 		}
 	}
@@ -102,32 +107,34 @@ public class XmlSplitter {
 		return xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals(condition);
 	}
 
-	private static List<XMLEvent> getHeader(String xmlResource, String condition) throws FileNotFoundException, XMLStreamException {
-		XMLInputFactory xif = XMLInputFactory.newInstance();
-		xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-		xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-		XMLEventReader xer = xif.createXMLEventReader(new FileReader(xmlResource));
+	private static List<XMLEvent> getHeader(String xmlResource, String condition, FileUtilsInterface fileUtilsInterface) throws IOException, XMLStreamException {
+		try(InputStream inputStream = fileUtilsInterface.readFile(xmlResource)) {
+			XMLInputFactory xif = XMLInputFactory.newInstance();
+			xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+			xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+			XMLEventReader xer = xif.createXMLEventReader(inputStream);
 
-		List<XMLEvent> cachedXMLEvents = new ArrayList<>();
-		while(xer.hasNext() && !xer.peek().isEndDocument()) {
-			XMLEvent xmlEvent = xer.nextTag();
-			if (!xmlEvent.isStartElement()) {
-				break;
-			}
-			StartElement breakStartElement = xmlEvent.asStartElement();
-
-			cachedXMLEvents.add(breakStartElement);
-			xmlEvent = xer.nextEvent();
-			while (!(xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(breakStartElement.getName()))) {
-				if (isStartElementWithName(condition, xmlEvent)) {
-					xer.close();
-					return cachedXMLEvents;
+			List<XMLEvent> cachedXMLEvents = new ArrayList<>();
+			while (xer.hasNext() && !xer.peek().isEndDocument()) {
+				XMLEvent xmlEvent = xer.nextTag();
+				if (!xmlEvent.isStartElement()) {
+					break;
 				}
-				cachedXMLEvents.add(xmlEvent);
+				StartElement breakStartElement = xmlEvent.asStartElement();
+
+				cachedXMLEvents.add(breakStartElement);
 				xmlEvent = xer.nextEvent();
+				while (!(xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(breakStartElement.getName()))) {
+					if (isStartElementWithName(condition, xmlEvent)) {
+						xer.close();
+						return cachedXMLEvents;
+					}
+					cachedXMLEvents.add(xmlEvent);
+					xmlEvent = xer.nextEvent();
+				}
 			}
+			xer.close();
 		}
-		xer.close();
 		return List.of();
 	}
 
