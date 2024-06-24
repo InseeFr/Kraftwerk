@@ -13,8 +13,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Interface to use to interact with storage
+ */
 public interface FileUtilsInterface {
-    //TODO organize this
+    //Common methods
     static Path transformToOut(Path inDirectory) {
         return transformToOther(inDirectory, "out");
     }
@@ -38,66 +41,28 @@ public interface FileUtilsInterface {
                 : transformToOther(inDirectory.getParent(), other).resolve(inDirectory.getFileName());
     }
 
-    void renameInputFile(Path inDirectory);
-
-    void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException;
-
-    void deleteDirectory(Path directoryPath) throws KraftwerkException;
-
-    //TODO change to listFilesNames
-    List<String> listFiles(String dir);
-
-    List<String> listFilePaths(String dir);
-
-    Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset);
-
-    Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;
-
-    URL convertToUrl(String userField, Path inputDirectory);
-
+    //Methods to implement
+    //File system interactions
     /**
-     *
+     * Read a file
      * @param path path of file
-     * @return true if directory, false if file, null if neither
+     * @return an InputStream of content of file
      */
-    @Nullable
-    Boolean isDirectory(String path);
-
+    InputStream readFile(String path);
     /**
-     *
-     * @param path path of file
-     * @return size of file
-     */
-    long getSizeOf(String path);
-
-    /**
-     * Write a file in the path
+     * Write string into a file
      * @param path path of the file
      * @param toWrite String to write
      * @param replace true if overwrite, false if append
      */
     void writeFile(String path, String toWrite, boolean replace);
-
     /**
-     * Find the file in the folder of a campaign
-     * @param directory directory where the file should be
-     * @param fileRegex regex of the file to match
-     * @return Path of the DDI file
-     * @throws KraftwerkException if no file found
-     */
-    String findFile(String directory, String fileRegex) throws KraftwerkException;
-    InputStream readFile(String path);
-
-    boolean isFileExists(String path);
-
-    /**
-     * Move file from source to destination (depends of the file system)
+     * Move file from source to destination (depends on the file system)
      * @param srcPath source path
      * @param dstPath destination path
      * @throws KraftwerkException
      */
     void moveFile(String srcPath, String dstPath) throws KraftwerkException;
-
     /**
      * Move file from local file system to another path
      * @param fileSystemPath local path
@@ -105,4 +70,68 @@ public interface FileUtilsInterface {
      * @throws KraftwerkException
      */
     void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException;
+
+    /**
+     * Deletes a directory recursively
+     * @param directoryPath path of directory
+     * @throws KraftwerkException if exception
+     */
+    void deleteDirectory(Path directoryPath) throws KraftwerkException;
+    /**
+     * Find the file in the folder of a campaign
+     * @param directory directory where the file should be
+     * @param fileRegex regex of the file to match
+     * @return Path of the file
+     * @throws KraftwerkException if no file found
+     */
+    String findFile(String directory, String fileRegex) throws KraftwerkException;
+
+    //File listing
+    /**
+     * List file names in a directory
+     * @param dir directory to list files from
+     * @return a list of file names
+     */
+    List<String> listFileNames(String dir);
+
+    /**
+     * List file paths in a directory
+     * @param dir directory to list files from
+     * @return a list of file paths
+     */
+    List<String> listFilePaths(String dir);
+
+    //Conversions
+    Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;
+    URL convertToUrl(String userField, Path inputDirectory);
+
+    //Checks
+    /**
+     * Check if file exists
+     * @param path path of file
+     * @return true if file exists, false otherwise
+     */
+    boolean isFileExists(String path);
+    /**
+     * Checks if path is a file or directory or neither
+     * @param path path of file
+     * @return true if directory, false if file, null if neither
+     */
+    @Nullable
+    Boolean isDirectory(String path);
+
+    /**
+     * Returns the size of a file
+     * @param path path of file
+     * @return size of file
+     */
+    long getSizeOf(String path);
+
+    //Misc.
+    /**
+     * Move the input file to another directory to archive it
+     */
+    void renameInputFile(Path inDirectory);
+    void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException;
+    Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset);
 }

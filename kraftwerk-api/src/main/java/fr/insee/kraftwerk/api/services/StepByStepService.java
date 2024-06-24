@@ -19,6 +19,7 @@ import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,17 +38,23 @@ import java.util.Map;
 
 @RestController
 @Tag(name = "${tag.stepbystep}")
+@Slf4j
 public class StepByStepService extends KraftwerkService {
 	MinioClient minioClient;
+	boolean useMinio;
 
 	@Autowired
 	public StepByStepService(MinioConfig minioConfig) {
 		super(minioConfig);
-		//TODO warn if enable null
-		if(minioConfig.isEnable()){
-			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+		useMinio = false;
+		if(minioConfig == null){
+			log.warn("Minio config null !");
 		}
-	}
+		if(minioConfig != null && minioConfig.isEnable()){
+			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+			useMinio = true;
+		}
+    }
 
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
@@ -59,7 +66,7 @@ public class StepByStepService extends KraftwerkService {
 		boolean fileByFile = false;
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -103,7 +110,7 @@ public class StepByStepService extends KraftwerkService {
 		boolean fileByFile = false;
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -140,7 +147,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -188,7 +195,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -245,7 +252,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) throws KraftwerkException, SQLException {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -262,7 +269,7 @@ public class StepByStepService extends KraftwerkService {
 		List<KraftwerkError> errors = new ArrayList<>();
 		// Read all bindings necessary to produce output
 		String path = FileUtilsInterface.transformToTemp(inDirectory).toString();
-		List<String> fileNames = fileUtilsInterface.listFiles(path);
+		List<String> fileNames = fileUtilsInterface.listFileNames(path);
 		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).toList();
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
@@ -291,7 +298,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> archiveService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -299,9 +306,4 @@ public class StepByStepService extends KraftwerkService {
 
 		return archive(inDirectoryParam, fileUtilsInterface);
 	}
-
-
-
-
-
 }

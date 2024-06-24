@@ -14,6 +14,7 @@ import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,19 +27,27 @@ import java.io.IOException;
 
 
 @RestController
+@Slf4j
 @Tag(name = "${tag.main}")
 public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;
 	MinioClient minioClient;
+	boolean useMinio;
+
 
 	@Autowired
 	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
         super(minioConfig);
         this.configProperties = configProperties;
 		this.minioConfig = minioConfig;
-		if(minioConfig.isEnable()){
+		useMinio = false;
+		if(minioConfig == null){
+			log.warn("Minio config null !");
+		}
+		if(minioConfig != null && minioConfig.isEnable()){
 			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+			useMinio = true;
 		}
 	}
 
@@ -52,7 +61,7 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = false;
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -81,7 +90,7 @@ public class MainService extends KraftwerkService {
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -109,7 +118,7 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
@@ -132,7 +141,7 @@ public class MainService extends KraftwerkService {
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(minioConfig.isEnable())){
+		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl();

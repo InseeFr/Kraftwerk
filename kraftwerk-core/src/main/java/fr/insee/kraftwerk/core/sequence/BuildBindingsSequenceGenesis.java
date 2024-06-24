@@ -94,7 +94,7 @@ public class BuildBindingsSequenceGenesis {
 	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
-			List<String> listFiles = fileUtilsInterface.listFiles(reportingDataFile.toString());
+			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());
 			for (String file : listFiles) {
 				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
 				if (file.contains(".xml")) {

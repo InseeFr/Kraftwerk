@@ -34,9 +34,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	
 
 	
-	/**
-	 * Move the input file to another directory to archive it
-	 */
+
 	@Override
 	public void renameInputFile(Path inDirectory) {
 		File file = inDirectory.resolve("kraftwerk.json").toFile();
@@ -89,7 +87,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	 * @return
 	 */
 	@Override
-	public List<String> listFiles(String dir) {
+	public List<String> listFileNames(String dir) {
 		File dirFile = new File(dir);
 
 		return Stream.of(new File(dir).listFiles())

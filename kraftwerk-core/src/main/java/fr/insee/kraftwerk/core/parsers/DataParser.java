@@ -13,7 +13,6 @@ import java.nio.file.Path;
  */
 @Log4j2
 public abstract class DataParser {
-	//TODO replace Path objects to String
 	public static final String DATAPATH_IS_NULL = "Datapath is null";
 	protected final SurveyRawData data;
 	protected final FileUtilsInterface fileUtilsInterface;

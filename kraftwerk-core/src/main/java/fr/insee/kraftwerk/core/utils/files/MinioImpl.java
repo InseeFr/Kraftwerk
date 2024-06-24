@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
@@ -80,7 +81,7 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public void deleteDirectory(Path directoryPath) throws KraftwerkException {
         try {
-            for (String filePath : listFiles(directoryPath.toString())) {
+            for (String filePath : listFileNames(directoryPath.toString())) {
                 deleteFile(filePath);
             }
         } catch (Exception e) {
@@ -89,7 +90,7 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     @Override
-    public List<String> listFiles(String dir) {
+    public List<String> listFileNames(String dir) {
         try {
             ArrayList<String> filePaths = new ArrayList<>();
             Iterable<Result<Item>> results = minioClient.listObjects(
@@ -107,7 +108,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public List<String> listFilePaths(String dir) {
-        return listFiles(dir);
+        return listFileNames(dir);
     }
 
     @Override
@@ -180,7 +181,10 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public String findFile(String directory, String fileRegex) throws KraftwerkException {
-        return null; //TODO faire ça
+        try (Stream<String> files = listFileNames(directory).stream().filter(s -> s.matches(fileRegex))) {
+            return files.findFirst()
+                    .orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + directory));
+        }
     }
 
     @Override
@@ -251,7 +255,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     private void moveDirectory(String srcMinioPath, String dstMinioPath) {
         try {
-            for (String filePath : listFiles(srcMinioPath)) {
+            for (String filePath : listFileNames(srcMinioPath)) {
                 moveFile(filePath, dstMinioPath + "/" + extractFileName(filePath));
             }
         } catch (Exception e) {

@@ -17,7 +17,6 @@ import fr.insee.kraftwerk.core.Constants;
 
 /** Encapsulate org.opencsv features that we use in Kraftwerk. */
 public class CsvUtils {
-    //TODO make it work with Minio
     private CsvUtils() {
         //Utility class
     }

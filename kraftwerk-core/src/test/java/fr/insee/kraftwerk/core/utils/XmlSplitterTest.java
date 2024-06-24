@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.files.FileSystemType;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,7 +33,7 @@ class XmlSplitterTest {
 	static void cleanUpBeforeTests() throws Exception {
 		File file = new File(outDirectory);
 		if (file.exists()) {
-			List<String> splitFiles = fileUtilsInterface.listFiles(outDirectory);
+			List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 			if (splitFiles != null){
 				for (String splitFile : splitFiles) {
 					if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
@@ -50,14 +49,14 @@ class XmlSplitterTest {
 	@Test
 	@DisplayName("OutDirectory should contain 3 files")
 	void splitInThreeTest() throws XMLStreamException, IOException {
-		List<String> splitFiles = fileUtilsInterface.listFiles(outDirectory);
+		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 		assertEquals(3,splitFiles.size());
 	}
 
 	@Test
 	@DisplayName("File split1.xml file should contain 2 survey units")
 	void contains2SuTest() throws XMLStreamException, IOException {
-		List<String> splitFiles = fileUtilsInterface.listFiles(outDirectory);
+		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 		int count = 0;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		try {
