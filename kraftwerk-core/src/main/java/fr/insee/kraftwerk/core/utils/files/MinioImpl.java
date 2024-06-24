@@ -21,9 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,7 +30,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Slf4j
 @AllArgsConstructor
@@ -62,7 +59,7 @@ public class MinioImpl implements FileUtilsInterface {
     public void archiveInputFiles(UserInputsFile userInputsFile) throws KraftwerkException {
         //
         Path inputFolder = userInputsFile.getInputDirectory();
-        String[] directories = inputFolder.toString().split(Pattern.quote(File.separator));
+        String[] directories = inputFolder.toString().split("/");
         String campaignName = directories[directories.length - 1];
 
         //
@@ -290,14 +287,14 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     private String getRoot(Path path, String campaignName) {
-        String[] directories = path.toString().split(Pattern.quote(File.separator));
+        String[] directories = path.toString().split("/");
         int campaignIndex = Arrays.asList(directories).indexOf(campaignName);
         String[] newDirectories = Arrays.copyOfRange(directories, campaignIndex + 1, directories.length);
         StringBuilder result = new StringBuilder();
         String sep = "";
         for (String directory : newDirectories) {
             result.append(sep).append(directory);
-            sep = File.separator;
+            sep = "/";
         }
         return result.toString();
     }

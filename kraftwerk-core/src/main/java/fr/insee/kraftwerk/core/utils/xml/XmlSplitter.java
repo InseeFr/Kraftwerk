@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.utils;
+package fr.insee.kraftwerk.core.utils.xml;
 
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 
@@ -15,11 +15,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XMLSplitter {
+public class XmlSplitter {
 	//TODO Make it work with MinIO
 
 	// We use StAX in this class to deal with memory issues on huge XML files
-	private XMLSplitter() {
+	private XmlSplitter() {
 		throw new IllegalStateException("Utility class");
 	}
 

@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.utils;
+package fr.insee.kraftwerk.core.utils.xml;
 
 import java.io.IOException;
 import java.io.InputStream;

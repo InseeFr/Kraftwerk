@@ -20,7 +20,6 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.sql.Statement;
 import java.util.List;
@@ -85,8 +84,7 @@ public class BuildBindingsSequenceGenesis {
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
 		Path paraDataPath = inDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
-		File paradataFolder = paraDataPath.toFile();
-		if (paradataFolder.exists()) {
+		if (fileUtilsInterface.isFileExists(paraDataPath.toString())) {
 			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
@@ -95,8 +93,7 @@ public class BuildBindingsSequenceGenesis {
 
 	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
-		File reportingDataFolder = reportingDataFile.toFile();
-		if (reportingDataFolder.exists()) {
+		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
 			List<String> listFiles = fileUtilsInterface.listFiles(reportingDataFile.toString());
 			for (String file : listFiles) {
 				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));

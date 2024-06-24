@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.api.services;
 
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
-import fr.insee.kraftwerk.core.utils.XMLSplitter;
+import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
@@ -31,7 +31,7 @@ public class SplitterService extends KraftwerkService{
 														   @RequestParam("nbResponsesByFile") int nbSU)
 			throws Exception {
 		log.info("Split XML file : " + filename + " into " + nbSU + " SU by file");
-		XMLSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU);
+		XmlSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU);
 		return new ResponseEntity<>("File split", HttpStatus.OK);
 	}
 

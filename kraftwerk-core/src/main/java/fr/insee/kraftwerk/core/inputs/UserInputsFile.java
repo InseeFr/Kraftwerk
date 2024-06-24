@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -46,12 +45,12 @@ public class UserInputsFile extends UserInputs {
 				String dataFolder = readField(fileNode, "data_file");
 				String paradataFolder = readField(fileNode, "paradata_folder");
 				String reportingFolder = readField(fileNode, "reporting_data_file");
-				Path dataPath = (new File(dataFolder).exists()) ? convertToUserPath(dataFolder) : fileUtilsInterface.convertToPath(dataFolder,inputDirectory);
+				Path dataPath = (fileUtilsInterface.isFileExists(dataFolder)) ? convertToUserPath(dataFolder) : fileUtilsInterface.convertToPath(dataFolder,inputDirectory);
 				URL ddiFile = fileUtilsInterface.convertToUrl(readField(fileNode, "DDI_file"),inputDirectory);
 				Path lunaticFile = fileUtilsInterface.convertToPath(readField(fileNode, "lunatic_file"),inputDirectory);
 				String dataFormat = readField(fileNode, "data_format");
-				Path paradataPath = (paradataFolder != null && new File(paradataFolder).exists()) ? convertToUserPath(paradataFolder) : fileUtilsInterface.convertToPath(paradataFolder,inputDirectory);
-				Path reportingDataFile = (reportingFolder != null && new File(reportingFolder).exists()) ? convertToUserPath(reportingFolder) : fileUtilsInterface.convertToPath(reportingFolder,inputDirectory);
+				Path paradataPath = (paradataFolder != null && fileUtilsInterface.isFileExists(paradataFolder)) ? convertToUserPath(paradataFolder) : fileUtilsInterface.convertToPath(paradataFolder,inputDirectory);
+				Path reportingDataFile = (reportingFolder != null && fileUtilsInterface.isFileExists(reportingFolder)) ? convertToUserPath(reportingFolder) : fileUtilsInterface.convertToPath(reportingFolder,inputDirectory);
 				Path vtlFile = fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				ModeInputs modeInputs = new ModeInputs();
 				modeInputs.setDataFile(dataPath);

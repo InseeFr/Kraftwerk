@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-class XMLSplitterTest {
+class XmlSplitterTest {
 
 	static final String outDirectory = TestConstants.UNIT_TESTS_DUMP+"/split/";
 
@@ -41,7 +42,7 @@ class XMLSplitterTest {
 				}
 			}
 		}
-		XMLSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
+		XmlSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
 				outDirectory,"SurveyUnit",2);
 	}
 
