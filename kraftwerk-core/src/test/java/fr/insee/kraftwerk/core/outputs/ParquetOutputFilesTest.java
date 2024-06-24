@@ -99,7 +99,7 @@ class ParquetOutputFilesTest {
 
 		// Clean the existing file
 //		Files.deleteIfExists(outputFiles.getOutputFolder());
-		FileSystemImpl.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+		fileUtilsInterface.createDirectoryIfNotExist(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metMod = new MetadataModel();

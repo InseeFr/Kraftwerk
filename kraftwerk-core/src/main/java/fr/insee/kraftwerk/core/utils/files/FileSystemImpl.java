@@ -102,8 +102,9 @@ public class FileSystemImpl implements FileUtilsInterface{
 		createDirectoryIfNotExist(FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()));
 		return FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
 	}
-	
-	public static void createDirectoryIfNotExist(Path path) {
+
+	@Override
+	public void createDirectoryIfNotExist(Path path) {
 		try {
 			Files.createDirectories(path);
 			log.info(String.format("Created folder: %s", path.toFile().getAbsolutePath()));

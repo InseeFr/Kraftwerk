@@ -48,7 +48,7 @@ public abstract class OutputFiles {
 
 	/** Create output folder if doesn't exist. */
 	private void createOutputFolder() {
-		FileSystemImpl.createDirectoryIfNotExist(outputFolder);
+		fileUtilsInterface.createDirectoryIfNotExist(outputFolder);
 	}
 
 	/** See getOutputDatasetNames doc. */

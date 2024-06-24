@@ -112,6 +112,11 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     @Override
+    public void createDirectoryIfNotExist(Path path) {
+        //MinIO creates automatically the folders
+    }
+
+    @Override
     public Path getTempVtlFilePath(UserInputs userInputs, String step, String dataset) {
         return FileUtilsInterface.transformToTemp(userInputs.getInputDirectory()).resolve(step+ dataset+".vtl");
     }

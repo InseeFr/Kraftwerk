@@ -121,7 +121,7 @@ public class VtlExecute {
      * @param jsonOutFile Path to write the output json file.
      * */
     public void writeJsonDataset(String bindingName, Path jsonOutFile, VtlBindings bindings) {
-    	FileSystemImpl.createDirectoryIfNotExist(jsonOutFile.getParent());
+    	fileUtilsInterface.createDirectoryIfNotExist(jsonOutFile.getParent());
     	
     	//Write file    	
         if (bindings.containsKey(bindingName)) {

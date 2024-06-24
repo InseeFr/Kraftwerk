@@ -370,7 +370,7 @@ public class MainDefinitions {
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
 		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
-		FileSystemImpl.createDirectoryIfNotExist(tempOutputPath.getParent());
+		new FileSystemImpl().createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
 		if (!errors.isEmpty()) {

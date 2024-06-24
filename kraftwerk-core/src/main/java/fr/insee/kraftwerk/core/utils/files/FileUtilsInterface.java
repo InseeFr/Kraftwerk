@@ -101,6 +101,12 @@ public interface FileUtilsInterface {
      */
     List<String> listFilePaths(String dir);
 
+    /**
+     * Create parent directories of the file
+     * @param path path of the file
+     */
+    void createDirectoryIfNotExist(Path path);
+
     //Conversions
     Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;
     URL convertToUrl(String userField, Path inputDirectory);

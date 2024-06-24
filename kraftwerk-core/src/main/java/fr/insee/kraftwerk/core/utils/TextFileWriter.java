@@ -36,7 +36,7 @@ public class TextFileWriter {
 	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors, FileUtilsInterface fileUtilsInterface) {
 		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime)
 				.resolve(Constants.ERRORS_FILE_NAME);
-		FileSystemImpl.createDirectoryIfNotExist(tempOutputPath.getParent());
+		fileUtilsInterface.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
 		if (!errors.isEmpty()) {
