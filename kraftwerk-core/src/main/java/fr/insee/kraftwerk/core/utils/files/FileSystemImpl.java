@@ -81,15 +81,8 @@ public class FileSystemImpl implements FileUtilsInterface{
 		}
 	}
 
-	/**
-	 * List the file names in the directory
-	 * @param dir
-	 * @return
-	 */
 	@Override
 	public List<String> listFileNames(String dir) {
-		File dirFile = new File(dir);
-
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
 				.map(File::getName)

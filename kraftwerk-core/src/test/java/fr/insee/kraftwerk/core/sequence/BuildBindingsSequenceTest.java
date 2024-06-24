@@ -30,7 +30,7 @@ class BuildBindingsSequenceTest {
 	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
-				inputSamplesDirectory.resolve("inputs_valid.json"),
+				inputSamplesDirectory.resolve("kraftwerk.json"),
 				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
@@ -50,7 +50,7 @@ class BuildBindingsSequenceTest {
 	void buildVtlBindings_success_changingDdi_and_reportingData(boolean withDdi, boolean withAllReportingData ) throws KraftwerkException {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
-				inputSamplesDirectory.resolve("inputs_valid.json"),
+				inputSamplesDirectory.resolve("kraftwerk.json"),
 				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
