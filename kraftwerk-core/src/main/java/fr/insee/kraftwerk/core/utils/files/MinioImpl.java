@@ -122,32 +122,6 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     @Override
-    public Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
-        if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
-            return  inputDirectory.resolve(userField);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public URL convertToUrl(String userField, Path inputDirectory) {
-        if (userField == null) {
-            log.debug("null value out of method that reads DDI field (should not happen).");
-            return null;
-        }
-        try {
-            if (userField.startsWith("http")) {
-                return new URI(userField).toURL();
-            }
-            return inputDirectory.resolve(userField).toFile().toURI().toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
-            log.error("Unable to convert URL from user input: " + userField);
-            return null;
-        }
-    }
-
-    @Override
     public Boolean isDirectory(String path){
         try {
             //List files of parent to check if directory

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -144,5 +145,165 @@ class FileSystemImplTest {
         for (String filePath : filePaths) {
             Assertions.assertThat(Path.of(filePath).getFileName().toString()).containsAnyOf("file1.txt", "file2.json", "file3.xml");
         }
+    }
+
+    @Test
+    void createDirectoryTest() throws IOException {
+        //GIVEN
+        String campaignName = "create_directory";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN
+        fileSystemImpl.createDirectoryIfNotExist(inputDirectory);
+
+        //THEN
+        Assertions.assertThat(inputDirectory.toFile()).exists().isDirectory();
+
+        //CLEAN
+        Files.deleteIfExists(inputDirectory);
+    }
+
+    @Test
+    void isDirectoryTest(){
+        //GIVEN
+        String campaignName = "move_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN + THEN
+        Assertions.assertThat(fileSystemImpl.isDirectory(String.valueOf(inputDirectory))).isTrue();
+        Assertions.assertThat(fileSystemImpl.isDirectory(String.valueOf(inputDirectory.resolve("move_files.json")))).isFalse();
+        Assertions.assertThat(fileSystemImpl.isDirectory(String.valueOf(inputDirectory.resolve("NULL.json")))).isNull();
+    }
+
+    @Test
+    void getSizeOfTest() throws IOException {
+        //GIVEN
+        String campaignName = "convert_path";
+        Path file = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName).resolve("test.txt");
+
+        //WHEN + THEN
+        Assertions.assertThat(fileSystemImpl.getSizeOf(file.toString())).isEqualTo(Files.size(file));
+    }
+
+    @Test
+    void writeFileTest() throws IOException {
+        //GIVEN
+        String campaignName = "write_file";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN
+        fileSystemImpl.writeFile(inputDirectory.resolve("test.txt").toString(),"test",true);
+
+        //THEN
+        Assertions.assertThat(new File(inputDirectory.resolve("test.txt").toString())).exists();
+        Assertions.assertThat(Files.readAllBytes(inputDirectory.resolve("test.txt"))).contains("test".getBytes());
+
+        //CLEAN
+        Files.deleteIfExists(inputDirectory.resolve("test.txt"));
+        Files.deleteIfExists(inputDirectory);
+    }
+
+    @Test
+    void writeFileTest_append() throws IOException {
+        //GIVEN
+        String campaignName = "write_file";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN
+        fileSystemImpl.writeFile(inputDirectory.resolve("test.txt").toString(),"test1",true);
+        fileSystemImpl.writeFile(inputDirectory.resolve("test.txt").toString(),"\ntest2",false);
+
+        //THEN
+        Assertions.assertThat(new File(inputDirectory.resolve("test.txt").toString())).exists();
+        Assertions.assertThat(Files.readAllBytes(inputDirectory.resolve("test.txt"))).contains("test".getBytes()).contains("test2".getBytes());
+
+        //CLEAN
+        Files.deleteIfExists(inputDirectory.resolve("test.txt"));
+        Files.deleteIfExists(inputDirectory);
+    }
+    @Test
+    void findFileTest() throws KraftwerkException {
+        //GIVEN
+        String campaignName = "list_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN + THEN
+        Assertions.assertThat(fileSystemImpl.findFile(inputDirectory.toString(), "[\\w,\\s-]+\\.xml")).isNotEmpty();
+    }
+
+    @Test
+    void findFileTest_notfound() throws KraftwerkException {
+        //GIVEN
+        String campaignName = "list_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN+THEN
+        assertThrows(KraftwerkException.class, () -> fileSystemImpl.findFile(inputDirectory.toString(),Constants.DDI_FILE_REGEX));
+    }
+
+    @Test
+    void readFileTest() throws IOException {
+        //GIVEN
+        String campaignName = "read_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN + THEN
+        try(InputStream inputStream = fileSystemImpl.readFile(inputDirectory.resolve("test.txt").toString())){
+            Assertions.assertThat(inputStream).hasContent("hello !");
+        }
+    }
+
+    @Test
+    void isFileExistsTest(){
+        //GIVEN
+        String campaignName = "read_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN + THEN
+        Assertions.assertThat(fileSystemImpl.isFileExists(inputDirectory.resolve("test.txt").toString())).isTrue();
+        Assertions.assertThat(fileSystemImpl.isFileExists(inputDirectory.resolve("null.txt").toString())).isFalse();
+    }
+
+    @Test
+    void moveFileTest() throws KraftwerkException, IOException {
+        //GIVEN
+        String campaignName = "move_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+        Files.copy(inputDirectory.resolve("move_files.json"),inputDirectory.resolve("test1.txt"));
+
+        String campaignName2 = "move_files2";
+        Path inputDirectory2 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName2);
+
+        //WHEN
+        fileSystemImpl.moveFile(inputDirectory.resolve("test1.txt").toString(), inputDirectory2.resolve("test2.txt").toString());
+
+        //THEN
+        Assertions.assertThat(inputDirectory2.resolve("test2.txt")).exists();
+
+        //CLEAN
+        Files.deleteIfExists(inputDirectory2.resolve("test2.txt"));
+        Files.deleteIfExists(inputDirectory.resolve("test1.txt"));
+    }
+
+    @Test
+    void moveFileTest_FromPath() throws KraftwerkException, IOException {
+        //GIVEN
+        String campaignName = "move_files";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+        Files.copy(inputDirectory.resolve("move_files.json"),inputDirectory.resolve("test1.txt"));
+
+        String campaignName2 = "move_files2";
+        Path inputDirectory2 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName2);
+
+        //WHEN
+        fileSystemImpl.moveFile(inputDirectory.resolve("test1.txt"), inputDirectory2.resolve("test2.txt").toString());
+
+        //THEN
+        Assertions.assertThat(inputDirectory2.resolve("test2.txt")).exists();
+
+        //CLEAN
+        Files.deleteIfExists(inputDirectory2.resolve("test2.txt"));
+        Files.deleteIfExists(inputDirectory.resolve("test1.txt"));
+        Files.deleteIfExists(inputDirectory2);
     }
 }

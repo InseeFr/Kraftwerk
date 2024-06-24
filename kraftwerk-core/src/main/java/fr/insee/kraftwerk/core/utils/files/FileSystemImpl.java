@@ -114,36 +114,6 @@ public class FileSystemImpl implements FileUtilsInterface{
 	}
 
 	@Override
-	public Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
-		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
-			Path inputPath = inputDirectory.resolve(userField);
-			if (!new File(inputPath.toUri()).exists()) {
-				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
-			}
-			return inputPath;
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public URL convertToUrl(String userField, Path inputDirectory) {
-		if (userField == null) {
-			log.debug("null value out of method that reads DDI field (should not happen).");
-			return null;
-		}
-		try {
-			if (userField.startsWith("http")) {
-				return new URI(userField).toURL();
-			}
-			return inputDirectory.resolve(userField).toFile().toURI().toURL();
-		} catch (MalformedURLException | URISyntaxException e) {
-			log.error("Unable to convert URL from user input: " + userField);
-			return null;
-		} 
-	}
-
-	@Override
 	@Nullable
 	public Boolean isDirectory(String path) {
 		File file = new File(path);
@@ -164,7 +134,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 
 	@Override
 	public void writeFile(String path, String toWrite, boolean replace) {
-		createDirectoryIfNotExist(Path.of(path));
+		createDirectoryIfNotExist(Path.of(path).getParent());
 		StandardOpenOption standardOpenOption = replace || !isFileExists(path) ? StandardOpenOption.CREATE : StandardOpenOption.APPEND;
 		try {
 			Files.write(Path.of(path), toWrite.getBytes(), standardOpenOption);
@@ -177,7 +147,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	public String findFile(String directory, String regex) throws KraftwerkException {
 		try (Stream<Path> files = Files.find(Path.of(directory), 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches(regex))) {
 			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + directory)).toString();
+					.orElseThrow(() -> new KraftwerkException(404, "No file (%s) found in ".formatted(regex) + directory)).toString();
 		}catch (IOException e){
 			log.error(e.toString());
 			return null;
@@ -199,6 +169,21 @@ public class FileSystemImpl implements FileUtilsInterface{
 		return Files.exists(Path.of(path));
 	}
 
+	@Override
+	public void moveFile(String srcPath, String dstPath) throws KraftwerkException {
+		try {
+			createDirectoryIfNotExist(Path.of(dstPath).getParent());
+			Files.move(Path.of(srcPath), Path.of(dstPath), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new KraftwerkException(500, "Can't move file " + srcPath + " to " + dstPath);
+		}
+	}
+
+	@Override
+	public void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException {
+		//Same than other moveFile
+		moveFile(fileSystemPath.toString(), dstPath);
+	}
 
 	// Utilities
 
@@ -215,22 +200,6 @@ public class FileSystemImpl implements FileUtilsInterface{
 			moveDirectory(modeInputs.getReportingDataFile().toFile(), inputFolder.resolve(ARCHIVE)
 					.resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toFile());
 		}
-	}
-
-	@Override
-	public void moveFile(String srcPath, String dstPath) throws KraftwerkException {
-		try {
-			createDirectoryIfNotExist(Path.of(dstPath).getParent());
-			Files.move(Path.of(srcPath), Path.of(dstPath), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			throw new KraftwerkException(500, "Can't move file " + srcPath + " to " + dstPath);
-		}
-	}
-
-	@Override
-	public void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException {
-		//Same than other moveFile
-		moveFile(fileSystemPath.toString(), dstPath);
 	}
 
 	/**

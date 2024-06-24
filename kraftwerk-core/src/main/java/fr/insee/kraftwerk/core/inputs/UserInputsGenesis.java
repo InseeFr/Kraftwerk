@@ -75,7 +75,7 @@ public class UserInputsGenesis extends UserInputs{
 				String dataMode = readField(fileNode, "data_mode");
 				if (dataMode == null) {break;}
 				if (dataMode.equals(mode.name())) {
-					return fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
+					return FileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				}
 			}
 		} catch (IOException e) {
