@@ -22,7 +22,7 @@ public class UserInputsGenesis extends UserInputs{
 
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, IOException {
+	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		super(inputDirectory, fileUtilsInterface);
 		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
