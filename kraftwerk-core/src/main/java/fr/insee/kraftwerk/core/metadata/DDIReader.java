@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -40,12 +39,12 @@ public class DDIReader {
 	 * written in the system temporary folder with the name 'variables.xml'. This file is
 	 * deleted after being used or when the virtual machine terminates.
 	 *
-	 * @param ddiUrl : Path to the DDI file.
+	 * @param ddiUrlString : Path to the DDI file.
 	 *
 	 * @return The variables found in the DDI.
 	 * @throws KraftwerkException
 	 */
-	public static MetadataModel getMetadataFromDDI(URL ddiUrl, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+	public static MetadataModel getMetadataFromDDI(String ddiUrlString, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 
 		try {
 			// Path of the output 'variables.xml' temp file
@@ -53,15 +52,15 @@ public class DDIReader {
 			variablesFile.deleteOnExit();
 			Path variablesTempFilePath = variablesFile.toPath();
 
-			transformDDI(ddiUrl, variablesTempFilePath);
+			transformDDI(ddiUrlString, variablesTempFilePath, fileUtilsInterface);
 
-			MetadataModel metadataModel = readVariables(variablesTempFilePath, fileUtilsInterface);
+			MetadataModel metadataModel = readVariables(variablesTempFilePath);
 			Files.delete(variablesFile.toPath());
 			return metadataModel;
 		}
 
 		catch (MalformedURLException e) {
-			log.error(String.format("Error when converting file path '%s' to an URL.", ddiUrl), e);
+			log.error(String.format("Error when converting file path '%s' to an URL.", ddiUrlString), e);
 			return null;
 		} catch (IOException e) {
 			log.error("Unable to write temp file.", e);
@@ -75,12 +74,12 @@ public class DDIReader {
 	/**
 	 * Apply the XSLT_STRUCTURED_VARIABLES transformation.
 	 *
-	 * @param ddiUrl            : URL of the DDI file.
+	 * @param ddiUrlString            : URL of the DDI file.
 	 * @param variablesFilePath : Path of the 'variables.xml' file to be generated.
 	 */
-	private static void transformDDI(URL ddiUrl, Path variablesFilePath) {
-		SaxonTransformer saxonTransformer = new SaxonTransformer();
-		saxonTransformer.xslTransform(ddiUrl, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
+	private static void transformDDI(String ddiUrlString, Path variablesFilePath, FileUtilsInterface fileUtilsInterface) {
+		SaxonTransformer saxonTransformer = new SaxonTransformer(fileUtilsInterface);
+		saxonTransformer.xslTransform(ddiUrlString, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
 	}
 
 	/**
@@ -94,12 +93,12 @@ public class DDIReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private static MetadataModel readVariables(Path variablesFilePath, FileUtilsInterface fileUtilsInterface)
+	private static MetadataModel readVariables(Path variablesFilePath)
 			throws KraftwerkException, SAXException, IOException, ParserConfigurationException {
 		MetadataModel metadataModel = new MetadataModel();
 
 		// Parse
-		Element root = readXmlFile(variablesFilePath, fileUtilsInterface);
+		Element root = readXmlFile(variablesFilePath);
 
 		// Get XML groups
 		NodeList groupElements = root.getChildNodes();
@@ -232,7 +231,7 @@ public class DDIReader {
 	private static boolean nodeIsElementWithName(Node groupNode, String name) {
 		return name.equals(groupNode.getNodeName()) && groupNode.getNodeType() == Node.ELEMENT_NODE;
 	}
-	private static Element readXmlFile(Path variablesFilePath, FileUtilsInterface fileUtilsInterface)
+	private static Element readXmlFile(Path variablesFilePath)
 			throws ParserConfigurationException, SAXException, IOException, KraftwerkException {
 		System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
 				"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
@@ -241,7 +240,7 @@ public class DDIReader {
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		try(InputStream inputStream = fileUtilsInterface.readFile(variablesFilePath.toString())){
+		try(InputStream inputStream = Files.newInputStream(variablesFilePath)){
 			Document document = builder.parse(inputStream);
 			if (document == null)
 				throw new KraftwerkException(500, "Can't read DDI - DDI is null");

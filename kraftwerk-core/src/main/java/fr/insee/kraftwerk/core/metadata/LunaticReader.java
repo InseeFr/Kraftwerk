@@ -3,7 +3,8 @@ package fr.insee.kraftwerk.core.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-import fr.insee.kraftwerk.core.utils.JsonFileReader;
+import fr.insee.kraftwerk.core.utils.JsonReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -38,9 +39,9 @@ public class LunaticReader {
 	 * @param lunaticFile Path to a lunatic questionnaire file.
 	 * @return A CalculatedVariables map.
 	 */
-	public static CalculatedVariables getCalculatedFromLunatic(Path lunaticFile) {
+	public static CalculatedVariables getCalculatedFromLunatic(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
 		try {
-			JsonNode rootNode = JsonFileReader.read(lunaticFile);
+			JsonNode rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			String lunaticModelVersion = rootNode.get(LUNATIC_MODEL_VERSION).asText();
 			boolean isLunaticV2 = compareVersions(lunaticModelVersion, "2.3.0") > 0;
 
@@ -76,9 +77,9 @@ public class LunaticReader {
 	 * @param lunaticFile Path to a lunatic questionnaire file.
 	 * @return A List of String.
 	 */
-	public static List<String> getMissingVariablesFromLunatic(Path lunaticFile) {
+	public static List<String> getMissingVariablesFromLunatic(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
 		try {
-			JsonNode rootNode = JsonFileReader.read(lunaticFile);
+			JsonNode rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			List<String> variables = new ArrayList<>();
 			List<String> varsEno = Arrays.asList(Constants.getEnoVariables());
 
@@ -100,9 +101,9 @@ public class LunaticReader {
 	 * @param lunaticFile Path to a lunatic questionnaire file.
 	 * @return A List of String.
 	 */
-	public static List<String> getFilterResultFromLunatic(Path lunaticFile) {
+	public static List<String> getFilterResultFromLunatic(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
 		try {
-			JsonNode rootNode = JsonFileReader.read(lunaticFile);
+			JsonNode rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			List<String> variables = new ArrayList<>();
 
 			JsonNode variablesNode = rootNode.get(VARIABLES);
@@ -115,9 +116,9 @@ public class LunaticReader {
 		}
 	}
 
-	public static String getLunaticModelVersion(Path lunaticFile){
+	public static String getLunaticModelVersion(Path lunaticFile, FileUtilsInterface fileUtilsInterface){
 		try {
-			JsonNode rootNode = JsonFileReader.read(lunaticFile);
+			JsonNode rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			return rootNode.get(LUNATIC_MODEL_VERSION).toString();
 
 		} catch (IOException e) {
@@ -133,10 +134,10 @@ public class LunaticReader {
 	 * @param lunaticFile : Path to a Lunatic specification file.
 	 * @return The variables found in the Lunatic specification.
 	 */
-	public static MetadataModel getMetadataFromLunatic(Path lunaticFile) {
+	public static MetadataModel getMetadataFromLunatic(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
 		JsonNode rootNode;
 		try {
-			rootNode = JsonFileReader.read(lunaticFile);
+			rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			List<String> variables = new ArrayList<>();
 			JsonNode variablesNode = rootNode.get(VARIABLES);
 			variablesNode.forEach(newVar -> variables.add(newVar.get("name").asText()));
@@ -405,10 +406,10 @@ public class LunaticReader {
 	 * @param lunaticFile : Path to a Lunatic specification file.
 	 * @return the questionnaire model id
 	 */
-	public static String getQuestionnaireModelId(Path lunaticFile) {
+	public static String getQuestionnaireModelId(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
 		JsonNode rootNode;
 		try {
-			rootNode = JsonFileReader.read(lunaticFile);
+			rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
 			return rootNode.get("id").asText();
 		} catch (IOException e) {
 			log.error(EXCEPTION_MESSAGE + lunaticFile);

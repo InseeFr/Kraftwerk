@@ -13,34 +13,33 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+@AllArgsConstructor
 public class SaxonTransformer {
+	private FileUtilsInterface fileUtilsInterface;
 
 	/**
 	 * XSL transformation method using Saxon.
 	 *
-	 * @param inputXmlURL   : URL of the XML input file
+	 * @param inputXmlPath   : Path of the XML input file
 	 * @param inputXslPath  : Path to the XSL file from the resources folder of the
 	 *                      application
 	 * @param outputXmlPath : Path to the XML output file which will be created
 	 */
-	public void xslTransform(URL inputXmlURL, String inputXslPath, Path outputXmlPath) {
-		log.info("About to transform the file from URL: " + inputXmlURL);
+	public void xslTransform(String inputXmlPath, String inputXslPath, Path outputXmlPath) {
+		log.info("About to transform the file: " + inputXmlPath);
 		log.info("using the XSL file " + inputXslPath);
 
 		// Get the XML input file
 		StreamSource xmlSource;
 		InputStream xmlInput;
-		try {
-			xmlInput = inputXmlURL.openStream();
-			xmlSource = new StreamSource(xmlInput);
-			xmlSource.setSystemId(inputXmlURL.toString());
-		} catch (IOException e) {
-			log.error(String.format("IOException when trying to read file from URL: %s", inputXmlURL), e);
-			return; // to break here if the xml input file is not found
-		}
+		xmlInput = fileUtilsInterface.readFile(inputXmlPath);
+		xmlSource = new StreamSource(xmlInput);
+		xmlSource.setSystemId(inputXmlPath);
 
 		// Get the XSL file
 		StreamSource xslSource;
@@ -86,13 +85,6 @@ public class SaxonTransformer {
 		log.info("About to transform the file " + inputXmlPath);
 		log.info("using the XSL file " + inputXslPath);
 
-		try {
-			URL inputXmlUrl = inputXmlPath.toUri().toURL();
-			xslTransform(inputXmlUrl, inputXslPath, outputXmlPath);
-		} catch (MalformedURLException e) {
-			log.error(String.format("Error when converting file path '%s' to an URL.", inputXmlPath), e);
-		}
-
+		xslTransform(inputXmlPath.toString(), inputXslPath, outputXmlPath);
 	}
-
 }

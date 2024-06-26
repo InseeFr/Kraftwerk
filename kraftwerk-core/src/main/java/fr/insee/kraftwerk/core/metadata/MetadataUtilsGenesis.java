@@ -34,12 +34,12 @@ public class MetadataUtilsGenesis {
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputsGenesis.getLunaticFile() != null) {
 			// First we add the collected _MISSING variables
-			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputsGenesis.getLunaticFile());
+			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputsGenesis.getLunaticFile(), fileUtilsInterface);
 			for (String missingVar : missingVars) {
 				addLunaticVariable(metadataModel, missingVar, Constants.MISSING_SUFFIX, VariableType.STRING);
 			}
 			// Then we add calculated FILTER_RESULT_ variables
-			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputsGenesis.getLunaticFile());
+			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputsGenesis.getLunaticFile(), fileUtilsInterface);
 			for (String filterResult : filterResults) {
 				addLunaticVariable(metadataModel, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
@@ -66,14 +66,14 @@ public class MetadataUtilsGenesis {
 		metadataModel.getVariables().putVariable(new Variable(missingVar, group, varType));
 	}
 
-	public static Map<String, MetadataModel> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap) {
+	public static Map<String, MetadataModel> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap, FileUtilsInterface fileUtilsInterface) {
 		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
-		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataModels));
+		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataModels, fileUtilsInterface));
 		return metadataModels;
 	}
 
-	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels ) {
-		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(modeInputs.getLunaticFile());
+	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
+		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(modeInputs.getLunaticFile(), fileUtilsInterface);
 		metadataModels.put(dataMode, metadataModel);
 	}
 }

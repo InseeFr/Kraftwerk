@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -305,5 +306,42 @@ class FileSystemImplTest {
         Files.deleteIfExists(inputDirectory2.resolve("test2.txt"));
         Files.deleteIfExists(inputDirectory.resolve("test1.txt"));
         Files.deleteIfExists(inputDirectory2);
+    }
+
+
+
+    @Test
+    void convertToPathTest_nullUserField() throws KraftwerkException {
+        Assertions.assertThat(fileSystemImpl.convertToPath(null,null)).isNull();
+    }
+
+    @Test
+    void convertToPathTest_directoryNotExists(){
+        Assert.assertThrows(KraftwerkException.class, () -> fileSystemImpl.convertToPath("test", Path.of("NOT SUPPOSED TO EXIST")));
+    }
+
+    @Test
+    void convertToPathTest() throws KraftwerkException {
+        //GIVEN
+        String campaignName = "convert_path";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN+THEN
+        Assertions.assertThat(fileSystemImpl.convertToPath("test.txt", inputDirectory)).exists();
+    }
+
+    @Test
+    void convertToURLTest_nullUserField(){
+        Assertions.assertThat(fileSystemImpl.convertToUrl(null,null)).isNull();
+    }
+
+    @Test
+    void convertToURLTest(){
+        //GIVEN
+        String campaignName = "convert_path";
+        Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);
+
+        //WHEN+THEN
+        Assertions.assertThat(fileSystemImpl.convertToUrl("test.txt", inputDirectory)).endsWith("test.txt");
     }
 }

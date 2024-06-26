@@ -45,7 +45,7 @@ class DDIReaderTest {
 				"SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1), fileUtilsInterface);
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_SIMPSONS_V1, fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -83,7 +83,7 @@ class DDIReaderTest {
 				"FEELCHAREV4", "LEAVDURATION11", "LEAVDURATION52", "NB_CHAR", "SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2), fileUtilsInterface);
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_SIMPSONS_V2, fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -111,7 +111,7 @@ class DDIReaderTest {
 				"RESIDM", "NHAB");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB), fileUtilsInterface);
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_VQS_WEB.toString(), fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);
@@ -151,7 +151,7 @@ class DDIReaderTest {
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP), fileUtilsInterface);
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_VQS_PAP, fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);

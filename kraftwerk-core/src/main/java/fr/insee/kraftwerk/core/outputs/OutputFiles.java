@@ -4,7 +4,6 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -41,9 +40,9 @@ public abstract class OutputFiles {
 		this.vtlBindings = vtlBindings;
 		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
-		createOutputFolder();
 		this.database = database;
 		this.fileUtilsInterface = fileUtilsInterface;
+		createOutputFolder();
 	}
 
 	/** Create output folder if doesn't exist. */

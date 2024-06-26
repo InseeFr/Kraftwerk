@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -94,7 +95,7 @@ public class MinioImpl implements FileUtilsInterface {
         try {
             ArrayList<String> filePaths = new ArrayList<>();
             Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder().bucket(bucketName).prefix(dir).recursive(true).build());
+                    ListObjectsArgs.builder().bucket(bucketName).prefix(dir.replace("\\","/")).recursive(true).build());
 
             for (Result<Item> result : results) {
                 filePaths.add(result.get().objectName());
@@ -108,7 +109,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public List<String> listFilePaths(String dir) {
-        return listFileNames(dir);
+        return listFileNames(dir.replace("\\","/"));
     }
 
     @Override
@@ -126,14 +127,14 @@ public class MinioImpl implements FileUtilsInterface {
         try {
             //List files of parent to check if directory
             Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder().bucket(bucketName).prefix(Path.of(path).getParent().toString()).recursive(true).build());
+                    ListObjectsArgs.builder().bucket(bucketName).prefix(Path.of(path).getParent().toString().replace("\\","/")).recursive(true).build());
 
             for (Result<Item> result : results) {
-                if(result.get().objectName().equals(Path.of(path).getFileName().toString())){
-                    return result.get().isDir();
+                if(result.get().objectName().startsWith(path)){
+                    return true;
                 }
             }
-            log.warn("S3 File or folder {} not found in {}", Path.of(path).getFileName().toString(), Path.of(path).getParent().toString());
+            log.warn("S3 File or folder {} not found in {}", Path.of(path).getFileName().toString().replace("\\","/"), Path.of(path).getParent().toString().replace("\\","/"));
             return null;
         } catch (Exception e) {
             log.error(e.toString());
@@ -144,7 +145,7 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public long getSizeOf(String path) {
         try {
-            StatObjectResponse objectStat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(path).build());
+            StatObjectResponse objectStat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(path.replace("\\","/")).build());
             return objectStat.size();
         }catch (Exception e){
             log.error(e.toString());
@@ -155,21 +156,21 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public void writeFile(String path, String toWrite, boolean replace) {
         InputStream inputStream = new ByteArrayInputStream(toWrite.getBytes());
-        writeFileOnMinio(path, inputStream, toWrite.length());
+        writeFileOnMinio(path.replace("\\","/"), inputStream, toWrite.length());
     }
 
     @Override
     public String findFile(String directory, String fileRegex) throws KraftwerkException {
-        try (Stream<String> files = listFileNames(directory).stream().filter(s -> s.matches(fileRegex))) {
+        try (Stream<String> files = listFileNames(directory.replace("\\","/")).stream().filter(s -> s.matches(fileRegex))) {
             return files.findFirst()
-                    .orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + directory));
+                    .orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + directory.replace("\\","/")));
         }
     }
 
     @Override
     public InputStream readFile(String minioPath) {
         try {
-            return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(minioPath).build());
+            return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(minioPath.replace("\\","/")).build());
         } catch (Exception e) {
             log.error(e.toString());
             return null;
@@ -179,7 +180,7 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public boolean isFileExists(String objectPath) {
         try {
-            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectPath).build());
+            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectPath.replace("\\","/")).build());
             return true;
         } catch (ErrorResponseException e) {
             return false;
@@ -192,19 +193,19 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public void moveFile(String srcMinioPath, String dstMinioPath) throws KraftwerkException {
         try {
-            copyFile(srcMinioPath, dstMinioPath);
+            copyFile(srcMinioPath.replace("\\","/"), dstMinioPath.replace("\\","/"));
             deleteFile(srcMinioPath);
         } catch (Exception e) {
-            throw new KraftwerkException(500, "Can't move file " + srcMinioPath + " to " + dstMinioPath);
+            throw new KraftwerkException(500, "Can't move file " + srcMinioPath.replace("\\","/") + " to " + dstMinioPath.replace("\\","/"));
         }
     }
 
     @Override
     public void moveFile(Path fileSystemPath, String dstMinioPath) throws KraftwerkException {
         try (InputStream inputStream = new FileInputStream(fileSystemPath.toFile())){
-            writeFileOnMinio(dstMinioPath, inputStream, Files.size(fileSystemPath));
+            writeFileOnMinio(dstMinioPath.replace("\\","/"), inputStream, Files.size(fileSystemPath));
         } catch (Exception e) {
-            throw new KraftwerkException(500, "Can't move file " + fileSystemPath + " to " + dstMinioPath);
+            throw new KraftwerkException(500, "Can't move file " + fileSystemPath + " to " + dstMinioPath.replace("\\","/"));
         }
         try {
             Files.deleteIfExists(fileSystemPath);
@@ -213,11 +214,41 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
+    @Override
+    public Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
+        if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
+            Path inputPath = inputDirectory.resolve(userField);
+            if (Boolean.FALSE.equals(isDirectory(inputPath.toString().replace("\\","/")))
+                || isDirectory(inputPath.toString().replace("\\","/")) == null
+            ) {
+                throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
+            }
+            return inputPath;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public String convertToUrl(String userField, Path inputDirectory) {
+        if (userField == null) {
+            return null;
+        }
+        try {
+            if (userField.startsWith("http")) {
+                return new URI(userField).toURL().toString();
+            }
+            return inputDirectory.resolve(userField).toString();
+        } catch (MalformedURLException | URISyntaxException e) {
+            return null;
+        }
+    }
+
     //Utilities
 
     private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize) {
         try {
-            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath).build());
+            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
         } catch (Exception e) {
             log.error(e.toString());
         }
@@ -225,7 +256,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     private void copyFile(String srcMinioPath, String dstMinioPath) {
         try {
-            CopySource copySource = CopySource.builder().bucket(bucketName).object(srcMinioPath).build();
+            CopySource copySource = CopySource.builder().bucket(bucketName).object(srcMinioPath.replace("\\","/")).build();
             minioClient.copyObject(CopyObjectArgs.builder().bucket(bucketName).object(dstMinioPath).source(copySource).build());
         } catch (Exception e) {
             log.error(e.toString());
@@ -234,7 +265,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     private void moveDirectory(String srcMinioPath, String dstMinioPath) {
         try {
-            for (String filePath : listFileNames(srcMinioPath)) {
+            for (String filePath : listFileNames(srcMinioPath.replace("\\","/"))) {
                 moveFile(filePath, dstMinioPath + "/" + extractFileName(filePath));
             }
         } catch (Exception e) {
@@ -246,12 +277,12 @@ public class MinioImpl implements FileUtilsInterface {
         if (filePath == null || filePath.isEmpty()) {
             return "";
         }
-        return Path.of(filePath).getFileName().toString();
+        return Path.of(filePath).getFileName().toString().replace("\\","/");
     }
 
     private void deleteFile(String minioPath) {
         try {
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(minioPath).build());
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(minioPath.replace("\\","/")).build());
         } catch (Exception e) {
             log.error(e.toString());
         }
@@ -276,7 +307,7 @@ public class MinioImpl implements FileUtilsInterface {
     private void archiveParadata(Path inputFolder, String campaignName, ModeInputs modeInputs){
         if (modeInputs.getParadataFolder() != null) {
             moveDirectory(modeInputs.getParadataFolder().toString(), inputFolder.resolve(ARCHIVE)
-                    .resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toString());
+                    .resolve(getRoot(modeInputs.getParadataFolder(), campaignName)).toString().replace("\\","/"));
         }
     }
 
@@ -286,7 +317,7 @@ public class MinioImpl implements FileUtilsInterface {
     private void archiveReportingData(Path inputFolder, String campaignName, ModeInputs modeInputs){
         if (modeInputs.getReportingDataFile() != null) {
             moveDirectory(modeInputs.getReportingDataFile().toString(), inputFolder.resolve(ARCHIVE)
-                    .resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toString());
+                    .resolve(getRoot(modeInputs.getReportingDataFile(), campaignName)).toString().replace("\\","/"));
         }
     }
 
@@ -300,6 +331,6 @@ public class MinioImpl implements FileUtilsInterface {
             result.append(sep).append(directory);
             sep = "/";
         }
-        return result.toString();
+        return result.toString().replace("\\","/");
     }
 }

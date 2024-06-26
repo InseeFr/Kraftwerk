@@ -6,12 +6,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,34 +36,11 @@ public interface FileUtilsInterface {
      * Change /some/path/in/campaign-name to /some/path/__other__/campaign-name
      */
     private static Path transformToOther(Path inDirectory, String other) {
-        return "in".equals(inDirectory.getFileName().toString()) ? inDirectory.getParent().resolve(other)
-                : transformToOther(inDirectory.getParent(), other).resolve(inDirectory.getFileName());
-    }
-
-    static Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
-        if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
-            Path inputPath = inputDirectory.resolve(userField);
-            if (!new File(inputPath.toUri()).exists()) {
-                throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
-            }
-            return inputPath;
-        } else {
-            return null;
+        if("in".equals(inDirectory.getFileName().toString()) && inDirectory.getParent() != null){
+            return inDirectory.getParent().resolve(other);
         }
-    }
-
-    static URL convertToUrl(String userField, Path inputDirectory) {
-        if (userField == null) {
-            return null;
-        }
-        try {
-            if (userField.startsWith("http")) {
-                return new URI(userField).toURL();
-            }
-            return inputDirectory.resolve(userField).toFile().toURI().toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
-            return null;
-        }
+        return "in".equals(inDirectory.getFileName().toString()) ? Path.of(other)
+            : transformToOther(inDirectory.getParent(), other).resolve(inDirectory.getFileName());
     }
 
     //Methods to implement
@@ -160,6 +132,8 @@ public interface FileUtilsInterface {
     long getSizeOf(String path);
 
     //Misc.
+    Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException;
+    String convertToUrl(String userField, Path inputDirectory);
     /**
      * Move the input file to another directory to archive it
      */

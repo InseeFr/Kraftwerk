@@ -23,7 +23,6 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Component
 public class MainProcessingGenesis {
 
 	@Setter
@@ -112,7 +110,7 @@ public class MainProcessingGenesis {
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory, database);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
 		}

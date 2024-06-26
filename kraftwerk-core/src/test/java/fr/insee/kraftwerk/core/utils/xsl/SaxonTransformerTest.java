@@ -21,7 +21,7 @@ class SaxonTransformerTest  {
         String inXmlFile = TestConstants.UNIT_TESTS_DIRECTORY + "/utils/xsl/note.xml";
         String outXmlFile = TestConstants.UNIT_TESTS_DUMP + "/xsl-output.xml";
         //
-        SaxonTransformer saxonTransformer = new SaxonTransformer();
+        SaxonTransformer saxonTransformer = new SaxonTransformer(fileUtilsInterface);
         saxonTransformer.xslTransform(Path.of(inXmlFile), xsltTestScript,Path.of(outXmlFile));
         //
         String inContent = TextFileReader.readFromPath(Path.of(inXmlFile), fileUtilsInterface);

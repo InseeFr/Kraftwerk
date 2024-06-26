@@ -29,7 +29,7 @@ class UserInputsFileTest {
 	@Test
 	void testReadValidUserInput_singleMode() throws KraftwerkException {
 		UserInputsFile userInputsFile = new UserInputsFile(
-				inputSamplesDirectory.resolve("kraftwerk.json"),
+				inputSamplesDirectory.resolve("inputs_valid.json"),
 				inputSamplesDirectory, fileUtilsInterface);
 		//
 		ModeInputs modeInputs = userInputsFile.getModeInputs("CAPI");

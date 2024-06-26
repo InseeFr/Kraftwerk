@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -27,7 +26,7 @@ public class ControlInputSequence {
 	}
 
 	public Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
-		Path inDirectory = Paths.get(inDirectoryParam);
+		Path inDirectory = Path.of(inDirectoryParam);
 		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
 		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
 		return inDirectory;

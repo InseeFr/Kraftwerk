@@ -43,8 +43,8 @@ public class DDIGetterDefinitions {
 		tempFile.deleteOnExit();
 		Path tempPath = Paths.get(tempFile.getAbsolutePath());
 		URL url = new URI(linkDDI).toURL();
-		SaxonTransformer transformer = new SaxonTransformer();
-		transformer.xslTransform(url, Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
+		SaxonTransformer transformer = new SaxonTransformer(new FileSystemImpl());
+		transformer.xslTransform(url.toString(), Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
 
 		actualString = TextFileReader.readFromPath(tempPath, new FileSystemImpl());
     	

@@ -21,7 +21,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.nio.file.Path;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class BuildBindingsSequenceGenesis {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database) throws KraftwerkException, NullException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws KraftwerkException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -91,7 +90,7 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException, NullException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
 		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
 			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());

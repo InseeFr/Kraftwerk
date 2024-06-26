@@ -62,7 +62,7 @@ public class LunaticXmlDataParser extends DataParser {
 					.getChildElements("SurveyUnit");
 			String questionnaireModelId = null;
 			if (lunaticFile != null) {
-				questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile);
+				questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile, fileUtilsInterface);
 			}
 
 			for (int i = 0; i < questionnaireNodeList.size(); i++) {

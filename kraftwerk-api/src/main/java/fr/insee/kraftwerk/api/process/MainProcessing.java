@@ -117,7 +117,7 @@ public class MainProcessing {
 
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 
-		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap());
+		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 
 		userInputsFileList = getUserInputsFile(userInputsFile, fileByFile);
 

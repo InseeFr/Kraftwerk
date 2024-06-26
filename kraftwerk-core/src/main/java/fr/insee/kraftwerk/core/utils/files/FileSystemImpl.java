@@ -185,6 +185,34 @@ public class FileSystemImpl implements FileUtilsInterface{
 		moveFile(fileSystemPath.toString(), dstPath);
 	}
 
+	@Override
+	public Path convertToPath(String userField, Path inputDirectory) throws KraftwerkException {
+		if (userField != null && !"null".equals(userField) && !userField.isEmpty()) {
+			Path inputPath = inputDirectory.resolve(userField);
+			if (!new File(inputPath.toUri()).exists()) {
+				throw new KraftwerkException(400, String.format("The input folder \"%s\" does not exist in \"%s\".", userField, inputDirectory));
+			}
+			return inputPath;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public String convertToUrl(String userField, Path inputDirectory) {
+		if (userField == null) {
+			return null;
+		}
+		try {
+			if (userField.startsWith("http")) {
+				return new URI(userField).toURL().toString();
+			}
+			return inputDirectory.resolve(userField).toFile().toString();
+		} catch (MalformedURLException | URISyntaxException e) {
+			return null;
+		}
+	}
+
 	// Utilities
 
 	/**

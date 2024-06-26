@@ -65,7 +65,7 @@ public class CalculatedProcessingDefinition {
         this.dataMode = dataMode;
         //
         metadataModel = DDIReader.getMetadataFromDDI(
-                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")), new FileSystemImpl());
+                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")).toString(), new FileSystemImpl());
         //
         SurveyRawData data = new SurveyRawData();
         data.setMetadataModel(metadataModel);
@@ -80,7 +80,7 @@ public class CalculatedProcessingDefinition {
     public void readCampaignData() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")));
+                Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")), new FileSystemImpl());
         DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl());
         calculatedProcessing.applyVtlTransformations("TEST", null,errors);
         //

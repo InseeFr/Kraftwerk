@@ -32,7 +32,7 @@ public class VariablesGetterDefinitions {
 
     @When("I try to collect the variables's infos")
     public void collect_variables() throws KraftwerkException {
-		metadataModel = DDIReader.getMetadataFromDDI(linkDDI, new FileSystemImpl());
+		metadataModel = DDIReader.getMetadataFromDDI(linkDDI.toString(), new FileSystemImpl());
     }
 
     @Then("The variables I try to count should answer {int} and have {string} in it")
