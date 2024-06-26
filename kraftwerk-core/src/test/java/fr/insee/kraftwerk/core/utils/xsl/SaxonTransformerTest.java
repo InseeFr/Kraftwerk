@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.utils.xsl;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 
@@ -16,7 +17,7 @@ class SaxonTransformerTest  {
     FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @Test
-    void applyXsltScript(){
+    void applyXsltScript() throws IOException {
         String xsltTestScript = TestConstants.UNIT_TESTS_DIRECTORY + "/utils/xsl/do-nothing.xsl";
         String inXmlFile = TestConstants.UNIT_TESTS_DIRECTORY + "/utils/xsl/note.xml";
         String outXmlFile = TestConstants.UNIT_TESTS_DUMP + "/xsl-output.xml";

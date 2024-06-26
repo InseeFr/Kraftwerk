@@ -77,7 +77,7 @@ public class DDIReader {
 	 * @param ddiUrlString            : URL of the DDI file.
 	 * @param variablesFilePath : Path of the 'variables.xml' file to be generated.
 	 */
-	private static void transformDDI(String ddiUrlString, Path variablesFilePath, FileUtilsInterface fileUtilsInterface) {
+	private static void transformDDI(String ddiUrlString, Path variablesFilePath, FileUtilsInterface fileUtilsInterface) throws IOException {
 		SaxonTransformer saxonTransformer = new SaxonTransformer(fileUtilsInterface);
 		saxonTransformer.xslTransform(ddiUrlString, Constants.XSLT_STRUCTURED_VARIABLES, variablesFilePath);
 	}

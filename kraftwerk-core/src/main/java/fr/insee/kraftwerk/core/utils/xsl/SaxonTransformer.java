@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.utils.xsl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -30,14 +31,18 @@ public class SaxonTransformer {
 	 *                      application
 	 * @param outputXmlPath : Path to the XML output file which will be created
 	 */
-	public void xslTransform(String inputXmlPath, String inputXslPath, Path outputXmlPath) {
+	public void xslTransform(String inputXmlPath, String inputXslPath, Path outputXmlPath) throws IOException {
 		log.info("About to transform the file: " + inputXmlPath);
 		log.info("using the XSL file " + inputXslPath);
 
 		// Get the XML input file
 		StreamSource xmlSource;
 		InputStream xmlInput;
-		xmlInput = fileUtilsInterface.readFile(inputXmlPath);
+		if(inputXmlPath.startsWith("http")){
+			xmlInput = URI.create(inputXmlPath).toURL().openStream();
+		}else{
+			xmlInput = fileUtilsInterface.readFile(inputXmlPath);
+		}
 		xmlSource = new StreamSource(xmlInput);
 		xmlSource.setSystemId(inputXmlPath);
 
@@ -81,7 +86,7 @@ public class SaxonTransformer {
 	 *                      application
 	 * @param outputXmlPath : Path to the XML output file which will be created
 	 */
-	public void xslTransform(Path inputXmlPath, String inputXslPath, Path outputXmlPath) {
+	public void xslTransform(Path inputXmlPath, String inputXslPath, Path outputXmlPath) throws IOException {
 		log.info("About to transform the file " + inputXmlPath);
 		log.info("using the XSL file " + inputXslPath);
 
