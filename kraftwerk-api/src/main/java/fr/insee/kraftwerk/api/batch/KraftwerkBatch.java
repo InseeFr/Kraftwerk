@@ -92,10 +92,10 @@ public class KraftwerkBatch implements CommandLineRunner {
             throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 4 !".formatted(args.length));
         }
         if(!args[1].equals("true") && !args[1].equals("false")){
-            throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument !");
+            throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
         }
         if(!args[2].equals("true") && !args[2].equals("false")){
-            throw new IllegalArgumentException("Invalid withAllReportingData boolean argument !");
+            throw new IllegalArgumentException("Invalid withAllReportingData boolean argument ! %s".formatted(args[2]));
         }
     }
 }
