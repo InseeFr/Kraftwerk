@@ -58,6 +58,10 @@ public class KraftwerkService {
 		if(minioConfig.isEnable()){
 			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+			//Replace default directory if using MinIO
+			if(minioConfig.isEnable()){
+				defaultDirectory = "";
+			}
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
 		}
