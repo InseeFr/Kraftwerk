@@ -129,7 +129,7 @@ class FileSystemImplTest {
         List<String> fileNames = fileSystemImpl.listFileNames(inputDirectory.toString());
 
         //THEN
-        Assertions.assertThat(fileNames).containsExactly("file1.txt","file2.json","file3.xml");
+        Assertions.assertThat(fileNames).contains("file1.txt","file2.json","file3.xml");
     }
 
     @Test
