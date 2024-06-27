@@ -61,11 +61,6 @@ public class KraftwerkBatch implements CommandLineRunner {
                 archiveAtEnd = false;
             }
 
-            //Replace default directory if using MinIO
-            if(minioConfig.isEnable()){
-                defaultDirectory = "";
-            }
-
 
             //Run kraftwerk
             if(kraftwerkServiceType == KraftwerkServiceType.GENESIS){
