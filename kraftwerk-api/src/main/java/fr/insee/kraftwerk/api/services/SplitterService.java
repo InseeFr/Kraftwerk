@@ -42,11 +42,6 @@ public class SplitterService extends KraftwerkService{
 				new MinioImpl(MinioClient.builder().credentials(minioConfig.getAccessKey(),minioConfig.getSecretKey()).endpoint(minioConfig.getEndpoint()).build(), minioConfig.getBucketName()) :
 				new FileSystemImpl();
 
-		if(fileSystemType.equals(FileSystemType.MINIO)){
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
-		}
-
 		XmlSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU, fileUtilsInterface);
 		return new ResponseEntity<>("File split", HttpStatus.OK);
 	}

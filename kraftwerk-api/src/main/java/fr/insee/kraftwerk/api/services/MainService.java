@@ -48,8 +48,6 @@ public class MainService extends KraftwerkService {
 		if(minioConfig != null && minioConfig.isEnable()){
 			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 			useMinio = true;
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
 		}
 	}
 
@@ -65,8 +63,6 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
 		}
@@ -96,8 +92,6 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
 		}
@@ -126,8 +120,6 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
 		}
@@ -151,8 +143,6 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-			//Replace default directory if using MinIO
-			defaultDirectory = "";
 		}else{
 			fileUtilsInterface = new FileSystemImpl();
 		}
