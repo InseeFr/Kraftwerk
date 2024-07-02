@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqModality;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -13,8 +14,8 @@ import java.util.List;
  */
 public class PaperDataProcessing extends UnimodalDataProcessing {
 
-    public PaperDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel) {
-        super(vtlBindings, metadataModel);
+    public PaperDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, metadataModel, fileUtilsInterface);
     }
 
     @Override

@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,6 +27,12 @@ public class ParadataParser {
 
 	private final List<String> inputFields = Arrays.asList("RADIO", "CHECKBOX", "INPUT", "DATEPICKER");
 
+	private final FileUtilsInterface fileUtilsInterface;
+
+	public ParadataParser(FileUtilsInterface fileUtilsInterface) {
+		this.fileUtilsInterface = fileUtilsInterface;
+	}
+
 	public void parseParadata(Paradata paradata, SurveyRawData surveyRawData) throws NullException {
 
 		log.info("Paradata parser being implemented for Survey Unit : {} !",
@@ -35,32 +42,25 @@ public class ParadataParser {
 			throw new NullException("JSONFile not defined");
 
 		if (!filePath.toString().contentEquals("")) {
-
+			// Parse each ParaDataUE
+			List<ParaDataUE> listParaDataUE = new ArrayList<>();
 			// Get all filepaths for each ParadataUE
-			try (Stream<Path> walk = Files.walk(filePath)) {
-				List<Path> listFilePaths = walk.filter(Files::isRegularFile)
-						.filter(file -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(file))).toList();
-				// Parse each ParaDataUE
-				List<ParaDataUE> listParaDataUE = new ArrayList<>();
-
-				for (Path fileParaDataPath : listFilePaths) {
-					ParaDataUE paraDataUE = new ParaDataUE();
-					paraDataUE.setFilepath(fileParaDataPath);
-					parseParadataUE(paraDataUE, surveyRawData);
-					paraDataUE.sortEvents();
-					paraDataUE.setSurveyValidationDateTimeStamp(Constants.PARADATA_SURVEY_VALIDATION_EVENT_NAME);
-					if (paraDataUE.getEvents().size() > 2) {
-						paraDataUE.createOrchestratorsAndSessions();
-						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
-						listParaDataUE.add(paraDataUE);
-					}
+			for(String fileParaDataPath : fileUtilsInterface.listFilePaths(filePath.toString()).stream().filter(
+					s -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(Path.of(s)))
+			).toList()){
+				ParaDataUE paraDataUE = new ParaDataUE();
+				paraDataUE.setFilepath(Path.of(fileParaDataPath));
+				parseParadataUE(paraDataUE, surveyRawData);
+				paraDataUE.sortEvents();
+				paraDataUE.setSurveyValidationDateTimeStamp(Constants.PARADATA_SURVEY_VALIDATION_EVENT_NAME);
+				if (paraDataUE.getEvents().size() > 2) {
+					paraDataUE.createOrchestratorsAndSessions();
+					integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
+					listParaDataUE.add(paraDataUE);
 				}
-				paradata.setListParadataUE(listParaDataUE);
-			} catch (Exception e) {
-				log.error(e.getMessage());
 			}
+			paradata.setListParadataUE(listParaDataUE);
 		}
-
 	}
 
 	private String getIdFromFilename(Path file) {
@@ -134,7 +134,7 @@ public class ParadataParser {
 		Path filePath = paradataUE.getFilepath();
 		JSONObject jsonObject;
 		try {
-			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
+			jsonObject = (JSONObject) Constants.readJsonSimple(filePath, fileUtilsInterface);
 		} catch (Exception e) {
 			throw new NullException("Can't read JSON file - " + e.getClass() + " " + e.getMessage());
 		}

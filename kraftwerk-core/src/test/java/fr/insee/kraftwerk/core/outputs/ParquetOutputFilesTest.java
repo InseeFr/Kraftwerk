@@ -1,30 +1,32 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import com.opencsv.exceptions.CsvException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.Group;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +35,15 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@TestMethodOrder(OrderAnnotation.class)
 class ParquetOutputFilesTest {
 
 	private static UserInputsFile testUserInputs;
 	private static ParquetOutputFiles outputFiles;
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private static Statement testDatabase;
 
 
-	Dataset testDataset = new InMemoryDataset(
+	static Dataset testDataset = new InMemoryDataset(
 			List.of(
 					List.of("T01", "01", "foo11", 11L),
 					List.of("T01", "02", "foo12", 12L),
@@ -54,14 +57,14 @@ class ParquetOutputFilesTest {
 			)
 	);
 
-	@Test
-	@Order(1)
-	void createInstance() {
+	@BeforeAll
+    static void createInstance() throws SQLException {
+		testDatabase = SqlUtils.openConnection().createStatement();
 		assertDoesNotThrow(() -> {
 			//
 			testUserInputs = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"), fileUtilsInterface);
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
@@ -72,12 +75,12 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("LOOP", testDataset);
 			vtlBindings.put("FROM_USER", testDataset);
 			//
-			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes());
+			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase);
+			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase, fileUtilsInterface);
 		});
 	}
 
 	@Test
-	@Order(2)
 	void testGetDatasetOutputNames() {
 		//
 		Set<String> outputDatasetNames = outputFiles.getDatasetToCreate();
@@ -92,12 +95,11 @@ class ParquetOutputFilesTest {
 
 	
 	@Test
-	@Order(3)
-	void writeParquetFromDatasetTest() throws IOException, CsvException {
+	void writeParquetFromDatasetTest() throws KraftwerkException {
 
 		// Clean the existing file
 //		Files.deleteIfExists(outputFiles.getOutputFolder());
-		FileUtils.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+		fileUtilsInterface.createDirectoryIfNotExist(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metMod = new MetadataModel();
@@ -108,28 +110,16 @@ class ParquetOutputFilesTest {
 		metMod.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
 		metaModels.put("test",metMod);
 
-		assertDoesNotThrow(() -> {outputFiles.writeOutputTables(metaModels);});
+		outputFiles.writeOutputTables(metaModels);
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.getAllOutputFileNames("RACINE").getFirst());
 		racinePath = racinePath.resolveSibling(racinePath.getFileName()+".parquet");
 		File f = racinePath.toFile();
 		Assertions.assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());
-
 	}
-	
-	
-	
-	
-	
 
-	
-	boolean deleteDirectory(File directoryToBeDeleted) {
-	    File[] allContents = directoryToBeDeleted.listFiles();
-	    if (allContents != null) {
-	        for (File file : allContents) {
-	            deleteDirectory(file);
-	        }
-	    }
-	    return directoryToBeDeleted.delete();
+	@AfterAll
+    static void closeConnection() throws SQLException {
+		testDatabase.getConnection().close();
 	}
 }

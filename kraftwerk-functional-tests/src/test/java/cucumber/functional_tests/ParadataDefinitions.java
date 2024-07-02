@@ -13,6 +13,8 @@ import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,21 +35,22 @@ public class ParadataDefinitions {
 	String userInputFileName = Constants.USER_INPUT_FILE;
 	ModeInputs modeInputs;
 	private ControlInputSequence controlInputSequence;
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Given("We read data from input named {string}")
 	public void launch_all_steps(String campaignName) throws KraftwerkException {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
-		controlInputSequence = new ControlInputSequence(campaignDirectory.toString());
-		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory);
+		controlInputSequence = new ControlInputSequence(campaignDirectory.toString(), new FileSystemImpl());
+		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory, fileUtilsInterface);
 		// For now, only one file
 		String modeName = userInputs.getModes().getFirst();
 		modeInputs = userInputs.getModeInputs(modeName);
 		// parse data
 		data = new SurveyRawData();
 		data.setDataMode(modeInputs.getDataMode());
-		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl()));
-		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface));
+		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data, fileUtilsInterface);
 		parser.parseSurveyData(modeInputs.getDataFile(),null);
 		// get paradata folder
 		paradataFolder = modeInputs.getParadataFolder();
@@ -57,7 +60,7 @@ public class ParadataDefinitions {
 	public void collect_paradata_test() throws NullException {
 		if (modeInputs.getParadataFolder() != null
 				&& !modeInputs.getParadataFolder().toString().contentEquals("")) {
-			ParadataParser paraDataParser = new ParadataParser();
+			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			paradata = new Paradata(paradataFolder);
 			paraDataParser.parseParadata(paradata, data);
 			paradata.getListParadataUE().get(0).getEvents().stream().forEach(e -> log.debug(e.getTimestamp() + ","+ e.getIdParadataObject()));

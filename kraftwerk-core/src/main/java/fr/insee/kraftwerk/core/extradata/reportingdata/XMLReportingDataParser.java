@@ -3,7 +3,8 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.XmlFileReader;
+import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -17,8 +18,12 @@ import java.util.List;
 public class XMLReportingDataParser extends ReportingDataParser {
  
   private Document document;
-  
-  public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
+
+    public XMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+        super(fileUtilsInterface);
+    }
+
+    public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
     Path filePath = reportingData.getFilepath();
     readFile(filePath);
 	Element root;
@@ -98,13 +103,13 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
 		  reportingData.addReportingDataUE(reportingDataUE);
 	  }
-    integrateReportingDataIntoUE(data, reportingData, withAllReportingData);
+    integrateReportingDataIntoUE(data, reportingData, withAllReportingData, fileUtilsInterface);
     this.document = null;
   }
 
 
   private void readFile(Path filePath) {
-    XmlFileReader xmlFileReader = new XmlFileReader();
+    XmlFileReader xmlFileReader = new XmlFileReader(fileUtilsInterface);
     this.document = xmlFileReader.readXmlFile(filePath);
     if (this.document != null) {
       log.info("Successfully parsed Coleman/Moog answers file: " + filePath);

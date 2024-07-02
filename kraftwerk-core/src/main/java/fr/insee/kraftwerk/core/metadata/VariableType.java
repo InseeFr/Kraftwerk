@@ -8,25 +8,27 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  * Enum class for variable types.
- *
- *  */
+ */
 @Log4j2
 @Getter
 public enum VariableType {
-	STRING ("character","character", "STRING"),
-	INTEGER ("integer","integer", "INTEGER"),
-	NUMBER ("number","numeric", "NUMBER"),
-	BOOLEAN ("logical","logical", "BOOLEAN"),
-	DATE ("Date","Date", "STRING");
+	STRING ("character","character", "STRING", "VARCHAR"),
+	INTEGER ("integer","integer", "INTEGER", "BIGINT"),
+	NUMBER ("number","numeric", "NUMBER", "DOUBLE"),
+	BOOLEAN ("logical","logical", "BOOLEAN", "BOOLEAN"),
+	DATE ("Date","Date", "STRING", "DATE");
 	
-	private String dataTableType;
-	private String formatR;
-	private String vtlType;	
+	private final String dataTableType;
+	private final String formatR;
+	private final String vtlType;
+	private final String sqlType;
+
 	
-	VariableType(String dataTableType,String formatR, String vtlType) {
+	VariableType(String dataTableType,String formatR, String vtlType, String sqlType) {
 		this.dataTableType =dataTableType;
 		this.formatR=formatR;
 		this.vtlType=vtlType;
+		this.sqlType=sqlType;
 	}
 
 	public static VariableType getTypeFromJavaClass(Class<?> clazz){

@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ParaDataParserTest {
 
-	ParadataParser paradataParser = new ParadataParser();
+	ParadataParser paradataParser = new ParadataParser(new FileSystemImpl());
 
 	@Test
 	void catchExceptionAndErrors() {

@@ -2,6 +2,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -16,7 +18,7 @@ import java.util.Map;
 import static org.junit.Assert.assertNotNull;
 
 class PaperDataProcessingTest {
-
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 	Dataset paperDataset = new InMemoryDataset(
 			List.of(
 					// Correct answers
@@ -70,7 +72,7 @@ class PaperDataProcessingTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", paperDataset);
 		//
-		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, metadataModel);
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
 		paperDataProcessing.applyAutomatedVtlInstructions("TEST", errors);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");

@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
@@ -36,14 +37,16 @@ public class VtlExecute {
     private final ObjectMapper mapper;
     /** Engine that will execute VTL instructions */
     private final ScriptEngine engine;
+    private final FileUtilsInterface fileUtilsInterface;
 
 
-    public VtlExecute(){
+    public VtlExecute(FileUtilsInterface fileUtilsInterface){
         mapper = new ObjectMapper();
         mapper.registerModule(new TrevasModule());
         // Engine
         engine = new ScriptEngineManager()
                 .getEngineByName("vtl");
+        this.fileUtilsInterface = fileUtilsInterface;
     }
     
     /**
@@ -118,12 +121,12 @@ public class VtlExecute {
      * @param jsonOutFile Path to write the output json file.
      * */
     public void writeJsonDataset(String bindingName, Path jsonOutFile, VtlBindings bindings) {
-    	FileUtils.createDirectoryIfNotExist(jsonOutFile.getParent());
+    	fileUtilsInterface.createDirectoryIfNotExist(jsonOutFile.getParent());
     	
     	//Write file    	
         if (bindings.containsKey(bindingName)) {
             try {
-                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)));
+                TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)), fileUtilsInterface);
             } catch (JsonProcessingException e) {
                 log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
             }

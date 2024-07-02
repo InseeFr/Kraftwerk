@@ -7,12 +7,13 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +22,41 @@ import java.util.Map;
 @NoArgsConstructor
 public class WriterSequence {
 
-	public void writeOutputFiles(Path inDirectory,LocalDateTime executionDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) throws KraftwerkException {
-		writeOutputFiles(inDirectory,executionDateTime,vtlBindings,modeInputsMap,metadataModels,errors,null);
+	public void writeOutputFiles(Path inDirectory,
+								 LocalDateTime executionDateTime,
+								 VtlBindings vtlBindings,
+								 Map<String, ModeInputs> modeInputsMap,
+								 Map<String, MetadataModel> metadataModels,
+								 List<KraftwerkError> errors, Statement database,
+								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
+
+		writeOutputFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, null, database, fileUtilsInterface);
+		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, database, fileUtilsInterface);
 	}
 
-	public void writeOutputFiles(Path inDirectory, LocalDateTime localDateTime, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
-		Path outDirectory = FileUtils.transformToOut(inDirectory,localDateTime);
+	public void writeOutputFiles(Path inDirectory,
+								 LocalDateTime localDateTime,
+								 VtlBindings vtlBindings,
+								 Map<String, ModeInputs> modeInputsMap,
+								 Map<String, MetadataModel> metadataModels,
+								 List<KraftwerkError> errors,
+								 KraftwerkExecutionLog kraftwerkExecutionLog,
+								 Statement databaseConnection,
+								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,localDateTime);
 		/* Step 4.1 : write csv output tables */
-		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()),kraftwerkExecutionLog);
+		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog, new ArrayList<>(modeInputsMap.keySet()), databaseConnection, fileUtilsInterface);
 		csvOutputFiles.writeOutputTables(metadataModels);
-
 		/* Step 4.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, errors);
-		
-		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()));
+	}
+
+	//Write Parquet
+	private void writeParquetFiles(Path outDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, Statement databaseConnection, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		/* Step 4.3 : write parquet output tables */
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), databaseConnection, fileUtilsInterface);
 		parquetOutputFiles.writeOutputTables(metadataModels);
 		parquetOutputFiles.writeImportScripts(metadataModels, errors);
-
 	}
 }

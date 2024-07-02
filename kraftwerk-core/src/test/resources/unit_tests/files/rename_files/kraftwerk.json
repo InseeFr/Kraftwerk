@@ -1,0 +1,24 @@
+{
+  
+  "survey_data": [
+    {
+      "data_mode": "CAPI",
+	  "data_file": "sample_files_to_get/data.xml",
+	  "DDI_file": "sample_files_to_get/ddi.xml",
+	  "data_format": "LUNATIC_XML",
+      "lunatic_file": "sample_files_to_get/lunatic.json",
+	  "paradata_folder": "",
+	  "reporting_data_file": "sample_files_to_get/reportingdata.xml",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}

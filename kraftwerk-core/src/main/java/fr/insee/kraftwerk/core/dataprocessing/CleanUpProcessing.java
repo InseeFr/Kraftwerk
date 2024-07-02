@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.PaperUcq;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -24,8 +25,8 @@ public class CleanUpProcessing extends DataProcessing {
 
     private Map<String, MetadataModel> metadataModels;
 
-    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels) {
-        super(vtlBindings);
+    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
         this.metadataModels=metadataModels;
     }
 

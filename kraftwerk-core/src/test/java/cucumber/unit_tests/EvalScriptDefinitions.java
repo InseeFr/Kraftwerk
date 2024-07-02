@@ -8,6 +8,7 @@ import java.util.List;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
@@ -18,7 +19,7 @@ import io.cucumber.java.en.When;
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
-	VtlExecute vtlExecute = new VtlExecute();
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() throws Exception {

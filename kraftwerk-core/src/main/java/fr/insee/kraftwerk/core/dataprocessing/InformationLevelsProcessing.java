@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -15,8 +16,8 @@ import java.util.Set;
  */
 public class InformationLevelsProcessing extends DataProcessing {
 
-    public InformationLevelsProcessing(VtlBindings vtlBindings) {
-        super(vtlBindings);
+    public InformationLevelsProcessing(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
     }
 
     @Override

@@ -3,6 +3,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CleanUpProcessingTest {
+
+    FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     Dataset cawiDataset = new InMemoryDataset(
             List.of(
@@ -95,7 +99,7 @@ class CleanUpProcessingTest {
         vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
-        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadatas);
+        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadatas, fileUtilsInterface);
         cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,errors);
 
         // Are paper indicator variables removed in VTL multimode dataset ?

@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -9,8 +10,8 @@ public class GroupProcessing extends DataProcessing{
 
 	private MetadataModel metadataModel;
 	
-    public GroupProcessing(VtlBindings vtlBindings, MetadataModel metadataModel) {
-        super(vtlBindings);
+    public GroupProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
         this.metadataModel = metadataModel;
     }
 

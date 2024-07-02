@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -16,7 +15,7 @@ import java.nio.file.Path;
 public class ModeInputs {
 
     protected Path dataFile;
-    protected URL ddiUrl;
+    protected String ddiUrl;
     protected Path lunaticFile;
     protected DataFormat dataFormat;
     protected String dataMode;

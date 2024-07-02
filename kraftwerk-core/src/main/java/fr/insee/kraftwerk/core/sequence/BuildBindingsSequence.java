@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
@@ -12,6 +13,7 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
@@ -24,13 +26,15 @@ public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
 	private final boolean withAllReportingData;
+	private final FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequence(boolean withAllReportingData) {
-		vtlExecute = new VtlExecute();
+	public BuildBindingsSequence(boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
+		vtlExecute = new VtlExecute(fileUtilsInterface);
 		this.withAllReportingData = withAllReportingData;
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
@@ -39,7 +43,7 @@ public class BuildBindingsSequence {
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		data.setDataFilePath(modeInputs.getDataFile());
-		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data);
+		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data, fileUtilsInterface);
 		log.info("Parsing survey data file " + modeInputs.getDataFile().getFileName());
 		if (withDDI) {
 			parser.parseSurveyData(modeInputs.getDataFile(),kraftwerkExecutionLog);
@@ -61,22 +65,22 @@ public class BuildBindingsSequence {
 	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
 		Path paraDataFolder = modeInputs.getParadataFolder();
 		if (paraDataFolder != null) {
-			ParadataParser paraDataParser = new ParadataParser();
+			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataFolder);
 			paraDataParser.parseParadata(paraData, data);
 		}
 	}
 
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws NullException {
+	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
 		Path reportingDataFile = modeInputs.getReportingDataFile();
 		if (reportingDataFile != null) {
 			ReportingData reportingData = new ReportingData(reportingDataFile);
 			if (reportingDataFile.toString().contains(".xml")) {
-				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
 
 			} else if (reportingDataFile.toString().contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
+					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
 			}
 		}

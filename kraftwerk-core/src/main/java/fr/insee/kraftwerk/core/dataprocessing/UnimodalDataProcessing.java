@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -11,8 +12,8 @@ public abstract class UnimodalDataProcessing extends DataProcessing {
 	
 	protected MetadataModel metadataModel;
 
-    protected UnimodalDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel){
-        super(vtlBindings);
+    protected UnimodalDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface){
+        super(vtlBindings, fileUtilsInterface);
         this.metadataModel = metadataModel;
     }
 

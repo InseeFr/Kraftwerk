@@ -1,25 +1,34 @@
 package fr.insee.kraftwerk.api.services;
 
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,18 +38,41 @@ import java.util.Map;
 
 @RestController
 @Tag(name = "${tag.stepbystep}")
+@Slf4j
 public class StepByStepService extends KraftwerkService {
+	MinioClient minioClient;
+	boolean useMinio;
+
+	@Autowired
+	public StepByStepService(MinioConfig minioConfig) {
+		super(minioConfig);
+		useMinio = false;
+		if(minioConfig == null){
+			log.warn("Minio config null !");
+		}
+		if(minioConfig != null && minioConfig.isEnable()){
+			minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+			useMinio = true;
+		}
+    }
 
 	@PutMapping(value = "/buildVtlBindings")
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -48,13 +80,13 @@ public class StepByStepService extends KraftwerkService {
 		}
 				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
-			try {
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null );
-			} catch (NullException e) {
+			try{
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null);
+			} catch (KraftwerkException e){
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 
@@ -73,11 +105,18 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize);
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -85,14 +124,14 @@ public class StepByStepService extends KraftwerkService {
 		}
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		try {
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null);
-		} catch (NullException e) {
+		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+
+        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
@@ -107,6 +146,13 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
 		//Read data in JSON file
 		Path inDirectory;
 		try {
@@ -116,26 +162,26 @@ public class StepByStepService extends KraftwerkService {
 		}
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		VtlBindings vtlBindings = new VtlBindings();
 		List<KraftwerkError> errors = new ArrayList<>();
 
-		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
-		vtlReaderSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
+		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+		vtlReaderSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		
 		//Process
 		UnimodalSequence unimodal = new UnimodalSequence();
-		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap);
+		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 		
 		//Write technical outputs
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -148,6 +194,13 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
 		//Read data in JSON file
 		Path inDirectory;
 		try {
@@ -157,32 +210,36 @@ public class StepByStepService extends KraftwerkService {
 		}
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		List<KraftwerkError> errors = new ArrayList<>();
 
 
-		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence();
+		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
-			vtlReaderWriterSequence.readDataset(FileUtils.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
+			vtlReaderWriterSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.UNIMODAL_PROCESSING, vtlBindings);
 		}
 
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 
 		//Process
-		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap);
+		try(Connection database = SqlUtils.openConnection()) {
+			MultimodalSequence multimodalSequence = new MultimodalSequence();
+			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, database.createStatement(), fileUtilsInterface);
+		}catch (SQLException e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors);
+		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), errors, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -193,7 +250,14 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
-			) throws KraftwerkException {
+			) throws KraftwerkException, SQLException {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
+
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
@@ -204,41 +268,42 @@ public class StepByStepService extends KraftwerkService {
 		VtlBindings vtlBindings = new VtlBindings();
 		List<KraftwerkError> errors = new ArrayList<>();
 		// Read all bindings necessary to produce output
-		String path = FileUtils.transformToTemp(inDirectory).toString();
-		List<String> fileNames = FileUtils.listFiles(path);
+		String path = FileUtilsInterface.transformToTemp(inDirectory).toString();
+		List<String> fileNames = fileUtilsInterface.listFileNames(path);
 		fileNames = fileNames.stream().filter(name -> name.endsWith(StepEnum.MULTIMODAL_PROCESSING.getStepLabel()+JSON)).toList();
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
-			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence();
+			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();
 		UserInputsFile userInputsFile;
 		try {
-			userInputsFile = controlInputSequence.getUserInputs(inDirectory);
+			userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
+		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
+		try (Statement database = SqlUtils.openConnection().createStatement()) {
+			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, database, fileUtilsInterface);
+		}
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}
 
 
-	
 	@PutMapping(value = "/archive")
 	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
 	public ResponseEntity<String> archiveService(
-			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam) 
-			{
-		return archive(inDirectoryParam);
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
+		return archive(inDirectoryParam, fileUtilsInterface);
 	}
-
-
-
-
-
 }

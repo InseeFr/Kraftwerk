@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +17,8 @@ public class TCMSequencesProcessing extends DataProcessing {
     private final String vtlDirectory;
     private final MetadataModel metadataModel;
 
-    public TCMSequencesProcessing(VtlBindings vtlBindings, MetadataModel metadataModel,String vtlDirectory) {
-        super(vtlBindings);
+    public TCMSequencesProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, String vtlDirectory, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, fileUtilsInterface);
         this.metadataModel = metadataModel;
         this.vtlDirectory = vtlDirectory;
     }
@@ -60,7 +61,7 @@ public class TCMSequencesProcessing extends DataProcessing {
             for(TCMModuleEnum tcmModuleEnum : tcmSequenceEnum.getTcmModules()){
                 Path tcmModulePath = Path.of(this.vtlDirectory).resolve("tcm").resolve(tcmModuleEnum.toString() + ".vtl");
                 if(tcmModulePath.toFile().exists()){
-                    vtlScriptBuilder.append(TextFileReader.readFromPath(tcmModulePath));
+                    vtlScriptBuilder.append(TextFileReader.readFromPath(tcmModulePath, fileUtilsInterface));
                     vtlScriptBuilder.append(System.lineSeparator());
                     log.info("TCM VTL instructions read for module " + tcmModuleEnum);
                 }else{

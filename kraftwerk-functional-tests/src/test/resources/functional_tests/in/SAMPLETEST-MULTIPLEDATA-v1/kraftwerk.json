@@ -1,0 +1,26 @@
+{
+ 
+  "campaign": "SAMPLETEST-MULTIPLEDATA-v1",  
+ 
+  "survey_data": [
+    {
+      "data_mode": "FAF",
+	  "data_file": "data/faf",
+	  "DDI_file": "ddi-SAMPLETEST-MULTIPLEDATA-v1.xml",
+	  "lunatic_file": "SAMPLETEST-MULTIPLEDATA-v1.json",
+	  "data_format": "LUNATIC_XML",
+	  "paradata_folder": "",
+	  "reporting_data_file": "",
+	  "mode_specifications": ""
+  	}
+  ],
+  
+  "multimode_dataset_name": "MULTIMODE",
+  
+  "reconciliation_specifications": "",
+  
+  "transformation_specifications": "",
+  
+  "information_levels_specifications": ""
+
+}

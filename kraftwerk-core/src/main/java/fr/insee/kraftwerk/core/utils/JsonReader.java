@@ -1,14 +1,16 @@
 package fr.insee.kraftwerk.core.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 
-public class JsonFileReader {
+public class JsonReader {
 
-    private JsonFileReader(){
+    private JsonReader(){
         throw new IllegalStateException("Utility class");
     }
 
@@ -19,9 +21,11 @@ public class JsonFileReader {
      *
      *  @return A jackson.databind.JsonNode.
      */
-    public static JsonNode read(Path filePath) throws IOException {
+    public static JsonNode read(Path filePath, FileUtilsInterface fileUtilsInterface) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readTree(filePath.toFile());
+        try (InputStream inputStream = fileUtilsInterface.readFile(filePath.toString())){
+            return mapper.readTree(inputStream);
+        }
     }
 
 }

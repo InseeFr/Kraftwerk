@@ -4,6 +4,8 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Sequence;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -25,6 +27,8 @@ class TCMSequenceProcessingTest {
     static final String VTL_EXTENSION = ".vtl";
     static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
     static final List<TCMModuleEnum> modules = new ArrayList<>();
+
+    FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     //Given
     static Dataset unimodalDataset = new InMemoryDataset(
@@ -77,7 +81,7 @@ class TCMSequenceProcessingTest {
         String expectedScript = expectedScriptBuilder.toString();
 
         //WHEN
-        TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString());
+        TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString(), fileUtilsInterface);
         String scriptString = processing.applyAutomatedVtlInstructions("TEST", errors);
 
         //THEN

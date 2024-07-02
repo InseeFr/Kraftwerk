@@ -7,6 +7,8 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.UcqVariable;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class BuildBindingsSequenceTest {
 	
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 
 
 	@Test
@@ -27,18 +31,18 @@ class BuildBindingsSequenceTest {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
-				inputSamplesDirectory);
+				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
 		boolean withAllReportingData = false;
 		boolean withDdi = true;	
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
 		//WHEN 
 		MetadataModel metadata = null;
 		
 		//THEN
 		assertThrows(NullPointerException.class, () -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadata, withDdi, null));
-		
+
 	}
 	
 	@ParameterizedTest
@@ -47,18 +51,15 @@ class BuildBindingsSequenceTest {
 		//GIVEN
 		UserInputsFile userInputsFile = new UserInputsFile(
 				inputSamplesDirectory.resolve("inputs_valid.json"),
-				inputSamplesDirectory);
+				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData);
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
         MetadataModel capiMetadata = new MetadataModel();
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));
 
-		//WHEN
-		//THEN
-		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi,null));
+		//WHEN + THEN
+		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null));
 	}
-	
-	
 }

@@ -10,6 +10,8 @@ import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -36,8 +38,9 @@ class ImportScriptTest {
 	TableScriptInfo tableScriptInfo;
 
 	Map<String, MetadataModel> metadata;
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 	
-	VtlExecute vtlExecute = new VtlExecute();
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	@BeforeEach
 	public void initMetadata() {
@@ -57,9 +60,9 @@ class ImportScriptTest {
 
 		// add group prefixes
 		List<KraftwerkError> errors = new ArrayList<>();
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface);
 		groupProcessing.applyVtlTransformations("CAWI", null, errors);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel());
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface);
 		groupProcessing2.applyVtlTransformations("PAPI", null, errors);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();

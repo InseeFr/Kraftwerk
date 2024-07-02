@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -17,14 +18,14 @@ public class ReconciliationProcessing extends DataProcessing {
 	private final String modeVariableIdentifier;
 
 	/** Return processing instance with default mode variable name. */
-	public ReconciliationProcessing(VtlBindings vtlBindings) {
-		super(vtlBindings);
+	public ReconciliationProcessing(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface) {
+		super(vtlBindings, fileUtilsInterface);
 		this.modeVariableIdentifier = Constants.MODE_VARIABLE_NAME;
 	}
 
 	/** Return processing instance with mode variable name given. */
-	public ReconciliationProcessing(VtlBindings vtlBindings, String modeVariableName) {
-		super(vtlBindings);
+	public ReconciliationProcessing(VtlBindings vtlBindings, String modeVariableName, FileUtilsInterface fileUtilsInterface) {
+		super(vtlBindings, fileUtilsInterface);
 		this.modeVariableIdentifier = modeVariableName;
 	}
 

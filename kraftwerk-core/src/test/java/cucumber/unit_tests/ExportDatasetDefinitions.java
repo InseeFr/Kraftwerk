@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
@@ -22,7 +23,7 @@ public class ExportDatasetDefinitions {
 	public String tempDatasetPath = "";
 	public SurveyRawData survey = null;
 	
-	VtlExecute vtlExecute = new VtlExecute();
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
 
 	@Given("We have some SurveyRawData named {string}")
 	public void initialize(String nameDataset) throws Exception {
@@ -44,7 +45,7 @@ public class ExportDatasetDefinitions {
 	public void importDataset(String nameDataset) throws Exception {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel(), new FileSystemImpl());
 		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new ArrayList<>());
 	}
 

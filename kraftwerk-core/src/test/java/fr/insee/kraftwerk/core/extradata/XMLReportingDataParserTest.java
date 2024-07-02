@@ -9,6 +9,8 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -18,9 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class XMLReportingDataParserTest {
 
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 	@Test
 	void parseReportingDataTest() {
-		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
@@ -62,7 +66,7 @@ class XMLReportingDataParserTest {
 
 	@Test
 	void parseMoogReportingDataTest(){
-		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
@@ -154,7 +158,7 @@ class XMLReportingDataParserTest {
 
 	@Test
 	void maxTest() {
-		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 		ReportingData reportingData = new ReportingData();
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
 		assertEquals(5, xMLReportingDataParser.countMaxStates(reportingData)); //remove double
@@ -162,7 +166,7 @@ class XMLReportingDataParserTest {
 
 	@Test
 	void maxTest_noData() {
-		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 		ReportingData reportingData = new ReportingData();
 		assertEquals(0, xMLReportingDataParser.countMaxStates(reportingData));
 		assertEquals(0, xMLReportingDataParser.countMaxAttempts(reportingData));

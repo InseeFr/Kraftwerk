@@ -2,6 +2,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -15,6 +17,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupProcessingTest {
+
+    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @Test
     void addPrefixes() {
@@ -41,7 +45,7 @@ class GroupProcessingTest {
         metadata.getVariables().putVariable(new Variable("FOO1", metadata.getGroup("DEPTH1"), VariableType.NUMBER));
         metadata.getVariables().putVariable(new Variable("FOO2", metadata.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings, metadata).applyAutomatedVtlInstructions("TEST",errors);
+        new GroupProcessing(vtlBindings, metadata, fileUtilsInterface).applyAutomatedVtlInstructions("TEST",errors);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //
