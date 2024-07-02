@@ -12,7 +12,7 @@ import lombok.extern.log4j.Log4j2;
 public class ControlInputSequenceGenesis {
 
 	String defaultDirectory;
-	private static final String INPUT_FOLDER = "in";
+	private static final String SPEC_FOLDER = "specs";
 	private final FileUtilsInterface fileUtilsInterface;
 
 	@Getter
@@ -25,7 +25,7 @@ public class ControlInputSequenceGenesis {
 	}
 
 	public Path getInDirectory(String inDirectoryParam) {
-		Path inDirectory = Paths.get(defaultDirectory, INPUT_FOLDER, inDirectoryParam);
+		Path inDirectory = Paths.get(defaultDirectory,SPEC_FOLDER, inDirectoryParam);
 		hasConfigFile = verifyInDirectory(inDirectory);
 		return inDirectory;
 	}

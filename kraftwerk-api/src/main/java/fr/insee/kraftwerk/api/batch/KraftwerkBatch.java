@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
@@ -37,48 +38,52 @@ public class KraftwerkBatch implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception{
-        //If .jar launched with cli args
-        if (args.length > 0) {
-            log.info("Launching Kraftwerk using cli");
+    public void run(String... args) {
+        try {
+            //If .jar launched with cli args
+            if (args.length > 0) {
+                log.info("Launching Kraftwerk using cli");
 
-            //Check arguments
-            checkArgs(args);
+                //Check arguments
+                checkArgs(args);
 
-            //Parse arguments
-            KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
-            boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
-            boolean withAllReportingData = Boolean.parseBoolean(args[2]);
-            String inDirectory = args[3];
+                //Parse arguments
+                KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
+                boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
+                boolean withAllReportingData = Boolean.parseBoolean(args[2]);
+                String inDirectory = args[3];
 
-            //Kraftwerk service type related parameters
-            boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
-            boolean withDDI = kraftwerkServiceType != KraftwerkServiceType.LUNATIC_ONLY;
-            if(kraftwerkServiceType != KraftwerkServiceType.MAIN){
-                withAllReportingData = false;
+                //Kraftwerk service type related parameters
+                boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
+                boolean withDDI = kraftwerkServiceType != KraftwerkServiceType.LUNATIC_ONLY;
+                if (kraftwerkServiceType != KraftwerkServiceType.MAIN) {
+                    withAllReportingData = false;
+                }
+                if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
+                    archiveAtEnd = false;
+                }
+
+
+                //Run kraftwerk
+                if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
+                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                    mainProcessingGenesis.runMain(inDirectory);
+                } else {
+                    MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                    mainProcessing.runMain();
+                }
+
+                //Archive
+                if (Boolean.TRUE.equals(archiveAtEnd)) {
+                    KraftwerkService kraftwerkService = new KraftwerkService(minioConfig);
+                    kraftwerkService.archive(inDirectory, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                }
+                System.exit(0);
             }
-            if(kraftwerkServiceType == KraftwerkServiceType.GENESIS){
-                archiveAtEnd = false;
-            }
-
-
-            //Run kraftwerk
-            if(kraftwerkServiceType == KraftwerkServiceType.GENESIS){
-                MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new MinioImpl(minioClient, minioConfig.getBucketName()));
-                mainProcessingGenesis.runMain(inDirectory);
-            }else{
-                MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
-                mainProcessing.runMain();
-            }
-
-            //Archive
-            if(Boolean.TRUE.equals(archiveAtEnd)){
-                KraftwerkService kraftwerkService = new KraftwerkService(minioConfig);
-                kraftwerkService.archive(inDirectory, new MinioImpl(minioClient, minioConfig.getBucketName()));
-            }
-
-            System.exit(0);
+        }catch(Exception e){
+            log.error(e.toString());
         }
+        System.exit(1);
     }
 
     /**

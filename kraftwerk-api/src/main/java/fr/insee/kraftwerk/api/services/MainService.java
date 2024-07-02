@@ -150,7 +150,6 @@ public class MainService extends KraftwerkService {
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
 
 		try {
-			mpGenesis.setControlInputSequenceGenesis(new ControlInputSequenceGenesis(defaultDirectory, fileUtilsInterface));
 			mpGenesis.runMain(idCampaign);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());

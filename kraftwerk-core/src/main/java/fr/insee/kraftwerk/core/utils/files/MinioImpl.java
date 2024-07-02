@@ -159,9 +159,11 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public String findFile(String directory, String fileRegex) throws KraftwerkException {
-        try (Stream<String> files = listFileNames(directory.replace("\\","/")).stream().filter(s -> s.matches(fileRegex))) {
+        //Stream of files with filename matching fileRegex
+        try (Stream<String> files = listFileNames(directory.replace("\\","/"))
+                .stream().filter(s -> s.split("/")[s.split("/").length - 1].matches(fileRegex))) {
             return files.findFirst()
-                    .orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + directory.replace("\\","/")));
+                    .orElseThrow(() -> new KraftwerkException(404, "No file with regex " + fileRegex + " found in " + directory.replace("\\","/")));
         }
     }
 

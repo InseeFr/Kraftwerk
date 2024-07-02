@@ -36,10 +36,10 @@ public interface FileUtilsInterface {
      * Change /some/path/in/campaign-name to /some/path/__other__/campaign-name
      */
     private static Path transformToOther(Path inDirectory, String other) {
-        if("in".equals(inDirectory.getFileName().toString()) && inDirectory.getParent() != null){
+        if(("in".equals(inDirectory.getFileName().toString()) || "specs".equals(inDirectory.getFileName().toString())) && inDirectory.getParent() != null){
             return inDirectory.getParent().resolve(other);
         }
-        return "in".equals(inDirectory.getFileName().toString()) ? Path.of(other)
+        return "in".equals(inDirectory.getFileName().toString()) || "specs".equals(inDirectory.getFileName().toString()) ? Path.of(other)
             : transformToOther(inDirectory.getParent(), other).resolve(inDirectory.getFileName());
     }
 
