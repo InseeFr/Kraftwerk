@@ -8,7 +8,10 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static fr.insee.kraftwerk.core.Constants.FILTER_RESULT_PREFIX;
 import static fr.insee.kraftwerk.core.Constants.MISSING_SUFFIX;
@@ -121,7 +124,7 @@ public class LunaticReader {
 			return rootNode.get(LUNATIC_MODEL_VERSION).toString();
 
 		} catch (IOException e) {
-			log.error(EXCEPTION_MESSAGE + lunaticFile);
+			log.error("{} {}",EXCEPTION_MESSAGE , lunaticFile);
 			return "";
 		}
 	}
@@ -156,7 +159,7 @@ public class LunaticReader {
 					varName -> metadataModel.getVariables().putVariable(new Variable(varName, rootGroup, VariableType.STRING)));
 			return metadataModel;
 		} catch (IOException e) {
-			log.error(EXCEPTION_MESSAGE + lunaticFile);
+			log.error("{} {}",EXCEPTION_MESSAGE, lunaticFile);
 			return null;
 		}
 	}
@@ -197,7 +200,7 @@ public class LunaticReader {
 		//We create a group only with the name of the first response
 		//Then we add all the variables found in response to the newly created group
 		String groupName = getFirstResponseName(primaryComponents);
-		log.info("Creation of group :" + groupName);
+		log.info("Creation of group : {}", groupName);
 		Group group = getNewGroup(metadataModel, groupName, parentGroup);
 		for (JsonNode primaryComponent : primaryComponents) {
 			addResponsesAndMissing(primaryComponent, group, variables, metadataModel);
@@ -219,7 +222,7 @@ public class LunaticReader {
 			groupNameBuilder.append("_").append(loopDependencies.get(i).asText());
 		}
 		String groupName = groupNameBuilder.toString();
-		log.info("Creation of group :" + groupName);
+		log.info("Creation of group : {}", groupName);
 		Group group = getNewGroup(metadataModel, groupName, parentGroup);
 		iterateOnComponentsToFindResponses(component, variables, metadataModel, group);
 		return group;

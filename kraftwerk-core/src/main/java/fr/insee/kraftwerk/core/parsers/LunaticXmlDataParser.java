@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.metadata.LunaticReader;
+import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -47,7 +51,7 @@ public class LunaticXmlDataParser extends DataParser {
 		XmlFileReader xmlFileReader = new XmlFileReader();
 		Document document = xmlFileReader.readXmlFile(filePath);
 		if (document == null) {
-			log.warn("Failed to parse Lunatic answers file: " + filePath);
+			log.warn("Failed to parse Lunatic answers file: {}" , filePath);
 		}
 		return document;
 	}
@@ -123,7 +127,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 		//Check collected data tag presence
 		if(questionnaireNode.getFirstChildElement("Data").getFirstChildElement(Constants.COLLECTED) == null){
-			log.warn("No collected data for survey unit " + questionnaireData.getIdentifier());
+			log.warn("No collected data for survey unit {}", questionnaireData.getIdentifier());
 			return;
 		}
 
@@ -235,13 +239,13 @@ public class LunaticXmlDataParser extends DataParser {
 
 	private void manageTcmLiens(String variableName, GroupInstance answers, Element node) {
 		if (variableName.equals(Constants.LIENS)) {
-			String groupName = Constants.BOUCLE_PRENOMS;
-			GroupData groupData = answers.getSubGroup(groupName);
+			GroupData groupData = answers.getSubGroup(Constants.BOUCLE_PRENOMS);
 			Elements individualNodes = node.getChildElements();
 			
 			for (int j = 0; j < individualNodes.size(); j++) {
 				Element individualNode = individualNodes.get(j);
 				Elements valueNodes = individualNode.getChildElements();
+				StringBuilder concatenatesValue = new StringBuilder().append("{");
 
 				for (int k=1;k <Constants.MAX_LINKS_ALLOWED;k++) {
 					String value = Constants.NO_PAIRWISE_VALUE;
@@ -252,8 +256,12 @@ public class LunaticXmlDataParser extends DataParser {
 							value = valueNodes.get(k-1).getValue();
 						}
 					}
+					concatenatesValue.append(value);
+					if (k<Constants.MAX_LINKS_ALLOWED-1) {concatenatesValue.append(",");}
 					groupData.putValue(value, Constants.LIEN+k, j);
 				}
+				concatenatesValue.append("}");
+				groupData.putValue(concatenatesValue.toString(), Constants.LIENS, j);
 			}
 		}
 	}

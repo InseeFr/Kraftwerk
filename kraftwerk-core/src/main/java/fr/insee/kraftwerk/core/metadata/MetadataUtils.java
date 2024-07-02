@@ -50,6 +50,11 @@ public class MetadataUtils {
 				Variable varLien = new Variable(Constants.LIEN+k, metadataModel.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
 				metadataModel.getVariables().putVariable(varLien);
 			}
+			//PUT variable LIENS in the correct group
+			metadataModel.getVariables().removeVariable(Constants.LIENS);
+			Variable varLiens = new Variable(Constants.LIENS, metadataModel.getGroup(Constants.BOUCLE_PRENOMS), VariableType.STRING);
+			metadataModel.getVariables().putVariable(varLiens);
+
 		}
 		// Step 3 : we add reporting data group if there is any reporting data
 		if(modeInputs.getReportingDataFile() != null){
