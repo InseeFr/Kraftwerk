@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,7 @@ public class KraftwerkBatch implements CommandLineRunner {
         try {
             //If .jar launched with cli args
             if (args.length > 0) {
-                log.info("Launching Kraftwerk using cli");
+                log.info("Launching Kraftwerk in CLI mode...");
 
                 //Check arguments
                 checkArgs(args);
@@ -83,7 +82,11 @@ public class KraftwerkBatch implements CommandLineRunner {
         }catch(Exception e){
             log.error(e.toString());
         }
-        System.exit(1);
+        if(args.length > 0) {
+            System.exit(1);
+        }else{
+            log.info("Launching Kraftwerk in API mode...");
+        }
     }
 
     /**
