@@ -7,5 +7,5 @@ Feature: Do we save number format correctly ?
     Then Step 7 : We check that id "<SurveyUnitId>" has value "<ExpectedValue>" for variable "<VariableName>" in table "<TableName>"
     Examples:
       |Directory                        |SurveyUnitId |ExpectedValue  |VariableName |TableName  |
-      |SAMPLETEST-DATAONLY-v1           |0000005      |19800340       |T_NPIECES    |RACINE     |
+      |SAMPLETEST-DATAONLY-v1           |0000005      |19800340.0     |T_NPIECES    |RACINE     |
 
