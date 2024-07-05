@@ -334,8 +334,14 @@ public class MainDefinitions {
 		if (tableName == null || tableName.isEmpty())
 			tableName = Constants.ROOT_GROUP_NAME;
 
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		File outputReportingDataFile = new File(executionOutDirectory + "/" + outDirectory.getFileName() + "_" + tableName + ".csv");
+
+
 		// Get reader to read the root table written in outputs
-		CSVReader csvReader = getCSVReader(outputFiles.getOutputFolder().resolve(outputFiles.outputFileName(tableName)));
+		CSVReader csvReader = getCSVReader(outputReportingDataFile.toPath());
 		// get header
 		String[] header = csvReader.readNext();
 		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
