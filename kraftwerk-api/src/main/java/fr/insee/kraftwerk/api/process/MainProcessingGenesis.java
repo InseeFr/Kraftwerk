@@ -11,6 +11,7 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
@@ -96,6 +97,7 @@ public class MainProcessingGenesis {
 					vtlBindings = new VtlBindings();
 					unimodalProcess(suLatest);
 					multimodalProcess();
+					insertDatabase();
 					outputFileWriter();
 					writeErrors();
 				}
@@ -109,7 +111,7 @@ public class MainProcessingGenesis {
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory, database);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels);
 		}
@@ -118,10 +120,16 @@ public class MainProcessingGenesis {
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, database);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels);
 	}
 
-	/* Step 4 : Write output files */
+	/* Step 4 : Insert into SQL database */
+	private void insertDatabase(){
+		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
+		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
+	}
+
+	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, database);

@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
@@ -31,17 +32,17 @@ public class WriterSequence {
 
 	//Write CSV
 	private void writeCsvFiles(Path outDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, KraftwerkExecutionLog kraftwerkExecutionLog, Statement databaseConnection) throws KraftwerkException {
-		/* Step 4.2 : write csv output tables */
+		/* Step 5.1 : write csv output tables */
 		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog, new ArrayList<>(modeInputsMap.keySet()), databaseConnection);
 		csvOutputFiles.writeOutputTables(metadataModels);
 
-		/* Step 4.3 : write scripts to import csv tables in several languages */
+		/* Step 5.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, errors);
 	}
 
 	//Write Parquet
 	private void writeParquetFiles(Path outDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, Statement databaseConnection) throws KraftwerkException {
-		/* Step 4.4 : write parquet output tables */
+		/* Step 5.3 : write parquet output tables */
 		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), databaseConnection);
 		parquetOutputFiles.writeOutputTables(metadataModels);
 		parquetOutputFiles.writeImportScripts(metadataModels, errors);

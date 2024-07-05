@@ -22,7 +22,6 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute = new VtlExecute();
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory, Statement database) throws KraftwerkException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws KraftwerkException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */

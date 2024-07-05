@@ -181,7 +181,7 @@ public class MainDefinitions {
 	public void aggregate_datasets() throws SQLException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		try (Statement statement = database.createStatement()) {
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, statement);
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
 		}
 	}
 
