@@ -27,12 +27,12 @@ public class CSVReportingDataParser extends ReportingDataParser {
 
 	public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
 		Path filePath = reportingData.getFilepath();
-	    try{
-	    	readFile(filePath);
-	    } catch (NullPointerException e) {
-	    	throw new NullException();
-	    }
-	    
+		try{
+			readFile(filePath);
+		} catch (NullPointerException e) {
+			throw new NullException();
+		}
+
 		try {
 			String[] header = this.csvReader.readNext();
 			if (controlHeader(header)) {
@@ -44,7 +44,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 					State state = new State(rowState, convertToTimestamp(rowTimestamp));
 					if (reportingData.containsReportingDataUE(rowIdentifier)) {
 						ReportingDataUE reportingDataUE1 = reportingData.getListReportingDataUE().stream().filter(
-								reportingDataUEToSearch -> rowIdentifier.equals(reportingDataUEToSearch.getIdentifier()))
+										reportingDataUEToSearch -> rowIdentifier.equals(reportingDataUEToSearch.getIdentifier()))
 								.findAny().orElse(null);
 						if (reportingDataUE1 != null) {
 							reportingDataUE1.addState(state);
@@ -83,6 +83,11 @@ public class CSVReportingDataParser extends ReportingDataParser {
 		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
 	}
 
+	/**
+	 *
+	 * @param header header to check
+	 * @return true if header correct, false otherwise
+	 */
 	public boolean controlHeader(String[] header) {
 		return (header.length == 8 && header[0].contentEquals("statut") && header[1].contentEquals("dateInfo")
 				&& header[2].contentEquals("idUe") && header[3].contentEquals("idContact")

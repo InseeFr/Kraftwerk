@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class MultimodalSequence {
-	
-	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels) {
+
+	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, List<KraftwerkError> errors, Map<String, MetadataModel> metadataModels){
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
@@ -45,10 +45,5 @@ public class MultimodalSequence {
 		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlInformationLevelsFile(), errors);
 		TextFileWriter.writeFile(FileUtils.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate);
-
-
-
 	}
-
-
 }

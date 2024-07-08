@@ -4,12 +4,12 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -52,9 +54,9 @@ public class StepByStepService extends KraftwerkService {
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
-			try {
-				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null );
-			} catch (NullException e) {
+			try{
+				buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(),mp.getMetadataModels().get(dataMode), withDDI, null);
+			} catch (KraftwerkException e){
 				return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 			}
 
@@ -73,7 +75,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			)  {
+			) throws KraftwerkException {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -86,13 +88,13 @@ public class StepByStepService extends KraftwerkService {
 		
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData);
-		try {
+		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, null);
-		} catch (NullException e) {
+		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
+
+        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence();
 		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
@@ -193,7 +195,7 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
-			) throws KraftwerkException {
+			) throws KraftwerkException, SQLException {
 		Path inDirectory;
 		try {
 			inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
@@ -221,7 +223,9 @@ public class StepByStepService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap());
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors);
+		try (Connection database = SqlUtils.openConnection()) {
+			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, null,database.createStatement());
+		}
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}

@@ -6,15 +6,16 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
+import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +43,11 @@ public class MainProcessingGenesis {
 	private ControlInputSequenceGenesis controlInputSequenceGenesis;
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
-	private List<KraftwerkError> errors = new ArrayList<>();
+	private final List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
+	private Statement database;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -53,7 +58,7 @@ public class MainProcessingGenesis {
 	@Getter
 	private Map<String, MetadataModel> metadataModels;
 
-	private GenesisClient client;
+	private final GenesisClient client;
 
 	public MainProcessingGenesis(ConfigProperties config) {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
@@ -77,26 +82,34 @@ public class MainProcessingGenesis {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idCampaign);
-		List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
-		if(questionnaireModelIds.isEmpty()){
-			throw new KraftwerkException(204, null);
+		//Try with resources to close database when done
+		try (Connection tryDatabase = SqlUtils.openConnection()) {
+			this.database = tryDatabase.createStatement();
+			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
+			if (questionnaireModelIds.isEmpty()) {
+				throw new KraftwerkException(204, null);
+			}
+			for (String questionnaireId : questionnaireModelIds) {
+				List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
+				List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
+				for (List<SurveyUnitId> listId : listIds) {
+					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
+					log.info("Number of documents retrieved from database : {}", suLatest.size());
+					vtlBindings = new VtlBindings();
+					unimodalProcess(suLatest);
+					multimodalProcess();
+					insertDatabase();
+					outputFileWriter();
+					writeErrors();
+				}
+			}
+		}catch (SQLException e){
+			log.error(e.toString());
+			throw new KraftwerkException(500,"SQL error");
 		}
-        for (String questionnaireId : questionnaireModelIds) {
-            List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
-            List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
-            for (List<SurveyUnitId> listId : listIds) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
-                log.info("Number of documents retrieved from database : {}", suLatest.size());
-                vtlBindings = new VtlBindings();
-                unimodalProcess(suLatest);
-                multimodalProcess();
-                outputFileWriter();
-                writeErrors();
-            }
-        }
-    }
+	}
 
-	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws NullException {
+	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
@@ -111,13 +124,19 @@ public class MainProcessingGenesis {
 		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels);
 	}
 
-	/* Step 4 : Write output files */
-	private void outputFileWriter() throws KraftwerkException {
-		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors);
+	/* Step 4 : Insert into SQL database */
+	private void insertDatabase(){
+		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
+		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
 	}
 
-	/* Step 5 : Write errors */
+	/* Step 5 : Write output files */
+	private void outputFileWriter() throws KraftwerkException {
+		WriterSequence writerSequence = new WriterSequence();
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database);
+	}
+
+	/* Step 6 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
 	}
