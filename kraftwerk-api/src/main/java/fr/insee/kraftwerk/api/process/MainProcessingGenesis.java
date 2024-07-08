@@ -27,6 +27,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -83,9 +84,9 @@ public class MainProcessingGenesis {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idCampaign);
-		//Try with ressources to close database when done
-		try (Statement trydatabase = SqlUtils.openConnection().createStatement()) {
-			this.database = trydatabase;
+		//Try with resources to close database when done
+		try (Connection tryDatabase = SqlUtils.openConnection()) {
+			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
@@ -134,10 +135,10 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database, fileUtilsInterface);
 	}
 
-	/* Step 5 : Write errors */
+	/* Step 6 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
 	}

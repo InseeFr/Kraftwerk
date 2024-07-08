@@ -16,6 +16,7 @@
 
 	<properties>
 		<trevas.version>1.4.1</trevas.version>
+		<duckdb.version>0.10.3</duckdb.version>
 	</properties>
 
 
@@ -109,7 +110,7 @@
 		<dependency>
 			<groupId>org.duckdb</groupId>
 			<artifactId>duckdb_jdbc</artifactId>
-			<version>0.10.3</version>
+			<version>${duckdb.version}</version>
 		</dependency>
 	</dependencies>
 </project>

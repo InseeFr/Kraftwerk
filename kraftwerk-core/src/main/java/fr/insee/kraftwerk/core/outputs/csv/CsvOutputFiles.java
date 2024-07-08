@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -77,15 +78,7 @@ public class CsvOutputFiles extends OutputFiles {
 				Files.write(tmpOutputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, tmpOutputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
-				//Double quote values parameter
-				exportCsvQuery.append(", FORCE_QUOTE(");
-				for (String stringColumnName : columnNames) {
-					exportCsvQuery.append(String.format("'%s',", stringColumnName));
-				}
-				//Remove last ","
-				exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
-				exportCsvQuery.append("))");
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, outputFile, columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				//Apply csv format transformations
@@ -111,7 +104,7 @@ public class CsvOutputFiles extends OutputFiles {
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
 					try(ResultSet countResult = this.getDatabase().executeQuery("SELECT COUNT(*) FROM " + datasetName)){
-                        assert kraftwerkExecutionLog != null; // Assert because IDE warning
+						countResult.next();
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
@@ -119,6 +112,19 @@ public class CsvOutputFiles extends OutputFiles {
 				throw new KraftwerkException(500, e.toString());
 			}
         }
+	}
+
+	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames) {
+		StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
+		//Double quote values parameter
+		exportCsvQuery.append(", FORCE_QUOTE(");
+		for (String stringColumnName : columnNames) {
+			exportCsvQuery.append(String.format("'%s',", stringColumnName));
+		}
+		//Remove last ","
+		exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
+		exportCsvQuery.append("))");
+		return exportCsvQuery;
 	}
 
 	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {

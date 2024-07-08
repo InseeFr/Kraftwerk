@@ -28,7 +28,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -228,12 +227,8 @@ public class StepByStepService extends KraftwerkService {
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 
 		//Process
-		try(Connection database = SqlUtils.openConnection()) {
-			MultimodalSequence multimodalSequence = new MultimodalSequence();
-			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
-		}catch (SQLException e){
-			return ResponseEntity.status(500).body(e.getMessage());
-		}
+		MultimodalSequence multimodalSequence = new MultimodalSequence();
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 
 		//Write technical fils
 		for (String datasetName : vtlBindings.getDatasetNames()) {
@@ -286,7 +281,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		try (Statement database = SqlUtils.openConnection().createStatement()) {
-			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, database, fileUtilsInterface);
+			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, errors, null, database, fileUtilsInterface);
 		}
 		return ResponseEntity.ok(inDirectoryParam);
 

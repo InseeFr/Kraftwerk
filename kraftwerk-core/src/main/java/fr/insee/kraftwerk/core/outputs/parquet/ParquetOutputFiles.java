@@ -41,8 +41,9 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param databaseConnection connection to duckDb database
 	 * @param fileUtilsInterface file interface to use (file system or minio)
 	 */
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement databaseConnection, FileUtilsInterface fileUtilsInterface) {
-		super(outDirectory, vtlBindings, modes, databaseConnection, fileUtilsInterface);
+
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 	}
 
 	
@@ -93,7 +94,6 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public String outputFileName(String datasetName) {
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		if (nbParquetFilesbyDataset.containsKey(datasetName)) { path = path +"_"+ nbParquetFilesbyDataset.get(datasetName);}
 		return path	+ PARQUET_EXTENSION;
 	}
 
@@ -101,13 +101,6 @@ public class ParquetOutputFiles extends OutputFiles {
 		List<String> filenames = new ArrayList<>();
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
 		filenames.add(path); // 0
-		if (!nbParquetFilesbyDataset.containsKey(datasetName)) {
-			return filenames;
-		}
-		for(int i = 1; i<=nbParquetFilesbyDataset.get(datasetName);i++) {
-			filenames.add(path+"_"+ nbParquetFilesbyDataset.get(datasetName));
-		}
-
 		return filenames;
 	}
 

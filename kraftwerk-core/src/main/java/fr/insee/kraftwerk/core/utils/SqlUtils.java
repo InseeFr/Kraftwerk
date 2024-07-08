@@ -17,11 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 public class SqlUtils {
@@ -37,7 +35,12 @@ public class SqlUtils {
      */
     public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement) {
         try {
-            createOutputSQLTables(statement, vtlBindings);
+            for (String datasetName : vtlBindings.getDatasetNames()) {
+                //Variables types map
+                LinkedHashMap<String, VariableType> sqlSchema = extractSqlSchema(vtlBindings.getDataset(datasetName).getDataStructure());
+                createDataSQLTables(statement, datasetName, sqlSchema);
+                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema);
+            }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
         }
@@ -45,45 +48,45 @@ public class SqlUtils {
 
 
     /**
-     * send CREATE TABLE queries into DB
+     * send CREATE TABLE query into DB for a dataset
      *
      * @param statement   DuckDB connection
-     * @param vtlBindings datasets to convert
+     * @param datasetName dataset to convert
+     * @param sqlSchema schema of dataset
      * @throws SQLException if sql error
      */
-    private static void createOutputSQLTables(Statement statement, VtlBindings vtlBindings) throws SQLException {
-        for (String datasetName : vtlBindings.getDatasetNames()) {
-            //Variables types map
-            Map<String, VariableType> sqlSchema = extractSqlSchema(vtlBindings.getDataset(datasetName).getDataStructure());
-            //Skip if no variable
-            if (sqlSchema.isEmpty()) {
-                log.warn("Empty schema for dataset {}", datasetName);
-            } else {
-                //Column order map to use in INSERT VALUES statement
-                List<String> schemaOrder = extractColumnsOrder(vtlBindings.getDataset(datasetName));
+    private static void createDataSQLTables(Statement statement, String datasetName, LinkedHashMap<String, VariableType> sqlSchema) throws SQLException {
 
-                //Skip CREATE if table already exists (ex: file-by-file)
-                List<String> tableNames = getTableNames(statement);
-                if (!tableNames.contains(datasetName)) {
-                    //CREATE query building
-                    StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
-
-                    for (String columnName : schemaOrder) {
-                        createTableQuery.append("\"").append(columnName).append("\"").append(" ").append(sqlSchema.get(columnName).getSqlType());
-                        createTableQuery.append(", ");
-                    }
-
-                    //Remove last delimiter and replace by ")"
-                    createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
-                    createTableQuery.append(")");
-
-                    //Execute query
-                    log.debug("SQL Query : {}", createTableQuery);
-                    statement.execute(createTableQuery.toString());
-                }
-                insertDataIntoTable(statement.getConnection(), datasetName, vtlBindings.getDataset(datasetName), schemaOrder);
-            }
+        //Skip if no variable
+        if (sqlSchema.isEmpty()) {
+            log.warn("Empty schema for dataset {}", datasetName);
+            return;
         }
+
+        //Skip CREATE if table already exists (ex: file-by-file)
+        List<String> tableNames = getTableNames(statement);
+        if (!tableNames.contains(datasetName)) {
+            String createTableQuery = getCreateTableQuery(datasetName, sqlSchema);
+
+            //Execute query
+            log.debug("SQL Query : {}", createTableQuery);
+            statement.execute(createTableQuery);
+        }
+    }
+
+    private static String getCreateTableQuery(String datasetName, LinkedHashMap<String, VariableType> sqlSchema) {
+        //CREATE query building
+        StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
+
+        for (Map.Entry<String, VariableType> column : sqlSchema.entrySet()) {
+            createTableQuery.append("\"").append(column.getKey()).append("\"").append(" ").append(sqlSchema.get(column.getKey()).getSqlType());
+            createTableQuery.append(", ");
+        }
+
+        //Remove last delimiter and replace by ")"
+        createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
+        createTableQuery.append(")");
+        return createTableQuery.toString();
     }
 
     /**
@@ -91,40 +94,22 @@ public class SqlUtils {
      * @param structure the structure of the dataset
      * @return a (variable name,type) map
      */
-    private static Map<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
-        //Deduplicate column names by case
-        Set<String> deduplicatedColumns = new HashSet<>();
-        for(Structured.Component component : structure.values()) {
-            deduplicatedColumns.add(component.getName().toLowerCase());
-        }
-
-        Map<String, VariableType> schema = new HashMap<>();
+    private static LinkedHashMap<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
+        LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
         for (Structured.Component component : structure.values()) {
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
             if (type != null){
-                //If column not added yet
-                if(deduplicatedColumns.contains(component.getName().toLowerCase())){
+                //If column not added yet (ignore case)
+                if(!schema.keySet().stream().filter(
+                        s -> s.equalsIgnoreCase(component.getName())
+                ).toList().contains(component.getName())){
                     schema.put(component.getName(), type);
-                    deduplicatedColumns.remove(component.getName().toLowerCase());
                 }
             } else {
                 log.warn("Cannot export variable {} to SQL, unrecognized type", component.getName());
             }
         }
         return schema;
-    }
-
-    /**
-     * Extract columns order from a VTL dataset
-     * @return a list of columns names in the right order
-     */
-    private static List<String> extractColumnsOrder(Dataset dataset){
-        List<String> columnsOrder = new ArrayList<>();
-        for(Structured.Component component : dataset.getDataStructure().values()){
-            columnsOrder.add(component.getName());
-        }
-
-        return columnsOrder;
     }
 
     /**
@@ -144,20 +129,20 @@ public class SqlUtils {
     /**
      * insert data into table associated with dataset
      *
-     * @param databaseConnection DuckDB connection
+     * @param database DuckDB connection
      * @param dataset   dataset to convert
-     * @param schemaOrder column names in order
+     * @param sqlSchema schema
      */
-    private static void insertDataIntoTable(Connection databaseConnection, String datasetName, Dataset dataset, List<String> schemaOrder) throws SQLException {
+    private static void insertDataIntoTable(Statement database, String datasetName, Dataset dataset, LinkedHashMap<String, VariableType> sqlSchema) throws SQLException {
         if (dataset.getDataAsMap().isEmpty()) {
             return;
         }
 
-        DuckDBConnection duckDBConnection = (DuckDBConnection) databaseConnection;
+        DuckDBConnection duckDBConnection = (DuckDBConnection) database.getConnection();
         try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
             for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
                 appender.beginRow();
-                for (String columnName : schemaOrder) {
+                for (String columnName : sqlSchema.keySet()) {
                     String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
                     appender.append(data);
                 }

@@ -28,36 +28,44 @@ public class WriterSequence {
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
 								 Map<String, MetadataModel> metadataModels,
-								 List<KraftwerkError> errors, Statement database,
+								 List<KraftwerkError> errors, 
+								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
 
-		writeOutputFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, null, database, fileUtilsInterface);
+		writeCsvFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, null, database, fileUtilsInterface);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, database, fileUtilsInterface);
 	}
 
-	public void writeOutputFiles(Path inDirectory,
-								 LocalDateTime localDateTime,
+	public void writeCsvFiles(Path inDirectory,
+								 LocalDateTime executionDateTime,
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
 								 Map<String, MetadataModel> metadataModels,
 								 List<KraftwerkError> errors,
 								 KraftwerkExecutionLog kraftwerkExecutionLog,
-								 Statement databaseConnection,
+								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		//Write CSV
-		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,localDateTime);
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
 		/* Step 5.1 : write csv output tables */
-		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog, new ArrayList<>(modeInputsMap.keySet()), databaseConnection, fileUtilsInterface);
+		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog, new ArrayList<>(modeInputsMap.keySet()),
+				database, fileUtilsInterface);
 		csvOutputFiles.writeOutputTables(metadataModels);
 		/* Step 5.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, errors);
 	}
 
 	//Write Parquet
-	private void writeParquetFiles(Path outDirectory, VtlBindings vtlBindings, Map<String, ModeInputs> modeInputsMap, Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors, Statement databaseConnection, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+	private void writeParquetFiles(Path outDirectory,
+									 VtlBindings vtlBindings, 
+									 Map<String, ModeInputs> modeInputsMap,
+									 Map<String, MetadataModel> metadataModels,
+									 List<KraftwerkError> errors,
+									 Statement database,
+									 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		/* Step 5.3 : write parquet output tables */
-		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), databaseConnection, fileUtilsInterface);
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface);
 		parquetOutputFiles.writeOutputTables(metadataModels);
 		parquetOutputFiles.writeImportScripts(metadataModels, errors);
 	}
