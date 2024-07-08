@@ -82,9 +82,9 @@ public class MainProcessingGenesis {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idCampaign);
-		//Try with ressources to close database when done
-		try (Connection trydatabase = SqlUtils.openConnection()) {
-			this.database = trydatabase.createStatement();
+		//Try with resources to close database when done
+		try (Connection tryDatabase = SqlUtils.openConnection()) {
+			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);

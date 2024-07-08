@@ -12,6 +12,7 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -74,15 +75,7 @@ public class CsvOutputFiles extends OutputFiles {
 				Files.write(outputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
-				//Double quote values parameter
-				exportCsvQuery.append(", FORCE_QUOTE(");
-				for (String stringColumnName : columnNames) {
-					exportCsvQuery.append(String.format("'%s',", stringColumnName));
-				}
-				//Remove last ","
-				exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
-				exportCsvQuery.append("))");
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, outputFile, columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				//Apply csv format transformations
@@ -113,6 +106,19 @@ public class CsvOutputFiles extends OutputFiles {
 				throw new KraftwerkException(500, e.toString());
 			}
         }
+	}
+
+	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames) {
+		StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
+		//Double quote values parameter
+		exportCsvQuery.append(", FORCE_QUOTE(");
+		for (String stringColumnName : columnNames) {
+			exportCsvQuery.append(String.format("'%s',", stringColumnName));
+		}
+		//Remove last ","
+		exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
+		exportCsvQuery.append("))");
+		return exportCsvQuery;
 	}
 
 	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
