@@ -35,8 +35,6 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
 
-	private Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
-
 	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement databaseConnection) {
 		super(outDirectory, vtlBindings, modes, databaseConnection);
 	}
@@ -84,7 +82,6 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public String outputFileName(String datasetName) {
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		if (nbParquetFilesbyDataset.containsKey(datasetName)) { path = path +"_"+ nbParquetFilesbyDataset.get(datasetName);}
 		return path	+ PARQUET_EXTENSION;
 	}
 
@@ -92,13 +89,6 @@ public class ParquetOutputFiles extends OutputFiles {
 		List<String> filenames = new ArrayList<>();
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
 		filenames.add(path); // 0
-		if (!nbParquetFilesbyDataset.containsKey(datasetName)) {
-			return filenames;
-		}
-		for(int i = 1; i<=nbParquetFilesbyDataset.get(datasetName);i++) {
-			filenames.add(path+"_"+ nbParquetFilesbyDataset.get(datasetName));
-		}
-
 		return filenames;
 	}
 

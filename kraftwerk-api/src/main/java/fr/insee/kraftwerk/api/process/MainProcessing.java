@@ -163,7 +163,7 @@ public class MainProcessing {
 	/* Step 5 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, kraftwerkExecutionLog,database);
 	}
 
 	/* Step 5 : Write errors */

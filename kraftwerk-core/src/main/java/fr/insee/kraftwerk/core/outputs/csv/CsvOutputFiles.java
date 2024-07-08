@@ -105,7 +105,7 @@ public class CsvOutputFiles extends OutputFiles {
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
 					try(ResultSet countResult = this.getDatabase().executeQuery("SELECT COUNT(*) FROM " + datasetName)){
-                        assert kraftwerkExecutionLog != null; // Assert because IDE warning
+						countResult.next();
                         kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}

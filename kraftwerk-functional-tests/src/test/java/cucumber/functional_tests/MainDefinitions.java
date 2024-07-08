@@ -190,7 +190,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, statement);
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, null, statement);
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement);
 		}

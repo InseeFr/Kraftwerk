@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -82,8 +83,8 @@ public class MainProcessingGenesis {
 		int batchSize = 1000;
 		init(idCampaign);
 		//Try with ressources to close database when done
-		try (Statement trydatabase = SqlUtils.openConnection().createStatement()) {
-			this.database = trydatabase;
+		try (Connection trydatabase = SqlUtils.openConnection()) {
+			this.database = trydatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
@@ -132,10 +133,10 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, database);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database);
 	}
 
-	/* Step 5 : Write errors */
+	/* Step 6 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
 	}
