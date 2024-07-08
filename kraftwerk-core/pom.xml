@@ -16,7 +16,7 @@
 
 	<properties>
 		<trevas.version>1.4.1</trevas.version>
-		<duckdb.version>0.10.3</duckdb.version>
+		<duckdb.version>1.0.0</duckdb.version>
 	</properties>
 
 
