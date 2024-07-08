@@ -88,8 +88,9 @@ public class MainProcessing {
 				this.userInputsFile = userFile;
 				vtlBindings = new VtlBindings();
 				unimodalProcess();
+				multimodalProcess();
 				try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
-					multimodalProcess(writeDatabase);
+					insertDatabase(writeDatabase);
 				}
 			}
 			//Export from database
@@ -148,12 +149,18 @@ public class MainProcessing {
 	}
 
 	/* Step 3 : multimodal VTL data processing */
-	private void multimodalProcess(Statement database){
+	private void multimodalProcess(){
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, database, fileUtilsInterface);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, fileUtilsInterface);
 	}
 
-	/* Step 4 : Write output files */
+	/* Step 4 : Insert into SQL database */
+	private void insertDatabase(Statement database) throws SQLException {
+		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
+		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
+	}
+
+	/* Step 5 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, database, fileUtilsInterface);

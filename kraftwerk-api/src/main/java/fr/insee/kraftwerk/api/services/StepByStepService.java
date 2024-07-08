@@ -230,7 +230,7 @@ public class StepByStepService extends KraftwerkService {
 		//Process
 		try(Connection database = SqlUtils.openConnection()) {
 			MultimodalSequence multimodalSequence = new MultimodalSequence();
-			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, database.createStatement(), fileUtilsInterface);
+			multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModelMap, fileUtilsInterface);
 		}catch (SQLException e){
 			return ResponseEntity.status(500).body(e.getMessage());
 		}
