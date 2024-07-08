@@ -17,11 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 public class SqlUtils {
@@ -98,16 +96,14 @@ public class SqlUtils {
      */
     private static LinkedHashMap<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
         LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
-        Set<String> lowCaseColumnNames = new HashSet<>();
         for (Structured.Component component : structure.values()) {
-            lowCaseColumnNames.add(component.getName().toLowerCase());
-
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
             if (type != null){
-                //If column not added yet
-                if(lowCaseColumnNames.contains(component.getName().toLowerCase())){
+                //If column not added yet (ignore case)
+                if(!schema.keySet().stream().filter(
+                        s -> s.equalsIgnoreCase(component.getName())
+                ).toList().contains(component.getName())){
                     schema.put(component.getName(), type);
-                    lowCaseColumnNames.remove(component.getName().toLowerCase());
                 }
             } else {
                 log.warn("Cannot export variable {} to SQL, unrecognized type", component.getName());
