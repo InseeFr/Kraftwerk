@@ -78,7 +78,7 @@ public class CsvOutputFiles extends OutputFiles {
 				Files.write(tmpOutputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, outputFile, columnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile, columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				//Apply csv format transformations

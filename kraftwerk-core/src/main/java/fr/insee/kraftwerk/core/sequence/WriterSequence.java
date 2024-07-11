@@ -28,7 +28,8 @@ public class WriterSequence {
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
 								 Map<String, MetadataModel> metadataModels,
-								 List<KraftwerkError> errors, 
+								 List<KraftwerkError> errors,
+								 KraftwerkExecutionLog kraftwerkExecutionLog,
 								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
