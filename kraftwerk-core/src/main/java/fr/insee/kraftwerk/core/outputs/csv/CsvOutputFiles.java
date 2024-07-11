@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -98,14 +97,9 @@ public class CsvOutputFiles extends OutputFiles {
 
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
-					String selectQuery = "SELECT COUNT(*) FROM ?";
-					try(PreparedStatement preparedStatement = getDatabase().getConnection().prepareStatement(selectQuery)) {
-						preparedStatement.setString(1, datasetName);
-						try (ResultSet countResult =
-									 preparedStatement.executeQuery()) {
-							countResult.next();
-							kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
-						}
+					try(ResultSet countResult = this.getDatabase().executeQuery("SELECT COUNT(*) FROM " + datasetName)){
+						countResult.next();
+                        kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
 			} catch (SQLException | IOException e) {
