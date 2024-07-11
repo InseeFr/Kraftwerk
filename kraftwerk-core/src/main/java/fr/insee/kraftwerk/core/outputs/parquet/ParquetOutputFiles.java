@@ -38,11 +38,12 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 * @param modes list of modes names
-	 * @param databaseConnection connection to duckDb database
+	 * @param database connection to duckDb database
 	 * @param fileUtilsInterface file interface to use (file system or minio)
 	 */
 
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, fileUtilsInterface) {
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database,
+							  FileUtilsInterface fileUtilsInterface) {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 	}
 

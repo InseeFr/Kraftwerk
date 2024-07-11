@@ -28,7 +28,7 @@ public abstract class OutputFiles {
 	private final VtlBindings vtlBindings;
 	private final Set<String> datasetToCreate = new HashSet<>();
 	private final Statement database;
-	private final FileUtilsInterface fileUtilsInterface;
+	protected final FileUtilsInterface fileUtilsInterface;
 
 	/**
 	 * When an instance is created, the output folder is created.
