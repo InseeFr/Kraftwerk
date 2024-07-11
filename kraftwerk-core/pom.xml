@@ -16,7 +16,7 @@
 
 	<properties>
 		<trevas.version>1.4.1</trevas.version>
-		<duckdb.version>0.10.3</duckdb.version>
+		<duckdb.version>1.0.0</duckdb.version>
 	</properties>
 
 
@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.5.0-M1</version>
+			<version>4.5.0-M2</version>
 		</dependency>
 
 		<!-- S3 -->
