@@ -81,12 +81,9 @@ public class KraftwerkBatch implements CommandLineRunner {
             }
         }catch(Exception e){
             log.error(e.toString());
-        }
-        if(args.length > 0) {
             System.exit(1);
-        }else{
-            log.info("Launching Kraftwerk in API mode...");
         }
+        log.info("Launching Kraftwerk in API mode...");
     }
 
     /**
