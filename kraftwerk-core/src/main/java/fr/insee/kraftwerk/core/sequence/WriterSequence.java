@@ -40,7 +40,7 @@ public class WriterSequence {
         /* Step 5.1 : write csv output tables */
         OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog,
 				new ArrayList<>(modeInputsMap.keySet()), databaseConnection);
-        csvOutputFiles.writeOutputTables(metadataModels);
+        csvOutputFiles.writeOutputTables();
 
         /* Step 5.2 : write scripts to import csv tables in several languages */
         csvOutputFiles.writeImportScripts(metadataModels, errors);
@@ -53,7 +53,7 @@ public class WriterSequence {
         /* Step 5.3 : write parquet output tables */
         OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,
 				new ArrayList<>(modeInputsMap.keySet()), databaseConnection);
-        parquetOutputFiles.writeOutputTables(metadataModels);
+        parquetOutputFiles.writeOutputTables();
         parquetOutputFiles.writeImportScripts(metadataModels, errors);
     }
 }
