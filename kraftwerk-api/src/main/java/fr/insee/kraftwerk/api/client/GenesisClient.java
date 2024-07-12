@@ -33,6 +33,12 @@ public class GenesisClient {
 		this.configProperties = configProperties;
 	}
 
+	public String pingGenesis(){
+		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+		return response.getBody() != null ? response.getBody() : null;
+	}
+
 	public List<SurveyUnitId> getSurveyUnitIds(String idQuestionnaire) {
 		String url = String.format("%s/response/get-idUEs/by-questionnaire?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
 		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(url, HttpMethod.GET, null, SurveyUnitId[].class);
