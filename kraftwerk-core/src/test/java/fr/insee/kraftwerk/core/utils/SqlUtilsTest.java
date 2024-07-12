@@ -15,6 +15,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -184,6 +187,28 @@ class SqlUtilsTest {
             //Then
             Assertions.assertThat(tableNames).contains("testtable1","testtable2");
         }
+    }
+
+    @Test
+    void openConnection_file_test() throws SQLException, IOException {
+        Path filePath = Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"sql","testdb.duckdb");
+        try(Connection testDatabaseFile = SqlUtils.openConnection(filePath)) {
+            Assertions.assertThat(testDatabaseFile).isNotNull();
+
+            Statement testDatabaseStatement = testDatabaseFile.createStatement();
+            //Given
+            testDatabaseStatement.execute("CREATE TABLE testtable1(testint1 INT, teststring1 NVARCHAR)");
+            testDatabaseStatement.execute("CREATE TABLE testtable2(testint2 INT, teststring2 NVARCHAR)");
+
+            //When
+            List<String> tableNames = SqlUtils.getTableNames(testDatabaseStatement);
+
+            //Then
+            Assertions.assertThat(tableNames).contains("testtable1","testtable2");
+            testDatabaseStatement.close();
+        }
+        Files.deleteIfExists(filePath);
+        Files.deleteIfExists(filePath.getParent().resolve(filePath.getFileName()+".wal"));
     }
 
 
