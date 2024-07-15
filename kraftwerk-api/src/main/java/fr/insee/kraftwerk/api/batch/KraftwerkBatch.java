@@ -47,6 +47,10 @@ public class KraftwerkBatch implements CommandLineRunner {
                 checkArgs(args);
 
                 //Parse arguments
+                //0. Service to use (MAIN,FILEBYFILE,GENESIS,LUNATIC_ONLY)
+                //1. Archive at end of execution (false or true)
+                //2. Integrate all reporting datas (false or true)
+                //3. Campaign name
                 KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
