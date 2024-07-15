@@ -214,11 +214,22 @@ public class LunaticReader {
 	 */
 	private static Group processDependingLoop(List<String> variables, MetadataModel metadataModel, Group parentGroup, JsonNode component) {
 		JsonNode loopDependencies = component.get("loopDependencies");
-		StringBuilder groupNameBuilder = new StringBuilder(loopDependencies.get(0).asText());
-		for (int i = 1; i < loopDependencies.size(); i++) {
-			groupNameBuilder.append("_").append(loopDependencies.get(i).asText());
+		String groupName;
+		if (!loopDependencies.isEmpty()) {
+			StringBuilder groupNameBuilder = new StringBuilder(loopDependencies.get(0).asText());
+			for (int i = 1; i < loopDependencies.size(); i++) {
+				groupNameBuilder.append("_").append(loopDependencies.get(i).asText());
+			}
+			groupName = groupNameBuilder.toString();
+		} else {
+			int i = 1;
+			groupName = "UNNAMED_" + i;
+			List<String> groups = metadataModel.getGroupNames();
+			while (groups.contains(groupName)) {
+				i++;
+				groupName = "UNNAMED_" + i;
+			}
 		}
-		String groupName = groupNameBuilder.toString();
 		log.info("Creation of group :" + groupName);
 		Group group = getNewGroup(metadataModel, groupName, parentGroup);
 		iterateOnComponentsToFindResponses(component, variables, metadataModel, group);
@@ -301,6 +312,7 @@ public class LunaticReader {
 				iterateOnTableBody(primaryComponent, group, variables, metadataModel, isLunaticV2);
 				break;
 			case null:
+				log.warn(String.format("%s component type not recognized", primaryComponent.get(COMPONENT_TYPE).asText()));
 				break;
 		}
 		//We also had the missing variable if it exists (only one missing variable even if multiple responses)
