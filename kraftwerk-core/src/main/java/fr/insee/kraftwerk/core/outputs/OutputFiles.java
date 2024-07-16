@@ -78,7 +78,7 @@ public abstract class OutputFiles {
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
      */
-	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
+	public void writeOutputTables() throws KraftwerkException {
 		// implemented in subclasses
 	}
 
