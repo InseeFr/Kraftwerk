@@ -13,11 +13,12 @@ import fr.insee.kraftwerk.core.metadata.VariablesMap;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,8 +33,8 @@ import java.util.Map;
 @Log4j2
 public class PaperDataParser extends DataParser {
 
-	/** File reader */
-	private FileReader filereader;
+	/** Input stream reader */
+	private InputStreamReader inputStreamReader;
 	/** Csv reader */
 	private CSVReader csvReader;
 
@@ -43,45 +44,38 @@ public class PaperDataParser extends DataParser {
 	 * @param data The SurveyRawData to be filled by the parseSurveyData method. The
 	 *             variables must have been previously set.
 	 */
-	public PaperDataParser(SurveyRawData data) {
-		super(data);
+	public PaperDataParser(SurveyRawData data, FileUtilsInterface fileUtilsInterface) {
+		super(data, fileUtilsInterface);
 	}
 
 	/**
 	 * Instantiate a CSVReader.
 	 *
-	 * @param filePath Path to the CSV file.
+	 * @param inputStream stream to the CSV file.
 	 */
-	private void readCsvFile(Path filePath) {
-		try {
-			// Create an object of file reader
-			// class with CSV file as a parameter.
-			filereader = new FileReader(filePath.toString());
-			// create csvReader object passing
-			// file reader as a parameter
-			csvReader = new CSVReader(filereader);
+	private void readCsvFileStream(InputStream inputStream) {
+		// Create an object of file reader
+		// class with CSV file as a parameter.
+		inputStreamReader = new InputStreamReader(inputStream);
+		// create csvReader object passing
+		// file reader as a parameter
+		csvReader = new CSVReader(inputStreamReader);
 
-			// create csvParser object with
-			// custom separator semicolon
-			CSVParser parser = new CSVParserBuilder().withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR).build();
+		// create csvParser object with
+		// custom separator semicolon
+		CSVParser parser = new CSVParserBuilder().withSeparator(Constants.CSV_PAPER_DATA_SEPARATOR).build();
 
-			// create csvReader object with parameter
-			// file reader and parser
-			csvReader = new CSVReaderBuilder(filereader)
-					// .withSkipLines(1) // (uncomment to ignore header)
-					.withCSVParser(parser).build();
-
-		} catch (FileNotFoundException e) {
-			log.error(String.format("Unable to find the file %s", filePath), e);
-		}
+		// create csvReader object with parameter
+		// file reader and parser
+		csvReader = new CSVReaderBuilder(inputStreamReader)
+				// .withSkipLines(1) // (uncomment to ignore header)
+				.withCSVParser(parser).build();
 	}
 
 	@Override
 	void parseDataFile(Path filePath) {
-
-		readCsvFile(filePath);
-
-		try {
+		try(InputStream inputStream = fileUtilsInterface.readFile(filePath.toString())){
+			readCsvFileStream(inputStream);
 
 			/*
 			 * We first map the variables in the header (first line) of the CSV file to the
@@ -161,7 +155,6 @@ public class PaperDataParser extends DataParser {
 				}
 				data.addQuestionnaire(questionnaireData);
 			}
-			filereader.close();
 			csvReader.close();
 		} catch (CsvValidationException e) {
 			log.error(String.format("Following CSV file is malformed: %s", filePath), e);

@@ -21,6 +21,18 @@ User documentation and functional tests are still in an [inhouse project](https:
 
 Kraftwerk uses [Lombok](https://projectlombok.org/).
 
+## Launch
+
+If no argument is specified in the `java -jar` command, Kraftwerk will launch
+as a REST API.
+Otherwise, it will launch on batch mode and apply treatments on one campaign
+with the specified arguments.
+The required arguments for batch mode are as follows (in order) :
+1. Service to use (`MAIN`,`FILEBYFILE`,`GENESIS`,`LUNATIC_ONLY`)
+2. Archive at end of execution (`false` or `true`)
+3. Integrate all reporting datas (`false` or `true`)
+4. Campaign name
+
 :fr:
 
 Kraftwerk est une application Java Spring conçue pour valider et traiter des données provenant d'enquêtes multimodes, afin de générer des tableaux de données prêts à être utilisés à des fins statistiques.
@@ -37,3 +49,14 @@ La documentation utilisateur et les tests fonctionnels sont encore dans un [proj
 * Maven 3.6 +
   
 Kraftwerk utilise [Lombok](https://projectlombok.org/).
+
+## Lancement
+
+Si aucun paramètre n'est spécifié dans la commande `java -jar`, Kraftwerk se lancera
+en tant qu'API REST.
+Sinon, il va se lancer en mode batch et appliquer les traitements sur une campagne
+avec les paramètres spécifiés. Les paramètres requis pour le mode batch sont les suivants (dans l'ordre) :
+1. Service à utiliser (`MAIN`,`FILEBYFILE`,`GENESIS`,`LUNATIC_ONLY`)
+2. Archiver à la fin de l'exécution (`false` ou `true`)
+3. Integrate all reporting datas (`false` ou `true`)
+4. Nom de la campagne

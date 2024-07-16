@@ -6,16 +6,14 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.FileUtils;
-import fr.insee.kraftwerk.core.utils.JsonFileReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.JsonReader;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Log4j2
 public class UserInputsGenesis extends UserInputs{
@@ -24,17 +22,17 @@ public class UserInputsGenesis extends UserInputs{
 
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes) throws KraftwerkException, IOException {
-		super(inputDirectory);
+	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		super(inputDirectory, fileUtilsInterface);
 		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
 		computeInputs();
 	}
 
-	private void computeInputs() throws KraftwerkException, IOException {
+	private void computeInputs() throws KraftwerkException {
         UserInputsFile userInputsFile;
 		if(hasConfigFile){
-            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory);
+            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory, fileUtilsInterface);
             modeInputsMap = userInputsFile.getModeInputsMap();
 		}else{
             for (Mode mode : modes) {
@@ -49,9 +47,9 @@ public class UserInputsGenesis extends UserInputs{
      * @param mode mode to get inputs from
      * @return a ModeInputs object
      */
-    private ModeInputs getModeInputs(Mode mode) throws KraftwerkException, IOException {
+    private ModeInputs getModeInputs(Mode mode) throws KraftwerkException {
         ModeInputs modeInputs = new ModeInputs();
-        modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toFile().toURI().toURL());
+        modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
         modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
         modeInputs.setDataMode(mode.name());
         if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
@@ -69,13 +67,13 @@ public class UserInputsGenesis extends UserInputs{
     private Path getModeVtlFile(Mode mode) throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
 		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
 		try {
-			JsonNode userInputs = JsonFileReader.read(userInputFile);
+			JsonNode userInputs = JsonReader.read(userInputFile, fileUtilsInterface);
 			JsonNode filesNode = userInputs.get("survey_data");
 			for (JsonNode fileNode : filesNode) {
 				String dataMode = readField(fileNode, "data_mode");
 				if (dataMode == null) {break;}
 				if (dataMode.equals(mode.name())) {
-					return FileUtils.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
+					return fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
 				}
 			}
 		} catch (IOException e) {
@@ -106,11 +104,8 @@ public class UserInputsGenesis extends UserInputs{
 	 * @return Path of the DDI file
 	 * @throws IOException – if an I/O error is thrown when accessing the starting file
 	 */
-	public Path findDDIFile(Path specDirectory) throws KraftwerkException, IOException {
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("ddi[\\w,\\s-]+\\.xml"))) {
-			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No DDI file (ddi*.xml) found in " + specDirectory.toString()));
-		}
+	public Path findDDIFile(Path specDirectory) throws KraftwerkException {
+		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.DDI_FILE_REGEX));
 	}
 
 	/**
@@ -119,10 +114,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * @return Path of the Lunatic file
 	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
 	 */
-	public Path findLunaticFile(Path specDirectory) throws KraftwerkException, IOException {
-		try (Stream<Path> files = Files.find(specDirectory, 1, (path, basicFileAttributes) -> path.toFile().getName().toLowerCase().matches("lunatic[\\w,\\s-]+\\.json"))) {
-			return files.findFirst()
-					.orElseThrow(() -> new KraftwerkException(404, "No Lunatic file (lunatic*.xml) found in " + specDirectory.toString()));
-		}
+	public Path findLunaticFile(Path specDirectory) throws KraftwerkException {
+		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.LUNATIC_FILE_REGEX));
 	}
 }

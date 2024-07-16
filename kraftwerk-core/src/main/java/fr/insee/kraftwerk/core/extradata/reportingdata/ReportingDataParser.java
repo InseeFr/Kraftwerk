@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.DateUtils;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.sql.Date;
@@ -19,9 +20,15 @@ public abstract class ReportingDataParser {
 	private int maxStates = 0;
 	private int maxAttempts = 0;
 	private int maxComments = 0;
+	protected FileUtilsInterface fileUtilsInterface;
+
+	public ReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+		this.fileUtilsInterface = fileUtilsInterface;
+	}
 
 	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData,
-			boolean withAllReportingData) {
+												boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
+		this.fileUtilsInterface = fileUtilsInterface;
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);
 		this.maxComments = countMaxComments(reportingData);

@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -25,9 +26,12 @@ public abstract class DataProcessing {
     protected final VtlBindings vtlBindings;
 	VtlExecute vtlExecute;
 
-    protected DataProcessing(VtlBindings vtlBindings){
+    FileUtilsInterface fileUtilsInterface;
+
+    protected DataProcessing(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface){
         this.vtlBindings = vtlBindings;
-        vtlExecute = new VtlExecute();
+        vtlExecute = new VtlExecute(fileUtilsInterface);
+        this.fileUtilsInterface = fileUtilsInterface;
     }
 
     public abstract String getStepName();
@@ -65,7 +69,7 @@ public abstract class DataProcessing {
     }
 
     protected void applyUserVtlInstructions(Path userVtlInstructionsPath, List<KraftwerkError> errors){
-        String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath);
+        String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath, fileUtilsInterface);
         log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {

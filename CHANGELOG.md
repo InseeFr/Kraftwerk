@@ -1,6 +1,10 @@
 # Changelog
-## 2.2.0 [TODO] - DuckDB implementation for output
+## 3.0.0 [TODO] - Kubernetes support
 ### Added
+- Launch treatment with command line
+- S3/MinIO support : All file system calls goes through an interface with both OS file system and MinIO implementations
+
+- DuckDB implementation for output
 - Transfer Vtl datasets into DuckDB before output step
 - SQL util class for SQL operations
 
@@ -10,7 +14,7 @@
 
 ### Removed
 - Avro
-- 
+
 ## 2.1.0 [2024-06-11] - Change Lunatic reader
 ### Changed
 - Refactor of Lunatic reader

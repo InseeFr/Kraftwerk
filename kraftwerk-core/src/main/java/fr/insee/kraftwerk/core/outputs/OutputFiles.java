@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,7 @@ public abstract class OutputFiles {
 	private final VtlBindings vtlBindings;
 	private final Set<String> datasetToCreate = new HashSet<>();
 	private final Statement database;
+	protected final FileUtilsInterface fileUtilsInterface;
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -35,17 +36,18 @@ public abstract class OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database) {
+	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
 		this.vtlBindings = vtlBindings;
 		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
-		createOutputFolder();
 		this.database = database;
+		this.fileUtilsInterface = fileUtilsInterface;
+		createOutputFolder();
 	}
 
 	/** Create output folder if doesn't exist. */
 	private void createOutputFolder() {
-		FileUtils.createDirectoryIfNotExist(outputFolder);
+		fileUtilsInterface.createDirectoryIfNotExist(outputFolder);
 	}
 
 	/** See getOutputDatasetNames doc. */

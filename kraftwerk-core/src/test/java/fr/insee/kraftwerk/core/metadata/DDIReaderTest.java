@@ -3,6 +3,8 @@ package fr.insee.kraftwerk.core.metadata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
@@ -27,6 +29,8 @@ class DDIReaderTest {
 	static final String DDI_LOG_X21 = "ddi-log-2021-x21-web.xml";
 	static final String DDI_LOG_X22 = "S2_WEB.xml";
 
+	static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 	@Test
 	void readSimpsonsV1Variables() throws MalformedURLException, KraftwerkException, URISyntaxException {
 
@@ -41,7 +45,7 @@ class DDIReaderTest {
 				"SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V1));
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_SIMPSONS_V1, fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -79,7 +83,7 @@ class DDIReaderTest {
 				"FEELCHAREV4", "LEAVDURATION11", "LEAVDURATION52", "NB_CHAR", "SURVEY_COMMENT");
 
 		MetadataModel simpsonsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_SIMPSONS_V2));
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_SIMPSONS_V2, fileUtilsInterface);
 
 		//
 		assertNotNull(simpsonsMetadata);
@@ -107,7 +111,7 @@ class DDIReaderTest {
 				"RESIDM", "NHAB");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_WEB));
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_VQS_WEB.toString(), fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);
@@ -147,7 +151,7 @@ class DDIReaderTest {
 				"AIDREG_B", "AIDREG_C", "AIDREG_D", "RESID", "RESIDANCIEN", "NBQUEST");
 
 		MetadataModel vqsMetadata = DDIReader
-				.getMetadataFromDDI(Constants.convertToUrl(DDI_FOLDER + "/" + DDI_VQS_PAP));
+				.getMetadataFromDDI(DDI_FOLDER + "/" + DDI_VQS_PAP, fileUtilsInterface);
 
 		//
 		assertNotNull(vqsMetadata);

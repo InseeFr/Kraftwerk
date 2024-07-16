@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONObject;
 
@@ -18,8 +19,8 @@ public class LunaticJsonDataParser extends DataParser {
 	 * @param data The SurveyRawData to be filled by the parseSurveyData method.
 	 *             The variables must have been previously set.
 	 */
-	public LunaticJsonDataParser(SurveyRawData data) {
-		super(data);
+	public LunaticJsonDataParser(SurveyRawData data, FileUtilsInterface fileUtilsInterface) {
+		super(data,fileUtilsInterface);
 	}
 
 	@Override
@@ -27,9 +28,10 @@ public class LunaticJsonDataParser extends DataParser {
 		log.warn("Lunatic data parser being implemented!");
 
 		//
-		JSONObject jsonObject = null;
+		JSONObject jsonObject;
+
 		try {
-			jsonObject = (JSONObject) Constants.readJsonSimple(filePath);
+			jsonObject = (JSONObject) Constants.readJsonSimple(filePath, fileUtilsInterface);
 		} catch (Exception e) {
 			throw new NullException("Can't read JSON file - "+e.getClass()+" "+ e.getMessage());
 		}

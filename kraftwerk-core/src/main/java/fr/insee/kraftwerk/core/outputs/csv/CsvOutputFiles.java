@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +41,12 @@ public class CsvOutputFiles extends OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database) {
-		super(outDirectory, vtlBindings, modes, database);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 		this.kraftwerkExecutionLog = null;
 	}
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionLog kraftwerkExecutionLog, List<String> modes, Statement database) {
-		super(outDirectory, vtlBindings, modes, database);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionLog kraftwerkExecutionLog, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 		this.kraftwerkExecutionLog = kraftwerkExecutionLog;
 	}
 
@@ -56,8 +57,10 @@ public class CsvOutputFiles extends OutputFiles {
 	@Override
 	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
-			File outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toFile();
 			try {
+				//Temporary file
+				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
 
@@ -72,28 +75,31 @@ public class CsvOutputFiles extends OutputFiles {
 				List<Integer> boolColumnIndexes = new ArrayList<>();
 
 				//Create file with double quotes header
-				Files.write(outputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+				Files.write(tmpOutputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, outputFile, columnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile, columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				//Apply csv format transformations
 
 				//Merge data file with header file
 				//Read line by line to avoid memory waste
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(outputFile.toPath().toAbsolutePath() + "data"))){
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"))){
 					String line = bufferedReader.readLine();
 					while(line != null){
 						//Apply transformations to elements
 						line = applyNullTransformation(line);
 						line = applyBooleanTransformations(line, boolColumnIndexes);
 
-						Files.write(outputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
+						Files.write(tmpOutputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
 						line = bufferedReader.readLine();
 					}
 				}
-				Files.deleteIfExists(Path.of(outputFile.toPath().toAbsolutePath() + "data"));
+				Files.deleteIfExists(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"));
+
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
@@ -177,9 +183,9 @@ public class CsvOutputFiles extends OutputFiles {
 		}
 		// Write scripts
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_with_data_table.R"),
-				new RImportScript(tableScriptInfoList).generateScript());
+				new RImportScript(tableScriptInfoList).generateScript(), getFileUtilsInterface());
 		TextFileWriter.writeFile(getOutputFolder().resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList,errors).generateScript());
+				new SASImportScript(tableScriptInfoList,errors).generateScript(), getFileUtilsInterface());
 	}
 
 	/**

@@ -1,6 +1,8 @@
 package fr.insee.kraftwerk.core.metadata;
 
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -11,12 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class LunaticReaderTest {
 
     static final Path lunaticSamplesPath = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "lunatic");
+    static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @Test
     void readLogX21TelLunaticFile() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                lunaticSamplesPath.resolve("log2021x21_tel.json"));
+                lunaticSamplesPath.resolve("log2021x21_tel.json"), fileUtilsInterface);
 
         //
         assertNotNull(calculatedVariables);
@@ -41,7 +44,7 @@ class LunaticReaderTest {
     void readLogX22WebLunaticFile() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                lunaticSamplesPath.resolve("log2021x22_web.json"));
+                lunaticSamplesPath.resolve("log2021x22_web.json"), fileUtilsInterface);
 
         //
         assertNotNull(calculatedVariables);
@@ -55,7 +58,7 @@ class LunaticReaderTest {
     void readVariablesFromLogX21WebLunaticFile() {
         //
         MetadataModel variables = LunaticReader.getMetadataFromLunatic(
-                lunaticSamplesPath.resolve("log2021x21_web.json"));
+                lunaticSamplesPath.resolve("log2021x21_web.json"), fileUtilsInterface);
 
         //
         assertNotNull(variables);

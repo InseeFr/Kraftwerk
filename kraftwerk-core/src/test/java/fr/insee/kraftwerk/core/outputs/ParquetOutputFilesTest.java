@@ -9,7 +9,8 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
@@ -38,6 +39,7 @@ class ParquetOutputFilesTest {
 
 	private static UserInputsFile testUserInputs;
 	private static ParquetOutputFiles outputFiles;
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 	private static Statement testDatabase;
 
 
@@ -62,7 +64,7 @@ class ParquetOutputFilesTest {
 			//
 			testUserInputs = new UserInputsFile(
 					Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
-					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"));
+					Path.of(TestConstants.UNIT_TESTS_DIRECTORY,"user_inputs"), fileUtilsInterface);
 			//
 			VtlBindings vtlBindings = new VtlBindings();
 			for (String mode : testUserInputs.getModes()) {
@@ -74,7 +76,7 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("FROM_USER", testDataset);
 			//
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase);
-			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase);
+			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase, fileUtilsInterface);
 		});
 	}
 
@@ -97,7 +99,7 @@ class ParquetOutputFilesTest {
 
 		// Clean the existing file
 //		Files.deleteIfExists(outputFiles.getOutputFolder());
-		FileUtils.createDirectoryIfNotExist(outputFiles.getOutputFolder());
+		fileUtilsInterface.createDirectoryIfNotExist(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
 		MetadataModel metMod = new MetadataModel();

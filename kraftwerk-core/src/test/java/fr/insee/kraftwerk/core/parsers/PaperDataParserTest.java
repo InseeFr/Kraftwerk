@@ -7,6 +7,8 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PaperDataParserTest {
 
     private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
+    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @Test
     void readPaperFile_null() {
         //Given
         SurveyRawData data = new SurveyRawData("TEST");
-        PaperDataParser parser = new PaperDataParser(data);
+        PaperDataParser parser = new PaperDataParser(data, fileUtilsInterface);
 
         //When + Then
         assertThrows(NullPointerException.class,() ->parser.parseDataFile(null));
@@ -39,7 +42,7 @@ class PaperDataParserTest {
         metadataModel.getVariables().putVariable(new Variable("TESTINT1", metadataModel.getRootGroup(), VariableType.INTEGER));
         data.setMetadataModel(metadataModel);
         Path dataPath = Paths.get(dataSamplesFolder + "/paper_csv/fake-paper-data.csv");
-        PaperDataParser parser = new PaperDataParser(data);
+        PaperDataParser parser = new PaperDataParser(data, fileUtilsInterface);
 
         //When
         parser.parseSurveyData(dataPath,null);
@@ -72,7 +75,7 @@ class PaperDataParserTest {
         metadataModel.getVariables().putVariable(new Variable("TESTINT1", metadataModel.getRootGroup(), VariableType.INTEGER));
         data.setMetadataModel(metadataModel);
         Path dataPath = Paths.get(dataSamplesFolder + "/paper_csv/fake-multiple-files");
-        PaperDataParser parser = new PaperDataParser(data);
+        PaperDataParser parser = new PaperDataParser(data, fileUtilsInterface);
 
         //When
         parser.parseSurveyData(dataPath,null);
