@@ -13,6 +13,9 @@
 - (File-by-file) Kraftwerk now exports only one .parquet file
 - Output is now made from DuckDB instead of VTL dataset
 
+### Fixed
+- Loop without name
+
 ### Removed
 - Avro
 
