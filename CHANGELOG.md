@@ -1,12 +1,13 @@
 # Changelog
-## 3.0.0 [TODO] - Kubernetes support
+
+## 3.0.0 [2024-07-16] - DuckDB implementation for output and Kubernetes support
 ### Added
 - Launch treatment with command line
 - S3/MinIO support : All file system calls goes through an interface with both OS file system and MinIO implementations
-
 - DuckDB implementation for output
 - Transfer Vtl datasets into DuckDB before output step
 - SQL util class for SQL operations
+- Health-check
 
 ### Changed
 - (File-by-file) Kraftwerk now exports only one .parquet file
