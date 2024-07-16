@@ -1,10 +1,10 @@
 package fr.insee.kraftwerk.core.utils;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -17,28 +17,27 @@ import fr.insee.kraftwerk.core.Constants;
 
 /** Encapsulate org.opencsv features that we use in Kraftwerk. */
 public class CsvUtils {
-
     private CsvUtils() {
         //Utility class
     }
 
-    public static CSVReader getReader(Path filePath) throws IOException {
+    public static CSVReader getReader(InputStream inputStream){
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
                 //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
                 //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
                 .build();
-        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+        return new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 //.withSkipLines(1) // (uncomment to ignore header)
                 .withCSVParser(parser)
                 .build();
     }
 
-    public static CSVReader getReaderWithSeparator(String filePath, char separator) throws IOException {
+    public static CSVReader getReaderWithSeparator(InputStream inputStream, char separator){
         CSVParser csvParser= new CSVParserBuilder()
                 .withSeparator(separator)
                 .build();
-        return new CSVReaderBuilder(new FileReader(filePath, StandardCharsets.UTF_8))
+        return new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .withCSVParser(csvParser)
                 .build();
     }

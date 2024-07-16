@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -17,7 +18,8 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
@@ -72,7 +74,8 @@ public class MainDefinitions {
 
 	@BeforeAll
 	public static void clean() throws KraftwerkException, SQLException {
-		FileUtils.deleteDirectory(outDirectory);
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+		fileUtilsInterface.deleteDirectory(outDirectory);
 		database = SqlUtils.openConnection();
 	}
 
@@ -83,7 +86,7 @@ public class MainDefinitions {
 		this.campaignName = campaignDirectoryName;
 		inDirectory = inDirectory.resolve(campaignName);
 		outDirectory = outDirectory.resolve(campaignName);
-		controlInputSequence = new ControlInputSequence(inDirectory.toString());
+		controlInputSequence = new ControlInputSequence(inDirectory.toString(), new FileSystemImpl());
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
@@ -106,19 +109,19 @@ public class MainDefinitions {
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
-		userInputs = controlInputSequence.getUserInputs(inDirectory);
+		userInputs = controlInputSequence.getUserInputs(inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize with input file {string}")
 	public void initialize_with_specific_input(String inputFileName) throws KraftwerkException {
-		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory);
+		userInputs = new UserInputsFile(inDirectory.resolve(inputFileName), inDirectory, new FileSystemImpl());
 		vtlBindings = new VtlBindings();
 	}
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -126,7 +129,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -137,7 +140,7 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
@@ -146,10 +149,10 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 		await().atMost(2, TimeUnit.SECONDS);
-		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L);
+		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
@@ -159,20 +162,20 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), true,
-				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L);
+				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L, new FileSystemImpl());
 		mp.runMain();
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws KraftwerkException, SQLException {
+	public void unimodal_treatments() throws KraftwerkException, SQLException, NullException {
 		try (Statement statement = database.createStatement()) {
-			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap());
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true);
+			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl());
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl());
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
 				UnimodalSequence unimodal = new UnimodalSequence();
-				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap);
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
 			}
 		}
 	}
@@ -181,7 +184,7 @@ public class MainDefinitions {
 	public void aggregate_datasets() throws SQLException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		try (Statement statement = database.createStatement()) {
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap);
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
 		}
 	}
 
@@ -190,9 +193,9 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, null, statement);
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, null, statement, new FileSystemImpl());
 			writeErrorsFile(inDirectory, localDateTime, errors);
-			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement);
+			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl());
 		}
 	}
 
@@ -372,8 +375,8 @@ public class MainDefinitions {
 	}
 
 	private void writeErrorsFile(Path inDirectory,LocalDateTime localDateTime, List<KraftwerkError> errors) {
-		Path tempOutputPath = FileUtils.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
-		FileUtils.createDirectoryIfNotExist(tempOutputPath.getParent());
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime).resolve(Constants.ERRORS_FILE_NAME);
+		new FileSystemImpl().createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		// Write errors file
 		if (!errors.isEmpty()) {

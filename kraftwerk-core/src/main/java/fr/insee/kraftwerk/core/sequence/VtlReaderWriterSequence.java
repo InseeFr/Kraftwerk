@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
@@ -14,9 +14,12 @@ public class VtlReaderWriterSequence {
 	VtlExecute vtlExecute;
 	private static final String JSON = ".json";
 
+	FileUtilsInterface fileUtilsInterface;
 
-	public VtlReaderWriterSequence() {
-		vtlExecute = new VtlExecute();
+
+	public VtlReaderWriterSequence(FileUtilsInterface fileUtilsInterface) {
+		vtlExecute = new VtlExecute(fileUtilsInterface);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public void readDataset(String path,String bindingName, StepEnum previousStep, VtlBindings vtlBindings) {
@@ -29,7 +32,7 @@ public class VtlReaderWriterSequence {
 	}
 
 	public void writeTempBindings(Path inDirectory, String dataMode, VtlBindings vtlBindings, StepEnum step)  {
-		Path tempOutputPath = FileUtils.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
+		Path tempOutputPath = FileUtilsInterface.transformToTemp(inDirectory).resolve(dataMode+"_"+step.getStepLabel()+JSON);
 		vtlExecute.writeJsonDataset(dataMode, tempOutputPath, vtlBindings);
 	}
 	

@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 
@@ -9,8 +10,8 @@ import fr.insee.kraftwerk.core.vtl.VtlScript;
  */
 public class LunaticDataProcessing extends UnimodalDataProcessing {
 
-    public LunaticDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel) {
-        super(vtlBindings, metadataModel);
+    public LunaticDataProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface) {
+        super(vtlBindings, metadataModel, fileUtilsInterface);
     }
 
     @Override

@@ -9,6 +9,8 @@ import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -23,11 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Test
 	void readXmlFile_null() {
 		SurveyRawData data = new SurveyRawData("TEST");
-		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		
 		assertThrows(NullPointerException.class,() ->parser.parseDataFile(null));
 		parser.parseDataFile(Path.of("notfound.xml"));
@@ -43,7 +46,7 @@ class LunaticXmlDataParserTest {
 		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
 		data.setMetadataModel(metadataModel);
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-multiple-files");
-		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		parser.parseSurveyData(dataPath,null);
 
 		//
@@ -63,7 +66,7 @@ class LunaticXmlDataParserTest {
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setMetadataModel(MetadataModelTest.createVariablesMap_rootOnly());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml");
-		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		parser.parseSurveyData(dataPath,null);
 
 		//
@@ -96,7 +99,7 @@ class LunaticXmlDataParserTest {
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml");
-		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		parser.parseSurveyData(dataPath,null);
 
 		//
@@ -130,7 +133,7 @@ class LunaticXmlDataParserTest {
 		SurveyRawData data = new SurveyRawData("TEST");
 		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-3.xml");
-		LunaticXmlDataParser parser = new LunaticXmlDataParser(data);
+		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 
 		//When
 		parser.parseSurveyData(dataPath,null);

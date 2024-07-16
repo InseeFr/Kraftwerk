@@ -1,18 +1,20 @@
 package fr.insee.kraftwerk.core;
 
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +63,8 @@ public final class Constants {
 	public static final String DUCKDB_URL = "jdbc:duckdb:";
 
 	public static final int DB_CONNECTION_TRY_COUNT = 10;
+	public static final String DDI_FILE_REGEX = "ddi[\\w,\\s-]+\\.xml";
+	public static final String LUNATIC_FILE_REGEX = "lunatic[\\w,\\s-]+\\.json";
 
 
 	// ----- Explicit Variables Names
@@ -206,10 +210,11 @@ public final class Constants {
 	 * @throws ParseException 
 	 * @throws IOException 
 	 */
-	public static Object readJsonSimple(Path filename) throws IOException, ParseException {
-		FileReader reader = new FileReader(filename.toString());
-		JSONParser jsonParser = new JSONParser();
-		return jsonParser.parse(reader);
+	public static Object readJsonSimple(Path filename, FileUtilsInterface fileUtilsInterface) throws IOException, ParseException {
+		try(InputStream inputStream = fileUtilsInterface.readFile(filename.toString())){
+			JSONParser jsonParser = new JSONParser();
+			return jsonParser.parse(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+		}
 	}
 
 	// ---------- Maths function

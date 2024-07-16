@@ -16,11 +16,10 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.FileUtils;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,11 @@ import java.util.Map;
 public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
+	FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequenceGenesis() {
-		vtlExecute = new VtlExecute();
+	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface) {
+		vtlExecute = new VtlExecute(fileUtilsInterface);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws KraftwerkException {
@@ -70,39 +71,37 @@ public class BuildBindingsSequenceGenesis {
 		}
 
 		/* Step 2.2 : Get paradata for the survey */
-		parseParadata(dataMode, data, inDirectory);
+		parseParadata(dataMode, data, inDirectory, fileUtilsInterface);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, inDirectory);
+		parseReportingData(dataMode, data, inDirectory, fileUtilsInterface);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory) throws NullException {
+	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
 		Path paraDataPath = inDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
-		File paradataFolder = paraDataPath.toFile();
-		if (paradataFolder.exists()) {
-			ParadataParser paraDataParser = new ParadataParser();
+		if (fileUtilsInterface.isFileExists(paraDataPath.toString())) {
+			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
 		}
 	}
 
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory) throws KraftwerkException {
+	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
-		File reportingDataFolder = reportingDataFile.toFile();
-		if (reportingDataFolder.exists()) {
-			List<String> listFiles = FileUtils.listFiles(reportingDataFile.toString());
+		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
+			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());
 			for (String file : listFiles) {
 				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
 				if (file.contains(".xml")) {
-					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser();
+					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 					xMLReportingDataParser.parseReportingData(reportingData, data, true);
 
 				} else if (file.contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser();
+					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 					cSVReportingDataParser.parseReportingData(reportingData, data, true);
 				}
 			}

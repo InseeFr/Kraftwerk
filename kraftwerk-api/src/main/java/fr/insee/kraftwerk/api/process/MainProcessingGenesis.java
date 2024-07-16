@@ -15,6 +15,7 @@ import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -23,7 +24,6 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Component
 public class MainProcessingGenesis {
 
 	@Setter
@@ -47,6 +46,7 @@ public class MainProcessingGenesis {
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
+	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
 
 	/* SPECIFIC VARIABLES */
@@ -60,19 +60,21 @@ public class MainProcessingGenesis {
 
 	private final GenesisClient client;
 
-	public MainProcessingGenesis(ConfigProperties config) {
+	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface) {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
+		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void init(String idCampaign) throws KraftwerkException, IOException {
+	public void init(String idCampaign) throws KraftwerkException {
 		log.info("Kraftwerk main service started for campaign: " + idCampaign);
+		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis("", fileUtilsInterface);
 		this.executionDateTime = LocalDateTime.now();
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign));
+		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign), fileUtilsInterface);
 		if (!userInputs.getModes().isEmpty()) {
-			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap());
+			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface);
 		} else {
 			log.error("No source found for campaign " + idCampaign);
 		}
@@ -110,18 +112,18 @@ public class MainProcessingGenesis {
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
-		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis();
+		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, fileUtilsInterface);
 	}
 
 	/* Step 4 : Insert into SQL database */
@@ -133,12 +135,12 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
 	}
 
 }

@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,15 +29,22 @@ import java.util.stream.Stream;
 public class ParquetOutputFiles extends OutputFiles {
 
 	public static final String PARQUET_EXTENSION = ".parquet";
+
+	private final Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
+
 	/**
 	 * When an instance is created, the output folder is created.
-	 * 
+	 *
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
+	 * @param modes list of modes names
+	 * @param database connection to duckDb database
+	 * @param fileUtilsInterface file interface to use (file system or minio)
 	 */
 
-	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement databaseConnection) {
-		super(outDirectory, vtlBindings, modes, databaseConnection);
+	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database,
+							  FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 	}
 
 	
@@ -45,11 +54,16 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
-			File outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toFile();
 			try {
-				Files.deleteIfExists(outputFile.toPath());
+				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+
+				Files.deleteIfExists(tmpOutputFile.toPath());
 				//Data export
-				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, outputFile.getAbsolutePath()));
+				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile.getAbsolutePath()));
+
+
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
@@ -72,7 +86,7 @@ public class ParquetOutputFiles extends OutputFiles {
 		}
 		// Write scripts
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_parquet.R"),
-				new RImportScript(tableScriptInfoList).generateScript());
+				new RImportScript(tableScriptInfoList).generateScript(), this.getFileUtilsInterface());
 	}
 
 	/**

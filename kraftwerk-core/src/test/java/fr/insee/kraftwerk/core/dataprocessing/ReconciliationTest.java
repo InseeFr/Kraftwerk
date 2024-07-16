@@ -2,6 +2,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -23,6 +25,7 @@ class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
 	private List<KraftwerkError> errors;
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -80,7 +83,7 @@ class ReconciliationTest {
 		//
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
 		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
@@ -92,7 +95,7 @@ class ReconciliationTest {
 		vtlBindings.put(mode1, testDatasets.get(mode1));
 		vtlBindings.put(mode2, testDatasets.get(mode2));
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
 		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		return vtlBindings.getDataset("MULTIMODE");
@@ -136,7 +139,7 @@ class ReconciliationTest {
 		vtlBindings.put("CAWI", capiDataset);
 		vtlBindings.put("PAPI", papiDataset);
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
 		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");

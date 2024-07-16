@@ -7,6 +7,8 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,9 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CSVReportingDataParserTest {
 
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+
 	@Test
 	void parseReportingDataTest() {
-		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
+		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
@@ -48,7 +52,7 @@ class CSVReportingDataParserTest {
 
 	@Test
 	void controlHeaderTest() {
-		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
+		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 		String[] validHeaderToControl = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot"};
 		String[] invalidHeaderWrongValues = new String [] {"statut", "dateInfo", "idUe2", "idContact", "nom", "prenom", "adresse2", "numeroDeLot2"};
 		String[] headerToControlWrongSize = new String [] {"statut", "dateInfo", "idUe", "idContact", "nom", "prenom", "adresse", "numeroDeLot", "ninth"};
@@ -60,7 +64,7 @@ class CSVReportingDataParserTest {
 
 	@Test
 	void convertDateTest() {
-		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser();
+		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 		assertEquals(1645007098, csvReportingDataParser.convertToTimestamp("16/02/2022 11:24:58"));
 		assertEquals(1566544132, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));
 		assertEquals(1111111111, csvReportingDataParser.convertToTimestamp("18/03/2005 02:58:31"));

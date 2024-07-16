@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -18,7 +20,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 
 class InformationLevelsTest {
-	
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 	private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
 
 	Dataset testDataset = new InMemoryDataset(
@@ -52,7 +54,7 @@ class InformationLevelsTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
 		//
-		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings);
+		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
 		processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
@@ -92,7 +94,7 @@ class InformationLevelsTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDatasetWithPartialIdNull);
 		//
-		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings);
+		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
 		processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
