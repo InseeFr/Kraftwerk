@@ -32,7 +32,8 @@ public class HealthcheckService extends KraftwerkService {
 
 	@Autowired
 	public HealthcheckService(ConfigProperties configProperties) {
-		this.configProperties = configProperties;
+        super(null);
+        this.configProperties = configProperties;
 		this.client = new GenesisClient(new RestTemplateBuilder(), configProperties);
 
 	}
