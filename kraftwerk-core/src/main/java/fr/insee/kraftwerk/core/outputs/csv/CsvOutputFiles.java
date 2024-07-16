@@ -55,7 +55,7 @@ public class CsvOutputFiles extends OutputFiles {
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
 	@Override
-	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
+	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file

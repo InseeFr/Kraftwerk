@@ -8,7 +8,6 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
@@ -52,10 +51,11 @@ public class WriterSequence {
 		/* Step 5.1 : write csv output tables */
 		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionLog, new ArrayList<>(modeInputsMap.keySet()),
 				database, fileUtilsInterface);
-		csvOutputFiles.writeOutputTables(metadataModels);
+		csvOutputFiles.writeOutputTables();
 		/* Step 5.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, errors);
 	}
+
 
 	//Write Parquet
 	private void writeParquetFiles(Path outDirectory,
@@ -67,7 +67,7 @@ public class WriterSequence {
 									 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		/* Step 5.3 : write parquet output tables */
 		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface);
-		parquetOutputFiles.writeOutputTables(metadataModels);
+		parquetOutputFiles.writeOutputTables();
 		parquetOutputFiles.writeImportScripts(metadataModels, errors);
 	}
 }

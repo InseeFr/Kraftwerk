@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,7 +51,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * Method to write output tables from datasets that are in the bindings.
 	 */
 	@Override
-	public void writeOutputTables(Map<String, MetadataModel> metadataModels) throws KraftwerkException {
+	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
