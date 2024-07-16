@@ -55,7 +55,7 @@ public class KraftwerkService {
 	@PostConstruct
 	public void initializeWithProperties() {
 		FileUtilsInterface fileUtilsInterface;
-		if(minioConfig.isEnable()){
+		if(minioConfig != null && minioConfig.isEnable()){
 			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{

@@ -4,8 +4,8 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
+import jakarta.annotation.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
