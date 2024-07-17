@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>kraftwerk-functional-tests</artifactId>
-	<name>Archetype - kraftwerk-tests</name>
+	<name>kraftwerk-tests</name>
 
 	<properties>
 		<kraftwerk.version>3.0.0</kraftwerk.version>
