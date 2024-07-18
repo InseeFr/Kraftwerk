@@ -174,6 +174,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 			createDirectoryIfNotExist(Path.of(dstPath).getParent());
 			Files.move(Path.of(srcPath), Path.of(dstPath), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
+			log.error(e.toString());
 			throw new KraftwerkException(500, "Can't move file " + srcPath + " to " + dstPath);
 		}
 	}
