@@ -96,10 +96,10 @@ public class CsvOutputFiles extends OutputFiles {
 						line = bufferedReader.readLine();
 					}
 				}
-				Files.deleteIfExists(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"));
+				Files.deleteIfExists(Path.of(tmpOutputFile.toPath() + "data"));
 
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {

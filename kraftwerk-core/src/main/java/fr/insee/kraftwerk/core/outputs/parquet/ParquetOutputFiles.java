@@ -63,7 +63,7 @@ public class ParquetOutputFiles extends OutputFiles {
 
 
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile.toPath().toAbsolutePath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
+				getFileUtilsInterface().moveFile(tmpOutputFile.toPath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
