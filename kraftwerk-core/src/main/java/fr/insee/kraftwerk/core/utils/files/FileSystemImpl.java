@@ -108,7 +108,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 			Files.createDirectories(path);
 			log.info(String.format("Created folder: %s", path.toFile().getAbsolutePath()));
 		} catch (IOException e) {
-			log.error("Permission refused to create folder: " + path.getParent(), e);
+			log.error("Permission refused to create folder: {} : {}", path.getParent(), e);
 		}
 	}
 
@@ -169,20 +169,15 @@ public class FileSystemImpl implements FileUtilsInterface{
 	}
 
 	@Override
-	public void moveFile(String srcPath, String dstPath) throws KraftwerkException {
+	public void moveFile(Path srcPath, String dstPath) throws KraftwerkException {
 		try {
-			createDirectoryIfNotExist(Path.of(dstPath).getParent());
-			Files.move(Path.of(srcPath), Path.of(dstPath), StandardCopyOption.REPLACE_EXISTING);
+			Path targetPath = Path.of(dstPath);
+			createDirectoryIfNotExist(targetPath.getParent());
+			Files.move(srcPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			log.error(e.toString());
+			log.error(e.getMessage());
 			throw new KraftwerkException(500, "Can't move file " + srcPath + " to " + dstPath);
 		}
-	}
-
-	@Override
-	public void moveFile(Path fileSystemPath, String dstPath) throws KraftwerkException {
-		//Same than other moveFile
-		moveFile(fileSystemPath.toString(), dstPath);
 	}
 
 	@Override
@@ -254,7 +249,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 			new File(newDataPath.getParent().toString()).mkdirs();
 		}
 		if (Files.isRegularFile(dataPath)) {
-			moveFile(dataPath.toString(), newDataPath.toString());
+			moveFile(dataPath, newDataPath.toString());
 		} else if (Files.isDirectory(dataPath)) {
 			moveDirectory(dataPath.toFile(),newDataPath.toFile());
 		} else {
