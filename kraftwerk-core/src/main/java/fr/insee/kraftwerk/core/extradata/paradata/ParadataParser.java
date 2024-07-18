@@ -42,24 +42,28 @@ public class ParadataParser {
 			throw new NullException("JSONFile not defined");
 
 		if (!filePath.toString().contentEquals("")) {
-			// Parse each ParaDataUE
-			List<ParaDataUE> listParaDataUE = new ArrayList<>();
-			// Get all filepaths for each ParadataUE
-			for(String fileParaDataPath : fileUtilsInterface.listFilePaths(filePath.toString()).stream().filter(
-					s -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(Path.of(s)))
-			).toList()){
-				ParaDataUE paraDataUE = new ParaDataUE();
-				paraDataUE.setFilepath(Path.of(fileParaDataPath));
-				parseParadataUE(paraDataUE, surveyRawData);
-				paraDataUE.sortEvents();
-				paraDataUE.setSurveyValidationDateTimeStamp(Constants.PARADATA_SURVEY_VALIDATION_EVENT_NAME);
-				if (paraDataUE.getEvents().size() > 2) {
-					paraDataUE.createOrchestratorsAndSessions();
-					integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
-					listParaDataUE.add(paraDataUE);
+			try {
+				// Parse each ParaDataUE
+				List<ParaDataUE> listParaDataUE = new ArrayList<>();
+				// Get all filepaths for each ParadataUE
+				for (String fileParaDataPath : fileUtilsInterface.listFilePaths(filePath.toString()).stream().filter(
+						s -> surveyRawData.getIdSurveyUnits().contains(getIdFromFilename(Path.of(s)))
+				).toList()) {
+					ParaDataUE paraDataUE = new ParaDataUE();
+					paraDataUE.setFilepath(Path.of(fileParaDataPath));
+					parseParadataUE(paraDataUE, surveyRawData);
+					paraDataUE.sortEvents();
+					paraDataUE.setSurveyValidationDateTimeStamp(Constants.PARADATA_SURVEY_VALIDATION_EVENT_NAME);
+					if (paraDataUE.getEvents().size() > 2) {
+						paraDataUE.createOrchestratorsAndSessions();
+						integrateParaDataVariablesIntoUE(paraDataUE, surveyRawData);
+						listParaDataUE.add(paraDataUE);
+					}
 				}
+				paradata.setListParadataUE(listParaDataUE);
+			} catch (NullException e){
+				log.error("Error parsing paradata : " + e.getMessage());
 			}
-			paradata.setListParadataUE(listParaDataUE);
 		}
 	}
 
