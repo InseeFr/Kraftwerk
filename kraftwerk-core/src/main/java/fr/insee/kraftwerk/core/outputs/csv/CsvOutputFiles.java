@@ -59,7 +59,7 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
-				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+				Path tmpOutputFile = Files.createTempFile(outputFileName(datasetName), null);
 
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
@@ -75,31 +75,31 @@ public class CsvOutputFiles extends OutputFiles {
 				List<Integer> boolColumnIndexes = new ArrayList<>();
 
 				//Create file with double quotes header
-				Files.write(tmpOutputFile.toPath(), buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile, columnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				//Apply csv format transformations
 
 				//Merge data file with header file
 				//Read line by line to avoid memory waste
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toPath().toAbsolutePath() + "data"))){
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
 					String line = bufferedReader.readLine();
 					while(line != null){
 						//Apply transformations to elements
 						line = applyNullTransformation(line);
 						line = applyBooleanTransformations(line, boolColumnIndexes);
 
-						Files.write(tmpOutputFile.toPath(),(line + "\n").getBytes(),StandardOpenOption.APPEND);
+						Files.write(tmpOutputFile,(line + "\n").getBytes(),StandardOpenOption.APPEND);
 						line = bufferedReader.readLine();
 					}
 				}
-				Files.deleteIfExists(Path.of(tmpOutputFile.toPath() + "data"));
+				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
 
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile.toPath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
+				getFileUtilsInterface().moveFile(tmpOutputFile, getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
