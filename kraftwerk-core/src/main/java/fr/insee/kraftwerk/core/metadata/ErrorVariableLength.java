@@ -8,13 +8,13 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class ErrorVariableLength extends KraftwerkError {
 
-    @Setter
+
     private Variable variable;
 
-    @Setter
     private String dataMode;
 
     @Override

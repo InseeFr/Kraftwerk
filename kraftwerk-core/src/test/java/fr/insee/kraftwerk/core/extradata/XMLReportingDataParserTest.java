@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,18 +24,14 @@ class XMLReportingDataParserTest {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Test
-	void parseReportingDataTest() {
+	void parseReportingDataTest() throws NullException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
-		try {
 			xMLReportingDataParser.parseReportingData(reportingData, data, true);
-		} catch (NullException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
 		// Check the reporting data is well captured
 		assertEquals(12, reportingData.getListReportingDataUE().size());
@@ -65,18 +62,14 @@ class XMLReportingDataParserTest {
 	}
 
 	@Test
-	void parseMoogReportingDataTest(){
+	void parseMoogReportingDataTest() throws NullException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdatamoog.xml"));
-		try {
 			xMLReportingDataParser.parseReportingData(reportingData, data, true);
-		} catch (NullException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
 		// Check the reporting data is well captured
 		assertEquals(101, reportingData.getListReportingDataUE().size());
@@ -159,7 +152,7 @@ class XMLReportingDataParserTest {
 	@Test
 	void maxTest() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-		ReportingData reportingData = new ReportingData();
+		ReportingData reportingData = new ReportingData(Path.of("test"));
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
 		assertEquals(5, xMLReportingDataParser.countMaxStates(reportingData)); //remove double
 	}
@@ -167,7 +160,7 @@ class XMLReportingDataParserTest {
 	@Test
 	void maxTest_noData() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-		ReportingData reportingData = new ReportingData();
+		ReportingData reportingData = new ReportingData(Path.of("test"));
 		assertEquals(0, xMLReportingDataParser.countMaxStates(reportingData));
 		assertEquals(0, xMLReportingDataParser.countMaxAttempts(reportingData));
 		assertEquals(0, xMLReportingDataParser.countMaxComments(reportingData));

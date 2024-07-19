@@ -31,8 +31,8 @@ public abstract class ImportScript {
 	public static Map<String, Variable> getAllLength(Structured.DataStructure dataStructure,
 			Map<String, MetadataModel> metadataModels) {
 		Map<String, Variable> result = new LinkedHashMap<>();
-		// datastructure : noms complets
-		// metadata : suffixe du nom
+		// dataStructure : complete name
+		// metadata : name suffix
 		// We loop with all variables in the current dataset we want to export
 		for (String variableName : dataStructure.keySet()) {
 			// We try to find it from the first datasets containing together all variables
@@ -42,14 +42,14 @@ public abstract class ImportScript {
 				MetadataModel metadataModel = metadata.getValue();
 
 				// We treat the identifiers
-				if (metadataModel.getIdentifierNames().contains(variableName) && !result.containsKey(variableName)) {
-					result.put(variableName,
-							new Variable(variableName, metadataModel.getGroup(variableName), VariableType.STRING, "32"));
+				if (metadataModel.getIdentifierNames().contains(variableName)) {
+					result.computeIfAbsent(variableName, v ->
+							new Variable(v, metadataModel.getGroup(v), VariableType.STRING, "32"));
 				}
 				if (metadataModel.getDistinctVariableNamesAndFullyQualifiedNames().contains(variableName)) {
 					variableName = addOrReplaceLength(result, variableName, metadataModel);
-				} else if (!result.containsKey(variableName)) {
-					result.put(variableName, new Variable(variableName,
+				} else {
+					result.computeIfAbsent(variableName, v -> new Variable(v,
 							metadataModel.getGroup(Constants.ROOT_GROUP_NAME), VariableType.STRING, STRING_LENGTH));
 
 				}

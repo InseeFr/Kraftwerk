@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.State;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ReportingDataUETest {
 
 	@Test
 	void containsReportingDataUETest() {
-		ReportingData reportingData = new ReportingData();
+		ReportingData reportingData = new ReportingData(Path.of("test"));
 		List<ReportingDataUE> listReportingDataUE = new ArrayList<>();
 		listReportingDataUE.add(new ReportingDataUE("Report0001"));
 		listReportingDataUE.add(new ReportingDataUE("Report0002"));

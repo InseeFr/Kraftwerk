@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +16,10 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 class XmlSplitterTest {
 
@@ -50,7 +48,7 @@ class XmlSplitterTest {
 	@DisplayName("OutDirectory should contain 3 files")
 	void splitInThreeTest() throws XMLStreamException, IOException {
 		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
-		assertEquals(3,splitFiles.size());
+		Assertions.assertEquals(3, splitFiles.size());
 	}
 
 	@Test
@@ -59,7 +57,6 @@ class XmlSplitterTest {
 		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 		int count = 0;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
-		try {
 			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(outDirectory+"split1.xml"));
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
@@ -70,10 +67,8 @@ class XmlSplitterTest {
 					}
 				}
 			}
-		} catch (FileNotFoundException | XMLStreamException e) {
-			e.printStackTrace();
-		}
-		assertEquals(2, count);
+
+		Assertions.assertEquals(2, count);
 	}
 
 
