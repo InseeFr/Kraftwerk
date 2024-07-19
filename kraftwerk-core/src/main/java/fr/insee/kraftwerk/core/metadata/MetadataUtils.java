@@ -69,12 +69,7 @@ public class MetadataUtils {
 			group = metadata.getVariables().getQuestionGridGroup(correspondingVariableName);
 		} else {
 			group = metadata.getGroup(metadata.getGroupNames().getFirst());
-			log.warn(String.format(
-					"No information from the DDI about question named \"%s\".",
-					correspondingVariableName));
-			log.warn(String.format(
-					"\"%s\" has been arbitrarily associated with group \"%s\".",
-					missingVar, group.getName()));
+			log.warn("No information from the DDI about question named {}. It has been arbitrarily associated with group {}.", correspondingVariableName, group.getName());
 		}
 		metadata.getVariables().putVariable(new Variable(missingVar, group, varType));
 	}
