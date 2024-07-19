@@ -10,7 +10,6 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,15 +54,15 @@ public class ParquetOutputFiles extends OutputFiles {
 	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
-				File tmpOutputFile = File.createTempFile(outputFileName(datasetName), null);
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
 
-				Files.deleteIfExists(tmpOutputFile.toPath());
+				Files.deleteIfExists(tmpOutputFile);
 				//Data export
-				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile.getAbsolutePath()));
+				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile));
 
 
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile.toPath(), getOutputFolder().resolve(outputFileName(datasetName)).toString());
+				getFileUtilsInterface().moveFile(tmpOutputFile, getOutputFolder().resolve(outputFileName(datasetName)).toString());
 
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
