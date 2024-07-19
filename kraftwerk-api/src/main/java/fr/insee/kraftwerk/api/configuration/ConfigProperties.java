@@ -1,9 +1,12 @@
 package fr.insee.kraftwerk.api.configuration;
 
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
+import java.nio.file.Paths;
 
 @Configuration
 @Getter
@@ -14,5 +17,10 @@ public class ConfigProperties {
 
 	@Value("${fr.insee.postcollecte.files}")
 	private String specDirectory;
+
+	@PostConstruct
+	public void setTempDirectory() {
+		System.setProperty("java.io.tmpdir", Paths.get(specDirectory,"temp","currentExecution").toString());
+	}
 
 }
