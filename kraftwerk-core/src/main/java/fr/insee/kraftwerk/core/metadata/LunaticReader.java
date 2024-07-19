@@ -135,6 +135,7 @@ public class LunaticReader {
 	 * @return The variables found in the Lunatic specification.
 	 */
 	public static MetadataModel getMetadataFromLunatic(Path lunaticFile, FileUtilsInterface fileUtilsInterface) {
+		log.info("Mode Lunatic-only : start reading file {} ",lunaticFile.getFileName());
 		JsonNode rootNode;
 		try {
 			rootNode = JsonReader.read(lunaticFile, fileUtilsInterface);
