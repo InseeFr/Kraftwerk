@@ -3,7 +3,12 @@ package fr.insee.kraftwerk.core.utils.xml;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndDocument;
 import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
@@ -68,7 +73,7 @@ public class XmlSplitter {
 					fileWriter.close();
 
 					//Move to outputFolder
-					fileUtilsInterface.moveFile(tempFile.getAbsolutePath(), outputFolder + "/" + tempFileName + ".xml");
+					fileUtilsInterface.moveFile(tempFile.toPath(), outputFolder + "/" + tempFileName + ".xml");
 
 					//Update the file's counter
 					fileCount++;

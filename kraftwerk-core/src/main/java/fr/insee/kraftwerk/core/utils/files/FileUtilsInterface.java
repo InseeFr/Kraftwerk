@@ -58,13 +58,7 @@ public interface FileUtilsInterface {
      * @param replace true if overwrite, false if append
      */
     void writeFile(String path, String toWrite, boolean replace);
-    /**
-     * Move file from source to destination (depends on the file system)
-     * @param srcPath source path
-     * @param dstPath destination path
-     * @throws KraftwerkException
-     */
-    void moveFile(String srcPath, String dstPath) throws KraftwerkException;
+
     /**
      * Move file from local file system to another path
      * @param fileSystemPath local path
