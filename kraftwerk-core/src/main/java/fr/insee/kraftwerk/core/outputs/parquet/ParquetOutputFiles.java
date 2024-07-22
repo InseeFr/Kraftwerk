@@ -54,6 +54,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
 				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
 
 				Files.deleteIfExists(tmpOutputFile);
