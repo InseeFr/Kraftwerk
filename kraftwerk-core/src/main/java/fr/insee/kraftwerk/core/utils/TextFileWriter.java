@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.utils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,7 +31,12 @@ public class TextFileWriter {
      */
     public static void writeFile(Path filePath, String fileContent, FileUtilsInterface fileUtilsInterface){
 		fileUtilsInterface.writeFile(String.valueOf(filePath), fileContent, true);
-		log.info(String.format("Text file: %s successfully written", filePath));
+		// if we write in temp folder we log in debug mode
+		if (pathContainsFolder(filePath,"temp")){
+			log.debug(String.format("File: %s successfully written", filePath));
+		} else {
+			log.info(String.format("File: %s successfully written", filePath));
+		}
 	}
     
 	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors, FileUtilsInterface fileUtilsInterface) {
@@ -54,5 +60,15 @@ public class TextFileWriter {
 		tempOutputPath = tempOutputPath.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
 
 		fileUtilsInterface.writeFile(tempOutputPath.toString(), kraftwerkExecutionLog.getFormattedString(), false);
+	}
+
+	public static boolean pathContainsFolder(Path pathString, String folderToFind) {
+		// Iterate through the elements of the path
+		for (Path element : pathString) {
+			if (element.toString().equals(folderToFind)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

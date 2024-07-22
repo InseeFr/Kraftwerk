@@ -105,8 +105,10 @@ public class FileSystemImpl implements FileUtilsInterface{
 	@Override
 	public void createDirectoryIfNotExist(Path path) {
 		try {
-			Files.createDirectories(path);
-			log.info(String.format("Created folder: %s", path.toFile().getAbsolutePath()));
+			if (Files.notExists(path)) {
+				Files.createDirectories(path);
+				log.info(String.format("Created folder: %s", path.toFile().getAbsolutePath()));
+			}
 		} catch (IOException e) {
 			log.error("Permission refused to create folder: " + path.getParent(), e);
 		}

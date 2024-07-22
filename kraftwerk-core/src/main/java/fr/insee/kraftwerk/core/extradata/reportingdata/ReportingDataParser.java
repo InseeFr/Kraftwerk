@@ -12,6 +12,8 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Log4j2
 public abstract class ReportingDataParser {
@@ -118,6 +120,7 @@ public abstract class ReportingDataParser {
 
 	private void addReportingValues(SurveyRawData surveyRawData, ReportingData reportingData,
 			boolean withAllReportingData) {
+		List<String> missingQuestionnaireIds = new ArrayList<>();
 		for (int i = 0; i < reportingData.getListReportingDataUE().size(); i++) {
 			ReportingDataUE reportingDataUE = reportingData.getListReportingDataUE().get(i);
 			QuestionnaireData questionnaire = surveyRawData.getQuestionnaires().stream()
@@ -127,17 +130,25 @@ public abstract class ReportingDataParser {
 			if (questionnaire == null && !withAllReportingData) {
 				return;
 			}
-			addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire);
+			addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
+		}
+		// We log the lists of missing questionnaires on one line only
+		if (!missingQuestionnaireIds.isEmpty()){
+			StringBuilder missingQuestionnaireIdsString=new StringBuilder();
+			for (String missingQuestionnaireId : missingQuestionnaireIds) {
+				missingQuestionnaireIdsString.append(missingQuestionnaireId).append(" ");
+			}
+			log.info("Missing questionnaire for reporting data: {}.", missingQuestionnaireIdsString.toString());
 		}
 	}
 
 	private void addReportingDataUEToQuestionnaire(SurveyRawData surveyRawData, ReportingDataUE reportingDataUE,
-			QuestionnaireData questionnaire) {
+			QuestionnaireData questionnaire, List<String> missingQuestionnaireIds) {
 		if (questionnaire == null) {
 			questionnaire = new QuestionnaireData();
 			questionnaire.setIdentifier(reportingDataUE.getIdentifier());
 			surveyRawData.addQuestionnaire(questionnaire);
-			log.info("Missing questionnaire for reporting data: {}.", reportingDataUE.getIdentifier());
+			missingQuestionnaireIds.add(reportingDataUE.getIdentifier());
 		}
 		// TODO Find another way than Constants.REPORTING_DATA_PREFIX_NAME +
 		// reportingDataUE.getIdentifier() to fill the identifier field
