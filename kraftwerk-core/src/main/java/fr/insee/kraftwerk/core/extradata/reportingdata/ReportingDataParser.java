@@ -18,13 +18,14 @@ import java.util.List;
 @Log4j2
 public abstract class ReportingDataParser {
 
+	public static final String DATE_SUFFIX = "_DATE";
 	Group reportingGroup;
 	private int maxStates = 0;
 	private int maxAttempts = 0;
 	private int maxComments = 0;
 	protected FileUtilsInterface fileUtilsInterface;
 
-	public ReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+	protected ReportingDataParser(FileUtilsInterface fileUtilsInterface) {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
@@ -66,7 +67,7 @@ public abstract class ReportingDataParser {
 			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataGroup,
 					VariableType.STRING, "50");
 			surveyRawData.putVariable(variableListStates);
-			Variable variableListStatesDates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE",
+			Variable variableListStatesDates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
 					reportingDataGroup, VariableType.DATE, "50");
 			surveyRawData.putVariable(variableListStatesDates);
 		}
@@ -83,7 +84,7 @@ public abstract class ReportingDataParser {
 			Variable variableListAttempts = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i,
 					reportingGroup, VariableType.STRING, "50");// TODO reportingDataGroup or reportingGroup ??
 			surveyRawData.putVariable(variableListAttempts);
-			Variable variableListAttemptsDates = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + "_DATE",
+			Variable variableListAttemptsDates = new Variable(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + i + DATE_SUFFIX,
 					reportingGroup, VariableType.DATE, "50");
 			surveyRawData.putVariable(variableListAttemptsDates);
 		}
@@ -233,7 +234,7 @@ public abstract class ReportingDataParser {
 							.getAttemptType(reportingDataUE.getContactAttempts().get(k - 1).getStatus()));
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + "_DATE",
+					.putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
 							DateUtils.formatDateToString(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
@@ -267,7 +268,7 @@ public abstract class ReportingDataParser {
 							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + "_DATE", DateUtils
+					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX, DateUtils
 							.formatDateToString(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)

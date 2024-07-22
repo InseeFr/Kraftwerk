@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.vtl;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,19 +9,13 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@AllArgsConstructor
 public class ErrorVtlTransformation extends KraftwerkError {
 
     private String vtlScript;
 
     private String message;
 
-    public ErrorVtlTransformation() {
-    }
-
-    public ErrorVtlTransformation(String vtlScript, String message) {
-        this.vtlScript = vtlScript;
-        this.message = message;
-    }
 
     @Override
     public String toString() {

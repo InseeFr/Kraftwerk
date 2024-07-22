@@ -21,18 +21,14 @@ class CSVReportingDataParserTest {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Test
-	void parseReportingDataTest() {
+	void parseReportingDataTest() throws NullException {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
 				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
-		try {
 			csvReportingDataParser.parseReportingData(reportingData, data, true);
-		} catch (NullException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
 		// Check the reporting data is well captured
 		assertEquals(3, reportingData.getListReportingDataUE().size());

@@ -5,16 +5,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
-import io.minio.CopyObjectArgs;
-import io.minio.CopySource;
-import io.minio.GetObjectArgs;
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.Result;
-import io.minio.StatObjectArgs;
-import io.minio.StatObjectResponse;
+import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.AllArgsConstructor;
@@ -55,7 +46,7 @@ public class MinioImpl implements FileUtilsInterface {
             deleteFile(file2MinioPathString);
         }
         try {
-            moveFile(file1MinioPathString, file2MinioPathString);
+            moveFile(Path.of(file1MinioPathString), file2MinioPathString);
         }catch (Exception e){
             log.error(e.toString());
         }
@@ -190,15 +181,6 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
-    @Override
-    public void moveFile(String srcMinioPath, String dstMinioPath) throws KraftwerkException {
-        try {
-            copyFile(srcMinioPath.replace("\\","/"), dstMinioPath.replace("\\","/"));
-            deleteFile(srcMinioPath);
-        } catch (Exception e) {
-            throw new KraftwerkException(500, "Can't move file " + srcMinioPath.replace("\\","/") + " to " + dstMinioPath.replace("\\","/"));
-        }
-    }
 
     @Override
     public void moveFile(Path fileSystemPath, String dstMinioPath) throws KraftwerkException {
@@ -266,7 +248,7 @@ public class MinioImpl implements FileUtilsInterface {
     private void moveDirectory(String srcMinioPath, String dstMinioPath) {
         try {
             for (String filePath : listFileNames(srcMinioPath.replace("\\","/"))) {
-                moveFile(filePath, dstMinioPath + "/" + extractFileName(filePath));
+                moveFile(Path.of(filePath), dstMinioPath + "/" + extractFileName(filePath));
             }
         } catch (Exception e) {
             log.error(e.toString());
@@ -295,7 +277,7 @@ public class MinioImpl implements FileUtilsInterface {
         Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
 
         if (!isDirectory(dataPath.toString())) {
-            moveFile(dataPath.toString(), newDataPath.toString());
+            moveFile(dataPath, newDataPath.toString());
         } else {
             moveDirectory(dataPath.toString(), newDataPath.toString());
         }

@@ -276,7 +276,7 @@ class FileSystemImplTest {
         Path inputDirectory2 = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName2);
 
         //WHEN
-        fileSystemImpl.moveFile(inputDirectory.resolve("test1.txt").toString(), inputDirectory2.resolve("test2.txt").toString());
+        fileSystemImpl.moveFile(inputDirectory.resolve("test1.txt"), inputDirectory2.resolve("test2.txt").toString());
 
         //THEN
         Assertions.assertThat(inputDirectory2.resolve("test2.txt")).exists();

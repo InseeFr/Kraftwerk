@@ -55,20 +55,11 @@ public class VariablesMap {
     }
     
 
-
-    /** Return the fully qualified names of all variables in the map. */
-
     /** Return the variables names that belongs to the group. */
     public Set<String> getGroupVariableNames(String groupName) {
         return variables.keySet()
                 .stream().filter(name -> variables.get(name).getGroupName().equals(groupName))
                 .collect(Collectors.toSet());
-    }
-
-    public List<String> getGroupVariableNamesAsList(String groupName) {
-        return variables.keySet()
-                .stream().filter(name -> variables.get(name).getGroupName().equals(groupName))
-                .toList();
     }
 
 
@@ -139,7 +130,7 @@ public class VariablesMap {
     public List<String> getUcqVariablesNames() {
         return variables.values().stream()
                 .filter(UcqVariable.class::isInstance)
-                .map(ucqVariable -> ucqVariable.getQuestionItemName())
+                .map(Variable::getQuestionItemName)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -148,7 +139,7 @@ public class VariablesMap {
     public List<String> getMcqVariablesNames() {
         return variables.values().stream()
                 .filter(McqVariable.class::isInstance)
-                .map(mcqVariable -> mcqVariable.getQuestionItemName())
+                .map(Variable::getQuestionItemName)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();

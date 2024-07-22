@@ -6,10 +6,15 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.sequence.*;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -155,7 +160,7 @@ public class MainProcessing {
 	}
 
 	/* Step 4 : Insert into SQL database */
-	private void insertDatabase(Statement database) throws SQLException {
+	private void insertDatabase(Statement database) {
 		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
 		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
 	}

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.1 [2024-07-19] - Fix IOException due to permission on temp directory
+
+### Fixed
+- IOException due to permission on temp directory
+
 ## 3.0.0 [2024-07-16] - DuckDB implementation for output and Kubernetes support
 ### Added
 - Launch treatment with command line
