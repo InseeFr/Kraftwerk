@@ -21,7 +21,7 @@ Feature: Do we apply correctly vtl script ?
   Scenario Outline: Do we remove root variable correctly ?
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then In a file named "<FileName>" there should'nt be a "<UnexpectedVariableName>" field
+    Then In a file named "<FileName>" there shouldn't be a "<UnexpectedVariableName>" field
 
     Examples:
     # Parameters :

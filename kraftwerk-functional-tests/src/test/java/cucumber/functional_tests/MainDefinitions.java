@@ -416,7 +416,7 @@ public class MainDefinitions {
 		assertThat(header).isNotEmpty().contains(fieldName);
 	}
 
-	@Then("In a file named {string} there should'nt be a {string} field")
+	@Then("In a file named {string} there shouldn't be a {string} field")
 	public void check_field_inexistence(String fileName, String fieldName) throws IOException, CsvValidationException {
 		// Go to first datetime folder
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
