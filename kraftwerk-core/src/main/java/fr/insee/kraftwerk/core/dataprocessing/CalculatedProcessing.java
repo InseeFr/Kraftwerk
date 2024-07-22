@@ -6,11 +6,14 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Log4j2
 public class CalculatedProcessing extends DataProcessing {
@@ -61,6 +64,7 @@ public class CalculatedProcessing extends DataProcessing {
 
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
             if (vtlExpression != null && !vtlExpression.isEmpty()) {
+                 vtlExpression = fixVtlExpression(vtlExpression, bindingName);
                 vtlScript.add(String.format("%s := %s [calc %s := %s];",
                         bindingName, bindingName, calculatedName, vtlExpression));
             }
@@ -69,6 +73,24 @@ public class CalculatedProcessing extends DataProcessing {
 
         return vtlScript;
     }
+
+    private String fixVtlExpression(String vtlExpression, String bindingName) {
+        vtlExpression = vtlExpression.replaceAll("CURRENT_DATE", "OUTCOME_DATE");
+        String identifiers = StringUtils.join(vtlBindings.getDatasetIdentifierNames(bindingName), ", ");
+        vtlExpression = vtlExpression.replaceAll("over\\(\\)", String.format("over(%s order by (%s))", bindingName,  identifiers));
+
+        // GET content of sum
+        String pattern = "sum\\((\\w*)\\)";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(vtlExpression);
+        String varToSum = m.find() ?  m.group(0) : "";
+
+        vtlExpression = vtlExpression.replaceAll("sum\\(\\w*\\)","sum("+varToSum+") group by "+identifiers);
+        return vtlExpression;
+    }
+
+
+
 
     /** Return a list of calculated variable names, in such an order that the evaluation of VTL expressions
      * can be performed. */
