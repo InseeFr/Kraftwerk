@@ -416,6 +416,28 @@ public class MainDefinitions {
 		assertThat(header).isNotEmpty().contains(fieldName);
 	}
 
+	@Then("In a file named {string} there should'nt be a {string} field")
+	public void check_field_inexistence(String fileName, String fieldName) throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		File outputReportingDataFile = new File(executionOutDirectory + "/" + fileName);
+
+		// File existence assertion
+		assertThat(outputReportingDataFile).exists().isFile().canRead();
+
+		CSVReader csvReader = getCSVReader(
+				outputReportingDataFile.toPath()
+		);
+
+
+		// Get header
+		String[] header = csvReader.readNext();
+		csvReader.close();
+
+		assertThat(header).isNotEmpty().doesNotContain(fieldName);
+	}
+
 	@When("We clean the test VTL script named {string}")
 	public void clean_vtl(String vtlScriptName) throws IOException {
 		Path vtlPath = Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm").resolve(vtlScriptName + ".vtl");

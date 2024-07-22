@@ -1,6 +1,7 @@
 | Test Campaign                    | Description                                        | Used for                    | Survey Unit(s)                                     |
 |----------------------------------|----------------------------------------------------|-----------------------------|----------------------------------------------------|
 | SAMPLETEST-DATAONLY-V1           | Only 1 data file                                   | Test data export            | 0000004 to 0000006                                 |
+| SAMPLETEST-VTL                   | Has VTL scripts                                    | Test VTL script             | //                                                 |
 | SAMPLETEST-ERROR                 | SAMPLETEST-DATAONLY-V1 but with invalid VTL script | Test VTL error export       | //                                                 |
 | SAMPLETEST-MULTIPLEDATA-V1       | Multiple data files                                | Test multiple data export   | 0000004 to 0000009                                 |
 | SAMPLETEST-MULTIPLEDATA-V2       | Multiple data files, first one has no SU,          | //                          | 0000007 to 0000009                                 |
@@ -9,3 +10,4 @@
 | SAMPLETEST-REPORTINGDATA-MOOG-V1 | Uses Moog XML reporting data structure             | Test moog xml data import   | 0000001 to 0000003                                 |
 | SAMPLETEST-REPORTINGDATA-V1      | Data with reporting data                           | Test reporting data parsing | //                                                 |
 | SAMPLETEST-REPORTINGDATA-V2      | Data with reporting data + Identification data     | //                          | //                                                 |
+| SAMPLETEST-METADATA              | Empty data with DDI and Lunatic JSON metadata file | Test metadata parsing       | None                                               |
