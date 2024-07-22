@@ -31,5 +31,5 @@ Feature: Do we apply correctly vtl script ?
 
       |Directory                        |FileName                           |UnexpectedVariableName |
       |SAMPLETEST-VTL                   |SAMPLETEST-VTL_RACINE.csv          |xAxis                  |
-
+      |SAMPLETEST-VTL                   |SAMPLETEST-VTL_RACINE.csv          |yAxis                  |
 
