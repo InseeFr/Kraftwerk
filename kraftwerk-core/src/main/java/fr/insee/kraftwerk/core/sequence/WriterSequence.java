@@ -33,7 +33,7 @@ public class WriterSequence {
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,executionDateTime);
 
-		writeCsvFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, null, database, fileUtilsInterface);
+		writeCsvFiles(inDirectory, executionDateTime,vtlBindings, modeInputsMap, metadataModels, errors, kraftwerkExecutionLog, database, fileUtilsInterface);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, errors, database, fileUtilsInterface);
 	}
 
