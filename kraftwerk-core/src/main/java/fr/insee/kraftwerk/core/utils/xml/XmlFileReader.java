@@ -49,9 +49,4 @@ public class XmlFileReader {
             return null;
         }
     }
-
-    public Document readXmlFile(Path filePath, boolean xsdValidation) {
-        this.xsdValidation = xsdValidation;
-        return readXmlFile(filePath);
-    }
 }

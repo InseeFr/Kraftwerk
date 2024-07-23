@@ -62,9 +62,10 @@ public class ParquetOutputFiles extends OutputFiles {
 				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile));
 
 
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, getOutputFolder().resolve(outputFileName(datasetName)).toString());
-
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info(String.format("File: %s successfully written", outputFile));
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
 			}
