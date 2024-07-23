@@ -59,6 +59,7 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
 				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
 
 				//Get column names
