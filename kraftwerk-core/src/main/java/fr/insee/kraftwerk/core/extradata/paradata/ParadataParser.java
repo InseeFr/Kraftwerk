@@ -62,7 +62,7 @@ public class ParadataParser {
 				}
 				paradata.setListParadataUE(listParaDataUE);
 			} catch (NullException e){
-				log.error("Error parsing paradata : " + e.getMessage());
+				log.error("Error parsing paradata : {}", e.getMessage());
 			}
 		}
 	}
