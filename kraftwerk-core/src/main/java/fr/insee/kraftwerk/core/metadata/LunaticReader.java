@@ -50,8 +50,8 @@ public class LunaticReader {
 			JsonNode variablesNode = rootNode.get(VARIABLES);
 			variablesNode.forEach(variableNode -> {
 				if (variableNode.get("variableType").asText().equals("CALCULATED")) {
-					String formula = isLunaticV2 ? variableNode.get("expression").get(VALUE).asText()
-							: variableNode.get("expression").asText();
+					String formula = isLunaticV2 ? variableNode.get("expression").get(VALUE).asText().replace("\r\n","")
+							: variableNode.get("expression").asText().replace("\r\n","");
 					CalculatedVariable calculatedVariable = new CalculatedVariable(variableNode.get("name").asText(),
 							formula);
 					JsonNode dependantVariablesNode = variableNode.get(BINDING_DEPENDENCIES);
