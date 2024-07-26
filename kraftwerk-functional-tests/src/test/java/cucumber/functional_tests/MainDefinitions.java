@@ -199,6 +199,17 @@ public class MainDefinitions {
 		}
 	}
 
+
+	@When("We launch lunatic only service")
+	public void stepWeLaunchLunaticOnlyService() throws KraftwerkException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
+				419430400L, new FileSystemImpl());
+		mp.runMain();
+	}
+
 	@Then("Step 5 : We check if we have {int} lines")
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
 		// Go to first datetime folder
