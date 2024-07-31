@@ -37,3 +37,4 @@ src/test/resources/unit_tests/out/*
 !src/test/resources/unit_tests/out/.gitkeep
 kraftwerk-core/src/test/resources/unit_tests/out/*
 qodana.yaml
+kraftwerk-api/src/main/resources/kraftwerk.properties

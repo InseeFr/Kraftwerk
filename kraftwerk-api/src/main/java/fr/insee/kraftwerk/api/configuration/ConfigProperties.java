@@ -16,11 +16,11 @@ public class ConfigProperties {
 	private String genesisUrl;
 
 	@Value("${fr.insee.postcollecte.files}")
-	private String specDirectory;
+	private String defaultDirectory;
 
 	@PostConstruct
 	public void setTempDirectory() {
-		System.setProperty("java.io.tmpdir", Paths.get(specDirectory,"temp","currentExecution").toString());
+		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
 	}
 
 }

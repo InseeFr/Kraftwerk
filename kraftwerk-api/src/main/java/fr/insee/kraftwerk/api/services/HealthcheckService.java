@@ -57,14 +57,14 @@ public class HealthcheckService extends KraftwerkService {
 								status,
 								projectVersion,
 								client.pingGenesis().split("\n")[0],
-								configProperties.getSpecDirectory(),
+								configProperties.getDefaultDirectory(),
 								fileStorageStatus
 						));
 	}
 
 	private String fileStorageExists() {
 		try{
-			Files.exists(Paths.get(configProperties.getSpecDirectory()));
+			Files.exists(Paths.get(configProperties.getDefaultDirectory()));
 		}catch (Exception e){
 			return "Disconnected " +e.getMessage();
 		}

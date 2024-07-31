@@ -67,7 +67,7 @@ public class MainProcessingGenesis {
 
 	public void init(String idCampaign) throws KraftwerkException {
 		log.info("Kraftwerk main service started for campaign: " + idCampaign);
-		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis("", fileUtilsInterface);
+		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
 		this.executionDateTime = LocalDateTime.now();
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
