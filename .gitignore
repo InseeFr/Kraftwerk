@@ -9,6 +9,7 @@ local_files/logs/*
 # Config
 src/main/resources/application-*.properties
 !src/main/resources/application-local.properties
+src/main/resources/kraftwerk.properties
 
 # Compiled files
 target/
@@ -37,4 +38,3 @@ src/test/resources/unit_tests/out/*
 !src/test/resources/unit_tests/out/.gitkeep
 kraftwerk-core/src/test/resources/unit_tests/out/*
 qodana.yaml
-kraftwerk-api/src/main/resources/kraftwerk.properties
