@@ -75,9 +75,9 @@ public class CalculatedProcessing extends DataProcessing {
     }
 
     private String fixVtlExpression(String vtlExpression, String bindingName) {
-        vtlExpression = vtlExpression.replaceAll("CURRENT_DATE", "OUTCOME_DATE");
+        vtlExpression = vtlExpression.replace("CURRENT_DATE", "OUTCOME_DATE");
         String identifiers = StringUtils.join(vtlBindings.getDatasetIdentifierNames(bindingName), ", ");
-        vtlExpression = vtlExpression.replaceAll("over\\(\\)", String.format("over(%s order by (%s))", bindingName,  identifiers));
+        vtlExpression = vtlExpression.replace("over\\(\\)", String.format("over(%s order by (%s))", bindingName,  identifiers));
 
         // GET content of sum
         String pattern = "sum\\((\\w*)\\)";
