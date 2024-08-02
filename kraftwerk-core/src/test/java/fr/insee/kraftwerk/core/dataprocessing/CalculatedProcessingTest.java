@@ -21,7 +21,10 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CalculatedProcessingTest {
 
@@ -69,7 +72,7 @@ class CalculatedProcessingTest {
     @Test
     void testIfCalculatedAreProcessed() {
         //
-        VtlBindings vtlBindings = getVtlBindings();
+        vtlBindings = getVtlBindings();
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
         processing.applyAutomatedVtlInstructions("TEST", errors);
@@ -97,8 +100,8 @@ class CalculatedProcessingTest {
                         List.of("C","Z")),
                 List.of(
                         new Structured.Component("ID", String.class, Role.IDENTIFIER),
-                        new Structured.Component("FOO", String.class, Role.MEASURE))
-        );
+                        new Structured.Component("FOO", String.class, Role.MEASURE)));
+
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", fooDataset);
         return vtlBindings;

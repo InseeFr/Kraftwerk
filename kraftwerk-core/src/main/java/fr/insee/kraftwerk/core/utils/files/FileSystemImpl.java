@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
+import org.springframework.util.FileSystemUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -74,7 +75,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	@Override
 	public void deleteDirectory(Path directoryPath) throws KraftwerkException {
 		try {
-			org.springframework.util.FileSystemUtils.deleteRecursively(directoryPath);
+			FileSystemUtils.deleteRecursively(directoryPath);
 		} catch (IOException e) {
 			throw new KraftwerkException(500, "IOException when deleting temp folder : "+e.getMessage());
 		}
