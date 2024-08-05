@@ -1,11 +1,10 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.bpm.metadata.model.CalculatedVariables;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -36,11 +35,11 @@ class CalculatedProcessingTest {
         //
         fooCalculated = new CalculatedVariables();
         fooCalculated.putVariable(
-                new CalculatedVariable("FOO1", "FOO2 + FOO3", List.of("FOO3", "FOO2")));
+                new CalculatedVariables.CalculatedVariable("FOO1", "FOO2 + FOO3", List.of("FOO3", "FOO2")));
         fooCalculated.putVariable(
-                new CalculatedVariable("FOO2", "FOO3", List.of("FOO3")));
+                new CalculatedVariables.CalculatedVariable("FOO2", "FOO3", List.of("FOO3")));
         fooCalculated.putVariable(
-                new CalculatedVariable("FOO3", "1"));
+                new CalculatedVariables.CalculatedVariable("FOO3", "1"));
         //
         fooMetadataModel = new MetadataModel();
         fooMetadataModel.getVariables().putVariable(new Variable("FOO", fooMetadataModel.getRootGroup(), VariableType.STRING));

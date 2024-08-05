@@ -1,8 +1,8 @@
 package cucumber.functional_tests;
 
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.exceptions.MetadataParserException;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -31,8 +31,8 @@ public class VariablesGetterDefinitions {
     }
 
     @When("I try to collect the variables's infos")
-    public void collect_variables() throws KraftwerkException {
-		metadataModel = DDIReader.getMetadataFromDDI(linkDDI.toString(), new FileSystemImpl());
+    public void collect_variables() throws MetadataParserException {
+		metadataModel = DDIReader.getMetadataFromDDI(linkDDI.toString(), new FileSystemImpl().readFile(linkDDI.toString()));
     }
 
     @Then("The variables I try to count should answer {int} and have {string} in it")

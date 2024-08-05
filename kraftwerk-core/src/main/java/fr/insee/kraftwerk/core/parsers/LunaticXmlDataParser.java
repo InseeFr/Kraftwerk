@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.parsers;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.bpm.metadata.model.VariablesMap;
+import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -62,7 +66,7 @@ public class LunaticXmlDataParser extends DataParser {
 					.getChildElements("SurveyUnit");
 			String questionnaireModelId = null;
 			if (lunaticFile != null) {
-				questionnaireModelId = LunaticReader.getQuestionnaireModelId(lunaticFile, fileUtilsInterface);
+				questionnaireModelId = LunaticReader.getQuestionnaireModelId(fileUtilsInterface.readFile(lunaticFile.toString()));
 			}
 
 			for (int i = 0; i < questionnaireNodeList.size(); i++) {
@@ -325,7 +329,7 @@ public class LunaticXmlDataParser extends DataParser {
 	 * Check if the given value is a VTL expression using the 'forbiddenWords'
 	 * attribute.
 	 * 
-	 * @see fr.insee.kraftwerk.core.metadata.LunaticReader
+	 * @see fr.insee.bpm.metadata.reader.lunatic.LunaticReader
 	 * @see fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing
 	 */
 	private static boolean isNotVtlExpression(String value) {

@@ -1,7 +1,16 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import fr.insee.bpm.exceptions.MetadataParserException;
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.MetadataModel;
+
+import fr.insee.bpm.metadata.model.SpecType;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
+import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
@@ -27,22 +36,22 @@ public class MetadataUtils {
 		// Step 1 : we add the variables read in the DDI
 		MetadataModel metadataModel = new MetadataModel();
 		try {
-			metadataModel = DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface);
-		} catch (KraftwerkException e) {
+			metadataModel = DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface.readFile(modeInputs.getDdiUrl()));
+		} catch (MetadataParserException e) {
 			log.error(e.getMessage());
 		}
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
 			log.info("Adding variables from Lunatic file : {}", modeInputs.getLunaticFile().getFileName());
 			// We read and store lunaticModelVersion
-            metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(modeInputs.getLunaticFile(), fileUtilsInterface));
+            metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString())));
 			// First we add the collected _MISSING variables
-			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(modeInputs.getLunaticFile(), fileUtilsInterface);
+			List<String> missingVars = LunaticReader.getMissingVariablesFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
 			for (String missingVar : missingVars) {
 				addLunaticVariable(metadataModel, missingVar, Constants.MISSING_SUFFIX, VariableType.STRING);
 			}
 			// Then we add calculated FILTER_RESULT_ variables
-			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(modeInputs.getLunaticFile(), fileUtilsInterface);
+			List<String> filterResults = LunaticReader.getFilterResultFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
 			for (String filterResult : filterResults) {
 				addLunaticVariable(metadataModel, filterResult, Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
 			}
@@ -81,7 +90,7 @@ public class MetadataUtils {
 	}
 
 	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
-		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(modeInputs.getLunaticFile(), fileUtilsInterface);
+		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
 		// We add the variables for pairwise links
 		if (metadataModel.getVariables().getVariable(Constants.LIENS) != null) {
 			// We identify the group containing the individuals

@@ -1,5 +1,6 @@
 package cucumber.functional_tests;
 
+import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
@@ -7,7 +8,7 @@ import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -38,7 +39,7 @@ public class ParadataDefinitions {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
 	@Given("We read data from input named {string}")
-	public void launch_all_steps(String campaignName) throws KraftwerkException {
+	public void launch_all_steps(String campaignName) throws KraftwerkException, MetadataParserException {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
 		controlInputSequence = new ControlInputSequence(campaignDirectory.toString(), new FileSystemImpl());
@@ -49,7 +50,7 @@ public class ParadataDefinitions {
 		// parse data
 		data = new SurveyRawData();
 		data.setDataMode(modeInputs.getDataMode());
-		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface));
+		data.setMetadataModel(DDIReader.getMetadataFromDDI(modeInputs.getDdiUrl(), fileUtilsInterface.readFile(modeInputs.getDdiUrl())));
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data, fileUtilsInterface);
 		parser.parseSurveyData(modeInputs.getDataFile(),null);
 		// get paradata folder

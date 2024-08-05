@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.core.rawdata;
 
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
@@ -49,14 +49,14 @@ public class SurveyRawDataTest {
 	/**
 	 * Create a SurveyRawData object with some fake data in it.
 	 * Use the variables from the method createFakeVariablesMap.
-	 * @see fr.insee.kraftwerk.core.metadata.MetadataModelTest
+	 * @see fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest
 	 * */
 	public static SurveyRawData createFakeCawiSurveyRawData() {
 		// Instantiate the data object
 		SurveyRawData data = new SurveyRawData("CAWI");
 
 		// Give it a data structure
-		MetadataModel metMod = MetadataModelTest.createCompleteFakeVariablesMap();
+		MetadataModel metMod = ImportScriptTest.createCompleteFakeVariablesMap();
 		data.setMetadataModel(metMod);
 
 		// Homer Simpsons, aged 40, has a purple and a red car.
@@ -91,7 +91,7 @@ public class SurveyRawDataTest {
 		SurveyRawData data = new SurveyRawData("CAPI");
 
 		// Give it a data structure
-		MetadataModel metadataModel = MetadataModelTest.createCompleteFakeVariablesMap();
+		MetadataModel metadataModel = ImportScriptTest.createCompleteFakeVariablesMap();
 		data.setMetadataModel(metadataModel);
 
 		// Homer Simpsons, aged 40, has a purple and a red car.
@@ -126,7 +126,7 @@ public class SurveyRawDataTest {
 		SurveyRawData data = new SurveyRawData("PAPI");
 
 		// Give it a data structure
-		MetadataModel metMod = MetadataModelTest.createAnotherFakeVariablesMap();
+		MetadataModel metMod = ImportScriptTest.createAnotherFakeVariablesMap();
 		data.setMetadataModel(metMod);
 
 		//
@@ -183,7 +183,7 @@ public class SurveyRawDataTest {
 
 		SurveyRawData data = new SurveyRawData();
 
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_rootOnly());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_rootOnly());
 
 		QuestionnaireData q1 = new QuestionnaireData();
 		q1.setIdentifier("S0000001");
@@ -204,7 +204,7 @@ public class SurveyRawDataTest {
 
 		SurveyRawData data = createFakeData_rootOnly();
 
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_oneLevel());
 
 		QuestionnaireData q1 = data.getQuestionnaires().getFirst();
 		q1.putValue("Homer", "FIRST_NAME", Pair.of("INDIVIDUALS_LOOP", 0));
@@ -227,7 +227,7 @@ public class SurveyRawDataTest {
 
 		SurveyRawData data = createFakeData_oneLevel();
 
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_twoLevels());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_twoLevels());
 
 		QuestionnaireData q1 = data.getQuestionnaires().getFirst();
 		q1.putValue("Purple", "CAR_COLOR", Pair.of("INDIVIDUALS_LOOP", 0), Pair.of("CARS_LOOP", 0));

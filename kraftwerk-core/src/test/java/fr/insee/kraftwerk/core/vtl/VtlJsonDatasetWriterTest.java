@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
+import fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
@@ -33,7 +37,7 @@ class VtlJsonDatasetWriterTest {
 	@Test
 	void testConvertToVtlDataset_rootOnly() {
 		//
-		MetadataModel variablesMap = MetadataModelTest.createVariablesMap_rootOnly();
+		MetadataModel variablesMap = ImportScriptTest.createVariablesMap_rootOnly();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_rootOnly();
 		//
@@ -70,7 +74,7 @@ class VtlJsonDatasetWriterTest {
 	@Test
 	void testConvertToVtlDataset_oneLevel() {
 		//
-		MetadataModel variablesMap = MetadataModelTest.createVariablesMap_oneLevel();
+		MetadataModel variablesMap = ImportScriptTest.createVariablesMap_oneLevel();
 		//
 		SurveyRawData testData = SurveyRawDataTest.createFakeData_oneLevel();
 		//
@@ -111,7 +115,7 @@ class VtlJsonDatasetWriterTest {
 		//
 		SurveyRawData paperLikeData = new SurveyRawData();
 		//
-		MetadataModel variables = MetadataModelTest.createVariablesMap_oneLevel();
+		MetadataModel variables = ImportScriptTest.createVariablesMap_oneLevel();
 		paperLikeData.setMetadataModel(variables);
 
 		// First household but split in several questionnaires

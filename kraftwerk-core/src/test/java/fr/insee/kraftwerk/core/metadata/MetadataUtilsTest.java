@@ -1,5 +1,10 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.McqVariable;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import org.junit.jupiter.api.Test;
 
