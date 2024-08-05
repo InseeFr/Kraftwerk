@@ -3,7 +3,7 @@ package cucumber.functional_tests;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.xsl.SaxonTransformer;
+import fr.insee.bpm.utils.xsl.SaxonTransformer;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -43,8 +43,8 @@ public class DDIGetterDefinitions {
 		tempFile.deleteOnExit();
 		Path tempPath = Paths.get(tempFile.getAbsolutePath());
 		URL url = new URI(linkDDI).toURL();
-		SaxonTransformer transformer = new SaxonTransformer(new FileSystemImpl());
-		transformer.xslTransform(url.toString(), Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
+		SaxonTransformer transformer = new SaxonTransformer();
+		transformer.xslTransform(url.toString(), new FileSystemImpl().readFile(url.toString()), Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
 
 		actualString = TextFileReader.readFromPath(tempPath, new FileSystemImpl());
     	
