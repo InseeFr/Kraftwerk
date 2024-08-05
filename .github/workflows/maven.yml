@@ -28,6 +28,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+
+    - name: Clone BPM
+      uses: actions/checkout@master
+      with:
+        name: InseeFr/BPM
+        ref: refs/heads/release
+        path: bpm
       
     - name: Build with Maven
       run: mvn -B clean package --file pom.xml
