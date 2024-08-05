@@ -1,7 +1,9 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.outputs.csv.SASImportScript;
 import fr.insee.vtl.model.Dataset;

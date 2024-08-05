@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.core.rawdata;
 
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.Variable;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
+
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import fr.insee.vtl.model.Structured.Component;
