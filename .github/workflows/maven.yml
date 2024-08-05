@@ -32,8 +32,7 @@ jobs:
     - name: Clone BPM
       uses: actions/checkout@master
       with:
-        name: InseeFr/BPM
-        ref: refs/heads/release
+        repository: InseeFr/BPM
         path: bpm
 
     - name: Build BPM
