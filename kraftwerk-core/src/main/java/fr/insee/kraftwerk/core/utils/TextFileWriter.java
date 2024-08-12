@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.utils;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.Constants;
