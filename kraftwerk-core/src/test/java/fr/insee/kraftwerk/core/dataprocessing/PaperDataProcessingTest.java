@@ -1,9 +1,9 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -11,11 +11,8 @@ import fr.insee.vtl.model.InMemoryDataset;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertNotNull;
 
 class PaperDataProcessingTest {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
@@ -62,7 +59,7 @@ class PaperDataProcessingTest {
 	@Test
 	void testPaperDataProcessing() {
 		//
-		List<KraftwerkError> errors =new ArrayList<>();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		MetadataModel metadataModel = new MetadataModel();
 		Group rootGroup = metadataModel.getRootGroup();
 		metadataModel.getVariables().putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));
@@ -73,7 +70,7 @@ class PaperDataProcessingTest {
 		vtlBindings.put("TEST", paperDataset);
 		//
 		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
-		paperDataProcessing.applyAutomatedVtlInstructions("TEST", errors);
+		paperDataProcessing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");
 

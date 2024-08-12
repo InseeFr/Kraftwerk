@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +34,7 @@ public class BuildBindingsSequence {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionLog kraftwerkExecutionLog) throws KraftwerkException {
+	public void buildVtlBindings(UserInputsFile userInputsFile, String dataMode, VtlBindings vtlBindings, MetadataModel metadataModel, boolean withDDI, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
 		ModeInputs modeInputs = userInputsFile.getModeInputs(dataMode);
 		SurveyRawData data = new SurveyRawData();
 
@@ -46,9 +46,9 @@ public class BuildBindingsSequence {
 		DataParser parser = DataParserManager.getParser(modeInputs.getDataFormat(), data, fileUtilsInterface);
 		log.info("Parsing survey data file or folder : {}" , modeInputs.getDataFile().getFileName());
 		if (withDDI) {
-			parser.parseSurveyData(modeInputs.getDataFile(),kraftwerkExecutionLog);
+			parser.parseSurveyData(modeInputs.getDataFile(), kraftwerkExecutionContext);
 		} else {
-			parser.parseSurveyDataWithoutDDI(modeInputs.getDataFile(), modeInputs.getLunaticFile(), kraftwerkExecutionLog);
+			parser.parseSurveyDataWithoutDDI(modeInputs.getDataFile(), modeInputs.getLunaticFile(), kraftwerkExecutionContext);
 		}
 
 		/* Step 2.2 : Get paradata for the survey */

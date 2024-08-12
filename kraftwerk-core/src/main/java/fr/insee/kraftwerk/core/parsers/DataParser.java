@@ -3,7 +3,7 @@ package fr.insee.kraftwerk.core.parsers;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
@@ -36,7 +36,7 @@ public abstract class DataParser {
 	 * @param dataPath A data file, or a folder only containing data files.
 	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
-	public final void parseSurveyData(Path dataPath, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+	public final void parseSurveyData(Path dataPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws NullException {
 		if (dataPath == null){
 			log.error(DATAPATH_IS_NULL);
 			throw new NullException(DATAPATH_IS_NULL);
@@ -47,16 +47,16 @@ public abstract class DataParser {
 		}
 		if(Boolean.FALSE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))){
 			parseDataFile(dataPath);
-			if(kraftwerkExecutionLog != null) {
-				kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
+			if(kraftwerkExecutionContext != null) {
+				kraftwerkExecutionContext.getOkFileNames().add(dataPath.getFileName().toString());
 			}
 		}
 		if(Boolean.TRUE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))){
 			for(String path : fileUtilsInterface.listFilePaths(String.valueOf(dataPath))){
 				try {
 					parseDataFile(Path.of(path));
-					if(kraftwerkExecutionLog != null) {
-						kraftwerkExecutionLog.getOkFileNames().add(Path.of(path).getFileName().toString());
+					if(kraftwerkExecutionContext != null) {
+						kraftwerkExecutionContext.getOkFileNames().add(Path.of(path).getFileName().toString());
 					}
 				} catch (NullException e) {
 					log.error("IOException occurred when trying to list data file: {} in folder {}", path, dataPath);
@@ -71,7 +71,7 @@ public abstract class DataParser {
 	 * @param dataPath A data file, or a folder only containing data files.
 	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
-	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile, KraftwerkExecutionLog kraftwerkExecutionLog) throws NullException {
+	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile, KraftwerkExecutionContext kraftwerkExecutionContext) throws NullException {
 		if (dataPath == null){
 			log.error(DATAPATH_IS_NULL);
 			throw new NullException(DATAPATH_IS_NULL);
@@ -82,16 +82,16 @@ public abstract class DataParser {
 		}
 		if(Boolean.FALSE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))) {
 			parseDataFileWithoutDDI(dataPath,lunaticFile);
-			if(kraftwerkExecutionLog != null) {
-				kraftwerkExecutionLog.getOkFileNames().add(dataPath.getFileName().toString());
+			if(kraftwerkExecutionContext != null) {
+				kraftwerkExecutionContext.getOkFileNames().add(dataPath.getFileName().toString());
 			}
 		}
 		if(Boolean.TRUE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))) {
 			for(String path : fileUtilsInterface.listFilePaths(dataPath.toString())){
 				try {
 					parseDataFileWithoutDDI(Path.of(path),lunaticFile);
-					if(kraftwerkExecutionLog != null) {
-						kraftwerkExecutionLog.getOkFileNames().add(Path.of(path).getFileName().toString());
+					if(kraftwerkExecutionContext != null) {
+						kraftwerkExecutionContext.getOkFileNames().add(Path.of(path).getFileName().toString());
 					}
 				} catch (NullException e) {
 					log.error("IOException occurred when trying to list data file: {} in folder {}", path, dataPath);

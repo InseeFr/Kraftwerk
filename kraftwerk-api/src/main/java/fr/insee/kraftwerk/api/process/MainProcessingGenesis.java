@@ -18,6 +18,7 @@ import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +42,13 @@ public class MainProcessingGenesis {
 	private ControlInputSequenceGenesis controlInputSequenceGenesis;
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
-	private final List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
 	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
+
+	private KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -116,14 +117,15 @@ public class MainProcessingGenesis {
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, fileUtilsInterface);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels,
+				fileUtilsInterface);
 	}
 
 	/* Step 4 : Insert into SQL database */
@@ -135,12 +137,12 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, null, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 }

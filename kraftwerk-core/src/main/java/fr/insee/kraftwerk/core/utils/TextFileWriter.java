@@ -1,16 +1,13 @@
 package fr.insee.kraftwerk.core.utils;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 
 
@@ -39,14 +36,14 @@ public class TextFileWriter {
 		}
 	}
     
-	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, List<KraftwerkError> errors, FileUtilsInterface fileUtilsInterface) {
+	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface) {
 		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime)
 				.resolve(Constants.ERRORS_FILE_NAME);
 		fileUtilsInterface.createDirectoryIfNotExist(tempOutputPath.getParent());
 
 		//Write errors file
-		if (!errors.isEmpty()) {
-			for (KraftwerkError error : errors) {
+		if (!kraftwerkExecutionContext.getErrors().isEmpty()) {
+			for (KraftwerkError error : kraftwerkExecutionContext.getErrors()) {
 				fileUtilsInterface.writeFile(tempOutputPath.toString(), error.toString(), false);
 			}
 			log.info(String.format("Text file: %s successfully written", tempOutputPath));
@@ -55,11 +52,11 @@ public class TextFileWriter {
 		}
 	}
 
-	public static void writeLogFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionLog kraftwerkExecutionLog, FileUtilsInterface fileUtilsInterface){
+	public static void writeLogFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface){
 		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime);
-		tempOutputPath = tempOutputPath.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionLog.getStartTimeStamp() +".txt");
+		tempOutputPath = tempOutputPath.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionContext.getStartTimeStamp() +".txt");
 
-		fileUtilsInterface.writeFile(tempOutputPath.toString(), kraftwerkExecutionLog.getFormattedString(), false);
+		fileUtilsInterface.writeFile(tempOutputPath.toString(), kraftwerkExecutionContext.getFormattedString(), false);
 	}
 
 	public static boolean pathContainsFolder(Path pathString, String folderToFind) {

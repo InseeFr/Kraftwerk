@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.VariableType;
@@ -10,7 +9,7 @@ import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
-	private final KraftwerkExecutionLog kraftwerkExecutionLog;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -43,11 +42,11 @@ public class CsvOutputFiles extends OutputFiles {
 	 */
 	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
-		this.kraftwerkExecutionLog = null;
+		this.kraftwerkExecutionContext = null;
 	}
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionLog kraftwerkExecutionLog, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
-		this.kraftwerkExecutionLog = kraftwerkExecutionLog;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 
@@ -104,11 +103,11 @@ public class CsvOutputFiles extends OutputFiles {
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
 				log.info(String.format("File: %s successfully written", outputFile));
 				//Count rows for functional log
-				if (kraftwerkExecutionLog != null) {
+				if (kraftwerkExecutionContext != null) {
 					try(ResultSet countResult =
 								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
 						countResult.next();
-                        kraftwerkExecutionLog.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
+                        kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
 				}
 			} catch (SQLException | IOException e) {
@@ -175,7 +174,7 @@ public class CsvOutputFiles extends OutputFiles {
 	}
 
 	@Override
-	public void writeImportScripts(Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) {
+	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		// Assemble required info to write scripts
 		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : getDatasetToCreate()) {
@@ -187,7 +186,10 @@ public class CsvOutputFiles extends OutputFiles {
 		TextFileWriter.writeFile(getOutputFolder().resolve("import_with_data_table.R"),
 				new RImportScript(tableScriptInfoList).generateScript(), getFileUtilsInterface());
 		TextFileWriter.writeFile(getOutputFolder().resolve("import.sas"),
-				new SASImportScript(tableScriptInfoList,errors).generateScript(), getFileUtilsInterface());
+				new SASImportScript(tableScriptInfoList,
+						kraftwerkExecutionContext == null ? new ArrayList<>() :
+								kraftwerkExecutionContext.getErrors()
+				).generateScript(), getFileUtilsInterface());
 	}
 
 	/**

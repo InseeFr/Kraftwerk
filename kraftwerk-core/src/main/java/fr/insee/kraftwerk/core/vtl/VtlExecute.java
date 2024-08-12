@@ -3,11 +3,10 @@ package fr.insee.kraftwerk.core.vtl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
@@ -24,7 +23,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * Class that provide method to use the Trevas library.
@@ -155,7 +153,7 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(String vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
+    public void evalVtlScript(String vtlScript, VtlBindings bindings, KraftwerkExecutionContext kraftwerkExecutionContext){
         if(vtlScript != null && !vtlScript.isEmpty()) {
             try {
                 // set script context
@@ -168,32 +166,32 @@ public class VtlExecute {
 
             } catch (ScriptException e) {
                 log.warn("ScriptException - VTL instruction given is invalid and has been skipped : {}",vtlScript);
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             } catch (NumberFormatException e) { 
                 log.warn("NumberFormatException - Corresponding variable could not be calculated.");
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             } catch (UnsupportedOperationException e) { 
                 log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             } catch (NullPointerException e) {
                 log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             } catch (Error e) { 
                 log.debug("Error - Probable cause: Syntax error.");
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             } catch (Exception e) {
                 log.warn("Exception - UNKNOWN EXCEPTION PLEASE REPORT IT!");
-                addError(vtlScript, errors, e);
+                addError(vtlScript, kraftwerkExecutionContext, e);
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
         }
     }
 
-    private static void addError(String vtlScript, List<KraftwerkError> errors, Throwable e) {
+    private static void addError(String vtlScript, KraftwerkExecutionContext kraftwerkExecutionContext, Throwable e) {
         ErrorVtlTransformation error = new ErrorVtlTransformation(vtlScript, e.getMessage());
-        if (!errors.contains(error)){
-            errors.add(error);
+        if (!kraftwerkExecutionContext.getErrors().contains(error)){
+            kraftwerkExecutionContext.getErrors().add(error);
         }
     }
 
@@ -204,10 +202,10 @@ public class VtlExecute {
      * @param vtlScript
      * A string containing vtl instructions.
      */
-    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, List<KraftwerkError> errors){
+    public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, KraftwerkExecutionContext kraftwerkExecutionContext){
         if(vtlScript != null && !vtlScript.isEmpty()) {
             for(String vtlInstruction : vtlScript) {
-                evalVtlScript(vtlInstruction, bindings, errors);
+                evalVtlScript(vtlInstruction, bindings, kraftwerkExecutionContext);
             }
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");

@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.metadata.CalculatedVariables.CalculatedVariable;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
@@ -8,6 +7,7 @@ import fr.insee.kraftwerk.core.metadata.Variable;
 import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +27,7 @@ class CalculatedProcessingTest {
     private static CalculatedVariables fooCalculated;
     private static MetadataModel fooMetadataModel;
     private static VtlBindings vtlBindings;
-    private static List<KraftwerkError> errors;
+    private static KraftwerkExecutionContext kraftwerkExecutionContext;
     private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 
     @BeforeAll
@@ -49,7 +48,7 @@ class CalculatedProcessingTest {
         fooMetadataModel.getVariables().putVariable(new Variable("FOO3", fooMetadataModel.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
-        errors = new ArrayList<>();
+        kraftwerkExecutionContext = new KraftwerkExecutionContext();
     }
 
     @Test
@@ -72,7 +71,7 @@ class CalculatedProcessingTest {
         VtlBindings vtlBindings = getVtlBindings();
         //
         CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
-        processing.applyAutomatedVtlInstructions("TEST", errors);
+        processing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         //
         Dataset outDataset = vtlBindings.getDataset("TEST");
 

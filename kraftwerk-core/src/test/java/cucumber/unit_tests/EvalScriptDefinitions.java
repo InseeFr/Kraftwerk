@@ -2,13 +2,10 @@ package cucumber.unit_tests;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
@@ -20,6 +17,7 @@ public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() throws Exception {
@@ -33,8 +31,7 @@ public class EvalScriptDefinitions {
 	
 	@When("I try to apply some VTL instruction : {string}")
 	public void exportDataset(String vtlScript) throws Exception {
-		List<KraftwerkError> errors = new ArrayList<>();
-		vtlExecute.evalVtlScript(vtlScript, vtlBindings, errors);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
 	}
 
 	@Then("The binding {string} should have {int} variables")

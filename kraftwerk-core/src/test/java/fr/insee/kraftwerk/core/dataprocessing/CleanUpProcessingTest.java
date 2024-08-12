@@ -1,10 +1,10 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -71,7 +71,7 @@ class CleanUpProcessingTest {
         // Metadata variables object
         Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
         // Errors list
-        List<KraftwerkError> errors = new ArrayList<>();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
         //
         MetadataModel cawiMetadata = new MetadataModel();
         cawiMetadata.getVariables().putVariable(new Variable("FOO", cawiMetadata.getRootGroup(), VariableType.STRING));
@@ -100,7 +100,7 @@ class CleanUpProcessingTest {
 
         // Apply clean up
         CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadatas, fileUtilsInterface);
-        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,errors);
+        cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,kraftwerkExecutionContext);
 
         // Are paper indicator variables removed in VTL multimode dataset ?
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));

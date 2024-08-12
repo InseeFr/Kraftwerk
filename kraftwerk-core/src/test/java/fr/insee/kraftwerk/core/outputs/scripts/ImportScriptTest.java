@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
@@ -12,6 +11,7 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -21,7 +21,6 @@ import fr.insee.vtl.model.Structured.DataStructure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +58,11 @@ class ImportScriptTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		List<KraftwerkError> errors = new ArrayList<>();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface);
-		groupProcessing.applyVtlTransformations("CAWI", null, errors);
+		groupProcessing.applyVtlTransformations("CAWI", null, kraftwerkExecutionContext);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface);
-		groupProcessing2.applyVtlTransformations("PAPI", null, errors);
+		groupProcessing2.applyVtlTransformations("PAPI", null, kraftwerkExecutionContext);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadata);
@@ -100,13 +99,13 @@ class ImportScriptTest {
 
 	@Test
 	void numberTypeInDatasets() {
-		List<KraftwerkError> errors = new ArrayList<>();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
 		);
 		vtlBindings.put("test", ds);
-		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings,errors);
+		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings, kraftwerkExecutionContext);
 		Dataset outDs = vtlBindings.getDataset("test");
 		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
 		// => "NUMBER" type in Trevas datasets is java "Double" type

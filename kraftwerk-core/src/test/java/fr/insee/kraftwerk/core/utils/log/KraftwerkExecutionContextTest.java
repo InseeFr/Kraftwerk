@@ -9,25 +9,25 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-class KraftwerkExecutionLogTest {
+class KraftwerkExecutionContextTest {
     @Test
     void getFormattedString_test(){
         //GIVEN
-        KraftwerkExecutionLog kraftwerkExecutionLog = new KraftwerkExecutionLog();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
         long start = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         long stop = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
 
-        kraftwerkExecutionLog.setStartTimeStamp(start);
-        kraftwerkExecutionLog.setEndTimeStamp(stop);
-        kraftwerkExecutionLog.setOkFileNames(new ArrayList<>());
-        kraftwerkExecutionLog.setLineCountByTableMap(new HashMap<>());
+        kraftwerkExecutionContext.setStartTimeStamp(start);
+        kraftwerkExecutionContext.setEndTimeStamp(stop);
+        kraftwerkExecutionContext.setOkFileNames(new ArrayList<>());
+        kraftwerkExecutionContext.setLineCountByTableMap(new HashMap<>());
 
-        kraftwerkExecutionLog.getOkFileNames().add("TEST.xml");
-        kraftwerkExecutionLog.getLineCountByTableMap().put("RACINE",1);
+        kraftwerkExecutionContext.getOkFileNames().add("TEST.xml");
+        kraftwerkExecutionContext.getLineCountByTableMap().put("RACINE",1);
 
         //WHEN
-        String formattedString = kraftwerkExecutionLog.getFormattedString();
+        String formattedString = kraftwerkExecutionContext.getFormattedString();
 
         //THEN
         Assertions.assertThat(formattedString).contains("TEST.xml", "RACINE", simpleDateFormat.format(start), simpleDateFormat.format(stop));
