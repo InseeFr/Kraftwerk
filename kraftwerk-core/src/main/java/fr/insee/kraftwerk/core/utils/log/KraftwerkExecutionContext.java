@@ -51,6 +51,11 @@ public class KraftwerkExecutionContext {
         }
 
         return toWrite.toString();
+    }
 
+    public void addUniqueError(KraftwerkError kraftwerkError){
+        if (!errors.contains(kraftwerkError)){
+            errors.add(kraftwerkError);
+        }
     }
 }

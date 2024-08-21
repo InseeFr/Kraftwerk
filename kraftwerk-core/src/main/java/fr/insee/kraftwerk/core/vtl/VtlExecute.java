@@ -166,32 +166,25 @@ public class VtlExecute {
 
             } catch (ScriptException e) {
                 log.warn("ScriptException - VTL instruction given is invalid and has been skipped : {}",vtlScript);
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (NumberFormatException e) { 
                 log.warn("NumberFormatException - Corresponding variable could not be calculated.");
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (UnsupportedOperationException e) { 
                 log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (NullPointerException e) {
                 log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (Error e) { 
                 log.debug("Error - Probable cause: Syntax error.");
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (Exception e) {
                 log.warn("Exception - UNKNOWN EXCEPTION PLEASE REPORT IT!");
-                addError(vtlScript, kraftwerkExecutionContext, e);
+                kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             }
         } else {
             log.info("null or empty VTL instruction given. VTL bindings has not been changed.");
-        }
-    }
-
-    private static void addError(String vtlScript, KraftwerkExecutionContext kraftwerkExecutionContext, Throwable e) {
-        ErrorVtlTransformation error = new ErrorVtlTransformation(vtlScript, e.getMessage());
-        if (!kraftwerkExecutionContext.getErrors().contains(error)){
-            kraftwerkExecutionContext.getErrors().add(error);
         }
     }
 

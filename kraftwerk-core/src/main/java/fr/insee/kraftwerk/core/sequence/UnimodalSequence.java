@@ -37,10 +37,7 @@ public class UnimodalSequence {
 			Variable variable = variablesMap.getVariable(variableName);
 			if (variable.getSasFormat() != null && variable.getExpectedLength()<variable.getMaxLengthData() && variable.getType() != VariableType.BOOLEAN){
 				log.warn(String.format("%s expected length is %s but max length received is %d",variable.getName(),variable.getExpectedLength(), variable.getMaxLengthData()));
-				ErrorVariableLength error = new ErrorVariableLength(variable, dataMode);
-				if (!kraftwerkExecutionContext.getErrors().contains(error)){
-					kraftwerkExecutionContext.getErrors().add(error);
-				}
+				kraftwerkExecutionContext.addUniqueError(new ErrorVariableLength(variable, dataMode));
 			}
 		}
 
