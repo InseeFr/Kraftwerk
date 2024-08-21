@@ -129,7 +129,7 @@ public abstract class ReportingDataParser {
 							.equals(questionnaireToSearch.getIdentifier()))
 					.findAny().orElse(null);
 			if (questionnaire == null && !withAllReportingData) {
-				return;
+				continue;
 			}
 			addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
 		}
