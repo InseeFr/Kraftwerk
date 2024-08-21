@@ -1,10 +1,14 @@
 package fr.insee.kraftwerk.core.outputs.scripts;
 
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.McqVariable;
+import fr.insee.bpm.metadata.model.PaperUcq;
+import fr.insee.bpm.metadata.model.UcqVariable;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -28,7 +32,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ImportScriptTest {
+public class ImportScriptTest {
 	
 	VtlBindings vtlBindings = new VtlBindings();
 
@@ -47,14 +51,14 @@ class ImportScriptTest {
 	}
 
 	private void instantiateMap() {
-		metadata.put("CAWI", MetadataModelTest.createCompleteFakeVariablesMap());
+		metadata.put("CAWI", createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
-		srdWeb.setMetadataModel(MetadataModelTest.createCompleteFakeVariablesMap());
+		srdWeb.setMetadataModel(createCompleteFakeVariablesMap());
 		vtlExecute.convertToVtlDataset(srdWeb, "CAWI", vtlBindings);
 
-		metadata.put("PAPI", MetadataModelTest.createAnotherFakeVariablesMap());
+		metadata.put("PAPI", createAnotherFakeVariablesMap());
 		SurveyRawData srdPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
-		srdPaper.setMetadataModel(MetadataModelTest.createAnotherFakeVariablesMap());
+		srdPaper.setMetadataModel(createAnotherFakeVariablesMap());
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
@@ -110,5 +114,128 @@ class ImportScriptTest {
 		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
 		// => "NUMBER" type in Trevas datasets is java "Double" type
 	}
+
+	/* Variables map objects to test multimode management */
+
+	/**
+	 * Return a VariablesMap object containing variables named as follows:
+	 * - FIRST_NAME, LAST_NAME, AGE at the root
+	 * - CAR_COLOR in a group named CARS_LOOP
+	 */
+	public static MetadataModel createCompleteFakeVariablesMap(){
+
+		MetadataModel metadataM = new MetadataModel();
+
+		// Groups
+		Group rootGroup = metadataM.getRootGroup();
+		Group carsGroup = new Group("CARS_LOOP", Constants.ROOT_GROUP_NAME);
+		metadataM.putGroup(carsGroup);
+
+		// Variables
+		metadataM.getVariables().putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING, "20"));
+		metadataM.getVariables().putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING, "50"));
+		metadataM.getVariables().putVariable(new Variable("AGE", rootGroup, VariableType.INTEGER, "50"));
+		metadataM.getVariables().putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING, "50"));
+
+		// unique choice question variable
+		UcqVariable ucq = new UcqVariable("SEXE", rootGroup, VariableType.STRING, "50");
+		ucq.addModality("1", "Male");
+		ucq.addModality("2", "Female");
+		Variable paperUcq1 = new PaperUcq("SEXE_1", ucq, "1");
+		Variable paperUcq2 = new PaperUcq("SEXE_2", ucq, "2");
+		metadataM.getVariables().putVariable(ucq);
+		metadataM.getVariables().putVariable(paperUcq1);
+		metadataM.getVariables().putVariable(paperUcq2);
+
+		// unique choice question variable related to multiple choices question
+		UcqVariable ucqMcq1 = new UcqVariable("CAR_OWNER", rootGroup, VariableType.STRING, "50");
+		ucqMcq1.setQuestionItemName("VEHICLE_OWNER");
+		ucqMcq1.addModality("1", "Yes");
+		ucqMcq1.addModality("2", "No");
+		UcqVariable ucqMcq2 = new UcqVariable("MOTO_OWNER", rootGroup, VariableType.STRING, "50");
+		ucqMcq2.setQuestionItemName("VEHICLE_OWNER");
+		ucqMcq2.addModality("1", "Yes");
+		ucqMcq2.addModality("2", "No");
+		metadataM.getVariables().putVariable(ucqMcq1);
+		metadataM.getVariables().putVariable(ucqMcq2);
+
+		// multiple choices question variable
+		metadataM.getVariables().putVariable(McqVariable.builder()
+				.name("RELATIONSHIP_A").group(rootGroup).questionItemName("RELATIONSHIP").text("Spouse").build());
+		metadataM.getVariables().putVariable(McqVariable.builder()
+				.name("RELATIONSHIP_B").group(rootGroup).questionItemName("RELATIONSHIP").text("Child").build());
+		metadataM.getVariables().putVariable(McqVariable.builder()
+				.name("RELATIONSHIP_C").group(rootGroup).questionItemName("RELATIONSHIP").text("Parent").build());
+		metadataM.getVariables().putVariable(McqVariable.builder()
+				.name("RELATIONSHIP_D").group(rootGroup).questionItemName("RELATIONSHIP").text("Other").build());
+
+		return metadataM;
+	}
+
+	public static MetadataModel createAnotherFakeVariablesMap(){
+
+		MetadataModel metadataM = new MetadataModel();
+
+		// Groups
+		Group rootGroup = metadataM.getRootGroup();
+		Group carsGroup = new Group("CARS_LOOP", Constants.ROOT_GROUP_NAME);
+		metadataM.putGroup(carsGroup);
+
+		// Variables
+		metadataM.getVariables().putVariable(new Variable("LAST_NAME", rootGroup, VariableType.STRING, "50"));
+		metadataM.getVariables().putVariable(new Variable("FIRST_NAME", rootGroup, VariableType.STRING, "20"));
+		metadataM.getVariables().putVariable(new Variable("ADDRESS", rootGroup, VariableType.STRING, "50"));
+		metadataM.getVariables().putVariable(new Variable("CAR_COLOR", carsGroup, VariableType.STRING, "500"));
+
+		return metadataM;
+	}
+
+	/* Variables map objects to test information levels management */
+
+	public static MetadataModel createVariablesMap_rootOnly() {
+		MetadataModel metadataModel1 = new MetadataModel();
+
+		Group rootGroup = metadataModel1.getRootGroup();
+
+		metadataModel1.putGroup(rootGroup);
+
+		metadataModel1.getVariables().putVariable(
+				new Variable("ADDRESS", rootGroup, VariableType.STRING));
+		metadataModel1.getVariables().putVariable(
+				new Variable("HOUSEHOLD_INCOME", rootGroup, VariableType.NUMBER));
+
+		return metadataModel1;
+	}
+
+	public static MetadataModel createVariablesMap_oneLevel() {
+		MetadataModel metadataModel1 = createVariablesMap_rootOnly();
+
+		Group individualsGroup = new Group("INDIVIDUALS_LOOP", Constants.ROOT_GROUP_NAME);
+
+		metadataModel1.putGroup(individualsGroup);
+
+		metadataModel1.getVariables().putVariable(
+				new Variable("FIRST_NAME", individualsGroup, VariableType.STRING));
+		metadataModel1.getVariables().putVariable(
+				new Variable("LAST_NAME", individualsGroup, VariableType.STRING));
+		metadataModel1.getVariables().putVariable(
+				new Variable("GENDER", individualsGroup, VariableType.STRING));
+
+		return metadataModel1;
+	}
+
+	public static MetadataModel createVariablesMap_twoLevels() {
+		MetadataModel metadataModel1 = createVariablesMap_oneLevel();
+
+		Group carsGroup = new Group("CARS_LOOP", "INDIVIDUALS_LOOP");
+
+		metadataModel1.putGroup(carsGroup);
+
+		metadataModel1.getVariables().putVariable(
+				new Variable("CAR_COLOR", carsGroup, VariableType.STRING));
+
+		return metadataModel1;
+	}
+
 
 }

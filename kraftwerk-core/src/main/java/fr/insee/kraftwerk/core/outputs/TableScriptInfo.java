@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.vtl.model.Structured.DataStructure;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

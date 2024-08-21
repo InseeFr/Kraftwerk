@@ -1,5 +1,12 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.bpm.metadata.model.CalculatedVariables;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.bpm.metadata.model.VariablesMap;
+
+import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.*;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
@@ -40,7 +47,7 @@ public class UnimodalSequence {
 		/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
-					.getCalculatedFromLunatic(modeInputs.getLunaticFile(), fileUtilsInterface);
+					.getCalculatedFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
 			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, fileUtilsInterface);
 			vtlGenerate = calculatedProcessing.applyCalculatedVtlTransformations(dataMode, modeInputs.getModeVtlFile(), kraftwerkExecutionContext);
 			TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CalculatedProcessing", dataMode),

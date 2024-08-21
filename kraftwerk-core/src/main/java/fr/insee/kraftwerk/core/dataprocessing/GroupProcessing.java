@@ -1,7 +1,8 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.VariablesMap;
+import fr.insee.bpm.metadata.model.MetadataModel;
+
+import fr.insee.bpm.metadata.model.VariablesMap;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;

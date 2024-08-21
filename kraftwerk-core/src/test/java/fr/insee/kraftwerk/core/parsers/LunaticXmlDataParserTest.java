@@ -2,10 +2,10 @@ package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.MetadataModelTest;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -64,7 +64,7 @@ class LunaticXmlDataParserTest {
 	void parseLunaticXml_rootOnly() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_rootOnly());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_rootOnly());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-root-only.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		parser.parseSurveyData(dataPath,null);
@@ -97,7 +97,7 @@ class LunaticXmlDataParserTest {
 	void parseLunaticXml_oneLevel() throws NullException {
 		//
 		SurveyRawData data = new SurveyRawData("TEST");
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-1.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 		parser.parseSurveyData(dataPath,null);
@@ -131,7 +131,7 @@ class LunaticXmlDataParserTest {
 	void parseLunaticXml_noCollected() throws NullException {
 		//Given
 		SurveyRawData data = new SurveyRawData("TEST");
-		data.setMetadataModel(MetadataModelTest.createVariablesMap_oneLevel());
+		data.setMetadataModel(ImportScriptTest.createVariablesMap_oneLevel());
 		Path dataPath = Paths.get(dataSamplesFolder + "/lunatic_xml/fake-lunatic-data-3.xml");
 		LunaticXmlDataParser parser = new LunaticXmlDataParser(data, fileUtilsInterface);
 

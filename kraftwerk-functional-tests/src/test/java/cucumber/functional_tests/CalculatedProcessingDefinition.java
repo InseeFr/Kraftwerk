@@ -1,14 +1,15 @@
 package cucumber.functional_tests;
 
 import cucumber.TestConstants;
+import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
-import fr.insee.kraftwerk.core.metadata.DDIReader;
-import fr.insee.kraftwerk.core.metadata.LunaticReader;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.CalculatedVariables;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
+import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -60,12 +61,12 @@ public class CalculatedProcessingDefinition {
         //TODO Put other sample test campaigns once they are ready
     }
     @Given("I read data from campaign {string}, mode {string}")
-    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException, URISyntaxException {
+    public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException, URISyntaxException, MetadataParserException {
         this.campaignName = campaignName;
         this.dataMode = dataMode;
         //
         metadataModel = DDIReader.getMetadataFromDDI(
-                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")).toString(), new FileSystemImpl());
+                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")).toString(), new FileSystemImpl().readFile(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
         //
         SurveyRawData data = new SurveyRawData();
         data.setMetadataModel(metadataModel);
@@ -80,7 +81,7 @@ public class CalculatedProcessingDefinition {
     public void readCampaignData() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")), new FileSystemImpl());
+                new FileSystemImpl().readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
         DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl());
         calculatedProcessing.applyVtlTransformations("TEST", null, kraftwerkExecutionContext);
         //

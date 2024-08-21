@@ -2,7 +2,7 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;

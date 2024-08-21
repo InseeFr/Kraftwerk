@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.PaperUcq;
+import fr.insee.bpm.metadata.model.UcqVariable;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
