@@ -2,7 +2,7 @@ package fr.insee.kraftwerk.core.vtl;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;

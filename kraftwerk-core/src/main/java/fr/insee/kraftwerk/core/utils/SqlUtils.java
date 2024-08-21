@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;

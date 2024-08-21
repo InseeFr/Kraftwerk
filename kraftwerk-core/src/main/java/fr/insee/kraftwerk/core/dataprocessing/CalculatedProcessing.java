@@ -1,7 +1,8 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.bpm.metadata.model.CalculatedVariables;
+
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.CalculatedVariables;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;

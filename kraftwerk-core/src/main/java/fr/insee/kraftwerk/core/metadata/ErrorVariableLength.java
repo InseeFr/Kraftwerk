@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.metadata;
 
+import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

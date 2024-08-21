@@ -11,7 +11,7 @@ import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;

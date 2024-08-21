@@ -112,5 +112,12 @@
 			<artifactId>duckdb_jdbc</artifactId>
 			<version>${duckdb.version}</version>
 		</dependency>
+
+		<!-- Metadatas -->
+		<dependency>
+			<groupId>fr.insee.bpm</groupId>
+			<artifactId>bpm</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 </project>
