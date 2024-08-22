@@ -128,10 +128,9 @@ public abstract class ReportingDataParser {
 					.filter(questionnaireToSearch -> reportingDataUE.getIdentifier()
 							.equals(questionnaireToSearch.getIdentifier()))
 					.findAny().orElse(null);
-			if (questionnaire == null && !withAllReportingData) {
-				return;
+			if (questionnaire != null || withAllReportingData) {
+				addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
 			}
-			addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
 		}
 		// We log the lists of missing questionnaires on one line only
 		if (!missingQuestionnaireIds.isEmpty()){

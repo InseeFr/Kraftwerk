@@ -145,6 +145,15 @@ public class MainDefinitions {
 		mp.runMain();
 	}
 
+	@When("Step 1 : We launch main service with an export of reporting data only for survey respondents")
+	public void launch_main_with_reporting_data_only_for_respondents() throws KraftwerkException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl());
+		mp.runMain();
+	}
+
 	@When("We launch main service 2 times")
 	public void launch_main_2() throws KraftwerkException {
 		// We clean the output and the temp directory
