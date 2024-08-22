@@ -199,6 +199,17 @@ public class MainDefinitions {
 		}
 	}
 
+
+	@When("We launch lunatic only service")
+	public void stepWeLaunchLunaticOnlyService() throws KraftwerkException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
+				419430400L, new FileSystemImpl());
+		mp.runMain();
+	}
+
 	@Then("Step 5 : We check if we have {int} lines")
 	public void count_lines_in_root_tables(int expectedLineCount) throws CsvValidationException, IOException {
 		// Go to first datetime folder
@@ -414,6 +425,28 @@ public class MainDefinitions {
 		csvReader.close();
 
 		assertThat(header).isNotEmpty().contains(fieldName);
+	}
+
+	@Then("In a file named {string} there shouldn't be a {string} field")
+	public void check_field_inexistence(String fileName, String fieldName) throws IOException, CsvValidationException {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		File outputReportingDataFile = new File(executionOutDirectory + "/" + fileName);
+
+		// File existence assertion
+		assertThat(outputReportingDataFile).exists().isFile().canRead();
+
+		CSVReader csvReader = getCSVReader(
+				outputReportingDataFile.toPath()
+		);
+
+
+		// Get header
+		String[] header = csvReader.readNext();
+		csvReader.close();
+
+		assertThat(header).isNotEmpty().doesNotContain(fieldName);
 	}
 
 	@When("We clean the test VTL script named {string}")

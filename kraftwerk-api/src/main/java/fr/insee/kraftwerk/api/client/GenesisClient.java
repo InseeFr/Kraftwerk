@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -24,6 +25,7 @@ public class GenesisClient {
 
 	private final RestTemplate restTemplate;
 
+	@Getter
 	private final ConfigProperties configProperties;
 
 

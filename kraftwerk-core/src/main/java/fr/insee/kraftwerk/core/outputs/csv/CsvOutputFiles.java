@@ -59,6 +59,7 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
 				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
 
 				//Get column names
@@ -98,9 +99,10 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
 
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, getOutputFolder().resolve(outputFileName(datasetName)).toString());
-
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info(String.format("File: %s successfully written", outputFile));
 				//Count rows for functional log
 				if (kraftwerkExecutionLog != null) {
 					try(ResultSet countResult =

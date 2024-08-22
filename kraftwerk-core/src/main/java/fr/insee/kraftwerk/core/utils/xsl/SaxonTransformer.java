@@ -33,7 +33,6 @@ public class SaxonTransformer {
 	 */
 	public void xslTransform(String inputXmlPath, String inputXslPath, Path outputXmlPath) throws IOException {
 		log.info("About to transform the file: " + inputXmlPath);
-		log.info("using the XSL file " + inputXslPath);
 
 		// Get the XML input file
 		StreamSource xmlSource;
@@ -87,9 +86,6 @@ public class SaxonTransformer {
 	 * @param outputXmlPath : Path to the XML output file which will be created
 	 */
 	public void xslTransform(Path inputXmlPath, String inputXslPath, Path outputXmlPath) throws IOException {
-		log.info("About to transform the file " + inputXmlPath);
-		log.info("using the XSL file " + inputXslPath);
-
 		xslTransform(inputXmlPath.toString(), inputXslPath, outputXmlPath);
 	}
 }

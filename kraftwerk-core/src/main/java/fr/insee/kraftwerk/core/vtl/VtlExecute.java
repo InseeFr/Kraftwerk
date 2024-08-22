@@ -166,7 +166,7 @@ public class VtlExecute {
                 engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE);
 
             } catch (ScriptException e) {
-                log.warn("ScriptException - Some VTL instruction given is invalid and has been skipped");
+                log.warn("ScriptException - VTL instruction given is invalid and has been skipped : {}",vtlScript);
                 addError(vtlScript, errors, e);
             } catch (NumberFormatException e) { 
                 log.warn("NumberFormatException - Corresponding variable could not be calculated.");

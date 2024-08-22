@@ -100,7 +100,20 @@ class ParaDataParserTest {
 
 		//COLLECTION_DATE
 		Assertions.assertEquals("1641920202155", Long.valueOf(paradata.getParadataUE("RR100144").getSurveyValidationDateTimeStamp()).toString());
+	}
 
+	@Test
+	void shouldNotThrowExceptionWhenParadataFileNonParsable() {
+		SurveyRawData srd = new SurveyRawData();
+		srd.setMetadataModel(new MetadataModel());
+
+		srd = addIdToTest(srd, "31P6023816");
+
+		Paradata paradata = new Paradata();
+		paradata.setFilepath(Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/paradata"));
+		SurveyRawData finalSrd = srd;
+
+		assertDoesNotThrow(() -> paradataParser.parseParadata(paradata, finalSrd));
 	}
 	
 	private SurveyRawData addIdToTest(SurveyRawData srd, String idToAdd) {

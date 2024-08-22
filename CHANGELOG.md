@@ -1,4 +1,12 @@
 # Changelog
+## 3.0.3 [2024-07-31] - Fixes for VPP
+### Fixed
+- Fixed genesis not looking in default directory to find specs
+
+## 3.0.2 [2024-07-29] - Various fixes
+### Fixed
+- \r\n in lunatic calculated variables breaks the CSV
+- Temporary data file directories creation (for local execution) 
 
 ## 3.0.1 [2024-07-19] - Fix IOException due to permission on temp directory
 

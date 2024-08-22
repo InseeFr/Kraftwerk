@@ -28,20 +28,13 @@ public class ControlInputSequence {
 	public Path getInDirectory(String inDirectoryParam) throws KraftwerkException {
 		Path inDirectory = Path.of(inDirectoryParam);
 		if (!verifyInDirectory(inDirectory)) inDirectory = Paths.get(defaultDirectory, "in", inDirectoryParam);
-		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, "Configuration file not found");
+		if (!verifyInDirectory(inDirectory)) throw new KraftwerkException(400, String.format("Configuration file not found at paths %s and %s",inDirectoryParam, inDirectory));
 		return inDirectory;
 	}
 
 	private boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-		if (fileUtilsInterface.isFileExists(userInputFile.toString())) {
-			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
-		} else {
-			log.info("No configuration file found in campaign folder: {}", inDirectory);
-			return false;
-		}
-		return true;
-	}
-
+        return fileUtilsInterface.isFileExists(userInputFile.toString());
+    }
 	
 }

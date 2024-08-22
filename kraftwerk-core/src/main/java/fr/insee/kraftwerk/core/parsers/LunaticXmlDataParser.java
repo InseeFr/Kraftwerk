@@ -87,7 +87,7 @@ public class LunaticXmlDataParser extends DataParser {
 					data.addQuestionnaire(questionnaireData);
 				}
 			}
-			log.info("Successfully parsed Lunatic answers file: {}", filePath);
+			log.debug("Successfully parsed Lunatic answers file: {}", filePath);
 		}
 	}
 

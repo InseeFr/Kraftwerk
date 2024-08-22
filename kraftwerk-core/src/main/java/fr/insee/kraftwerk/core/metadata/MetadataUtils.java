@@ -33,6 +33,7 @@ public class MetadataUtils {
 		}
 		// Step 2 : we add the variables that are only present in the Lunatic file
 		if (modeInputs.getLunaticFile() != null) {
+			log.info("Adding variables from Lunatic file : {}", modeInputs.getLunaticFile().getFileName());
 			// We read and store lunaticModelVersion
             metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(modeInputs.getLunaticFile(), fileUtilsInterface));
 			// First we add the collected _MISSING variables
@@ -68,12 +69,7 @@ public class MetadataUtils {
 			group = metadata.getVariables().getQuestionGridGroup(correspondingVariableName);
 		} else {
 			group = metadata.getGroup(metadata.getGroupNames().getFirst());
-			log.warn(String.format(
-					"No information from the DDI about question named \"%s\".",
-					correspondingVariableName));
-			log.warn(String.format(
-					"\"%s\" has been arbitrarily associated with group \"%s\".",
-					missingVar, group.getName()));
+			log.warn("No information from the DDI about question named {}. It has been arbitrarily associated with group {}.", correspondingVariableName, group.getName());
 		}
 		metadata.getVariables().putVariable(new Variable(missingVar, group, varType));
 	}

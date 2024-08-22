@@ -9,6 +9,7 @@ local_files/logs/*
 # Config
 src/main/resources/application-*.properties
 !src/main/resources/application-local.properties
+src/main/resources/kraftwerk.properties
 
 # Compiled files
 target/

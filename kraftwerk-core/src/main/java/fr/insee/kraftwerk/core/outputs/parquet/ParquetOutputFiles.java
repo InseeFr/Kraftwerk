@@ -54,6 +54,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
 				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
 
 				Files.deleteIfExists(tmpOutputFile);
@@ -61,9 +62,10 @@ public class ParquetOutputFiles extends OutputFiles {
 				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile));
 
 
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
 				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, getOutputFolder().resolve(outputFileName(datasetName)).toString());
-
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info(String.format("File: %s successfully written", outputFile));
 			} catch (Exception e) {
 				throw new KraftwerkException(500, e.toString());
 			}
