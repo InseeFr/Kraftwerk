@@ -1,0 +1,311 @@
+{
+  "id": "lz9w40p7",
+  "label": {
+    "type": "VTL|MD",
+    "value": "Traiter - Questions Simples"
+  },
+  "modele": "TESTTRAITE",
+  "maxPage": "6",
+  "resizing": {},
+  "variables": [
+    {
+      "name": "QSIMPLETXT",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QUESTIONSI",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QSIMPLENUM",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QSIMPLEBOOLEAN",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QSIMPLEDUR",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "FILTER_RESULT_QSIMPLETXT",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_QSIMPLEDAT",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_QSIMPLENUM",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_QSIMPLEBOOL",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_QSIMPLEDUR",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    }
+  ],
+  "components": [
+    {
+      "id": "lz9wf679",
+      "page": "1",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"I - \" || \"Sequence 1\""
+      },
+      "componentType": "Sequence",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lz9wh5gy",
+      "page": "2",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"1\\. \" || \"Question simple texte\""
+      },
+      "components": [
+        {
+          "id": "lz9wh5gy",
+          "page": "2",
+          "response": {
+            "name": "QSIMPLETXT"
+          },
+          "mandatory": false,
+          "maxLength": 249,
+          "componentType": "Input"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzcs0rqe",
+      "page": "3",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"2\\. \" || \"Question simple date\""
+      },
+      "components": [
+        {
+          "id": "lzcs0rqe",
+          "max": "format-date(current-date(),'[Y0001]-[M01]-[D01]')",
+          "min": "1900-01-01",
+          "page": "3",
+          "controls": [
+            {
+              "id": "lzcs0rqe-format-date-borne-inf-sup",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(QUESTIONSI)) and (cast(QUESTIONSI, date, \"YYYY-MM-DD\")<cast(\"1900-01-01\", date, \"YYYY-MM-DD\") or cast(QUESTIONSI, date, \"YYYY-MM-DD\")>cast(\"format-date(current-date(),'[Y0001]-[M01]-[D01]')\", date, \"YYYY-MM-DD\")))"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\"La date saisie doit être comprise entre 1900-01-01 et format-date(current-date(),'[Y0001]-[M01]-[D01]').\""
+              },
+              "typeOfControl": "FORMAT"
+            }
+          ],
+          "response": {
+            "name": "QUESTIONSI"
+          },
+          "mandatory": false,
+          "dateFormat": "YYYY-MM-DD",
+          "componentType": "Datepicker"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzcrsjso",
+      "page": "4",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"3\\. \" || \"Question simple nombre\""
+      },
+      "components": [
+        {
+          "id": "lzcrsjso",
+          "max": 150,
+          "min": 0,
+          "page": "4",
+          "unit": "kg",
+          "controls": [
+            {
+              "id": "lzcrsjso-format-borne-inf-sup",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(QSIMPLENUM)) and (0.0>QSIMPLENUM or 150.0<QSIMPLENUM))"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\" La valeur doit être comprise entre 0.0 et 150.0.\""
+              },
+              "typeOfControl": "FORMAT"
+            },
+            {
+              "id": "lzcrsjso-format-decimal",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(QSIMPLENUM))  and round(QSIMPLENUM,1)<>QSIMPLENUM)"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\"Le nombre doit comporter au maximum 1 chiffre(s) après la virgule.\""
+              },
+              "typeOfControl": "FORMAT"
+            }
+          ],
+          "decimals": 1,
+          "response": {
+            "name": "QSIMPLENUM"
+          },
+          "mandatory": false,
+          "description": {
+            "type": "VTL|MD",
+            "value": "Format attendu : un nombre en kg entre 0,0 et 150,0"
+          },
+          "componentType": "InputNumber"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzcrwu04",
+      "page": "5",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"4\\. \" || \"Question simple booléen\""
+      },
+      "components": [
+        {
+          "id": "lzcrwu04",
+          "page": "5",
+          "response": {
+            "name": "QSIMPLEBOOLEAN"
+          },
+          "mandatory": false,
+          "componentType": "CheckboxBoolean"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzcsc9rr",
+      "page": "6",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"5\\. \" || \"Question simple durée\""
+      },
+      "components": [
+        {
+          "id": "lzcsc9rr",
+          "page": "6",
+          "format": "PTnHnM",
+          "response": {
+            "name": "QSIMPLEDUR"
+          },
+          "mandatory": false,
+          "componentType": "Duration"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    }
+  ],
+  "pagination": "question",
+  "componentType": "Questionnaire",
+  "enoCoreVersion": "3.24.0",
+  "generatingDate": "05-08-2024 12:33:23",
+  "lunaticModelVersion": "3.12.0"
+}

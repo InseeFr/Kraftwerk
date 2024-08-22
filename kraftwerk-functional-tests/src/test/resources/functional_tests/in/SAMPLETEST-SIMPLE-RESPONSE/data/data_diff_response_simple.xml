@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Campaign>
+	<Id>ENQTESTSIMP</Id>
+	<Label>Traiter - Questions Simples</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>00000001</Id>
+			<QuestionnaireModelId>ENQTESTSIMP</QuestionnaireModelId>
+			<Data>
+				<COLLECTED>
+					<QUESTIONSI>
+						<COLLECTED type="string">1983-03-01</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</QUESTIONSI>
+					<QSIMPLEBOOLEAN>
+						<COLLECTED type="boolean">true</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</QSIMPLEBOOLEAN>
+					<QSIMPLENUM>
+						<COLLECTED type="number">120</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</QSIMPLENUM>
+					<QSIMPLETXT>
+						<COLLECTED type="string">graegagaegarega gag a gaerg hg jhtyej</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</QSIMPLETXT>
+					<QSIMPLEDUR>
+						<COLLECTED type="string">PT2H06M</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</QSIMPLEDUR>
+				</COLLECTED>
+				<CALCULATED/>
+				<EXTERNAL/>
+			</Data>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>
