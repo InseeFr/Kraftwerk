@@ -1,4 +1,13 @@
 # Changelog
+## 3.0.4 [2024-08-22] - BPM integration
+### Changed
+- Metadata parsing shared with Genesis using BPM (Basic Parser of Metadata)
+- Regrouped kraftwerkError list and kraftwerk execution log into kraftwerkExecutionContext object
+- kraftwerk.properties renamed to kraftwerk_exemple.properties and now optional
+
+### Fixed
+- No reporting data when withAllReportingData = false
+
 ## 3.0.3 [2024-07-31] - Fixes for VPP
 ### Fixed
 - Fixed genesis not looking in default directory to find specs
