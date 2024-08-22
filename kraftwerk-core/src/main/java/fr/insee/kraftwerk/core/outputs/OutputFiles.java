@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;

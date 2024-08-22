@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.util.List;
-import java.util.Map;
-
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
@@ -10,12 +8,13 @@ import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
-import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @NoArgsConstructor
 public class MultimodalSequence {
