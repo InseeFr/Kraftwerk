@@ -1,9 +1,8 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.bpm.metadata.model.CalculatedVariables;
-
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +17,7 @@ public class CalculatedProcessing extends DataProcessing {
 
     /** Maximal number of iterations to resolve the order of execution of VTL expressions. */
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
-    private CalculatedVariables calculatedVariables;
+    private final CalculatedVariables calculatedVariables;
 
     public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, FileUtilsInterface fileUtilsInterface) {
         super(vtlBindings, fileUtilsInterface);
@@ -31,13 +30,13 @@ public class CalculatedProcessing extends DataProcessing {
     }
     
     
-    public String applyCalculatedVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<KraftwerkError> errors){
+    public String applyCalculatedVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext){
         // First step
-        String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, errors);
+        String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         // Second step
         if(userVtlInstructionsPath != null) {
-            applyUserVtlInstructions(userVtlInstructionsPath, errors);
-            applyAutomatedVtlInstructions(bindingName, errors);
+            applyUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
+            applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         } else {
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));

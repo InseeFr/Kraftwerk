@@ -3,17 +3,16 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -49,13 +48,13 @@ class InformationLevelsTest {
 
 	@Test
 	void applyInformationLevelsProcessing() {
-		List<KraftwerkError> errors = new ArrayList<>();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
 		//
 		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
-		processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
+		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");
@@ -89,13 +88,13 @@ class InformationLevelsTest {
 	
 	@Test
 	void applyInformationLevelsProcessingWithPartialIdNUll() {
-		List<KraftwerkError> errors = new ArrayList<>();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDatasetWithPartialIdNull);
 		//
 		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
-		processing.applyAutomatedVtlInstructions("MULTIMODE",errors);
+		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");

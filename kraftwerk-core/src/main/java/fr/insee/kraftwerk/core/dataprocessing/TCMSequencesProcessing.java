@@ -1,16 +1,15 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 
 import java.nio.file.Path;
-import java.util.List;
 
 @Slf4j
 public class TCMSequencesProcessing extends DataProcessing {
@@ -34,11 +33,11 @@ public class TCMSequencesProcessing extends DataProcessing {
     }
 
     @Override
-    public String applyAutomatedVtlInstructions(String bindingName, List<KraftwerkError> errors){
+    public String applyAutomatedVtlInstructions(String bindingName, KraftwerkExecutionContext kraftwerkExecutionContext){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName, metadataModel);
         log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName()));
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
-            vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, errors);
+            vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, kraftwerkExecutionContext);
         }
         return automatedInstructions.toString();
     }

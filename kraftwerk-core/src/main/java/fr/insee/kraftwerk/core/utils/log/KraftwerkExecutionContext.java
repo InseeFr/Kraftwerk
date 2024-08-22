@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.utils.log;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,16 +14,19 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class KraftwerkExecutionLog {
+public class KraftwerkExecutionContext {
     private long startTimeStamp;
     private long endTimeStamp;
     private Map<String,Integer> lineCountByTableMap;
     private List<String> okFileNames;
 
-    public KraftwerkExecutionLog() {
+    private List<KraftwerkError> errors;
+
+    public KraftwerkExecutionContext() {
         this.startTimeStamp = System.currentTimeMillis();
         this.lineCountByTableMap = new HashMap<>();
         this.okFileNames = new ArrayList<>();
+        this.errors = new ArrayList<>();
     }
 
     public String getFormattedString() {
@@ -47,6 +51,11 @@ public class KraftwerkExecutionLog {
         }
 
         return toWrite.toString();
+    }
 
+    public void addUniqueError(KraftwerkError kraftwerkError){
+        if (!errors.contains(kraftwerkError)){
+            errors.add(kraftwerkError);
+        }
     }
 }

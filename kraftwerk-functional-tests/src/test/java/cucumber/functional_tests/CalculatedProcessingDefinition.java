@@ -3,7 +3,6 @@ package cucumber.functional_tests;
 import cucumber.TestConstants;
 import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -15,6 +14,7 @@ import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -46,7 +46,7 @@ public class CalculatedProcessingDefinition {
     private List<String> variableNamesList;
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
-    List<KraftwerkError> errors = new ArrayList<>();
+    KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
     public List<String> listOfStrings(String arg){
@@ -83,7 +83,7 @@ public class CalculatedProcessingDefinition {
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 new FileSystemImpl().readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
         DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl());
-        calculatedProcessing.applyVtlTransformations("TEST", null,errors);
+        calculatedProcessing.applyVtlTransformations("TEST", null, kraftwerkExecutionContext);
         //
         outDataset = vtlBindings.getDataset("TEST");
     }

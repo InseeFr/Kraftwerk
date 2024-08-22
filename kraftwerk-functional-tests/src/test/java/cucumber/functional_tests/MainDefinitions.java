@@ -21,6 +21,7 @@ import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.BeforeAll;
@@ -175,7 +176,7 @@ public class MainDefinitions {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
 				UnimodalSequence unimodal = new UnimodalSequence();
-				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
 			}
 		}
 	}
@@ -184,7 +185,7 @@ public class MainDefinitions {
 	public void aggregate_datasets() throws SQLException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		try (Statement statement = database.createStatement()) {
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
 		}
 	}
 
@@ -193,7 +194,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, null, statement, new FileSystemImpl());
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, null, statement, new FileSystemImpl());
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl());
 		}

@@ -3,8 +3,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.PaperUcq;
 import fr.insee.bpm.metadata.model.VariablesMap;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -45,11 +45,11 @@ public class CleanUpProcessing extends DataProcessing {
      * @param userVtlInstructionsPath User vtl script (none for this step).
      */
     @Override
-    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, List<KraftwerkError> errors) {
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) {
         // Remove paper UCQ variables in vtl multimode dataset
         VtlScript cleanUpScript = generateVtlInstructions(bindingName);
         log.debug("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
-        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings, errors);
+        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings, kraftwerkExecutionContext);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
         // Remove unimodal datasets
