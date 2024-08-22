@@ -49,8 +49,8 @@ public class VtlChecker {
             }
 
             result.append(input, index, sumIndex);
-            result.append(input, sumIndex, closingParenthesisIndex + 1);
-            result.append(" group by ").append(groupByParam);
+            result.append(input, sumIndex, closingParenthesisIndex );
+            result.append(" group by ").append(groupByParam).append(" )");
             index = closingParenthesisIndex + 1;
         }
 

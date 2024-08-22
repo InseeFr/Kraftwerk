@@ -37,8 +37,8 @@ class VtlCheckerTest {
 
 	private String vtlFixed =
 			"TEST := TEST [calc test_month := substr(cast(OUTCOME_DATE, string, \"YYYY-MM-DD\"), 6, 2)];\n" +
-			"TEST := TEST [calc test_sum := sum(cast(VAR1,integer)) group by IdUE, INDIVIDU];\n" +
-			"TEST := TEST [calc test_sum2 := sum(VAR2) group by IdUE, INDIVIDU];\n" +
+			"TEST := TEST [calc test_sum := sum(cast(VAR1,integer) group by IdUE, INDIVIDU)];\n" +
+			"TEST := TEST [calc test_sum2 := sum(VAR2 group by IdUE, INDIVIDU)];\n" +
 			"TEST := TEST [calc test_first := first_value(VAR1 over(PARTITION BY IdUE order by (INDIVIDU)))];\n";
 
 

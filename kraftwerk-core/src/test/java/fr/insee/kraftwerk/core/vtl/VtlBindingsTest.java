@@ -112,12 +112,12 @@ class VtlBindingsTest {
 	@Test
 	void evalEmptyVtlString() {
 		VtlBindings vtlBindingsInitial = vtlBindings;
-		List<KraftwerkError> errors = new ArrayList<>();
-		vtlExecute.evalVtlScript((String) null, vtlBindings, errors);
-		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errors);
-		vtlExecute.evalVtlScript("", vtlBindings, errors);
+		List<KraftwerkError> errorList = new ArrayList<>();
+		vtlExecute.evalVtlScript((String) null, vtlBindings, errorList);
+		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errorList);
+		vtlExecute.evalVtlScript("", vtlBindings, errorList);
 		assertEquals(vtlBindingsInitial, vtlBindings);
-		assertEquals(0, errors.size());
+		assertEquals(0, errorList.size());
 	}
 	
 
