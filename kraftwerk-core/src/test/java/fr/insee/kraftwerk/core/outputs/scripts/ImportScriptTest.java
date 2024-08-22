@@ -149,11 +149,11 @@ public class ImportScriptTest {
 
 		// unique choice question variable related to multiple choices question
 		UcqVariable ucqMcq1 = new UcqVariable("CAR_OWNER", rootGroup, VariableType.STRING, "50");
-		ucqMcq1.setQuestionItemName("VEHICLE_OWNER");
+		ucqMcq1.setQuestionName("VEHICLE_OWNER");
 		ucqMcq1.addModality("1", "Yes");
 		ucqMcq1.addModality("2", "No");
 		UcqVariable ucqMcq2 = new UcqVariable("MOTO_OWNER", rootGroup, VariableType.STRING, "50");
-		ucqMcq2.setQuestionItemName("VEHICLE_OWNER");
+		ucqMcq2.setQuestionName("VEHICLE_OWNER");
 		ucqMcq2.addModality("1", "Yes");
 		ucqMcq2.addModality("2", "No");
 		metadataM.getVariables().putVariable(ucqMcq1);
