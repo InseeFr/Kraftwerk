@@ -4,16 +4,15 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ class GroupProcessingTest {
                         new Structured.Component("FOO2", Long.class, Dataset.Role.MEASURE)
                 )
         );
-        List<KraftwerkError> errors = new ArrayList<>();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
         //
@@ -48,7 +47,7 @@ class GroupProcessingTest {
         metadata.getVariables().putVariable(new Variable("FOO1", metadata.getGroup("DEPTH1"), VariableType.NUMBER));
         metadata.getVariables().putVariable(new Variable("FOO2", metadata.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings, metadata, fileUtilsInterface).applyAutomatedVtlInstructions("TEST",errors);
+        new GroupProcessing(vtlBindings, metadata, fileUtilsInterface).applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //
