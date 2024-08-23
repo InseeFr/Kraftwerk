@@ -16,6 +16,8 @@ public class VtlChecker {
         vtlExpression = fixCurrentDate(vtlExpression);
         vtlExpression = fixFirstValue(vtlExpression, identifiers);
         vtlExpression = fixSum(vtlExpression, identifiers);
+        vtlExpression = fixMin(vtlExpression, identifiers);
+        vtlExpression = fixMax(vtlExpression, identifiers);
 
         return vtlExpression;
     }
@@ -27,29 +29,43 @@ public class VtlChecker {
     }
 
     private static @NotNull String fixSum(String input, String groupByParam) {
-        if (!input.contains("sum(") && !input.contains("SUM(")){return input;}
+        if (!input.toLowerCase().contains("sum(")){return input;}
+        return addMissingGroupBy(input, groupByParam, "sum");
+    }
+
+    private static @NotNull String fixMin(String input, String groupByParam) {
+        if (!input.toLowerCase().contains("min(")){return input;}
+        return addMissingGroupBy(input, groupByParam, "min");
+    }
+
+    private static @NotNull String fixMax(String input, String groupByParam) {
+        if (!input.toLowerCase().contains("max(")){return input;}
+        return addMissingGroupBy(input, groupByParam, "max");
+    }
+
+    private static @NotNull String addMissingGroupBy(String input, String groupByParam, String functionToFind) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
         while (index < input.length()) {
-            int sumIndex = findNextSumIndex(input, index);
-            int closingParenthesisIndex = findClosingParenthesisIndex(input, sumIndex + 3);
+            int functionIndex = findNextFunctionIndex(input, index, functionToFind);
+            int closingParenthesisIndex = findClosingParenthesisIndex(input, functionIndex + 3);
 
-            if (sumIndex == -1) { //no more sum
+            if (functionIndex == -1) { //no more sum
                 result.append(input.substring(index));
             }
 
-            if (sumIndex != -1 && closingParenthesisIndex == -1) {
+            if (functionIndex != -1 && closingParenthesisIndex == -1) {
                 log.warn("Missing closing parenthesis in VTL expression : {}", input);
-                result.append(input.substring(sumIndex));  // Incomplete sum function, just append the rest
+                result.append(input.substring(functionIndex));  // Incomplete function, just append the rest
             }
 
-            if (sumIndex == -1 ||  closingParenthesisIndex == -1){
+            if (functionIndex == -1 ||  closingParenthesisIndex == -1){
                 break;
             }
 
-            result.append(input, index, sumIndex);
-            result.append(input, sumIndex, closingParenthesisIndex );
+            result.append(input, index, functionIndex);
+            result.append(input, functionIndex, closingParenthesisIndex );
             result.append(" group by ").append(groupByParam).append(" )");
             index = closingParenthesisIndex + 1;
         }
@@ -57,16 +73,17 @@ public class VtlChecker {
         return result.toString();
     }
 
-    private static int findNextSumIndex(String input, int fromIndex) {
+    private static int findNextFunctionIndex(String input, int fromIndex, String functionToFind) {
         String lowerInput = input.toLowerCase();
-        int sumIndex = lowerInput.indexOf("sum(", fromIndex);
-        while (sumIndex != -1 && !isSumFunction(input, sumIndex)) {
-            sumIndex = lowerInput.indexOf("sum(", sumIndex + 4); //4 is char number of "sum("
+        String withParenthesis = functionToFind.toLowerCase() + "(";
+        int functionIndex = lowerInput.indexOf(withParenthesis, fromIndex);
+        while (functionIndex != -1 && !isFunctionToFind(input, functionIndex)) {
+            functionIndex = lowerInput.indexOf(withParenthesis, functionIndex + 4); //4 is char number of "sum("
         }
-        return sumIndex;
+        return functionIndex;
     }
 
-    private static boolean isSumFunction(String input, int index) {
+    private static boolean isFunctionToFind(String input, int index) {
         return index == 0 || !Character.isLetterOrDigit(input.charAt(index - 1));
     }
 
