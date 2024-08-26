@@ -31,3 +31,4 @@ Feature: Do we retrieve correctly all metadata from specifications ?
       |SAMPLETEST-METADATA              |370                            | 163                        |
       |SAMPLETEST-SIMPLE-RESPONSE       |10                             | 1                          |
       |SAMPLETEST-UCQ                   |8                              | 4                          |
+      |SAMPLETEST-MCQ                   |16                             | 9                          |

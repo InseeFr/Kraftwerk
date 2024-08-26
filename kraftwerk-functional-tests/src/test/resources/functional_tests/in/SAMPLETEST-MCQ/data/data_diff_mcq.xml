@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Campaign>
+	<Id>LOG2024X02</Id>
+	<Label>Enquête Logement 2023-2024 - Séquence 2</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>10148552</Id>
+			<QuestionnaireModelId>LOG2024X02</QuestionnaireModelId>
+			<Data>
+				<COLLECTED>
+					<MCQCODELIST31>
+						<COLLECTED type="string">1</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST31>
+					<MCQCODELIST21>
+						<COLLECTED type="string">2</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST21>
+					<MCQCODELIST32>
+						<COLLECTED type="null"/>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST32>
+					<MCQCODELIST22>
+						<COLLECTED type="string">1</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST22>
+					<MCQCODELIST33>
+						<COLLECTED type="string">2</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST33>
+					<MCQCODELIST23>
+						<COLLECTED type="string">0</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST23>
+					<QUESTIONCH3>
+						<COLLECTED type="null"/>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</QUESTIONCH3>
+					<MCQCODELIST1>
+						<COLLECTED type="string">2</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST1>
+					<QUESTIONCH2>
+						<COLLECTED type="boolean">true</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</QUESTIONCH2>
+					<QUESTIONCH1>
+						<COLLECTED type="null"/>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</QUESTIONCH1>
+					<MCQCODELIST3>
+						<COLLECTED type="null"/>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST3>
+					<MCQCODELIST2>
+						<COLLECTED type="string">1</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</MCQCODELIST2>
+				</COLLECTED>
+				<CALCULATED/>
+				<EXTERNAL/>
+			</Data>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>
