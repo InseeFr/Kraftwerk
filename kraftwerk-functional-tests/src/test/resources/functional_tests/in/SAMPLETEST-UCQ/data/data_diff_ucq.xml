@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Campaign>
+	<Id>ENQTESTUCQ</Id>
+	<Label>Traiter - Response à choix unique</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>00000002</Id>
+			<QuestionnaireModelId>ENQTESTUCQ</QuestionnaireModelId>
+			<data>
+				<COLLECTED>
+					<LISTEDROUL>
+						<COLLECTED type="STRING">3</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</LISTEDROUL>
+					<BOUTONRADI>
+						<COLLECTED type="STRING">2</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</BOUTONRADI>
+					<RECHLISTE>
+						<COLLECTED type="STRING">59</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</RECHLISTE>
+					<CASECOCHER>
+						<COLLECTED type="STRING">1</COLLECTED>
+						<EDITED type="null">null</EDITED>
+						<FORCED type="null">null</FORCED>
+						<INPUTTED type="null">null</INPUTTED>
+						<PREVIOUS type="null">null</PREVIOUS>
+					</CASECOCHER>
+				</COLLECTED>
+				<CALCULATED/>
+				<EXTERNAL/>
+			</data>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>
