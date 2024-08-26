@@ -28,8 +28,20 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+
+    - name: Clone BPM
+      uses: actions/checkout@master
+      with:
+        repository: InseeFr/BPM
+        path: bpm
+
+    - name: Build BPM
+      run: |
+        cd bpm
+        mvn clean install
+        cd ..
       
-    - name: Build with Maven
+    - name: Build Kraftwerk with Maven
       run: mvn -B clean package --file pom.xml
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive

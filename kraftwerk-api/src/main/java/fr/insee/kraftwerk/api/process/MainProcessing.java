@@ -1,10 +1,8 @@
 package fr.insee.kraftwerk.api.process;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
@@ -15,8 +13,11 @@ import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionLog;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+
+import fr.insee.bpm.metadata.model.MetadataModel;
+
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -48,8 +49,7 @@ public class MainProcessing {
 	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
-	private KraftwerkExecutionLog kraftwerkExecutionLog;
-	private final List<KraftwerkError> errors = new ArrayList<>();
+	private KraftwerkExecutionContext kraftwerkExecutionContext;
 	private LocalDateTime executionDateTime;
 	private final FileUtilsInterface fileUtilsInterface;
 
@@ -103,7 +103,7 @@ public class MainProcessing {
 				outputFileWriter(writeDatabase);
 			}
 			writeErrors();
-			kraftwerkExecutionLog.setEndTimeStamp(System.currentTimeMillis());
+			kraftwerkExecutionContext.setEndTimeStamp(System.currentTimeMillis());
 			writeLog();
 		} catch (SQLException e) {
 			log.error(e.toString());
@@ -113,7 +113,7 @@ public class MainProcessing {
 
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
-		kraftwerkExecutionLog = new KraftwerkExecutionLog(); //Init logger
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(); //Init logger
 		this.executionDateTime = LocalDateTime.now();
 
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
@@ -147,16 +147,18 @@ public class MainProcessing {
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionLog);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionContext);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
+			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, kraftwerkExecutionContext,
+					metadataModels,
+					fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess(){
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, errors, metadataModels, fileUtilsInterface);
+		multimodalSequence.multimodalProcessing(userInputsFile, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
 	}
 
 	/* Step 4 : Insert into SQL database */
@@ -168,17 +170,17 @@ public class MainProcessing {
 	/* Step 5 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, errors, kraftwerkExecutionLog, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 
 	/* Step 6 : Write log */
-	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionLog, fileUtilsInterface);}
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source, boolean fileByFile) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();

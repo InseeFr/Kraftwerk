@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
@@ -27,6 +28,7 @@ public class AggregateDefinitions {
 	public List<KraftwerkError> errors = new ArrayList<>();
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset){
@@ -37,9 +39,9 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel(), new FileSystemImpl());
-		groupProcessing.applyVtlTransformations(firstDataset, null,errors);
+		groupProcessing.applyVtlTransformations(firstDataset, null, kraftwerkExecutionContext);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel(), new FileSystemImpl());
-		groupProcessing2.applyVtlTransformations(secondDataset, null,errors);
+		groupProcessing2.applyVtlTransformations(secondDataset, null,kraftwerkExecutionContext);
 
 		//
 		assertTrue(vtlBindings.containsKey(firstDataset));
@@ -50,7 +52,7 @@ public class AggregateDefinitions {
 	public void collect_variables() {
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl());
 		reconciliationProcessing.applyVtlTransformations(
-				"MULTIMODE", null,errors);
+				"MULTIMODE", null,kraftwerkExecutionContext);
 	}
 
 	@Then("The datasets I try to aggregate should return an aggregated dataset")

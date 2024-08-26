@@ -1,5 +1,8 @@
 package fr.insee.kraftwerk.api.process;
 
+import fr.insee.bpm.exceptions.MetadataParserException;
+import fr.insee.bpm.metadata.model.MetadataModel;
+
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -7,7 +10,6 @@ import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
 import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
@@ -18,6 +20,7 @@ import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +34,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +44,13 @@ public class MainProcessingGenesis {
 	private ControlInputSequenceGenesis controlInputSequenceGenesis;
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
-	private final List<KraftwerkError> errors = new ArrayList<>();
 	@Getter
 	private UserInputsGenesis userInputs;
 	private LocalDateTime executionDateTime;
 	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
+
+	private KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -74,8 +77,12 @@ public class MainProcessingGenesis {
 		//We build userInputs for the given questionnaire
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign), fileUtilsInterface);
 		if (!userInputs.getModes().isEmpty()) {
-			metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface);
-		} else {
+            try {
+                metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface);
+            } catch (MetadataParserException e) {
+                throw new KraftwerkException(500, e.getMessage());
+            }
+        } else {
 			log.error("No source found for campaign " + idCampaign);
 		}
 	}
@@ -116,14 +123,15 @@ public class MainProcessingGenesis {
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
-			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModels, fileUtilsInterface);
+			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
 		}
 	}
 
 	/* Step 3 : multimodal VTL data processing */
 	private void multimodalProcess() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModels, fileUtilsInterface);
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels,
+				fileUtilsInterface);
 	}
 
 	/* Step 4 : Insert into SQL database */
@@ -135,12 +143,12 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, errors, null, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, null, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, errors, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 }

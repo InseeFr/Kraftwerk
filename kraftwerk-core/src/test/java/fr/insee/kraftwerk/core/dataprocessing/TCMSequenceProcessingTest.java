@@ -1,11 +1,11 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
-import fr.insee.kraftwerk.core.metadata.Sequence;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Sequence;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -72,7 +72,8 @@ class TCMSequenceProcessingTest {
         metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_THLHAB.name()));
 
         // Errors list
-        List<KraftwerkError> errors = new ArrayList<>();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+
         StringBuilder expectedScriptBuilder = new StringBuilder();
         for (TCMModuleEnum module : modules){
             expectedScriptBuilder.append(String.format(FORMAT_INSTRUCTION,module));
@@ -82,7 +83,7 @@ class TCMSequenceProcessingTest {
 
         //WHEN
         TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString(), fileUtilsInterface);
-        String scriptString = processing.applyAutomatedVtlInstructions("TEST", errors);
+        String scriptString = processing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
 
         //THEN
         Assertions.assertThat(scriptString).isEqualToIgnoringNewLines(expectedScript);

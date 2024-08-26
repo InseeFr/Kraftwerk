@@ -2,9 +2,9 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.metadata.Group;
-import fr.insee.kraftwerk.core.metadata.Variable;
-import fr.insee.kraftwerk.core.metadata.VariableType;
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.DateUtils;
@@ -128,10 +128,9 @@ public abstract class ReportingDataParser {
 					.filter(questionnaireToSearch -> reportingDataUE.getIdentifier()
 							.equals(questionnaireToSearch.getIdentifier()))
 					.findAny().orElse(null);
-			if (questionnaire == null && !withAllReportingData) {
-				return;
+			if (questionnaire != null || withAllReportingData) {
+				addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
 			}
-			addReportingDataUEToQuestionnaire(surveyRawData, reportingDataUE, questionnaire, missingQuestionnaireIds);
 		}
 		// We log the lists of missing questionnaires on one line only
 		if (!missingQuestionnaireIds.isEmpty()){

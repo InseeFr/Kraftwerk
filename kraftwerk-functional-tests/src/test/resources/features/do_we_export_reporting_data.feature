@@ -31,7 +31,23 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedTotalCount : Expected line count (other than header)
 
       |Directory                        |OutputFileName                                    |ExpectedTotalCount |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |4                  |
+
+
+  Scenario Outline: Do we have the good amount of lines when we exclude non-respondents
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service with an export of reporting data only for survey respondents
+    Then We should have <ExpectedTotalCount> lines different than header in a file named "<OutputFileName>" in directory "<Directory>"
+
+    Examples:
+    # Parameters :
+    # - Directory : Directory of test campaigns
+    # - OutputFileName : Name of reporting data file (with .csv extension)
+    # - ExpectedTotalCount : Expected line count (other than header)
+
+      |Directory                        |OutputFileName                                    |ExpectedTotalCount |
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |3                  |
+
 
   Scenario Outline: Does the file have a correct date format
     Given Step 0 : We have some survey in directory "<Directory>"

@@ -1,12 +1,13 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
-	private List<KraftwerkError> errors;
+	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
@@ -49,7 +50,7 @@ class VtlBindingsTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		errors = new ArrayList<>();
+		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 	}
 
 	@Test
@@ -97,7 +98,7 @@ class VtlBindingsTest {
 		vtlScript.append("    \"\" ))];");
 		log.info("Test VTL script:");
 		log.info(vtlScript.toString());
-		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings,errors);
+		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings, kraftwerkExecutionContext);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 
@@ -113,9 +114,9 @@ class VtlBindingsTest {
 	void evalEmptyVtlString() {
 		VtlBindings vtlBindingsInitial = vtlBindings;
 		List<KraftwerkError> errorList = new ArrayList<>();
-		vtlExecute.evalVtlScript((String) null, vtlBindings, errorList);
-		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings,errorList);
-		vtlExecute.evalVtlScript("", vtlBindings, errorList);
+		vtlExecute.evalVtlScript((String) null, vtlBindings, kraftwerkExecutionContext);
+		vtlExecute.evalVtlScript((VtlScript) null, vtlBindings, kraftwerkExecutionContext);
+		vtlExecute.evalVtlScript("", vtlBindings, kraftwerkExecutionContext);
 		assertEquals(vtlBindingsInitial, vtlBindings);
 		assertEquals(0, errorList.size());
 	}
@@ -123,8 +124,8 @@ class VtlBindingsTest {
 
 	@Test
 	void evalEmptyVtlScriptObject() {
-		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings,errors);
-		assertEquals(0, errors.size());
+		vtlExecute.evalVtlScript(new VtlScript(), vtlBindings, kraftwerkExecutionContext);
+		assertEquals(0, kraftwerkExecutionContext.getErrors().size());
 
 	}
 
@@ -137,7 +138,7 @@ class VtlBindingsTest {
 		vtlScript.add("TEST := TEST [calc new1 := \"new\"];");
 		vtlScript.add("nOt VtL cOdE "); // should write a warning in the log but not throw an exception
 		vtlScript.add("TEST := TEST [calc new2 := 2];");
-		vtlExecute.evalVtlScript(vtlScript, vtlBindings,errors);
+		vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
 		//
 		Dataset ds = vtlBindings.getDataset("TEST");
 

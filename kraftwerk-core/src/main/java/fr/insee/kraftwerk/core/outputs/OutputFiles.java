@@ -1,10 +1,10 @@
 package fr.insee.kraftwerk.core.outputs;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public abstract class OutputFiles {
 		}
 	}
 
-	public void writeImportScripts(Map<String, MetadataModel> metadataModels, List<KraftwerkError> errors) {
+	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		//Should be override
 	}
 

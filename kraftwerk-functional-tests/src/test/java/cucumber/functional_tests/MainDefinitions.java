@@ -6,21 +6,22 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.kraftwerk.core.metadata.MetadataModel;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.metadata.VariableType;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.BeforeAll;
@@ -144,6 +145,15 @@ public class MainDefinitions {
 		mp.runMain();
 	}
 
+	@When("Step 1 : We launch main service with an export of reporting data only for survey respondents")
+	public void launch_main_with_reporting_data_only_for_respondents() throws KraftwerkException {
+		// We clean the output and the temp directory
+		deleteDirectory(outDirectory.toFile());
+		deleteDirectory(tempDirectory.toFile());
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl());
+		mp.runMain();
+	}
+
 	@When("We launch main service 2 times")
 	public void launch_main_2() throws KraftwerkException {
 		// We clean the output and the temp directory
@@ -175,7 +185,7 @@ public class MainDefinitions {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
 				UnimodalSequence unimodal = new UnimodalSequence();
-				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
 			}
 		}
 	}
@@ -184,7 +194,7 @@ public class MainDefinitions {
 	public void aggregate_datasets() throws SQLException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		try (Statement statement = database.createStatement()) {
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, errors, metadataModelMap, new FileSystemImpl());
+			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
 		}
 	}
 
@@ -193,7 +203,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, errors, null, statement, new FileSystemImpl());
+			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, null, statement, new FileSystemImpl());
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl());
 		}

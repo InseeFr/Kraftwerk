@@ -1,9 +1,9 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
-	private List<KraftwerkError> errors;
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -74,7 +73,7 @@ class ReconciliationTest {
 	@BeforeEach
 	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		errors = new ArrayList<>();
+		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 	}
 
 	@ParameterizedTest
@@ -84,7 +83,7 @@ class ReconciliationTest {
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
-		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
+		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		assertNotNull(multimodeDataset);
@@ -96,7 +95,7 @@ class ReconciliationTest {
 		vtlBindings.put(mode2, testDatasets.get(mode2));
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
-		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
+		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		return vtlBindings.getDataset("MULTIMODE");
 	}
@@ -140,7 +139,7 @@ class ReconciliationTest {
 		vtlBindings.put("PAPI", papiDataset);
 		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
-		reconciliation.applyVtlTransformations("MULTIMODE", null,errors);
+		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		//
