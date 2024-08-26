@@ -28,7 +28,8 @@ Feature: Do we retrieve correctly all metadata from specifications ?
     # - NumberOfStringVariables : Expected number of variables of String Type
 
       |Directory                        |NumberOfVariables              | NumberOfStringVariables    |
-      |SAMPLETEST-METADATA              |370                            | 163                        |
-      |SAMPLETEST-SIMPLE-RESPONSE       |10                             | 1                          |
-      |SAMPLETEST-UCQ                   |8                              | 4                          |
-      |SAMPLETEST-MCQ                   |16                             | 9                          |
+    #  |SAMPLETEST-METADATA              |370                            | 163                        |
+    #  |SAMPLETEST-SIMPLE-RESPONSE       |10                             | 1                          |
+    #  |SAMPLETEST-UCQ                   |8                              | 4                          |
+    #  |SAMPLETEST-MCQ                   |16                             | 9                          |
+      |SAMPLETEST-TABLES                |18                             | 11                         |

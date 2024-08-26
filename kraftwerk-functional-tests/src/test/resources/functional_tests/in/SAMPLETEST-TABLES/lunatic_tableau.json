@@ -1,0 +1,670 @@
+{
+  "id": "lzh06lcp",
+  "label": {
+    "type": "VTL|MD",
+    "value": "Traiter - Tableaux"
+  },
+  "modele": "TRAITERTAB",
+  "maxPage": "6",
+  "resizing": {},
+  "variables": [
+    {
+      "name": "TABLIST1FTXT1",
+      "values": {
+        "EDITED": [],
+        "FORCED": [],
+        "INPUTTED": [],
+        "PREVIOUS": [],
+        "COLLECTED": []
+      },
+      "dimension": 1,
+      "variableType": "COLLECTED",
+      "iterationReference": "lzh0i8kz"
+    },
+    {
+      "name": "TABLISTE2F1",
+      "values": {
+        "EDITED": [],
+        "FORCED": [],
+        "INPUTTED": [],
+        "PREVIOUS": [],
+        "COLLECTED": []
+      },
+      "dimension": 1,
+      "variableType": "COLLECTED",
+      "iterationReference": "lzh061xt"
+    },
+    {
+      "name": "TABLISTE2F2",
+      "values": {
+        "EDITED": [],
+        "FORCED": [],
+        "INPUTTED": [],
+        "PREVIOUS": [],
+        "COLLECTED": []
+      },
+      "dimension": 1,
+      "variableType": "COLLECTED",
+      "iterationReference": "lzh061xt"
+    },
+    {
+      "name": "TABCODELIST1D11",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST1D21",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST1D31",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D11",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D21",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D31",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D12",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D22",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABCODELIST2D32",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "TABLIST1FINT1",
+      "values": {
+        "EDITED": [],
+        "FORCED": [],
+        "INPUTTED": [],
+        "PREVIOUS": [],
+        "COLLECTED": []
+      },
+      "dimension": 1,
+      "variableType": "COLLECTED",
+      "iterationReference": "lzjsjvnu"
+    },
+    {
+      "name": "FILTER_RESULT_TABLIST1FTXT",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_TABLIST1FINT",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_TABLISTE2F",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_TABCODELIST1D",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_TABCODELIST2D",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    }
+  ],
+  "components": [
+    {
+      "id": "lzh07tx5",
+      "page": "1",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"I - \" || \"Première séquence\""
+      },
+      "componentType": "Sequence",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzh0i8kz",
+      "page": "2",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"1\\. \" || \"Tableau sur Liste - 1 info - Texte\""
+      },
+      "components": [
+        {
+          "id": "lzh0i8kz",
+          "page": "2",
+          "lines": {
+            "max": {
+              "type": "VTL",
+              "value": "5"
+            },
+            "min": {
+              "type": "VTL",
+              "value": "1"
+            }
+          },
+          "header": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Prénom des habitants du ménage\""
+              }
+            }
+          ],
+          "mandatory": false,
+          "components": [
+            {
+              "id": "lzh0i8kz-RDOP-lzjtig42",
+              "response": {
+                "name": "TABLIST1FTXT1"
+              },
+              "maxLength": 249,
+              "componentType": "Input"
+            }
+          ],
+          "positioning": "HORIZONTAL",
+          "componentType": "RosterForLoop"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzjsjvnu",
+      "page": "3",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"2\\. \" || \"Tableau sur Liste - 1 info - Int\""
+      },
+      "components": [
+        {
+          "id": "lzjsjvnu",
+          "page": "3",
+          "lines": {
+            "max": {
+              "type": "VTL",
+              "value": "5"
+            },
+            "min": {
+              "type": "VTL",
+              "value": "1"
+            }
+          },
+          "header": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Age des habitants du ménage\""
+              }
+            }
+          ],
+          "controls": [
+            {
+              "id": "lzjsjvnu-RDOP-lzjt925h-format-borne-inf-sup",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(TABLIST1FINT1)) and (1.0>TABLIST1FINT1 or 140.0<TABLIST1FINT1))"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\" La valeur doit être comprise entre 1.0 et 140.0.\""
+              },
+              "typeOfControl": "FORMAT"
+            },
+            {
+              "id": "lzjsjvnu-RDOP-lzjt925h-format-decimal",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(TABLIST1FINT1))  and round(TABLIST1FINT1,1)<>TABLIST1FINT1)"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\"Le nombre doit comporter au maximum 1 chiffre(s) après la virgule.\""
+              },
+              "typeOfControl": "FORMAT"
+            }
+          ],
+          "mandatory": false,
+          "components": [
+            {
+              "id": "lzjsjvnu-RDOP-lzjt925h",
+              "max": 140,
+              "min": 1,
+              "unit": "ans",
+              "decimals": 1,
+              "response": {
+                "name": "TABLIST1FINT1"
+              },
+              "componentType": "InputNumber"
+            }
+          ],
+          "positioning": "HORIZONTAL",
+          "componentType": "RosterForLoop"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzh061xt",
+      "page": "4",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"3\\. \" || \"Tableau sur Liste - 2 infos - Int et Texte\""
+      },
+      "components": [
+        {
+          "id": "lzh061xt",
+          "page": "4",
+          "lines": {
+            "max": {
+              "type": "VTL",
+              "value": "5"
+            },
+            "min": {
+              "type": "VTL",
+              "value": "1"
+            }
+          },
+          "header": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Prénom des animaux du ménage\""
+              }
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Age des animaux\""
+              }
+            }
+          ],
+          "controls": [
+            {
+              "id": "lzh061xt-RDOP-lzjsz7hy-format-borne-inf-sup",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(TABLISTE2F2)) and (1.0>TABLISTE2F2 or 50.0<TABLISTE2F2))"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\" La valeur doit être comprise entre 1.0 et 50.0.\""
+              },
+              "typeOfControl": "FORMAT"
+            },
+            {
+              "id": "lzh061xt-RDOP-lzjsz7hy-format-decimal",
+              "type": "SIMPLE",
+              "control": {
+                "type": "VTL",
+                "value": "not(not(isnull(TABLISTE2F2))  and round(TABLISTE2F2,1)<>TABLISTE2F2)"
+              },
+              "criticality": "ERROR",
+              "errorMessage": {
+                "type": "VTL|MD",
+                "value": "\"Le nombre doit comporter au maximum 1 chiffre(s) après la virgule.\""
+              },
+              "typeOfControl": "FORMAT"
+            }
+          ],
+          "mandatory": false,
+          "components": [
+            {
+              "id": "lzh061xt-RDOP-lzjth8sg",
+              "response": {
+                "name": "TABLISTE2F1"
+              },
+              "maxLength": 249,
+              "componentType": "Input"
+            },
+            {
+              "id": "lzh061xt-RDOP-lzjsz7hy",
+              "max": 50,
+              "min": 1,
+              "unit": "ans",
+              "decimals": 1,
+              "response": {
+                "name": "TABLISTE2F2"
+              },
+              "componentType": "InputNumber"
+            }
+          ],
+          "positioning": "HORIZONTAL",
+          "componentType": "RosterForLoop"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzh0vcth",
+      "page": "5",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"4\\. \" || \"Tableau - Liste de codes - 1 Dimension\""
+      },
+      "components": [
+        {
+          "id": "lzh0vcth",
+          "body": [
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 1\""
+                },
+                "value": "1"
+              },
+              {
+                "id": "lzh0vcth-RDOP-lzh0mplp",
+                "response": {
+                  "name": "TABCODELIST1D11"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 2\""
+                },
+                "value": "2"
+              },
+              {
+                "id": "lzh0vcth-RDOP-lzh13g0n",
+                "response": {
+                  "name": "TABCODELIST1D21"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 3\""
+                },
+                "value": "3"
+              },
+              {
+                "id": "lzh0vcth-RDOP-lzh108bx",
+                "response": {
+                  "name": "TABCODELIST1D31"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ]
+          ],
+          "page": "5",
+          "header": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": ""
+              }
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Information mesurée\""
+              }
+            }
+          ],
+          "mandatory": false,
+          "positioning": "HORIZONTAL",
+          "componentType": "Table"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzh0joo0",
+      "page": "6",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"5\\. \" || \"Tableau - Liste de codes - 2 Dimension\""
+      },
+      "components": [
+        {
+          "id": "lzh0joo0",
+          "body": [
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 1\""
+                },
+                "value": "1"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh113t9",
+                "response": {
+                  "name": "TABCODELIST2D11"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh14dec",
+                "response": {
+                  "name": "TABCODELIST2D12"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 2\""
+                },
+                "value": "2"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh1619y",
+                "response": {
+                  "name": "TABCODELIST2D21"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh0sotm",
+                "response": {
+                  "name": "TABCODELIST2D22"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 3\""
+                },
+                "value": "3"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh0mhmj",
+                "response": {
+                  "name": "TABCODELIST2D31"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              },
+              {
+                "id": "lzh0joo0-RDOP-lzh0n2yt",
+                "response": {
+                  "name": "TABCODELIST2D32"
+                },
+                "maxLength": 249,
+                "componentType": "Input"
+              }
+            ]
+          ],
+          "page": "6",
+          "header": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": ""
+              }
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 2D 1\""
+              }
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 2D 2\""
+              }
+            }
+          ],
+          "mandatory": false,
+          "positioning": "HORIZONTAL",
+          "componentType": "Table"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    }
+  ],
+  "pagination": "question",
+  "componentType": "Questionnaire",
+  "enoCoreVersion": "3.24.1",
+  "generatingDate": "07-08-2024 12:04:21",
+  "lunaticModelVersion": "3.12.0"
+}
