@@ -1,20 +1,19 @@
 package fr.insee.kraftwerk.api.configuration;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 
 @Component
@@ -56,14 +55,10 @@ public class LogRequestFilter extends OncePerRequestFilter {
         // Execution request chain
         filterChain.doFilter(req, resp);
                
-        StringBuilder  headers = new StringBuilder() ;
-        resp.getHeaderNames().forEach(h-> headers.append(h).append(" : ").append(resp.getHeader(h)).append(";"));
 
         log.info(RESPONSE_MESSAGE_FORMAT, 
         		req.getMethod(), req.getRequestURI(), 
         		resp.getStatus(),
-   //     		resp.getContentType(), 
-   //     		headers.toString(),
                 getResponseBody(req, resp)); //Body
         
         // Finally remember to respond to the client with the cached data.

@@ -62,9 +62,9 @@ public class TCMSequencesProcessing extends DataProcessing {
                 if(tcmModulePath.toFile().exists()){
                     vtlScriptBuilder.append(TextFileReader.readFromPath(tcmModulePath, fileUtilsInterface));
                     vtlScriptBuilder.append(System.lineSeparator());
-                    log.info("TCM VTL instructions read for module " + tcmModuleEnum);
+                    log.info("TCM VTL instructions read for module {}", tcmModuleEnum);
                 }else{
-                    log.warn("TCM VTL instructions for module " + tcmModuleEnum + " not found");
+                    log.warn("TCM VTL instructions for module {} not found", tcmModuleEnum);
                 }
             }
         }

@@ -4,8 +4,8 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -37,9 +37,9 @@ public class XformsDataParser extends DataParser {
 		XmlFileReader xmlFileReader = new XmlFileReader(fileUtilsInterface);
 		Document document = xmlFileReader.readXmlFile(filePath);
 		if (document != null) {
-			log.info("Successfully parsed Xforms answers file: " + filePath);
+            log.info("Successfully parsed Xforms answers file: {}", filePath);
 		} else {
-			log.warn("Failed to parse Xforms answers file: " + filePath);
+            log.warn("Failed to parse Xforms answers file: {}", filePath);
 		}
 		return document;
 	}

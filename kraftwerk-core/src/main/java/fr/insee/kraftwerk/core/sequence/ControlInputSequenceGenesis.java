@@ -1,12 +1,12 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Log4j2
 public class ControlInputSequenceGenesis {
@@ -35,7 +35,7 @@ public class ControlInputSequenceGenesis {
 		if (fileUtilsInterface.isFileExists(userInputFile.toString())) {
 			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
 		} else {
-			log.info("No configuration file found in campaign folder: " + inDirectory);
+            log.info("No configuration file found in campaign folder: {}", inDirectory);
 			return false;
 		}
 		return true;

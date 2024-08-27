@@ -5,22 +5,24 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
-import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
@@ -52,7 +54,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static cucumber.TestConstants.*;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,9 +78,13 @@ public class MainDefinitions {
 	static Connection database;
 
 	@BeforeAll
-	public static void clean() throws KraftwerkException, SQLException {
+	public static void clean() throws SQLException {
 		FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
-		fileUtilsInterface.deleteDirectory(outDirectory);
+		try {
+			fileUtilsInterface.deleteDirectory(outDirectory);
+		} catch (Exception ignored){
+
+		}
 		database = SqlUtils.openConnection();
 	}
 
@@ -177,7 +185,7 @@ public class MainDefinitions {
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
-	public void unimodal_treatments() throws KraftwerkException, SQLException, NullException {
+	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl());
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl());
@@ -191,11 +199,9 @@ public class MainDefinitions {
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() throws SQLException {
+	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		try (Statement statement = database.createStatement()) {
-			multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
-		}
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl());
 	}
 
 	@When("Step 4 : We export the final version")
@@ -203,7 +209,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, localDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, null, statement, new FileSystemImpl());
+			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, new KraftwerkExecutionContext(), statement, new FileSystemImpl());
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl());
 		}
@@ -311,7 +317,7 @@ public class MainDefinitions {
 	}
 
 	@Then("We check {string} parquet output file has {int} lines and {int} variables")
-	public void check_parquet_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException, SQLException {
+	public void check_parquet_output_loop_table(String loopName, int expectedLineCount, int expectedVariablesCount) throws SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".parquet");
 		try (Statement statement = database.createStatement()) {
@@ -474,14 +480,14 @@ public class MainDefinitions {
 
 
 	@Then("We should have a metadata model with {int} variables")
-	public void check_variables_count(int nbVariablesExpected) throws IOException, CsvValidationException {
+	public void check_variables_count(int nbVariablesExpected) {
 		String mode = userInputs.getModes().getFirst();
 		int nbVariables = metadataModelMap.get(mode).getVariables().getVariables().size();
 		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
 	}
 
 	@And("We should have {int} of type STRING")
-	public void check_string_variables_count(int nbStringVariablesExpected) throws IOException, CsvValidationException {
+	public void check_string_variables_count(int nbStringVariablesExpected) {
 		String mode = userInputs.getModes().getFirst();
 		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
 		assertThat(nbStringVariables).isEqualTo(nbStringVariablesExpected);

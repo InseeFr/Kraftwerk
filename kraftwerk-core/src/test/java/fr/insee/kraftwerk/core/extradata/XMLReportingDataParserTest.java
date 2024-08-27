@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -29,7 +30,7 @@ class XMLReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"));
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.xml"), new ArrayList<>());
 			xMLReportingDataParser.parseReportingData(reportingData, data, true);
 
 
@@ -67,7 +68,7 @@ class XMLReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdatamoog.xml"));
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdatamoog.xml"), new ArrayList<>());
 			xMLReportingDataParser.parseReportingData(reportingData, data, true);
 
 
@@ -152,7 +153,7 @@ class XMLReportingDataParserTest {
 	@Test
 	void maxTest() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-		ReportingData reportingData = new ReportingData(Path.of("test"));
+		ReportingData reportingData = new ReportingData(Path.of("test"), new ArrayList<>());
 		reportingData.putReportingDataUE(ReportingDataUETest.createFakeReportingDataUEs());
 		assertEquals(5, xMLReportingDataParser.countMaxStates(reportingData)); //remove double
 	}
@@ -160,7 +161,7 @@ class XMLReportingDataParserTest {
 	@Test
 	void maxTest_noData() {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-		ReportingData reportingData = new ReportingData(Path.of("test"));
+		ReportingData reportingData = new ReportingData(Path.of("test"), new ArrayList<>());
 		assertEquals(0, xMLReportingDataParser.countMaxStates(reportingData));
 		assertEquals(0, xMLReportingDataParser.countMaxAttempts(reportingData));
 		assertEquals(0, xMLReportingDataParser.countMaxComments(reportingData));

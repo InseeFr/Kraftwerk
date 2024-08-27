@@ -5,11 +5,11 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.PaperUcq;
 import fr.insee.bpm.metadata.model.UcqVariable;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariablesMap;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -33,9 +33,7 @@ import java.util.Map;
 @Log4j2
 public class PaperDataParser extends DataParser {
 
-	/** Input stream reader */
-	private InputStreamReader inputStreamReader;
-	/** Csv reader */
+    /** Csv reader */
 	private CSVReader csvReader;
 
 	/**
@@ -56,7 +54,8 @@ public class PaperDataParser extends DataParser {
 	private void readCsvFileStream(InputStream inputStream) {
 		// Create an object of file reader
 		// class with CSV file as a parameter.
-		inputStreamReader = new InputStreamReader(inputStream);
+        /** Input stream reader */
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		// create csvReader object passing
 		// file reader as a parameter
 		csvReader = new CSVReader(inputStreamReader);
@@ -131,27 +130,7 @@ public class PaperDataParser extends DataParser {
 				data.getIdSurveyUnits().add(rowIdentifiers[0]);
 
 				if (rowIdentifiers.length >= 1) {
-
-					// Read variables values
-					for ( Map.Entry<Integer, String> entry : csvVariablesMap.entrySet()) {
-						// Get the value
-						String value = nextRecord[entry.getKey()];
-
-						// Get the variable
-						String variableName = entry.getValue();
-						Variable variable = variables.getVariable(variableName);
-						// Put the value
-						if (variable.getGroup().isRoot()) {
-							answers.putValue(variableName, value);
-						} else if (rowIdentifiers.length > 1) {
-							answers.putValue(variableName, value);
-							String subGroupId = rowIdentifiers[1];
-							String groupName = variable.getGroupName();
-							answers.getSubGroup(groupName).putValue(value, variableName,
-									createGroupId(groupName, subGroupId));
-
-						}
-					}
+					readVariablesValues(csvVariablesMap, nextRecord, variables, answers, rowIdentifiers);
 				}
 				data.addQuestionnaire(questionnaireData);
 			}
@@ -160,6 +139,29 @@ public class PaperDataParser extends DataParser {
 			log.error(String.format("Following CSV file is malformed: %s", filePath), e);
 		} catch (IOException e) {
 			log.error(String.format("Could not connect to data file %s", filePath), e);
+		}
+	}
+
+	private void readVariablesValues(Map<Integer, String> csvVariablesMap, String[] nextRecord, VariablesMap variables, GroupInstance answers, String[] rowIdentifiers) {
+		// Read variables values
+		for ( Map.Entry<Integer, String> entry : csvVariablesMap.entrySet()) {
+			// Get the value
+			String value = nextRecord[entry.getKey()];
+
+			// Get the variable
+			String variableName = entry.getValue();
+			Variable variable = variables.getVariable(variableName);
+			// Put the value
+			if (variable.getGroup().isRoot()) {
+				answers.putValue(variableName, value);
+			} else if (rowIdentifiers.length > 1) {
+				answers.putValue(variableName, value);
+				String subGroupId = rowIdentifiers[1];
+				String groupName = variable.getGroupName();
+				answers.getSubGroup(groupName).putValue(value, variableName,
+						createGroupId(groupName, subGroupId));
+
+			}
 		}
 	}
 
@@ -181,8 +183,6 @@ public class PaperDataParser extends DataParser {
 
 	/**
 	 * In paper datafiles, the identifier is like "[IdUE]_[row identifier]"
-	 *
-	 * Example: //TODO: write explanations for this
 	 *
 	 * @param subGroupId The group level identifier for all variables of a given
 	 *                   questionnaire.

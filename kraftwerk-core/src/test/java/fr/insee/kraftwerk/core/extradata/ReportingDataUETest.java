@@ -65,7 +65,6 @@ public class ReportingDataUETest {
 
 	@Test
 	void containsReportingDataUETest() {
-		ReportingData reportingData = new ReportingData(Path.of("test"));
 		List<ReportingDataUE> listReportingDataUE = new ArrayList<>();
 		listReportingDataUE.add(new ReportingDataUE("Report0001"));
 		listReportingDataUE.add(new ReportingDataUE("Report0002"));
@@ -76,7 +75,7 @@ public class ReportingDataUETest {
 		listReportingDataUE.add(new ReportingDataUE("Report0007"));
 		listReportingDataUE.add(new ReportingDataUE("Report0008"));
 		listReportingDataUE.add(new ReportingDataUE("Report0009"));
-		reportingData.setListReportingDataUE(listReportingDataUE);
+		ReportingData reportingData = new ReportingData(Path.of("test"), listReportingDataUE);
 		Assertions.assertTrue(reportingData.containsReportingDataUE("Report0001"));
 		Assertions.assertFalse(reportingData.containsReportingDataUE("Report9999"));
 		

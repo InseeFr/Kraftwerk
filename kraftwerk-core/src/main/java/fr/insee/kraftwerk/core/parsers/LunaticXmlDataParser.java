@@ -10,8 +10,8 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -52,7 +52,7 @@ public class LunaticXmlDataParser extends DataParser {
 		XmlFileReader xmlFileReader = new XmlFileReader(fileUtilsInterface);
 		Document document = xmlFileReader.readXmlFile(filePath);
 		if (document == null) {
-			log.warn("Failed to parse Lunatic answers file: " + filePath);
+            log.warn("Failed to parse Lunatic answers file: {}", filePath);
 		}
 		return document;
 	}
@@ -128,7 +128,7 @@ public class LunaticXmlDataParser extends DataParser {
 
 		//Check collected data tag presence
 		if(questionnaireNode.getFirstChildElement("Data").getFirstChildElement(Constants.COLLECTED) == null){
-			log.warn("No collected data for survey unit " + questionnaireData.getIdentifier());
+            log.warn("No collected data for survey unit {}", questionnaireData.getIdentifier());
 			return;
 		}
 
@@ -152,7 +152,7 @@ public class LunaticXmlDataParser extends DataParser {
 				answers.putValue(variableName, value);
 			}
 
-			// Group variables // TODO : recursion etc.
+			// Group variables
 			else if (collectedNode != null) {
 				addGroupVariables(variables, variableName, answers, collectedNode, true);
 			}

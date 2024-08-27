@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -9,7 +10,6 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.DataParserManager;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -20,6 +20,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 @Log4j2
 public class BuildBindingsSequence {
@@ -74,7 +75,7 @@ public class BuildBindingsSequence {
 	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
 		Path reportingDataFile = modeInputs.getReportingDataFile();
 		if (reportingDataFile != null) {
-			ReportingData reportingData = new ReportingData(reportingDataFile);
+			ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
 			if (reportingDataFile.toString().contains(".xml")) {
 				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);

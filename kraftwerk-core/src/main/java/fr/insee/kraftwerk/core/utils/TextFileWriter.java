@@ -1,13 +1,12 @@
 package fr.insee.kraftwerk.core.utils;
 
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
+
+import java.nio.file.Path;
 
 
 /**
@@ -35,8 +34,8 @@ public class TextFileWriter {
 		}
 	}
     
-	public static void writeErrorsFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface) {
-		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime)
+	public static void writeErrorsFile(Path inDirectory, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface) {
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime())
 				.resolve(Constants.ERRORS_FILE_NAME);
 		fileUtilsInterface.createDirectoryIfNotExist(tempOutputPath.getParent());
 
@@ -51,8 +50,8 @@ public class TextFileWriter {
 		}
 	}
 
-	public static void writeLogFile(Path inDirectory, LocalDateTime localDateTime, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface){
-		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,localDateTime);
+	public static void writeLogFile(Path inDirectory, KraftwerkExecutionContext kraftwerkExecutionContext, FileUtilsInterface fileUtilsInterface){
+		Path tempOutputPath = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
 		tempOutputPath = tempOutputPath.resolve(inDirectory.getFileName() + "_LOG_" + kraftwerkExecutionContext.getStartTimeStamp() +".txt");
 
 		fileUtilsInterface.writeFile(tempOutputPath.toString(), kraftwerkExecutionContext.getFormattedString(), false);

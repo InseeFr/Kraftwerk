@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,9 @@ import java.util.Map;
 @Getter
 @Setter
 public class KraftwerkExecutionContext {
+
+    private LocalDateTime executionDateTime;
+
     private long startTimeStamp;
     private long endTimeStamp;
     private Map<String,Integer> lineCountByTableMap;
@@ -24,6 +28,7 @@ public class KraftwerkExecutionContext {
 
     public KraftwerkExecutionContext() {
         this.startTimeStamp = System.currentTimeMillis();
+        this.executionDateTime = LocalDateTime.now();
         this.lineCountByTableMap = new HashMap<>();
         this.okFileNames = new ArrayList<>();
         this.errors = new ArrayList<>();
