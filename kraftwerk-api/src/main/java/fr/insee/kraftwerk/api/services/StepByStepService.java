@@ -7,12 +7,16 @@ import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
-import fr.insee.kraftwerk.core.sequence.*;
+import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
+import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
+import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
+import fr.insee.kraftwerk.core.sequence.VtlReaderWriterSequence;
+import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.minio.MinioClient;
@@ -22,7 +26,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -181,7 +189,7 @@ public class StepByStepService extends KraftwerkService {
 		//Write technical outputs
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), kraftwerkExecutionContext, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
 
@@ -235,7 +243,7 @@ public class StepByStepService extends KraftwerkService {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlReaderWriterSequence.writeTempBindings(inDirectory, datasetName, vtlBindings, StepEnum.MULTIMODAL_PROCESSING);
 		}
-		TextFileWriter.writeErrorsFile(inDirectory, LocalDateTime.now(), kraftwerkExecutionContext, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 		
 		return ResponseEntity.ok(inDirectoryParam);
 
@@ -283,7 +291,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		try (Statement database = SqlUtils.openConnection().createStatement()) {
-			writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, database, fileUtilsInterface);
+			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, database, fileUtilsInterface);
 		}
 		return ResponseEntity.ok(inDirectoryParam);
 

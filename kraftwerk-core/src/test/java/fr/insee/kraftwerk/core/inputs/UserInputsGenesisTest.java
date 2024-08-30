@@ -7,19 +7,20 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class UserInputsGenesisTest {
 
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 
 	@Test
-	void testReadValidUserInput_singleMode() throws KraftwerkException, IOException {
+	void testReadValidUserInput_singleMode() throws KraftwerkException {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 

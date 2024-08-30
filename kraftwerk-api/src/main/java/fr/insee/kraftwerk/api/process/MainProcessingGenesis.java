@@ -2,10 +2,8 @@ package fr.insee.kraftwerk.api.process;
 
 import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.bpm.metadata.model.MetadataModel;
-
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -17,9 +15,9 @@ import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
@@ -33,7 +31,6 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +43,6 @@ public class MainProcessingGenesis {
 	private VtlBindings vtlBindings = new VtlBindings();
 	@Getter
 	private UserInputsGenesis userInputs;
-	private LocalDateTime executionDateTime;
 	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
 
@@ -69,9 +65,8 @@ public class MainProcessingGenesis {
 	}
 
 	public void init(String idCampaign) throws KraftwerkException {
-		log.info("Kraftwerk main service started for campaign: " + idCampaign);
+		log.info("Kraftwerk main service started for campaign: {}", idCampaign);
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
-		this.executionDateTime = LocalDateTime.now();
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
@@ -83,7 +78,7 @@ public class MainProcessingGenesis {
                 throw new KraftwerkException(500, e.getMessage());
             }
         } else {
-			log.error("No source found for campaign " + idCampaign);
+            log.error("No source found for campaign {}", idCampaign);
 		}
 	}
 
@@ -143,12 +138,12 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputs.getModeInputsMap(), metadataModels, null, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 }

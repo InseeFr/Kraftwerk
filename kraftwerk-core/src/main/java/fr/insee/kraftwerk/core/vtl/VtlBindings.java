@@ -4,7 +4,6 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -125,7 +124,7 @@ public class VtlBindings extends SimpleBindings {
 
         Dataset ds = this.getDataset(bindingName);
         if (ds == null) {
-            log.warn("Dataset " + bindingName + " inexistant !");
+            log.warn("Dataset {} inexistant !", bindingName);
             return metadataModel;
         }
         Structured.DataStructure dataStructure = ds.getDataStructure();

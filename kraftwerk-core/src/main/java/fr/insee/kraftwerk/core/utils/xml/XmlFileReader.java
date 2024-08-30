@@ -1,9 +1,5 @@
 package fr.insee.kraftwerk.core.utils.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Builder;
@@ -11,9 +7,12 @@ import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+
 /**
  * Class providing method to parse an XML document using the nu.xom library.
- * TODO: (if it seems necessary) replace XOM by something else.
  */
 @Log4j2
 public class XmlFileReader {
@@ -35,7 +34,6 @@ public class XmlFileReader {
         } catch (ValidityException ex) {
             log.warn("XSD validation error.", ex);
             log.warn("See following INFO log for details.");
-            // TODO: maybe write the following log in a file.
             for (int i = 0; i < ex.getErrorCount(); i++) {
                 log.info(String.format("Line %d, column %d :", ex.getLineNumber(i), ex.getColumnNumber(i)));
                 log.info(ex.getValidityError(i));

@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -11,7 +12,6 @@ import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -21,8 +21,10 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BuildBindingsSequenceGenesis {
 
@@ -59,13 +61,9 @@ public class BuildBindingsSequenceGenesis {
 					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
 				}
 			}
-
-			for (ExternalVariable extVar : surveyUnit.getExternalVariables()){
-				// The external are always in root group name
-				if (!extVar.getValues().isEmpty()){
-					answers.putValue(extVar.getIdVar(), extVar.getValues().getFirst());
-				}
-			}
+			Map<String, String> externalVarToAdd = surveyUnit.getExternalVariables().stream().filter(extVar -> !extVar.getValues().isEmpty())
+					.collect(Collectors.toMap(ExternalVariable::getIdVar, ExternalVariable::getFirstValue));
+			answers.putValues(externalVarToAdd);
 
 			data.getQuestionnaires().add(questionnaire);
 		}
@@ -95,7 +93,7 @@ public class BuildBindingsSequenceGenesis {
 		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
 			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());
 			for (String file : listFiles) {
-				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file));
+				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file), new ArrayList<>());
 				if (file.contains(".xml")) {
 					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 					xMLReportingDataParser.parseReportingData(reportingData, data, true);

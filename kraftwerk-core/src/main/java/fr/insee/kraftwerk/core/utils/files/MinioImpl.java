@@ -5,7 +5,14 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
-import io.minio.*;
+import io.minio.GetObjectArgs;
+import io.minio.ListObjectsArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.Result;
+import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.AllArgsConstructor;
@@ -92,7 +99,7 @@ public class MinioImpl implements FileUtilsInterface {
             return filePaths;
         } catch (Exception e) {
             log.error(e.toString());
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -192,7 +199,7 @@ public class MinioImpl implements FileUtilsInterface {
         try {
             Files.deleteIfExists(fileSystemPath);
         }catch (Exception e) {
-            log.error("Error during file system file deletion : " + e);
+            log.error("Error during file system file deletion : {}", e.getMessage());
         }
     }
 
@@ -236,15 +243,6 @@ public class MinioImpl implements FileUtilsInterface {
         }
     }
 
-    private void copyFile(String srcMinioPath, String dstMinioPath) {
-        try {
-            CopySource copySource = CopySource.builder().bucket(bucketName).object(srcMinioPath.replace("\\","/")).build();
-            minioClient.copyObject(CopyObjectArgs.builder().bucket(bucketName).object(dstMinioPath).source(copySource).build());
-        } catch (Exception e) {
-            log.error(e.toString());
-        }
-    }
-
     private void moveDirectory(String srcMinioPath, String dstMinioPath) {
         try {
             for (String filePath : listFileNames(srcMinioPath.replace("\\","/"))) {
@@ -276,7 +274,7 @@ public class MinioImpl implements FileUtilsInterface {
         Path dataPath = modeInputs.getDataFile();
         Path newDataPath = inputFolder.resolve(ARCHIVE).resolve(getRoot(dataPath, campaignName));
 
-        if (!isDirectory(dataPath.toString())) {
+        if (Boolean.FALSE.equals(isDirectory(dataPath.toString()))) {
             moveFile(dataPath, newDataPath.toString());
         } else {
             moveDirectory(dataPath.toString(), newDataPath.toString());

@@ -2,22 +2,19 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class ReportingData {
 
   private final Path filepath;
   
-  public List<ReportingDataUE> listReportingDataUE = new ArrayList<>();
+  private final List<ReportingDataUE> listReportingDataUE ;
 
   public void addReportingDataUE(ReportingDataUE reportingDataUE) {
 	  if (reportingDataUE != null) {

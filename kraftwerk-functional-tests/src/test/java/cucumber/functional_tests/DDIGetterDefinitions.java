@@ -1,9 +1,9 @@
 package cucumber.functional_tests;
 
+import fr.insee.bpm.utils.xsl.SaxonTransformer;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.bpm.utils.xsl.SaxonTransformer;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -29,7 +29,7 @@ public class DDIGetterDefinitions {
 	 * Download DDI
 	 */
     @Given("I collect the DDI named {string} using link {string}")
-    public void get_DDI(String nameDDI, String linkDDI) throws Exception {
+    public void get_DDI(String nameDDI, String linkDDI) {
     	this.linkDDI = linkDDI;
     }
 
