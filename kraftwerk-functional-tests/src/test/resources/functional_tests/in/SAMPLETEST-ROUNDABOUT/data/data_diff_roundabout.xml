@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Campaign>
+	<Id>LOG2024X02</Id>
+	<Label>Enquête Logement 2023-2024 - Séquence 2</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>10148552</Id>
+			<QuestionnaireModelId>LOG2024X02</QuestionnaireModelId>
+			<Data>
+				<COLLECTED>
+					<QUELGEAVEZ>
+						<COLLECTED>
+							<COLLECTED type="number">41</COLLECTED>
+							<COLLECTED type="number">28</COLLECTED>
+							<COLLECTED type="null"/>
+							<COLLECTED type="number">25</COLLECTED>
+							<COLLECTED type="number">26</COLLECTED>
+						</COLLECTED>
+					</QUELGEAVEZ>
+					<BOUCLE_IND_PROGRESS>
+						<COLLECTED type="null">
+							<COLLECTED type="null">1</COLLECTED>
+							<COLLECTED type="null">1</COLLECTED>
+							<COLLECTED type="null"/>
+							<COLLECTED type="null">1</COLLECTED>
+							<COLLECTED type="null">1</COLLECTED>
+						</COLLECTED>
+					</BOUCLE_IND_PROGRESS>
+					<NBIND>
+						<COLLECTED type="number">5</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</NBIND>
+					<PRENOM>
+						<COLLECTED>
+							<COLLECTED type="string">Loïc</COLLECTED>
+							<COLLECTED type="null"/>
+							<COLLECTED type="string">Quentin</COLLECTED>
+							<COLLECTED type="string">Alice</COLLECTED>
+							<COLLECTED type="string">Alexis</COLLECTED>
+						</COLLECTED>
+					</PRENOM>
+				</COLLECTED>
+				<CALCULATED/>
+				<EXTERNAL/>
+			</Data>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>
