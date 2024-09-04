@@ -36,7 +36,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +66,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			) throws KraftwerkException {
+			) {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -112,7 +111,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @PathVariable String dataMode,
 			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			) throws KraftwerkException {
+			) {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
@@ -268,7 +267,6 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		LocalDateTime executionDateTime = LocalDateTime.now();
 		VtlBindings vtlBindings = new VtlBindings();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
