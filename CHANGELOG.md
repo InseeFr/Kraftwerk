@@ -1,5 +1,8 @@
 # Changelog
 ## 3.0.5 [2024-09-06] - Genesis service fix
+### Changed
+- Update BPM version
+
 ### Fixed
 - Execution crash when vtl error on genesis service (kraftwerkExecutionContext null)
 
