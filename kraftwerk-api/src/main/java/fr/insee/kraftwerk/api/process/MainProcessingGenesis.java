@@ -65,6 +65,7 @@ public class MainProcessingGenesis {
 	}
 
 	public void init(String idCampaign) throws KraftwerkException {
+		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		log.info("Kraftwerk main service started for campaign: {}", idCampaign);
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
