@@ -1,4 +1,9 @@
 # Changelog
+
+## 3.0.6 [2024-09-09] - Fix : Xslt transformation
+### Fixed
+- Fix conflict : remove xslt folder in Kraftwerk. These transformations are now in BPM library.
+
 ## 3.0.5 [2024-09-06] - Genesis service fix
 ### Changed
 - Update BPM version
