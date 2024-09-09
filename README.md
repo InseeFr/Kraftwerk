@@ -31,7 +31,7 @@ The required arguments for batch mode are as follows (in order) :
 1. Service to use (`MAIN`,`FILEBYFILE`,`GENESIS`,`LUNATIC_ONLY`)
 2. Archive at end of execution (`false` or `true`)
 3. Integrate all reporting datas (`false` or `true`)
-4. Campaign name
+4. Campaign name (or path to campaign folder)
 
 :fr:
 
@@ -59,4 +59,4 @@ avec les paramètres spécifiés. Les paramètres requis pour le mode batch sont
 1. Service à utiliser (`MAIN`,`FILEBYFILE`,`GENESIS`,`LUNATIC_ONLY`)
 2. Archiver à la fin de l'exécution (`false` ou `true`)
 3. Integrate all reporting datas (`false` ou `true`)
-4. Nom de la campagne
+4. Nom de la campagne (ou chemin du dossier de la campagne)
