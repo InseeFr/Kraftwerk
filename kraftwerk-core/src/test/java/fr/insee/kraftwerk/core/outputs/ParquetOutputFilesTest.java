@@ -1,17 +1,17 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -98,7 +98,6 @@ class ParquetOutputFilesTest {
 	void writeParquetFromDatasetTest() throws KraftwerkException {
 
 		// Clean the existing file
-//		Files.deleteIfExists(outputFiles.getOutputFolder());
 		fileUtilsInterface.createDirectoryIfNotExist(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();

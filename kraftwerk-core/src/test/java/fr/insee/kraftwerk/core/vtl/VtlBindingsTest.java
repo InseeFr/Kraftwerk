@@ -87,8 +87,6 @@ class VtlBindingsTest {
 
 	@Test
 	void evalVtlScriptTest_uniqueString() {
-		List<KraftwerkError> errors = new ArrayList<>();
-		//
 		vtlBindings.put("TEST", ds1);
 		//
 		StringBuilder vtlScript = new StringBuilder("\n");

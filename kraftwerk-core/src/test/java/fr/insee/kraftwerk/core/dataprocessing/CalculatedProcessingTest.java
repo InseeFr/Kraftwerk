@@ -70,12 +70,13 @@ class CalculatedProcessingTest {
     @Test
     void testIfCalculatedAreProcessed() {
         //
-        vtlBindings = getVtlBindings();
+        VtlBindings vtlBindingsTest = getVtlBindings();
+
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
+        CalculatedProcessing processing = new CalculatedProcessing(vtlBindingsTest, fooCalculated, fileUtilsInterface);
         processing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         //
-        Dataset outDataset = vtlBindings.getDataset("TEST");
+        Dataset outDataset = vtlBindingsTest.getDataset("TEST");
 
         //
         assertNotNull(outDataset);
@@ -84,9 +85,9 @@ class CalculatedProcessingTest {
         assertTrue(outDataset.getDataStructure().containsKey("FOO2"));
         assertTrue(outDataset.getDataStructure().containsKey("FOO3"));
         //
-        assertEquals(1L, outDataset.getDataPoints().get(0).get("FOO3"));
-        assertEquals(1L, outDataset.getDataPoints().get(0).get("FOO2"));
-        assertEquals(2L, outDataset.getDataPoints().get(0).get("FOO1"));
+        assertEquals(1L, outDataset.getDataPoints().getFirst().get("FOO3"));
+        assertEquals(1L, outDataset.getDataPoints().getFirst().get("FOO2"));
+        assertEquals(2L, outDataset.getDataPoints().getFirst().get("FOO1"));
     }
 
     @NotNull

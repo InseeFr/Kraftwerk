@@ -46,7 +46,7 @@ class XmlSplitterTest {
 
 	@Test
 	@DisplayName("OutDirectory should contain 3 files")
-	void splitInThreeTest() throws XMLStreamException, IOException {
+	void splitInThreeTest() {
 		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 		Assertions.assertEquals(3, splitFiles.size());
 	}
@@ -54,7 +54,6 @@ class XmlSplitterTest {
 	@Test
 	@DisplayName("File split1.xml file should contain 2 survey units")
 	void contains2SuTest() throws XMLStreamException, IOException {
-		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
 		int count = 0;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(outDirectory+"split1.xml"));

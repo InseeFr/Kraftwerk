@@ -1,24 +1,18 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.nio.file.Path;
-import java.util.Set;
-
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import org.junit.jupiter.api.Test;
-
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserInputsFileTest {
 
@@ -92,7 +86,7 @@ class UserInputsFileTest {
 	}
 
 	@Test
-	void testReadMalformedInput() throws KraftwerkException {
+	void testReadMalformedInput() {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_malformed.json");
 		assertThrows(UnknownDataFormatException.class, () -> {
 			new UserInputsFile(path,inputSamplesDirectory, fileUtilsInterface);
@@ -100,7 +94,7 @@ class UserInputsFileTest {
 	}
 	
 	@Test
-	void testReadInputMissingFile() throws KraftwerkException {
+	void testReadInputMissingFile() {
 		Path path = inputSamplesDirectory.resolve("inputs_invalid_several_modes_fileNotExist.json");
 		assertThrows(KraftwerkException.class, () -> {
 			new UserInputsFile(path,inputSamplesDirectory, fileUtilsInterface);
@@ -108,7 +102,7 @@ class UserInputsFileTest {
 	}
 	
 	@Test
-	void testReadInputCompletePath() throws KraftwerkException {
+	void testReadInputCompletePath() {
 		Path path = inputSamplesDirectory.resolve("inputs_valid_several_modes_completePath.json");
 		assertDoesNotThrow(() -> {
 			new UserInputsFile(path,inputSamplesDirectory, fileUtilsInterface);

@@ -37,13 +37,9 @@ public abstract class DataParser {
 	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
 	public final void parseSurveyData(Path dataPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws NullException {
-		if (dataPath == null){
-			log.error(DATAPATH_IS_NULL);
-			throw new NullException(DATAPATH_IS_NULL);
-		}
+		checkDatapathIsNotNull(dataPath);
 		if(fileUtilsInterface.isDirectory(dataPath.toString()) == null){
-			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-			log.warn("No data was parsed.");
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s /n No data was parsed.", dataPath));
 		}
 		if(Boolean.FALSE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))){
 			parseDataFile(dataPath);
@@ -54,14 +50,22 @@ public abstract class DataParser {
 		if(Boolean.TRUE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))){
 			for(String path : fileUtilsInterface.listFilePaths(String.valueOf(dataPath))){
 				try {
-					parseDataFile(Path.of(path));
+					Path filePath = Path.of(path);
+					parseDataFile(filePath);
 					if(kraftwerkExecutionContext != null) {
-						kraftwerkExecutionContext.getOkFileNames().add(Path.of(path).getFileName().toString());
+						kraftwerkExecutionContext.getOkFileNames().add(filePath.getFileName().toString());
 					}
 				} catch (NullException e) {
 					log.error("IOException occurred when trying to list data file: {} in folder {}", path, dataPath);
 				}
 			}
+		}
+	}
+
+	private static void checkDatapathIsNotNull(Path dataPath) throws NullException {
+		if (dataPath == null){
+			log.error(DATAPATH_IS_NULL);
+			throw new NullException(DATAPATH_IS_NULL);
 		}
 	}
 
@@ -72,13 +76,9 @@ public abstract class DataParser {
 	 * @throws NullException -- throws null exception if datapath or a file is missing
 	 */
 	public final void parseSurveyDataWithoutDDI(Path dataPath, Path lunaticFile, KraftwerkExecutionContext kraftwerkExecutionContext) throws NullException {
-		if (dataPath == null){
-			log.error(DATAPATH_IS_NULL);
-			throw new NullException(DATAPATH_IS_NULL);
-		}
+		checkDatapathIsNotNull(dataPath);
 		if(fileUtilsInterface.isDirectory(dataPath.toString()) == null){
-			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
-			log.warn("No data was parsed.");
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s /n No data was parsed.", dataPath));
 		}
 		if(Boolean.FALSE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))) {
 			parseDataFileWithoutDDI(dataPath,lunaticFile);
@@ -89,12 +89,13 @@ public abstract class DataParser {
 		if(Boolean.TRUE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))) {
 			for(String path : fileUtilsInterface.listFilePaths(dataPath.toString())){
 				try {
-					parseDataFileWithoutDDI(Path.of(path),lunaticFile);
+					Path filePath = Path.of(path);
+					parseDataFileWithoutDDI(filePath,lunaticFile);
 					if(kraftwerkExecutionContext != null) {
-						kraftwerkExecutionContext.getOkFileNames().add(Path.of(path).getFileName().toString());
+						kraftwerkExecutionContext.getOkFileNames().add(filePath.getFileName().toString());
 					}
 				} catch (NullException e) {
-					log.error("IOException occurred when trying to list data file: {} in folder {}", path, dataPath);
+					log.error("IOException occurred when trying to list data file without DDI: {} in folder {}", path, dataPath);
 				}
 			}
 		}

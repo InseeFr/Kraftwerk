@@ -3,8 +3,8 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
 import lombok.extern.log4j.Log4j2;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -112,9 +112,9 @@ public class XMLReportingDataParser extends ReportingDataParser {
         XmlFileReader xmlFileReader = new XmlFileReader(fileUtilsInterface);
         this.document = xmlFileReader.readXmlFile(filePath);
         if (this.document != null) {
-            log.info("Successfully parsed Coleman/Moog answers file: " + filePath);
+            log.info("Successfully parsed Coleman/Moog answers file: {}", filePath);
         } else {
-            log.warn("Failed to parse Coleman/Moog answers file: " + filePath);
+            log.warn("Failed to parse Coleman/Moog answers file: {}", filePath);
         }
     }
 

@@ -55,7 +55,6 @@ class PaperDataProcessingTest {
 		variablesMap.putVariable(ucq);
 		for (int k=1; k < modalitiesNumber+1; k++) {
 			Variable ucqModality = new Variable(String.format("%s_%s", variableName, k), group, VariableType.STRING);
-			//ucqModality.setMcqName(ucq.getName());
 			variablesMap.putVariable(ucqModality);
 		}
 	}

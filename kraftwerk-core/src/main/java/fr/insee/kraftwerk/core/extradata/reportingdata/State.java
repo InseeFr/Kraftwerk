@@ -37,7 +37,7 @@ public class State{
   }
 
   public boolean isPriorTo(State otherState){
-    if(otherState == null) {
+    if(otherState == null ) {
       return true;
     }
     return (

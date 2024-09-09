@@ -43,10 +43,10 @@ public final class Constants {
 
 	// ----- Parameters from properties
 	public static final String METADATA_SEPARATOR = ".";
-	public static final String PAPER_IDENTIFIER_SEPARATOR = "_"; //TODO: get it from properties
-	public static final char CSV_PAPER_DATA_SEPARATOR = '#'; //TODO: get it from properties
-	public static final char CSV_REPORTING_DATA_SEPARATOR = ','; //TODO: get it from properties
-	public static final char CSV_OUTPUTS_SEPARATOR = ';'; //TODO: get it from properties
+	public static final String PAPER_IDENTIFIER_SEPARATOR = "_";
+	public static final char CSV_PAPER_DATA_SEPARATOR = '#';
+	public static final char CSV_REPORTING_DATA_SEPARATOR = ',';
+	public static final char CSV_OUTPUTS_SEPARATOR = ';';
 	@Getter
 	private static char csvOutputQuoteChar = '"';
 
@@ -188,7 +188,7 @@ public final class Constants {
 	 * @return the file or null when not found.
 	 * */
 	public static InputStream getInputStreamFromPath(String path) {
-		log.debug("Loading " + path);
+        log.debug("Loading {}", path);
 		try {
 			return Constants.class.getResourceAsStream(path);
 		} catch (Exception e) {

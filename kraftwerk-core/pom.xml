@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.0.4</version>
+		<version>3.0.5</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -117,7 +117,7 @@
 		<dependency>
 			<groupId>fr.insee.bpm</groupId>
 			<artifactId>bpm</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 </project>
