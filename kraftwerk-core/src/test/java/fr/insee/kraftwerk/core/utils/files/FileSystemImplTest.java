@@ -233,7 +233,7 @@ class FileSystemImplTest {
     }
 
     @Test
-    void findFileTest_notfound() throws KraftwerkException {
+    void findFileTest_notfound() {
         //GIVEN
         String campaignName = "list_files";
         Path inputDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "files", campaignName);

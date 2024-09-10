@@ -1,8 +1,7 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
-import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
@@ -16,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +28,7 @@ public class ParquetOutputFiles extends OutputFiles {
 
 	public static final String PARQUET_EXTENSION = ".parquet";
 
-	private final Map<String, Long> nbParquetFilesbyDataset = new HashMap<>();
-
-	/**
+    /**
 	 * When an instance is created, the output folder is created.
 	 *
 	 * @param outDirectory Out directory defined in application properties.

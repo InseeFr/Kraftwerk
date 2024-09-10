@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.process;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
@@ -15,9 +16,6 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-
-import fr.insee.bpm.metadata.model.MetadataModel;
-
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -25,7 +23,6 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +47,6 @@ public class MainProcessing {
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
 	private KraftwerkExecutionContext kraftwerkExecutionContext;
-	private LocalDateTime executionDateTime;
 	private final FileUtilsInterface fileUtilsInterface;
 
 	
@@ -114,12 +110,11 @@ public class MainProcessing {
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
 		kraftwerkExecutionContext = new KraftwerkExecutionContext(); //Init logger
-		this.executionDateTime = LocalDateTime.now();
 
 		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
 
 		String campaignName = inDirectory.getFileName().toString();
-		log.info("Kraftwerk main service started for campaign: " + campaignName);
+		log.info("Kraftwerk main service started for campaign: {}", campaignName);
 
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 
@@ -170,17 +165,17 @@ public class MainProcessing {
 	/* Step 5 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, executionDateTime, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 5 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 
 	/* Step 6 : Write log */
-	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, executionDateTime, kraftwerkExecutionContext, fileUtilsInterface);}
+	private void writeLog() {TextFileWriter.writeLogFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);}
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source, boolean fileByFile) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();

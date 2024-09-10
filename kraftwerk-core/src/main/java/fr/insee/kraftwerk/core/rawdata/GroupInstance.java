@@ -59,6 +59,9 @@ public class GroupInstance {
 	public void putValue(String variableName, String value) {
 		values.put(variableName, value);
 	}
+	public void putValues (Map<String,String> mapToAdd){
+		mapToAdd.forEach(this::putValue);
+	}
 
 	public GroupData getSubGroup(String groupName) {
 		if (subGroups.containsKey(groupName)) {

@@ -5,12 +5,14 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 public class ExternalVariable {
 
-	@Getter
-	@Setter
 	private String idVar;
-	@Getter
-	@Setter
 	private List<String> values;
+
+	public String getFirstValue(){
+		return values.getFirst();
+	}
 }

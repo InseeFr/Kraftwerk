@@ -1,4 +1,16 @@
 # Changelog
+
+## 3.0.6 [2024-09-09] - Fix : DDI xslt transformation
+### Changed
+- Fixed conflict : remove xslt transformation from Kraftwerk as it is now in BPM library.
+
+## 3.0.5 [2024-09-06] - Genesis service fix
+### Changed
+- Update BPM version
+
+### Fixed
+- Execution crash when vtl error on genesis service (kraftwerkExecutionContext null)
+
 ## 3.0.4 [2024-08-22] - BPM integration
 ### Changed
 - Metadata parsing shared with Genesis using BPM (Basic Parser of Metadata)

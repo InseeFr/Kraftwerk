@@ -144,7 +144,5 @@ class ReconciliationTest {
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		//
 		assertNotNull(multimodeDataset);
-		// TODO: improve reconciliation class or see with Trevas devs how to simplify
-
 	}
 }

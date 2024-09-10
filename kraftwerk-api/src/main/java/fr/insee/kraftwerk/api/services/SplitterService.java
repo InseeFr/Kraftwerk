@@ -35,7 +35,7 @@ public class SplitterService extends KraftwerkService{
 														   @RequestParam("nbResponsesByFile") int nbSU,
 														   @RequestParam("fileSystemType") FileSystemType fileSystemType)
 			throws Exception {
-		log.info("Split XML file : " + filename + " into " + nbSU + " SU by file using " +
+		log.info("Split XML file : {} into {} SU by file using {}", filename , nbSU ,
 				(fileSystemType.equals(FileSystemType.MINIO) ? "Minio" : "OS file system"));
 
 		FileUtilsInterface fileUtilsInterface = fileSystemType.equals(FileSystemType.MINIO) ?

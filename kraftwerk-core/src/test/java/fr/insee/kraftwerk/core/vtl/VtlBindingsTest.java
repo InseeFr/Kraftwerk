@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.core.vtl;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -87,8 +87,6 @@ class VtlBindingsTest {
 
 	@Test
 	void evalVtlScriptTest_uniqueString() {
-		List<KraftwerkError> errors = new ArrayList<>();
-		//
 		vtlBindings.put("TEST", ds1);
 		//
 		StringBuilder vtlScript = new StringBuilder("\n");

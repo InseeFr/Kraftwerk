@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,7 +27,7 @@ class CSVReportingDataParserTest {
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
 		ReportingData reportingData = new ReportingData(
-				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"));
+				Paths.get(TestConstants.UNIT_TESTS_DIRECTORY + "/reportingdata/reportingdata.csv"), new ArrayList<>());
 			csvReportingDataParser.parseReportingData(reportingData, data, true);
 
 

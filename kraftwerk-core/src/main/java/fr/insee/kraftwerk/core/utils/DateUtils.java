@@ -1,13 +1,13 @@
 package fr.insee.kraftwerk.core.utils;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class DateUtils {
@@ -25,7 +25,7 @@ public class DateUtils {
 	public static long convertToTimestamp(String rowTimestamp) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
-		Date parsedDate = null;
+		Date parsedDate;
 		try {
 			parsedDate = dateFormat.parse(rowTimestamp);
 		} catch (ParseException e1) {
