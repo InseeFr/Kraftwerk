@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.0.5</version>
+		<version>3.0.6</version>
 	</parent>
 
 	<artifactId>kraftwerk-functional-tests</artifactId>
 	<name>kraftwerk-tests</name>
 
 	<properties>
-		<kraftwerk.version>3.0.5</kraftwerk.version>
+		<kraftwerk.version>3.0.6</kraftwerk.version>
 	</properties>
 
 	<dependencies>
