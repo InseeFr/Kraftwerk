@@ -44,19 +44,20 @@ public class VtlChecker {
     }
 
     private static @NotNull String addMissingGroupBy(String input, String groupByParam, String functionToFind) {
+        String inputAggr = input.replace("calc", "aggr");
         StringBuilder result = new StringBuilder();
         int index = 0;
 
-        while (index < input.length()) {
-            int functionIndex = findNextFunctionIndex(input, index, functionToFind);
-            int closingParenthesisIndex = findClosingParenthesisIndex(input, functionIndex + 3);
+        while (index < inputAggr.length()) {
+            int functionIndex = findNextFunctionIndex(inputAggr, index, functionToFind);
+            int closingParenthesisIndex = findClosingParenthesisIndex(inputAggr, functionIndex + 3);
 
             if (functionIndex == -1) { //no more sum
-                result.append(input.substring(index));
+                result.append(inputAggr.substring(index));
             }
 
             if (functionIndex != -1 && closingParenthesisIndex == -1) {
-                log.warn("Missing closing parenthesis in VTL expression : {}", input);
+                log.warn("Missing closing parenthesis in VTL expression : {}", inputAggr);
                 result.append(input.substring(functionIndex));  // Incomplete function, just append the rest
             }
 
@@ -64,8 +65,8 @@ public class VtlChecker {
                 break;
             }
 
-            result.append(input, index, functionIndex);
-            result.append(input, functionIndex, closingParenthesisIndex );
+            result.append(inputAggr, index, functionIndex);
+            result.append(inputAggr, functionIndex, closingParenthesisIndex );
             result.append(" group by ").append(groupByParam).append(" )");
             index = closingParenthesisIndex + 1;
         }
