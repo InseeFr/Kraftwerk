@@ -32,6 +32,6 @@ public class DateUtils {
 			log.error("Parsing error : {}", e1.getMessage());
 			return 0L;
 		}
-		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
+		return parsedDate.getTime();
 	}
 }

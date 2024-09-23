@@ -81,7 +81,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 			log.error("Parsing error : the parsed date is null");
 			return 0L;
 		}
-		return TimeUnit.MILLISECONDS.toSeconds(parsedDate.getTime());
+		return parsedDate.getTime();
 	}
 
 	/**
