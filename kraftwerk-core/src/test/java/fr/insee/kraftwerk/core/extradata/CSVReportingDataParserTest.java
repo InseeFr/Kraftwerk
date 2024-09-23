@@ -44,9 +44,9 @@ class CSVReportingDataParserTest {
 		assertEquals("VALINT", reportingDataUE.getStates().get(2).getStateType());
 
 		// Check the reporting data date is correctly parsed
-		assertEquals(1644845734, reportingDataUE.getStates().get(0).getTimestamp());
-		assertEquals(1644854405, reportingDataUE.getStates().get(1).getTimestamp());
-		assertEquals(1644919206, reportingDataUE.getStates().get(2).getTimestamp());
+		assertEquals(1644845734000L, reportingDataUE.getStates().get(0).getTimestamp());
+		assertEquals(1644854405000L, reportingDataUE.getStates().get(1).getTimestamp());
+		assertEquals(1644919206000L, reportingDataUE.getStates().get(2).getTimestamp());
 
 
 		// Check the reporting data is correctly translated in the output
@@ -69,10 +69,10 @@ class CSVReportingDataParserTest {
 	@Test
 	void convertDateTest() {
 		CSVReportingDataParser csvReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
-		assertEquals(1645007098, csvReportingDataParser.convertToTimestamp("16/02/2022 11:24:58"));
-		assertEquals(1566544132, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));
-		assertEquals(1111111111, csvReportingDataParser.convertToTimestamp("18/03/2005 02:58:31"));
-		assertEquals(1, csvReportingDataParser.convertToTimestamp("01/01/1970 01:00:01"));
+		assertEquals(1645007098000L, csvReportingDataParser.convertToTimestamp("16/02/2022 11:24:58"));
+		assertEquals(1566544132000L, csvReportingDataParser.convertToTimestamp("23/08/2019 09:08:52"));
+		assertEquals(1111111111000L, csvReportingDataParser.convertToTimestamp("18/03/2005 02:58:31"));
+		assertEquals(1000L, csvReportingDataParser.convertToTimestamp("01/01/1970 01:00:01"));
 
 	}
 
