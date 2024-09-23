@@ -7,11 +7,11 @@ import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.DateUtils;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +19,8 @@ import java.util.List;
 public abstract class ReportingDataParser {
 
 	public static final String DATE_SUFFIX = "_DATE";
+	private final SimpleDateFormat reportingDataOutputDateFormat =
+			new SimpleDateFormat(Constants.REPORTING_DATA_OUTPUT_DATE_FORMAT);
 	Group reportingGroup;
 	private int maxStates = 0;
 	private int maxAttempts = 0;
@@ -221,7 +223,7 @@ public abstract class ReportingDataParser {
 		}
 		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
-					DateUtils.formatLongToString(reportingDataUE.getSurveyValidationDateTimeStamp()));
+					reportingDataOutputDateFormat.format(new java.util.Date(reportingDataUE.getSurveyValidationDateTimeStamp())));
 		}
 	}
 
@@ -234,12 +236,12 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OUTCOME_ATTEMPT_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
-							DateUtils.formatDateToString(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
+							reportingDataOutputDateFormat.format(reportingDataUE.getContactAttempts().get(k - 1).getDate()));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 				.putValue(Constants.LAST_ATTEMPT_DATE,
-						DateUtils.formatDateToString(getLastContactAttempt(reportingDataUE).getDate()));
+						reportingDataOutputDateFormat.format(getLastContactAttempt(reportingDataUE).getDate()));
 	}
 
 	private void addContactOutcome(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
@@ -251,7 +253,7 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OUTCOME_DATE,
-							DateUtils.formatDateToString(new Date(contactOutcome.getDateEndContact())));
+							reportingDataOutputDateFormat.format(new Date(contactOutcome.getDateEndContact())));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
@@ -267,8 +269,8 @@ public abstract class ReportingDataParser {
 							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX, DateUtils
-							.formatDateToString(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
+					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
+							reportingDataOutputDateFormat.format(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())

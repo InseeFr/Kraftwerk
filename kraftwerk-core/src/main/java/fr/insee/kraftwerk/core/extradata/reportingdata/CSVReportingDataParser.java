@@ -16,6 +16,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -68,7 +69,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 	}
 
 	public long convertToTimestamp(String rowTimestamp) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.REPORTING_DATA_INPUT_DATE_FORMAT);
 		dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
 		Date parsedDate = null;
 		try {

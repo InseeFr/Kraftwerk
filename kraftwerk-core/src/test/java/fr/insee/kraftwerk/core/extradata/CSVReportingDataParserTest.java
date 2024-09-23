@@ -42,6 +42,13 @@ class CSVReportingDataParserTest {
 		assertEquals("INITLA", reportingDataUE.getStates().get(0).getStateType());
 		assertEquals("PARTIELINT", reportingDataUE.getStates().get(1).getStateType());
 		assertEquals("VALINT", reportingDataUE.getStates().get(2).getStateType());
+
+		// Check the reporting data date is correctly parsed
+		assertEquals(1644845734, reportingDataUE.getStates().get(0).getTimestamp());
+		assertEquals(1644854405, reportingDataUE.getStates().get(1).getTimestamp());
+		assertEquals(1644919206, reportingDataUE.getStates().get(2).getTimestamp());
+
+
 		// Check the reporting data is correctly translated in the output
 		/* à implémenter ? *//*
 		"Affectée, non visible enquêteur" et "Questionnaire démarré"*/
