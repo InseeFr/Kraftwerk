@@ -31,7 +31,8 @@ public enum StateType {
   STATE22("VALPAP", "Questionnaire validé sur papier"),
   STATE23("VALINT", "Questionnaire validé sur internet"),
   STATE24("REFUSAL", "Refus de répondre"),
-  STATE25("RELANCE", "RELANCE");
+  STATE25("RELANCE", "RELANCE"),
+  STATE26("FOLLOWUP", "RELANCE");
   
 	private final String key;
 	private final String value;
