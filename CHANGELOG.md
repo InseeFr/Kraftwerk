@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.7 [2024-09-25] - DDI : add support for Dynamic tables and Roundabouts
+### Added
+- Upgrade BPM version to 3.0.7 that adds support for dynamic tables and roundabouts from DDI specification
+### Fixed
+- Fix : misreading of dates from reporting data in csv format
+
 ## 3.0.6 [2024-09-09] - Fix : DDI xslt transformation
 ### Changed
 - Fixed conflict : remove xslt transformation from Kraftwerk as it is now in BPM library.
