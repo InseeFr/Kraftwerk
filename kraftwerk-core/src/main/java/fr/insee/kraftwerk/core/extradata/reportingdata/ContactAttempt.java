@@ -26,7 +26,7 @@ public class ContactAttempt {
   }
   
   public LocalDateTime getDate() {
-	  return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+	  return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("CET"));
   }
   
   

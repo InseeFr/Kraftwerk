@@ -1,26 +1,24 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Log4j2
 public class CSVReportingDataParser extends ReportingDataParser {
@@ -80,7 +78,7 @@ public class CSVReportingDataParser extends ReportingDataParser {
 			log.error("Parsing error : the parsed date is null");
 			return 0L;
 		}
-		return parsedDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		return parsedDate.atZone(ZoneId.of("CET")).toInstant().toEpochMilli();
 	}
 
 	/**
