@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -68,20 +68,19 @@ public class CSVReportingDataParser extends ReportingDataParser {
 		}
 	}
 
-	public long convertToTimestamp(String rowTimestamp) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.REPORTING_DATA_INPUT_DATE_FORMAT);
-		dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
-		Date parsedDate = null;
+	public long convertToTimestamp(String dateString) {
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(Constants.REPORTING_DATA_INPUT_DATE_FORMAT);
+		LocalDateTime parsedDate = null;
 		try {
-			parsedDate = dateFormat.parse(rowTimestamp);
-		} catch (ParseException e1) {
-			log.error("Parsing error : {}", e1.getMessage());
+			parsedDate = LocalDateTime.parse(dateString, dateFormat);
+		} catch (DateTimeParseException e) {
+			log.error("Parsing error : {}", e.getMessage());
 		}
 		if (parsedDate == null) {
 			log.error("Parsing error : the parsed date is null");
 			return 0L;
 		}
-		return parsedDate.getTime();
+		return parsedDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 
 	/**

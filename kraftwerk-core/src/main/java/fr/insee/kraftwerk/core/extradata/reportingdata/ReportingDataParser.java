@@ -10,8 +10,10 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,8 @@ import java.util.List;
 public abstract class ReportingDataParser {
 
 	public static final String DATE_SUFFIX = "_DATE";
-	private final SimpleDateFormat reportingDataOutputDateFormat =
-			new SimpleDateFormat(Constants.REPORTING_DATA_OUTPUT_DATE_FORMAT);
+	private final DateTimeFormatter reportingDataOutputDateFormat =
+			DateTimeFormatter.ofPattern(Constants.REPORTING_DATA_OUTPUT_DATE_FORMAT);
 	Group reportingGroup;
 	private int maxStates = 0;
 	private int maxAttempts = 0;
@@ -223,7 +225,7 @@ public abstract class ReportingDataParser {
 		}
 		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
-					reportingDataOutputDateFormat.format(new java.util.Date(reportingDataUE.getSurveyValidationDateTimeStamp())));
+					reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getSurveyValidationDateTimeStamp()),ZoneId.systemDefault())));
 		}
 	}
 
@@ -253,7 +255,7 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OUTCOME_DATE,
-							reportingDataOutputDateFormat.format(new Date(contactOutcome.getDateEndContact())));
+							reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(contactOutcome.getDateEndContact()),ZoneId.systemDefault())));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
@@ -270,7 +272,7 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
-							reportingDataOutputDateFormat.format(new Date((reportingDataUE.getStates().get(k - 1)).getTimestamp())));
+							reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getStates().get(k - 1).getTimestamp()),ZoneId.systemDefault())));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
