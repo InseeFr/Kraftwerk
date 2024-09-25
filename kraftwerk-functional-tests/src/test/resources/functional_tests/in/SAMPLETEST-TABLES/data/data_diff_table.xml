@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Campaign>
+	<Id>ENQTESTTAB</Id>
+	<Label>Traiter - Tableaux</Label>
+	<SurveyUnits>
+		<SurveyUnit>
+			<Id>00000001</Id>
+			<QuestionnaireModelId>ENQTESTTAB</QuestionnaireModelId>
+			<Data>
+				<COLLECTED>
+					<TABCODELIST1D31>
+						<COLLECTED type="string">lituliut</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST1D31>
+					<TABCODELIST2D11>
+						<COLLECTED type="string">jytjyet</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D11>
+					<TABCODELIST2D22>
+						<COLLECTED type="string">grqeg</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D22>
+					<TABLIST1FTXT1>
+						<COLLECTED>
+							<COLLECTED type="string">Loic</COLLECTED>
+							<COLLECTED type="string">Manon</COLLECTED>
+						</COLLECTED>
+					</TABLIST1FTXT1>
+					<TABCODELIST2D12>
+						<COLLECTED type="string">jyetjeyt</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D12>
+					<TABCODELIST1D11>
+						<COLLECTED type="string">graegra</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST1D11>
+					<TABCODELIST2D31>
+						<COLLECTED type="string">cqsfcqs</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D31>
+					<TABCODELIST1D21>
+						<COLLECTED type="null"/>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST1D21>
+					<TABCODELIST2D21>
+						<COLLECTED type="string">jyetje</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D21>
+					<TABCODELIST2D32>
+						<COLLECTED type="string">azerezare</COLLECTED>
+						<EDITED type="null"/>
+						<FORCED type="null"/>
+						<INPUTTED type="null"/>
+						<PREVIOUS type="null"/>
+					</TABCODELIST2D32>
+					<TABLIST1FINT1>
+						<COLLECTED>
+							<COLLECTED type="number">41</COLLECTED>
+							<COLLECTED type="number">40</COLLECTED>
+						</COLLECTED>
+					</TABLIST1FINT1>
+					<TABLISTE2F2>
+						<COLLECTED>
+							<COLLECTED type="number">8</COLLECTED>
+						</COLLECTED>
+					</TABLISTE2F2>
+					<TABLISTE2F1>
+						<COLLECTED type="null">
+							<COLLECTED type="string">Golan</COLLECTED>
+						</COLLECTED>
+					</TABLISTE2F1>
+				</COLLECTED>
+				<CALCULATED/>
+				<EXTERNAL/>
+			</Data>
+		</SurveyUnit>
+	</SurveyUnits>
+</Campaign>

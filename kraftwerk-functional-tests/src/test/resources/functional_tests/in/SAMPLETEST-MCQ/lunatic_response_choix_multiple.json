@@ -1,0 +1,693 @@
+{
+  "id": "lzgzxf0x",
+  "label": {
+    "type": "VTL|MD",
+    "value": "Traiter - Responses à choix multiples"
+  },
+  "modele": "TRAITERMULT",
+  "maxPage": "5",
+  "resizing": {},
+  "variables": [
+    {
+      "name": "QUESTIONCH1",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QUESTIONCH2",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "QUESTIONCH3",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST1",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST2",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST3",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST21",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST22",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST23",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST31",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST32",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "MCQCODELIST33",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "FILTER_RESULT_QUESTIONCH",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_MCQCODELIST1",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_MCQCODELIST2",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_MCQCODELIST3",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    }
+  ],
+  "components": [
+    {
+      "id": "lzh05v71",
+      "page": "1",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"I - \" || \"Première séquence\""
+      },
+      "componentType": "Sequence",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzryja",
+      "page": "2",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"1\\. \" || \"Question à choix multiples - Booléen\""
+      },
+      "components": [
+        {
+          "id": "lzgzryja",
+          "page": "2",
+          "responses": [
+            {
+              "id": "lzgzryja-QOP-lzgzvtva",
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 1\""
+              },
+              "response": {
+                "name": "QUESTIONCH1"
+              }
+            },
+            {
+              "id": "lzgzryja-QOP-lzgzvpwd",
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 2\""
+              },
+              "response": {
+                "name": "QUESTIONCH2"
+              }
+            },
+            {
+              "id": "lzgzryja-QOP-lzh007iz",
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 3\""
+              },
+              "response": {
+                "name": "QUESTIONCH3"
+              }
+            }
+          ],
+          "orientation": "VERTICAL",
+          "componentType": "CheckboxGroup"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzzp4t",
+      "page": "3",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"2\\. \" || \"Question à choix multiples - Liste de code - Cose à cocher\""
+      },
+      "components": [
+        {
+          "id": "lzgzzp4t",
+          "body": [
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 1\""
+                },
+                "value": "1"
+              },
+              {
+                "id": "lzgzzp4t-RDOP-lzh0e6qf",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST1"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "CheckboxOne"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 2\""
+                },
+                "value": "2"
+              },
+              {
+                "id": "lzgzzp4t-RDOP-lzh05bq9",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST2"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "CheckboxOne"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 3\""
+                },
+                "value": "3"
+              },
+              {
+                "id": "lzgzzp4t-RDOP-lzgzykjn",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST3"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "CheckboxOne"
+              }
+            ]
+          ],
+          "page": "3",
+          "mandatory": false,
+          "positioning": "HORIZONTAL",
+          "componentType": "Table"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzscf7",
+      "page": "4",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"3\\. \" || \"Question à choix multiples - Liste de code - Bouton radio\""
+      },
+      "components": [
+        {
+          "id": "lzgzscf7",
+          "body": [
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 1\""
+                },
+                "value": "1"
+              },
+              {
+                "id": "lzgzscf7-RDOP-lzh08rk8",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST21"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Radio"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 2\""
+                },
+                "value": "2"
+              },
+              {
+                "id": "lzgzscf7-RDOP-lzh0cwfy",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST22"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Radio"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 3\""
+                },
+                "value": "3"
+              },
+              {
+                "id": "lzgzscf7-RDOP-lzgzuo2b",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST23"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Radio"
+              }
+            ]
+          ],
+          "page": "4",
+          "mandatory": false,
+          "positioning": "HORIZONTAL",
+          "componentType": "Table"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzh06ddm",
+      "page": "5",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"4\\. \" || \"Question à choix multiples - Liste de code - Liste déroulante\""
+      },
+      "components": [
+        {
+          "id": "lzh06ddm",
+          "body": [
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 1\""
+                },
+                "value": "1"
+              },
+              {
+                "id": "lzh06ddm-RDOP-lzh03gbx",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST31"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Dropdown"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 2\""
+                },
+                "value": "2"
+              },
+              {
+                "id": "lzh06ddm-RDOP-lzh0dsrg",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST32"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Dropdown"
+              }
+            ],
+            [
+              {
+                "label": {
+                  "type": "VTL|MD",
+                  "value": "\"Modalité 3\""
+                },
+                "value": "3"
+              },
+              {
+                "id": "lzh06ddm-RDOP-lzh03c64",
+                "options": [
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Oui\""
+                    },
+                    "value": "1"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Non\""
+                    },
+                    "value": "2"
+                  },
+                  {
+                    "label": {
+                      "type": "VTL|MD",
+                      "value": "\"Ne sais pas\""
+                    },
+                    "value": "0"
+                  }
+                ],
+                "response": {
+                  "name": "MCQCODELIST33"
+                },
+                "orientation": "HORIZONTAL",
+                "componentType": "Dropdown"
+              }
+            ]
+          ],
+          "page": "5",
+          "mandatory": false,
+          "positioning": "HORIZONTAL",
+          "componentType": "Table"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    }
+  ],
+  "pagination": "question",
+  "componentType": "Questionnaire",
+  "enoCoreVersion": "3.24.0",
+  "generatingDate": "05-08-2024 12:53:35",
+  "lunaticModelVersion": "3.12.0"
+}

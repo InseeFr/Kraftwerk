@@ -29,3 +29,8 @@ Feature: Do we retrieve correctly all metadata from specifications ?
 
       |Directory                        |NumberOfVariables              | NumberOfStringVariables    |
       |SAMPLETEST-METADATA              |370                            | 163                        |
+      |SAMPLETEST-SIMPLE-RESPONSE       |10                             | 1                          |
+      |SAMPLETEST-UCQ                   |8                              | 4                          |
+      |SAMPLETEST-MCQ                   |16                             | 9                          |
+      |SAMPLETEST-TABLES                |18                             | 11                         |
+      |SAMPLETEST-ROUNDABOUT            |6                              | 1                          |

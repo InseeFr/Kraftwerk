@@ -1,0 +1,313 @@
+{
+  "id": "lzgzhi4n",
+  "label": {
+    "type": "VTL|MD",
+    "value": "Traiter - Response à choix unique"
+  },
+  "modele": "TRAITERUCQ",
+  "maxPage": "5",
+  "resizing": {},
+  "variables": [
+    {
+      "name": "BOUTONRADI",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "LISTEDROUL",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "CASECOCHER",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "RECHLISTE",
+      "values": {
+        "EDITED": null,
+        "FORCED": null,
+        "INPUTTED": null,
+        "PREVIOUS": null,
+        "COLLECTED": null
+      },
+      "dimension": 0,
+      "variableType": "COLLECTED"
+    },
+    {
+      "name": "FILTER_RESULT_BOUTONRADI",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_LISTEDROUL",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_CASECOCHER",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    },
+    {
+      "name": "FILTER_RESULT_RECHLISTE",
+      "expression": {
+        "type": "VTL",
+        "value": "true"
+      },
+      "variableType": "CALCULATED"
+    }
+  ],
+  "components": [
+    {
+      "id": "lzgzea1o",
+      "page": "1",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"I - \" || \"Première séquence\""
+      },
+      "componentType": "Sequence",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzs2db",
+      "page": "2",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"1\\. \" || \"Bouton radio\""
+      },
+      "components": [
+        {
+          "id": "lzgzs2db",
+          "page": "2",
+          "options": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 1\""
+              },
+              "value": "1"
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 2\""
+              },
+              "value": "2"
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 3\""
+              },
+              "value": "3"
+            }
+          ],
+          "response": {
+            "name": "BOUTONRADI"
+          },
+          "mandatory": false,
+          "orientation": "VERTICAL",
+          "componentType": "Radio"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzdt5c",
+      "page": "3",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"2\\. \" || \"Liste déroulante\""
+      },
+      "components": [
+        {
+          "id": "lzgzdt5c",
+          "page": "3",
+          "options": [
+            {
+              "label": {
+                "type": "VTL",
+                "value": "\"Modalité 1\""
+              },
+              "value": "1"
+            },
+            {
+              "label": {
+                "type": "VTL",
+                "value": "\"Modalité 2\""
+              },
+              "value": "2"
+            },
+            {
+              "label": {
+                "type": "VTL",
+                "value": "\"Modalité 3\""
+              },
+              "value": "3"
+            }
+          ],
+          "response": {
+            "name": "LISTEDROUL"
+          },
+          "mandatory": false,
+          "componentType": "Dropdown"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzix06",
+      "page": "4",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"3\\. \" || \"Case à cocher\""
+      },
+      "components": [
+        {
+          "id": "lzgzix06",
+          "page": "4",
+          "options": [
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 1\""
+              },
+              "value": "1"
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 2\""
+              },
+              "value": "2"
+            },
+            {
+              "label": {
+                "type": "VTL|MD",
+                "value": "\"Modalité 3\""
+              },
+              "value": "3"
+            }
+          ],
+          "response": {
+            "name": "CASECOCHER"
+          },
+          "mandatory": false,
+          "orientation": "VERTICAL",
+          "componentType": "CheckboxOne"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    },
+    {
+      "id": "question-lzgzir01",
+      "page": "5",
+      "label": {
+        "type": "VTL|MD",
+        "value": "\"4\\. \" || \"Recherche sur liste - départements\""
+      },
+      "components": [
+        {
+          "id": "lzgzir01",
+          "page": "5",
+          "response": {
+            "name": "RECHLISTE"
+          },
+          "mandatory": false,
+          "storeName": "L_DEP-1-1-0",
+          "componentType": "Suggester"
+        }
+      ],
+      "componentType": "Question",
+      "conditionFilter": {
+        "type": "VTL",
+        "value": "true"
+      }
+    }
+  ],
+  "pagination": "question",
+  "suggesters": [
+    {
+      "name": "L_DEP-1-1-0",
+      "order": {
+        "type": "ascending",
+        "field": "label"
+      },
+      "fields": [
+        {
+          "name": "label",
+          "rules": [
+            "[\\w]+"
+          ]
+        },
+        {
+          "name": "id",
+          "rules": [
+            "[\\w]+"
+          ]
+        }
+      ],
+      "version": 1,
+      "queryParser": {
+        "type": "tokenized",
+        "params": {
+          "min": 2,
+          "pattern": "[\\w.]+",
+          "stemmer": false,
+          "language": "French"
+        }
+      }
+    }
+  ],
+  "componentType": "Questionnaire",
+  "enoCoreVersion": "3.24.0",
+  "generatingDate": "05-08-2024 12:42:15",
+  "lunaticModelVersion": "3.12.0"
+}
