@@ -2,5 +2,5 @@ statut,dateInfo,idUe,idContact,nom,prenom,adresse,numeroDeLot
 INITLA,14/02/2022 14:35:34,L0000005,XXXXXXX,NAME,FirstName,13  rue du Général hulot Insee Grand Est  54042 - Nancy cedex,99
 INITLA,14/02/2022 14:35:34,L0000006,XXXXXXX,NAME,FirstName,13  rue du Général hulot Insee Grand Est  54042 - Nancy cedex,99
 INITLA,14/02/2022 14:35:34,L0000169,XXXXXXX,NAME,FirstName,13  rue du Général hulot   54042 - Nancy cedex,2
-VALINT,15/02/2022 11:00:06,L0000169,XXXXXXX,NAME,FirstName,1  rue du moulin - Paris,1
-PARTIELINT,14/02/2022 17:00:05,L0000169,XXXXXXX,NAME,FirstName,1  rue du pont - Paris,1
+VALINT,"15/02/2022 11:00:06",L0000169,XXXXXXX,NAME,FirstName,1  rue du moulin - Paris,1
+PARTIELINT,"14/02/2022 17:00:05",L0000169,XXXXXXX,NAME,FirstName,1  rue du pont - Paris,1

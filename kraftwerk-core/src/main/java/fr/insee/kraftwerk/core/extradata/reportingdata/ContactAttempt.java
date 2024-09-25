@@ -1,5 +1,8 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import lombok.Getter;
@@ -22,8 +25,8 @@ public class ContactAttempt {
     this.timestamp = timestamp;
   }
   
-  public Date getDate() {
-	  return new Date(timestamp);
+  public LocalDateTime getDate() {
+	  return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("CET"));
   }
   
   
