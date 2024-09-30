@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
