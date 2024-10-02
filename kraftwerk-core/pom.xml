@@ -119,5 +119,12 @@
 			<artifactId>bpm</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+
+		<!-- Encryption -->
+		<dependency>
+			<groupId>fr.insee.lib_java_chiffrement</groupId>
+			<artifactId>lib_java_chiffrement_core</artifactId>
+			<version>1.1.0</version>
+		</dependency>
 	</dependencies>
 </project>

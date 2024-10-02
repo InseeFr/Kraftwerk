@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.api.batch;
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class KraftwerkBatch implements CommandLineRunner {
 
     ConfigProperties configProperties;
+    VaultConfig vaultConfig;
     MinioConfig minioConfig;
     MinioClient minioClient;
 
@@ -28,12 +30,13 @@ public class KraftwerkBatch implements CommandLineRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
             minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
         }
+        this.vaultConfig = vaultConfig;
     }
 
     @Override
@@ -69,8 +72,9 @@ public class KraftwerkBatch implements CommandLineRunner {
 
                 //Run kraftwerk
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new MinioImpl(minioClient, minioConfig.getBucketName()));
-                    mainProcessingGenesis.runMain(inDirectory);
+                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
+                            new MinioImpl(minioClient, minioConfig.getBucketName()), vaultConfig);
+                    mainProcessingGenesis.runMain(inDirectory,false); //TODO Use kraftwerk level encryption as batch parameter ?
                 } else {
                     MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
                     mainProcessing.runMain();

@@ -4,6 +4,8 @@ import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -20,12 +22,18 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.libjavachiffrement.config.CipherConfig;
+import fr.insee.libjavachiffrement.core.cipher.EndPoint;
+import fr.insee.libjavachiffrement.core.vault.VaultCaller;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -33,6 +41,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Log4j2
 public class MainProcessingGenesis {
@@ -58,10 +68,12 @@ public class MainProcessingGenesis {
 	private Map<String, MetadataModel> metadataModels;
 
 	private final GenesisClient client;
+	private final VaultConfig vaultConfig;
 
-	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface) {
+	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, VaultConfig vaultConfig) {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 		this.fileUtilsInterface = fileUtilsInterface;
+		this.vaultConfig = vaultConfig;
 	}
 
 	public void init(String idCampaign) throws KraftwerkException {
@@ -83,7 +95,7 @@ public class MainProcessingGenesis {
 		}
 	}
 
-	public void runMain(String idCampaign) throws KraftwerkException, IOException {
+	public void runMain(String idCampaign, boolean useEncryption) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idCampaign);
@@ -111,6 +123,10 @@ public class MainProcessingGenesis {
 		}catch (SQLException e){
 			log.error(e.toString());
 			throw new KraftwerkException(500,"SQL error");
+		}
+		//We zip and encrypt the folder if asked
+		if (useEncryption) {
+			zipAndEncrypt();
 		}
 	}
 
@@ -147,4 +163,74 @@ public class MainProcessingGenesis {
 		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
+	/* Step 7 : Zip and encrypt output folder */
+	private void zipAndEncrypt() throws KraftwerkException {
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
+
+		//Zip
+		Path zipFilePath = outDirectory.getParent().resolve(kraftwerkExecutionContext.getExecutionDateTime() + ".zip");
+		try(FileOutputStream fileOutputStream = new FileOutputStream(zipFilePath.toString())){
+			ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+			addFileOrDirectoryToZip(outDirectory.toFile(), zipOutputStream);
+		} catch (IOException e) {
+			log.error(e.toString());
+            throw new KraftwerkException(500, "Error during zipping");
+        }
+		//Encryption config
+		CipherConfig cipherConfig = new CipherConfig(
+				false,
+				false,
+				zipFilePath,
+				zipFilePath.getParent(),
+				new VaultCaller(vaultConfig.getRoleId(), vaultConfig.getSecretId(), Constants.ENCRYPTION_VAULT_APPROLE_ENDPOINT),
+				vaultConfig.getVaultUri(),
+				Constants.ENCRYPTION_VAULT_NAME,
+				Constants.ENCRYPTION_VAULT_PROPERTY_NAME,
+				null,
+				null, //TODO Add endpoint parameter ?
+				null
+				);
+		//Encrypt
+		EndPoint cipherEndpoint = new EndPoint(cipherConfig);
+		try{
+			cipherEndpoint.encrypt();
+		}catch(IOException | InterruptedException e){
+			log.error(e.toString());
+			Thread.currentThread().interrupt();
+			throw new KraftwerkException(500, "Error during encryption");
+		}
+    }
+
+	/**
+	 * Recursive function to add file or directory in zip output stream along with subfiles
+	 * @param file file or directory
+	 * @param zipOutputStream ZipOutputStream to populate
+	 */
+	private void addFileOrDirectoryToZip(File file, ZipOutputStream zipOutputStream) throws IOException {
+		if(file.isHidden()){
+			return;
+		}
+		if(file.isDirectory()){
+			if(file.getName().endsWith("/")){
+				zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+			}else{
+				zipOutputStream.putNextEntry(new ZipEntry(file.getName() + "/"));
+			}
+			zipOutputStream.closeEntry();
+			File[] subfiles = file.listFiles();
+			assert subfiles != null; // Can't happen, we check if file is a directory beforehand
+			for(File subfile : subfiles){
+				addFileOrDirectoryToZip(subfile, zipOutputStream);
+			}
+		}
+		try(FileInputStream fileInputStream = new FileInputStream(file)){
+			ZipEntry zipEntry = new ZipEntry(file.getName());
+			zipOutputStream.putNextEntry(zipEntry);
+			byte[] bytes = new byte[1024];
+			int length;
+			while ((length = fileInputStream.read(bytes)) >= 0) {
+				zipOutputStream.write(bytes, 0, length);
+			}
+		}
+	}
 }
