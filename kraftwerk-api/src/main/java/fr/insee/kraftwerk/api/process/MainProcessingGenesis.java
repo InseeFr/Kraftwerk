@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -95,7 +96,7 @@ public class MainProcessingGenesis {
 		}
 	}
 
-	public void runMain(String idCampaign, boolean useEncryption) throws KraftwerkException, IOException {
+	public void runMain(String idCampaign, boolean useEncryption, String publicPartnerAppKeyPath) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
 		init(idCampaign);
@@ -126,7 +127,10 @@ public class MainProcessingGenesis {
 		}
 		//We zip and encrypt the folder if asked
 		if (useEncryption) {
-			zipAndEncrypt();
+			if(publicPartnerAppKeyPath == null || publicPartnerAppKeyPath.isEmpty()){
+				throw new KraftwerkException(400, "Vault public partner key is required for encryption");
+			}
+			zipAndEncrypt(publicPartnerAppKeyPath);
 		}
 	}
 
@@ -164,18 +168,23 @@ public class MainProcessingGenesis {
 	}
 
 	/* Step 7 : Zip and encrypt output folder */
-	private void zipAndEncrypt() throws KraftwerkException {
+	private void zipAndEncrypt(String publicPartnerAppKeyName) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
 
 		//Zip
-		Path zipFilePath = outDirectory.getParent().resolve(kraftwerkExecutionContext.getExecutionDateTime() + ".zip");
+		Path zipFilePath =
+				outDirectory.getParent().resolve(kraftwerkExecutionContext
+						.getExecutionDateTime()
+						.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)) + ".zip");
 		try(FileOutputStream fileOutputStream = new FileOutputStream(zipFilePath.toString())){
 			ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 			addFileOrDirectoryToZip(outDirectory.toFile(), zipOutputStream);
+			zipOutputStream.close();
 		} catch (IOException e) {
 			log.error(e.toString());
-            throw new KraftwerkException(500, "Error during zipping");
+            throw new KraftwerkException(500, "Error during zipping : " + e);
         }
+
 		//Encryption config
 		CipherConfig cipherConfig = new CipherConfig(
 				false,
@@ -187,7 +196,7 @@ public class MainProcessingGenesis {
 				Constants.ENCRYPTION_VAULT_NAME,
 				Constants.ENCRYPTION_VAULT_PROPERTY_NAME,
 				null,
-				null, //TODO Add endpoint parameter ?
+				publicPartnerAppKeyName,
 				null
 				);
 		//Encrypt
@@ -197,7 +206,7 @@ public class MainProcessingGenesis {
 		}catch(IOException | InterruptedException e){
 			log.error(e.toString());
 			Thread.currentThread().interrupt();
-			throw new KraftwerkException(500, "Error during encryption");
+			throw new KraftwerkException(500, "Error during encryption : " + e);
 		}
     }
 
@@ -211,17 +220,12 @@ public class MainProcessingGenesis {
 			return;
 		}
 		if(file.isDirectory()){
-			if(file.getName().endsWith("/")){
-				zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
-			}else{
-				zipOutputStream.putNextEntry(new ZipEntry(file.getName() + "/"));
-			}
-			zipOutputStream.closeEntry();
 			File[] subfiles = file.listFiles();
 			assert subfiles != null; // Can't happen, we check if file is a directory beforehand
 			for(File subfile : subfiles){
 				addFileOrDirectoryToZip(subfile, zipOutputStream);
 			}
+			return;
 		}
 		try(FileInputStream fileInputStream = new FileInputStream(file)){
 			ZipEntry zipEntry = new ZipEntry(file.getName());
@@ -231,6 +235,7 @@ public class MainProcessingGenesis {
 			while ((length = fileInputStream.read(bytes)) >= 0) {
 				zipOutputStream.write(bytes, 0, length);
 			}
+			zipOutputStream.closeEntry();
 		}
 	}
 }

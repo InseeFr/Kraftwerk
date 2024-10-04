@@ -140,7 +140,8 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign
+	) {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
@@ -151,7 +152,7 @@ public class MainService extends KraftwerkService {
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, null);
 
 		try {
-			mpGenesis.runMain(idCampaign, false);
+			mpGenesis.runMain(idCampaign, false, null);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
@@ -163,7 +164,9 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis/with-encryption")
 	@Operation(operationId = "mainGenesisEncryption", summary = "${summary.mainGenesisEncryption}", description = "${description.mainGenesisEncryption}")
 	public ResponseEntity<String> mainGenesisEncryption(
-			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign,
+			@Parameter(description = "${param.publicPartnerKey}") String publicPartnerKeyPath
+	) {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
@@ -173,7 +176,7 @@ public class MainService extends KraftwerkService {
 
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, vaultConfig);
 		try {
-			mpGenesis.runMain(idCampaign, true);
+			mpGenesis.runMain(idCampaign, true, publicPartnerKeyPath);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {

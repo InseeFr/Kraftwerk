@@ -74,7 +74,9 @@ public class KraftwerkBatch implements CommandLineRunner {
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
                             new MinioImpl(minioClient, minioConfig.getBucketName()), vaultConfig);
-                    mainProcessingGenesis.runMain(inDirectory,false); //TODO Use kraftwerk level encryption as batch parameter ?
+                    mainProcessingGenesis.runMain(inDirectory,false, null); //TODO Use kraftwerk level encryption as
+                    // batch
+                    // parameter ?
                 } else {
                     MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
                     mainProcessing.runMain();

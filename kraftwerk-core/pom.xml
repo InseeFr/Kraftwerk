@@ -124,7 +124,7 @@
 		<dependency>
 			<groupId>fr.insee.lib_java_chiffrement</groupId>
 			<artifactId>lib_java_chiffrement_core</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1</version>
 		</dependency>
 	</dependencies>
 </project>

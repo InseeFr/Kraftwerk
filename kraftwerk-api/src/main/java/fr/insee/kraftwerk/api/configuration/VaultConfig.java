@@ -11,10 +11,10 @@ public class VaultConfig {
     @Value("${fr.insee.kraftwerk.encryption.vault.uri}")
     private String vaultUri;
 
-    @Value("${fr.insee.trust.kraftwerk.encryption.app-role.role-id}")
+    @Value("${fr.insee.kraftwerk.encryption.vault.app-role.role-id}")
     private String roleId;
 
-    @Value("${fr.insee.trust.kraftwerk.encryption.app-role.secret-id}")
+    @Value("${fr.insee.kraftwerk.encryption.vault.app-role.secret-id}")
     private String secretId;
 
 }
