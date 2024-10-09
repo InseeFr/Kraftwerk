@@ -40,6 +40,13 @@ jobs:
         cd bpm
         mvn clean install
         cd ..
+
+    - name: Build encryption lib
+      run: |
+        git clone --branch main --single-branch --depth 1 https://gitlab-ci-token:${GITLAB_CI_TOKEN}@gitlab.insee.fr/lib-java-chiffrement/lib-java-chiffrement.git
+        cd lib-java-chiffrement
+        mvn clean install
+        cd ..
       
     - name: Build Kraftwerk with Maven
       run: mvn -B clean package --file pom.xml
