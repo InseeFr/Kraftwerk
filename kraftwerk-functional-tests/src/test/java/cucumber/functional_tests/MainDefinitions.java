@@ -493,6 +493,17 @@ public class MainDefinitions {
 		assertThat(nbStringVariables).isEqualTo(nbStringVariablesExpected);
 	}
 
+	@Then("The variables {string} should be respectively in groups {string}")
+	public void check_group_affectation(String variableNames, String groupNames){
+		List<String> variables = Arrays.stream(variableNames.split(",")).map(String::strip).toList();
+		List<String> expectedGroups = Arrays.stream(groupNames.split(",")).map(String::strip).toList();
+		String mode = userInputs.getModes().getFirst();
+		MetadataModel metadataModel = metadataModelMap.get(mode);
+		for (int i = 0; i < variables.size(); i++) {
+			assertThat(metadataModel.getVariables().getVariable(variables.get(i)).getGroup().getName()).isEqualTo(expectedGroups.get(i));
+		}
+	}
+
 	//CSV Utilities
 	public CSVReader getCSVReader(Path filePath) throws IOException {
 		CSVParser parser = new CSVParserBuilder()

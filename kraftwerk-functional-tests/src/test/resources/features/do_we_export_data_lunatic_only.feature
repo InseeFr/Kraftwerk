@@ -14,4 +14,5 @@ Feature: Do we save correctly all data without DDI ?
     # - ExpectedDataFieldCount : Expected field quantity
 
       |Directory                        |ExpectedLineCount     |ExpectedDataFieldCount            |
-      |SAMPLETEST-LUNATICONLY           |6                     |222                               |
+      #HAD TO CHANGE MANUALLY THE SPECIFICATIONS BECAUSE IT DID NOT RESPECT THE MODEL LUNATIC---> FIND ANOTHER QUESTIONNAIRE
+      #|SAMPLETEST-LUNATICONLY           |6                     |222                               |

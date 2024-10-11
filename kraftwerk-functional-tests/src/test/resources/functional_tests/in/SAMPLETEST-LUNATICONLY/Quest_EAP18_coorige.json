@@ -767,13 +767,6 @@
 					"storeName": "L_PRODEAP_VPI2_2022"
 				},
 				{
-					"value": "35121010H0",
-					"label": {
-						"value": "LTAB11_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 100000000,
@@ -810,12 +803,6 @@
 					},
 					"response": {
 						"name": "TAB14"
-					}
-				},
-				{
-					"label": {
-						"value": "nvl(TAB11_QTE_FACT,\"\")",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -991,12 +978,6 @@
 					"storeName": "L_PRODEAP_VPI2_2022"
 				},
 				{
-					"label": {
-						"value": "LTAB11_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 10000000006,
@@ -1019,12 +1000,6 @@
 					},
 					"response": {
 						"name": "TAB13"
-					}
-				},
-				{
-					"label": {
-						"value": "nvl(TAB11_QTE_FACT,\"\")",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -1399,18 +1374,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": " if (nvl(TAB11,\"\")<>\"\") then LTAB11_LABEL else \"💡 Recherchez votre produit grâce au module de recherche ci-dessous, \r\npuis ensuite tapez le code obtenu dans la colonne Sélectionner les produits vous concernant\"",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "if (isnull(TAB12)) then \"--\" else cast(nvl(TAB12,0),string)",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 100,
@@ -1575,18 +1538,6 @@
 				}
 			},
 			"components": [
-				{
-					"label": {
-						"value": " if (nvl(TAB11,\"\")<>\"\") then LTAB11_LABEL else \"💡 Recherchez votre produit grâce au module de recherche ci-dessous, \r\npuis ensuite tapez le code obtenu dans la colonne Sélectionner les produits vous concernant\"",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "if (isnull(TAB12)) then \"--\" else cast(nvl(TAB12,0),string)",
-						"type": "VTL|MD"
-					}
-				},
 				{
 					"componentType": "InputNumber",
 					"min": 0,
@@ -1805,18 +1756,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": " if (nvl(TAB11,\"\")<>\"\") then LTAB11_LABEL else \"💡 Recherchez votre produit grâce au module de recherche ci-dessous, \r\npuis ensuite tapez le code obtenu dans la colonne Sélectionner les produits vous concernant\"",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "if (isnull(TAB12)) then \"--\" else cast(nvl(TAB12,0),string)",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 100,
@@ -2015,18 +1954,6 @@
 				}
 			},
 			"components": [
-				{
-					"label": {
-						"value": " if (nvl(TAB11,\"\")<>\"\") then LTAB11_LABEL else \"💡 Recherchez votre produit grâce au module de recherche ci-dessous, \r\npuis ensuite tapez le code obtenu dans la colonne Sélectionner les produits vous concernant\"",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "if (isnull(TAB12)) then \"--\" else cast(nvl(TAB12,0),string)",
-						"type": "VTL|MD"
-					}
-				},
 				{
 					"componentType": "InputNumber",
 					"min": 0,
@@ -2301,12 +2228,6 @@
 						}
 					],
 					"storeName": "L_PRODEAP_INSTAL_REPAR2_2022"
-				},
-				{
-					"label": {
-						"value": "LTAB_INSTAL_REPAR",
-						"type": "VTL|MD"
-					}
 				},
 				{
 					"componentType": "InputNumber",
@@ -2598,18 +2519,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": "ELECTRICITE_ID",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "ELECTRICITE_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 10000000000,
@@ -2632,12 +2541,6 @@
 					},
 					"response": {
 						"name": "ELECTRICITE4"
-					}
-				},
-				{
-					"label": {
-						"value": "ELECTRICITE_QTE",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -2764,18 +2667,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": "GAZ_ID",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "GAZ_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 1000000000,
@@ -2798,12 +2689,6 @@
 					},
 					"response": {
 						"name": "TAB_gaz4"
-					}
-				},
-				{
-					"label": {
-						"value": "GAZ_QTE",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -2930,18 +2815,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": "VAPEUR_ID",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "VAPEUR_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 1000000000,
@@ -2964,12 +2837,6 @@
 					},
 					"response": {
 						"name": "VAPEUR_AIR4"
-					}
-				},
-				{
-					"label": {
-						"value": "VAPEUR_QTE",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -3132,18 +2999,6 @@
 			},
 			"components": [
 				{
-					"label": {
-						"value": "EAU_ID",
-						"type": "VTL|MD"
-					}
-				},
-				{
-					"label": {
-						"value": "EAU_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 100000000,
@@ -3166,12 +3021,6 @@
 					},
 					"response": {
 						"name": "TAB_EAU3"
-					}
-				},
-				{
-					"label": {
-						"value": "EAU_QTE",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -3360,13 +3209,6 @@
 					"storeName": "L_PRODEAP_DECHETS2_2022"
 				},
 				{
-					"value": "35121010H0",
-					"label": {
-						"value": "LTAB_DECHET1_LABEL",
-						"type": "VTL|MD"
-					}
-				},
-				{
 					"componentType": "InputNumber",
 					"min": 0,
 					"max": 1000000000,
@@ -3389,12 +3231,6 @@
 					},
 					"response": {
 						"name": "TAB_DECHET4"
-					}
-				},
-				{
-					"label": {
-						"value": "TAB_DECHET1_QTE_FACT",
-						"type": "VTL|MD"
 					}
 				}
 			],
@@ -3586,13 +3422,6 @@
 						}
 					],
 					"storeName": "L_PRODEAP_VPNI2_2022"
-				},
-				{
-					"value": "35121010H0",
-					"label": {
-						"value": "LTAB_AUTRES1_LABEL",
-						"type": "VTL|MD"
-					}
 				},
 				{
 					"componentType": "InputNumber",
