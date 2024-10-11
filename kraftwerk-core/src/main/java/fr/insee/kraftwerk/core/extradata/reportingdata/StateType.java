@@ -3,10 +3,12 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.insee.kraftwerk.core.Constants;
 import lombok.Getter;
 
 @Getter
 public enum StateType {
+
   STATE01("NVM", "UE non visible gestionnaire"),
   STATE02("NNS", "Non affecté, non commencé"),
   STATE03("ANV", "Affectée, non visible enquêteur"),
@@ -31,7 +33,8 @@ public enum StateType {
   STATE22("VALPAP", "Questionnaire validé sur papier"),
   STATE23("VALINT", "Questionnaire validé sur internet"),
   STATE24("REFUSAL", "Refus de répondre"),
-  STATE25("RELANCE", "RELANCE");
+  STATE25("RELANCE", Constants.REPORTING_DATA_FOLLOWUP_OUTPUT_STRING),
+  STATE26("FOLLOWUP", Constants.REPORTING_DATA_FOLLOWUP_OUTPUT_STRING);
   
 	private final String key;
 	private final String value;
