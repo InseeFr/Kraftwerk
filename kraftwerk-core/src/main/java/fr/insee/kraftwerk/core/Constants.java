@@ -136,7 +136,13 @@ public final class Constants {
 	public static final String PAIRWISE_GROUP_NAME = "LIENS";
 	public static final String SAME_AXIS_VALUE = "0";
 	public static final String NO_PAIRWISE_VALUE = "99";
-	
+
+	// ------ Encryption variables
+	public static final String ENCRYPTION_VAULT_APPROLE_ENDPOINT = "approle_produit";
+	public static final String ENCRYPTION_VAULT_NAME = "filiere_enquetes";
+	public static final String ENCRYPTION_VAULT_PROPERTY_NAME = "value";
+
+
 	// ---------- Functions
 	// ---------- Get a file
 	/**
