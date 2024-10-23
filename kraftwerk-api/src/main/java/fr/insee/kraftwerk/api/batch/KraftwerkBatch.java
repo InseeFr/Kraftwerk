@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +84,9 @@ public class KraftwerkBatch implements CommandLineRunner {
                 }
                 System.exit(0);
             }
+        }catch (KraftwerkException ke) {
+            log.error("Kraftwerk exception caught : Code {}, {}", ke.getStatus(), ke.getMessage());
+            System.exit(1);
         }catch(Exception e){
             log.error(e.toString());
             System.exit(1);
