@@ -28,7 +28,7 @@ class TCMSequenceProcessingTest {
     static final String FORMAT_INSTRUCTION = "/* Instruction %s */";
     static final List<TCMModuleEnum> modules = new ArrayList<>();
 
-    FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+    FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
     //Given
     static Dataset unimodalDataset = new InMemoryDataset(

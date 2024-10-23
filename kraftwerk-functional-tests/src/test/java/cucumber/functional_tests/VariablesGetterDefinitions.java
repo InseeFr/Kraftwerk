@@ -1,5 +1,6 @@
 package cucumber.functional_tests;
 
+import cucumber.TestConstants;
 import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.bpm.metadata.reader.ddi.DDIReader;
 import fr.insee.bpm.metadata.model.MetadataModel;
@@ -32,7 +33,7 @@ public class VariablesGetterDefinitions {
 
     @When("I try to collect the variables's infos")
     public void collect_variables() throws MetadataParserException {
-		metadataModel = DDIReader.getMetadataFromDDI(linkDDI.toString(), new FileSystemImpl().readFile(linkDDI.toString()));
+		metadataModel = DDIReader.getMetadataFromDDI(linkDDI.toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(linkDDI.toString()));
     }
 
     @Then("The variables I try to count should answer {int} and have {string} in it")

@@ -1,5 +1,6 @@
 package cucumber.functional_tests;
 
+import cucumber.TestConstants;
 import fr.insee.bpm.utils.xsl.SaxonTransformer;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.TextFileReader;
@@ -44,9 +45,9 @@ public class DDIGetterDefinitions {
 		Path tempPath = Paths.get(tempFile.getAbsolutePath());
 		URL url = new URI(linkDDI).toURL();
 		SaxonTransformer transformer = new SaxonTransformer();
-		transformer.xslTransform(url.toString(), new FileSystemImpl().readFile(url.toString()), Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
+		transformer.xslTransform(url.toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(url.toString()), Constants.XSLT_STRUCTURED_VARIABLES, tempPath);
 
-		actualString = TextFileReader.readFromPath(tempPath, new FileSystemImpl());
+		actualString = TextFileReader.readFromPath(tempPath, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
     	
     	if (actualString.trim().contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
     		actualAnswer = "DDI collected";

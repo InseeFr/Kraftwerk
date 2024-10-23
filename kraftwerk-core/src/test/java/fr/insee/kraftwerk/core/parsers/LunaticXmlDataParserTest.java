@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class LunaticXmlDataParserTest {
 
 	private final String dataSamplesFolder = TestConstants.UNIT_TESTS_DIRECTORY + "/data";
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@Test
 	void readXmlFile_null() {

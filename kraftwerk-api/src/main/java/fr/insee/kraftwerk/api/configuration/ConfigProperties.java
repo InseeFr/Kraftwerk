@@ -17,10 +17,4 @@ public class ConfigProperties {
 
 	@Value("${fr.insee.postcollecte.files}")
 	private String defaultDirectory;
-
-	@PostConstruct
-	public void setTempDirectory() {
-		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
-	}
-
 }

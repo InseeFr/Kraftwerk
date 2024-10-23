@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertThrows;
 
 class FileSystemImplTest {
-    private static final FileSystemImpl fileSystemImpl = new FileSystemImpl();
+    private static final FileSystemImpl fileSystemImpl = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
     @Test
     void renameInputFileTest() throws IOException {

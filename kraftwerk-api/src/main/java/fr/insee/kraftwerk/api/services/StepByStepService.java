@@ -74,7 +74,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
@@ -119,7 +119,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
@@ -157,7 +157,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
@@ -205,7 +205,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		//Read data in JSON file
@@ -258,7 +258,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		Path inDirectory;
@@ -304,7 +304,7 @@ public class StepByStepService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		return archive(inDirectoryParam, fileUtilsInterface);

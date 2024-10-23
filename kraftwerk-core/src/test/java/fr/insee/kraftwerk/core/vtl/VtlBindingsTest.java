@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.vtl;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -28,7 +29,7 @@ class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
 	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	Dataset ds1 = new InMemoryDataset(

@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
@@ -26,13 +27,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Log4j2
-@NoArgsConstructor
 public class FileSystemImpl implements FileUtilsInterface{
 
 	private static final String ARCHIVE = "Archive";
-	
 
-	
+	public FileSystemImpl(String defaultDirectory) {
+		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
+	}
 
 	@Override
 	public void renameInputFile(Path inDirectory) {

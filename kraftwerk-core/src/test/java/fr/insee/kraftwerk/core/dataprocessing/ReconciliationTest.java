@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	InMemoryDataset capiDataset = new InMemoryDataset(

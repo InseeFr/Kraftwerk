@@ -4,6 +4,7 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupProcessingTest {
 
-    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
     @Test
     void addPrefixes() {

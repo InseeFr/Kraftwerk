@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
+import fr.insee.kraftwerk.core.TestConstants;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -22,7 +23,7 @@ public class ExportDatasetDefinitions {
 	public String tempDatasetPath = "";
 	public SurveyRawData survey = null;
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 
 	@Given("We have some SurveyRawData named {string}")
 	public void initialize(String nameDataset) {
@@ -44,7 +45,7 @@ public class ExportDatasetDefinitions {
 	public void importDataset(String nameDataset) {
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel(), new FileSystemImpl());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, new KraftwerkExecutionContext());
 	}
 

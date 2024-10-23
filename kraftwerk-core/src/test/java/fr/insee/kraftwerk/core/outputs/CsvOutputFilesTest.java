@@ -47,7 +47,7 @@ class CsvOutputFilesTest {
 	private static OutputFiles outputFiles;
 	private static Connection database;
 
-	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	Dataset fooDataset = new InMemoryDataset(List.of(),
 			List.of(new Structured.Component("FOO", String.class, Dataset.Role.IDENTIFIER)));

@@ -1,5 +1,6 @@
 package cucumber.functional_tests;
 
+import cucumber.TestConstants;
 import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -36,13 +37,13 @@ public class ParadataDefinitions {
 	String userInputFileName = Constants.USER_INPUT_FILE;
 	ModeInputs modeInputs;
 	private ControlInputSequence controlInputSequence;
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@Given("We read data from input named {string}")
 	public void launch_all_steps(String campaignName) throws KraftwerkException, MetadataParserException {
 
 		Path campaignDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName);
-		controlInputSequence = new ControlInputSequence(campaignDirectory.toString(), new FileSystemImpl());
+		controlInputSequence = new ControlInputSequence(campaignDirectory.toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		UserInputsFile userInputs = controlInputSequence.getUserInputs(campaignDirectory, fileUtilsInterface);
 		// For now, only one file
 		String modeName = userInputs.getModes().getFirst();
