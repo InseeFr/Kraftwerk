@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.api.services;
 
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +32,8 @@ public class HealthcheckService extends KraftwerkService {
 	ConfigProperties configProperties;
 
 	@Autowired
-	public HealthcheckService(ConfigProperties configProperties) {
-        super(null);
+	public HealthcheckService(ConfigProperties configProperties, MinioConfig minioConfig) {
+        super(minioConfig);
         this.configProperties = configProperties;
 		this.client = new GenesisClient(new RestTemplateBuilder(), configProperties);
 
