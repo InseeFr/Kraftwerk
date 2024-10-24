@@ -32,6 +32,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	private static final String ARCHIVE = "Archive";
 
 	public FileSystemImpl(String defaultDirectory) {
+		log.warn("java.io.tmpdir CHANGED !");//TODO REMOVE, USED FOR TESTING
 		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
 	}
 
