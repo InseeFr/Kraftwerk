@@ -86,6 +86,7 @@ public class KraftwerkBatch implements CommandLineRunner {
             }
         }catch (KraftwerkException ke) {
             log.error("Kraftwerk exception caught : Code {}, {}", ke.getStatus(), ke.getMessage());
+            log.warn("Temp dir value : {}", System.getProperty("java.io.tmpdir")); //TODO REMOVE, ONLY FOR TESTING
             System.exit(1);
         }catch(Exception e){
             log.error(e.toString());
