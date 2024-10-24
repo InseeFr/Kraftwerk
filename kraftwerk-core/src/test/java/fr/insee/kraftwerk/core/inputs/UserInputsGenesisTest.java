@@ -24,7 +24,7 @@ class UserInputsGenesisTest {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 
-		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl());
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		//
 		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
 		assertNotNull(modeInputs.getDdiUrl());

@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -30,7 +31,7 @@ class CalculatedProcessingTest {
     private static MetadataModel fooMetadataModel;
     private static VtlBindings vtlBindings;
     private static KraftwerkExecutionContext kraftwerkExecutionContext;
-    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+    private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
     @BeforeAll
     static void setFooCalculated() {

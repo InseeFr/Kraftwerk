@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
@@ -19,7 +20,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 
 class InformationLevelsTest {
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
 
 	Dataset testDataset = new InMemoryDataset(

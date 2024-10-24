@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserInputsFileTest {
 
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
-	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 
 	@Test

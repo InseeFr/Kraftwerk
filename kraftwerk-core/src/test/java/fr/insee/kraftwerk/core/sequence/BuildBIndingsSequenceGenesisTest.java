@@ -69,7 +69,7 @@ class BuildBIndingsSequenceGenesisTest {
         String dataMode = "WEB";
 
         VtlBindings vtlBindings = new VtlBindings();
-        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(new FileSystemImpl());
+        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
         //WHEN + THEN
         assertThrows(NullPointerException.class, () -> bbsg.buildVtlBindings(dataMode, vtlBindings, null, surveyUnits, null));
 
@@ -81,7 +81,7 @@ class BuildBIndingsSequenceGenesisTest {
         String dataMode = "WEB";
 
         VtlBindings vtlBindings = new VtlBindings();
-        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(new FileSystemImpl());
+        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
         MetadataModel metadata = new MetadataModel();
         metadata.getVariables().putVariable(new Variable("COLLVAR1", metadata.getRootGroup(), VariableType.STRING));
         Group group = new Group("TESTLOOP",Constants.ROOT_GROUP_NAME);

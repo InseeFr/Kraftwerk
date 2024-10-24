@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.McqVariable;
 import fr.insee.bpm.metadata.model.PaperUcq;
 import fr.insee.bpm.metadata.model.UcqVariable;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
@@ -41,7 +42,7 @@ public class ImportScriptTest {
 	TableScriptInfo tableScriptInfo;
 
 	Map<String, MetadataModel> metadata;
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 

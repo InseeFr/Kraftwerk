@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -26,7 +27,7 @@ class VtlJsonDatasetWriterTest {
 
 	private VtlBindings vtlBindings;
 
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	@BeforeEach

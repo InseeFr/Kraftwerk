@@ -64,7 +64,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
@@ -93,7 +93,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
@@ -121,7 +121,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
@@ -144,7 +144,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);

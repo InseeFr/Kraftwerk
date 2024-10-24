@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class BuildBindingsSequenceTest {
 	
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
-	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 
 
@@ -36,7 +36,7 @@ class BuildBindingsSequenceTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		boolean withAllReportingData = false;
 		boolean withDdi = true;	
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		//WHEN 
 		MetadataModel metadata = null;
 		
@@ -54,7 +54,7 @@ class BuildBindingsSequenceTest {
 				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
-		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl());
+		BuildBindingsSequence bbs = new BuildBindingsSequence(withAllReportingData, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
         MetadataModel capiMetadata = new MetadataModel();
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));

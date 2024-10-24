@@ -25,7 +25,7 @@ class XmlSplitterTest {
 
 	static final String outDirectory = TestConstants.UNIT_TESTS_DUMP+"/split/";
 
-	static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@BeforeAll
 	static void cleanUpBeforeTests() throws Exception {
@@ -41,7 +41,7 @@ class XmlSplitterTest {
 			}
 		}
 		XmlSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
-				outDirectory,"SurveyUnit",2, new FileSystemImpl());
+				outDirectory,"SurveyUnit",2, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	}
 
 	@Test

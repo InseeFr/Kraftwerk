@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import fr.insee.kraftwerk.core.TestConstants;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	@Given("We have some simple VTLBindings")

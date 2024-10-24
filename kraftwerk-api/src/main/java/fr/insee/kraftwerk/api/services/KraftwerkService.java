@@ -59,7 +59,7 @@ public class KraftwerkService {
 			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl();
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));

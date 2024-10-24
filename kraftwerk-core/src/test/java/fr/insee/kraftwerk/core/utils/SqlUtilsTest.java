@@ -42,7 +42,7 @@ class SqlUtilsTest {
             UserInputsFile testUserInputsFile = new UserInputsFile(
                     Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
                     Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"),
-                    new FileSystemImpl());
+                    new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
             VtlBindings vtlBindings = new VtlBindings();
             Dataset testDataset = new InMemoryDataset(List.of(),
                     List.of(new Structured.Component("TestString", String.class, Dataset.Role.IDENTIFIER)));

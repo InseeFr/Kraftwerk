@@ -2,6 +2,7 @@ package cucumber.unit_tests;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
@@ -27,7 +28,7 @@ public class AggregateDefinitions {
 
 	public List<KraftwerkError> errors = new ArrayList<>();
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 	@Given("We have some VTLBindings named {string} and {string}")
@@ -38,9 +39,9 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakeCawiData, firstDataset, vtlBindings);
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel(), new FileSystemImpl());
+		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		groupProcessing.applyVtlTransformations(firstDataset, null, kraftwerkExecutionContext);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel(), new FileSystemImpl());
+		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		groupProcessing2.applyVtlTransformations(secondDataset, null,kraftwerkExecutionContext);
 
 		//
@@ -50,7 +51,7 @@ public class AggregateDefinitions {
 
 	@When("I try to aggregate the bindings")
 	public void collect_variables() {
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl());
+		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		reconciliationProcessing.applyVtlTransformations(
 				"MULTIMODE", null,kraftwerkExecutionContext);
 	}

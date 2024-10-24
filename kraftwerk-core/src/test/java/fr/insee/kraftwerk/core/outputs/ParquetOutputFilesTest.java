@@ -39,7 +39,7 @@ class ParquetOutputFilesTest {
 
 	private static UserInputsFile testUserInputs;
 	private static ParquetOutputFiles outputFiles;
-	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl();
+	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	private static Statement testDatabase;
 
 

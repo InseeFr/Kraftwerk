@@ -45,7 +45,7 @@ public class CalculatedProcessingDefinition {
     private Dataset outDataset;
     private List<String> variableNamesList;
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl());
+	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
     KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
@@ -66,11 +66,11 @@ public class CalculatedProcessingDefinition {
         this.dataMode = dataMode;
         //
         metadataModel = DDIReader.getMetadataFromDDI(
-                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")).toString(), new FileSystemImpl().readFile(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
+                Constants.convertToUrl(campaignPacks.get(campaignName).get(dataMode).get("ddi")).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(campaignPacks.get(campaignName).get(dataMode).get("ddi")));
         //
         SurveyRawData data = new SurveyRawData();
         data.setMetadataModel(metadataModel);
-        DataParser parser = new LunaticXmlDataParser(data, new FileSystemImpl());
+        DataParser parser = new LunaticXmlDataParser(data, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
         parser.parseSurveyData(Paths.get(campaignPacks.get(campaignName).get(dataMode).get("data")),null);
         //
         vtlBindings = new VtlBindings();
@@ -81,8 +81,8 @@ public class CalculatedProcessingDefinition {
     public void readCampaignData() {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
-                new FileSystemImpl().readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
-        DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl());
+                new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
+        DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
         calculatedProcessing.applyVtlTransformations("TEST", null, kraftwerkExecutionContext);
         //
         outDataset = vtlBindings.getDataset("TEST");

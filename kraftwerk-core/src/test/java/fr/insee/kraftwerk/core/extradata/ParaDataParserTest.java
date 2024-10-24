@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ParaDataParserTest {
 
-	ParadataParser paradataParser = new ParadataParser(new FileSystemImpl());
+	ParadataParser paradataParser = new ParadataParser(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 
 	@Test
 	void catchExceptionAndErrors() {
