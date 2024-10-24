@@ -11,7 +11,6 @@ import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,10 +49,6 @@ public class KraftwerkService {
 	@Autowired
 	public KraftwerkService(MinioConfig minioConfig){
 		this.minioConfig = minioConfig;
-	}
-	
-	@PostConstruct
-	public void initializeWithProperties() {
 		FileUtilsInterface fileUtilsInterface;
 		if(minioConfig != null && minioConfig.isEnable()){
 			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
