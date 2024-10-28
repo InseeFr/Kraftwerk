@@ -1,9 +1,8 @@
 package fr.insee.kraftwerk.api.services;
 
-
-import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -32,14 +31,16 @@ import java.io.IOException;
 public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;
+	VaultConfig vaultConfig;
 	MinioClient minioClient;
 	boolean useMinio;
 
 
 	@Autowired
-	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
+	public MainService(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
         super(minioConfig);
         this.configProperties = configProperties;
+		this.vaultConfig = vaultConfig;
 		this.minioConfig = minioConfig;
 		useMinio = false;
 		if(minioConfig == null){
@@ -139,7 +140,8 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign
+	) {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
@@ -147,10 +149,10 @@ public class MainService extends KraftwerkService {
 			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
 
-		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
+		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, null);
 
 		try {
-			mpGenesis.runMain(idCampaign);
+			mpGenesis.runMain(idCampaign, false, null);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
@@ -159,5 +161,27 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(idCampaign);
 	}
 
+	@PutMapping(value = "/main/genesis/with-encryption")
+	@Operation(operationId = "mainGenesisEncryption", summary = "${summary.mainGenesisEncryption}", description = "${description.mainGenesisEncryption}")
+	public ResponseEntity<String> mainGenesisEncryption(
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign,
+			@Parameter(description = "${param.publicPartnerKey}") String publicPartnerKeyPath
+	) {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl();
+		}
 
+		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, vaultConfig);
+		try {
+			mpGenesis.runMain(idCampaign, true, publicPartnerKeyPath);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(idCampaign);
+	}
 }
