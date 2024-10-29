@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.0.7</version>
+		<version>3.0.8</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -17,7 +17,7 @@
 	<properties>
 		<trevas.version>1.7.0</trevas.version>
 		<duckdb.version>1.1.2</duckdb.version>
-		<bpm.version>1.0.2</bpm.version>
+		<bpm.version>1.0.3</bpm.version>
 	</properties>
 
 

@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.api.services;
 
 
-import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -15,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,12 +60,7 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -89,12 +84,7 @@ public class MainService extends KraftwerkService {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -117,12 +107,7 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = false;
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
@@ -140,12 +125,7 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface);
 
@@ -159,5 +139,34 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(idCampaign);
 	}
 
+
+	@PutMapping(value = "/main/genesis/lunatic-only")
+	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesisLunaticOnly(
+			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+		boolean withDDI = false;
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+
+		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
+
+		try {
+			mpGenesis.runMain(idCampaign);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(idCampaign);
+	}
+
+	private @NotNull FileUtilsInterface getFileUtilsInterface() {
+		FileUtilsInterface fileUtilsInterface;
+		if(Boolean.TRUE.equals(useMinio)){
+			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
+		}else{
+			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
+		}
+		return fileUtilsInterface;
+	}
 
 }
