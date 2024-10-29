@@ -46,6 +46,8 @@ public class MainProcessingGenesis {
 	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
 
+	private final boolean withDDI;
+
 	private KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/* SPECIFIC VARIABLES */
@@ -59,14 +61,21 @@ public class MainProcessingGenesis {
 
 	private final GenesisClient client;
 
+	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, boolean withDDI) {
+		this.client = new GenesisClient(new RestTemplateBuilder(), config);
+		this.fileUtilsInterface = fileUtilsInterface;
+		this.withDDI = withDDI;
+	}
+
 	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface) {
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 		this.fileUtilsInterface = fileUtilsInterface;
+		this.withDDI = true;
 	}
 
 	public void init(String idCampaign) throws KraftwerkException {
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
-		log.info("Kraftwerk main service started for campaign: {}", idCampaign);
+		log.info("Kraftwerk main service started for campaign: {} {}", idCampaign, withDDI ? "withDDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
 		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
 		//First we check the modes present in database for the given questionnaire
@@ -74,8 +83,8 @@ public class MainProcessingGenesis {
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory, client.getModes(idCampaign), fileUtilsInterface);
 		if (!userInputs.getModes().isEmpty()) {
             try {
-                metadataModels = MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface);
-            } catch (MetadataParserException e) {
+                metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+			} catch (MetadataParserException e) {
                 throw new KraftwerkException(500, e.getMessage());
             }
         } else {
