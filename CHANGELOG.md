@@ -1,8 +1,25 @@
 # Changelog
 
+## 3.0.8 [2024-10-29] 
+### Added
+- Endpoint for genesis data without DDI
+
+### Changed
+- Improve Kubernetes deployment
+- Genesis endpoint (new names)
+
+### Fixed
+- Logs
+
+### Upgraded
+- BPM to 1.0.3 that adds support for dynamic tables and roundabouts from Lunatic specification, and refactor lunatic spec reading
+- Trevas 1.6.0, then 1.7.0
+- DuckDB, Cucumber, Coverall, Minio
+- Springboot 3.3.5
+
 ## 3.0.7 [2024-09-25] - DDI : add support for Dynamic tables and Roundabouts
 ### Added
-- Upgrade BPM version to 3.0.7 that adds support for dynamic tables and roundabouts from DDI specification
+- Upgrade BPM version to 1.0.2 that adds support for dynamic tables and roundabouts from DDI specification
 ### Fixed
 - Fix : misreading of dates from reporting data in csv format
 
