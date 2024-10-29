@@ -79,7 +79,7 @@ public class KraftwerkBatch implements CommandLineRunner {
 
                 //Archive
                 if (Boolean.TRUE.equals(archiveAtEnd)) {
-                    KraftwerkService kraftwerkService = new KraftwerkService(minioConfig);
+                    KraftwerkService kraftwerkService = new KraftwerkService(configProperties, minioConfig);
                     kraftwerkService.archive(inDirectory, new MinioImpl(minioClient, minioConfig.getBucketName()));
                 }
                 System.exit(0);

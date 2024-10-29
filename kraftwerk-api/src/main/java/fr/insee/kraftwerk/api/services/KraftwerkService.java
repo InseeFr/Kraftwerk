@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.services;
 
 
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -47,19 +48,19 @@ public class KraftwerkService {
 	protected ControlInputSequence controlInputSequence ;
 
 	@Autowired
-	public KraftwerkService(MinioConfig minioConfig){
+	public KraftwerkService(ConfigProperties configProperties, MinioConfig minioConfig){
 		this.minioConfig = minioConfig;
 		FileUtilsInterface fileUtilsInterface;
 		if(minioConfig != null && minioConfig.isEnable()){
 			MinioClient minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
+			fileUtilsInterface = new FileSystemImpl(configProperties.getDefaultDirectory());
 		}
 		if (StringUtils.isNotEmpty(csvOutputsQuoteChar)) {
 			Constants.setCsvOutputQuoteChar(csvOutputsQuoteChar.trim().charAt(0));
 		}
-		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
+		controlInputSequence = new ControlInputSequence(configProperties.getDefaultDirectory(), fileUtilsInterface);
 	}
 	
 	public ResponseEntity<String> archive(String inDirectoryParam, FileUtilsInterface fileUtilsInterface) {

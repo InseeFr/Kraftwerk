@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.services;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
@@ -49,8 +50,8 @@ public class StepByStepService extends KraftwerkService {
 	boolean useMinio;
 
 	@Autowired
-	public StepByStepService(MinioConfig minioConfig) {
-		super(minioConfig);
+	public StepByStepService(ConfigProperties configProperties, MinioConfig minioConfig) {
+		super(configProperties, minioConfig);
 		useMinio = false;
 		if(minioConfig == null){
 			log.warn("Minio config null !");

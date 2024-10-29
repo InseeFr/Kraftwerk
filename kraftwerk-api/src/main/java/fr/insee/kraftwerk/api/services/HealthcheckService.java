@@ -33,7 +33,7 @@ public class HealthcheckService extends KraftwerkService {
 
 	@Autowired
 	public HealthcheckService(ConfigProperties configProperties, MinioConfig minioConfig) {
-        super(minioConfig);
+        super(configProperties, minioConfig);
         this.configProperties = configProperties;
 		this.client = new GenesisClient(new RestTemplateBuilder(), configProperties);
 

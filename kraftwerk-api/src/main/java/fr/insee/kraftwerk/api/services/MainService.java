@@ -38,7 +38,7 @@ public class MainService extends KraftwerkService {
 
 	@Autowired
 	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
-        super(minioConfig);
+        super(configProperties, minioConfig);
         this.configProperties = configProperties;
 		this.minioConfig = minioConfig;
 		useMinio = false;

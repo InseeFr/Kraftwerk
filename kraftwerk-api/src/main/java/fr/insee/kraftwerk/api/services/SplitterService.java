@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.services;
 
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileSystemType;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SplitterService extends KraftwerkService{
 
 	@Autowired
-	public SplitterService(MinioConfig minioConfig) {
-		super(minioConfig);
+	public SplitterService(ConfigProperties configProperties, MinioConfig minioConfig) {
+		super(configProperties, minioConfig);
 	}
 
 	@Operation(summary = "Split a XML file into smaller ones")
