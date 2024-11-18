@@ -11,8 +11,12 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,19 +41,30 @@ public class GenesisClient {
 
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
+		//Null requestEntity because health check is whitelisted
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
 	public List<SurveyUnitId> getSurveyUnitIds(String idQuestionnaire) {
 		String url = String.format("%s/idUEs/by-questionnaire?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(url, HttpMethod.GET, null, SurveyUnitId[].class);
+		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(
+				url,
+				HttpMethod.GET,
+				new HttpEntity<>(null, getHttpHeaders()),
+				SurveyUnitId[].class
+		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 	public List<Mode> getModes(String idCampaign) {
 		String url = String.format("%s/modes/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
-		ResponseEntity<String[]> response = restTemplate.exchange(url, HttpMethod.GET, null, String[].class);
+		ResponseEntity<String[]> response = restTemplate.exchange(
+				url,
+				HttpMethod.GET,
+				new HttpEntity<>(null, getHttpHeaders()),
+				String[].class
+		);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
@@ -57,21 +72,47 @@ public class GenesisClient {
 
 	public List<SurveyUnitUpdateLatest> getUELatestState(String idQuestionnaire, SurveyUnitId suId) {
 		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s&idUE=%s", configProperties.getGenesisUrl(), idQuestionnaire, suId.getIdUE());
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(url, HttpMethod.GET, null, SurveyUnitUpdateLatest[].class);
+		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
+				url,
+				HttpMethod.GET,
+				new HttpEntity<>(null, getHttpHeaders()),
+				SurveyUnitUpdateLatest[].class
+		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String idQuestionnaire, List<SurveyUnitId> idUEs) {
 		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(idUEs);
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(url, HttpMethod.POST, request, SurveyUnitUpdateLatest[].class);
+		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(idUEs, getHttpHeaders());
+		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
+				url,
+				HttpMethod.POST,
+				request,
+				SurveyUnitUpdateLatest[].class
+		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
     public List<String> getQuestionnaireModelIds(String idCampaign) throws JsonProcessingException {
 		String url = String.format("%s/questionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+		ResponseEntity<String> response = restTemplate.exchange(url,
+				HttpMethod.GET,
+				new HttpEntity<>(null, getHttpHeaders()),
+				String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
+	}
+
+	private HttpHeaders getHttpHeaders() {
+		//Auth
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Authorization", "Bearer " + getTokenValue());
+		return httpHeaders;
+	}
+
+	private String getTokenValue() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		JwtAuthenticationToken oauthToken = (JwtAuthenticationToken) authentication;
+		return oauthToken.getToken().getTokenValue();
 	}
 }
