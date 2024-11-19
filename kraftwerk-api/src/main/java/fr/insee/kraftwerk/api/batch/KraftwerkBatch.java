@@ -6,6 +6,8 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ public class KraftwerkBatch implements CommandLineRunner {
 
     ConfigProperties configProperties;
     MinioConfig minioConfig;
+    FileUtilsInterface fileSystem;
     MinioClient minioClient;
 
     @Value("${fr.insee.postcollecte.files}")
@@ -34,6 +37,9 @@ public class KraftwerkBatch implements CommandLineRunner {
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
             minioClient = MinioClient.builder().endpoint(minioConfig.getEndpoint()).credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
+            fileSystem = new MinioImpl(minioClient, minioConfig.getBucketName());
+        }else{
+            fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
     }
 
@@ -52,10 +58,12 @@ public class KraftwerkBatch implements CommandLineRunner {
                 //1. Archive at end of execution (false or true)
                 //2. Integrate all reporting datas (false or true)
                 //3. Campaign name
+                //4. Authentication token for Genesis
                 KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
                 String inDirectory = args[3];
+                String genesisToken = args[4];
 
                 //Kraftwerk service type related parameters
                 boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
@@ -65,22 +73,33 @@ public class KraftwerkBatch implements CommandLineRunner {
                 }
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     archiveAtEnd = false;
+
                 }
 
 
                 //Run kraftwerk
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+                            configProperties,
+                            fileSystem,
+                            genesisToken);
                     mainProcessingGenesis.runMain(inDirectory);
                 } else {
-                    MainProcessing mainProcessing = new MainProcessing(inDirectory, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                    MainProcessing mainProcessing = new MainProcessing(
+                            inDirectory,
+                            fileByFile,
+                            withAllReportingData,
+                            withDDI,
+                            defaultDirectory,
+                            limitSize,
+                            fileSystem);
                     mainProcessing.runMain();
                 }
 
                 //Archive
                 if (Boolean.TRUE.equals(archiveAtEnd)) {
                     KraftwerkService kraftwerkService = new KraftwerkService(configProperties, minioConfig);
-                    kraftwerkService.archive(inDirectory, new MinioImpl(minioClient, minioConfig.getBucketName()));
+                    kraftwerkService.archive(inDirectory, fileSystem);
                 }
                 System.exit(0);
             }
@@ -101,8 +120,8 @@ public class KraftwerkBatch implements CommandLineRunner {
      * @throws IllegalArgumentException if invalid argument
      */
     private static void checkArgs(String[] args) throws IllegalArgumentException{
-        if(args.length != 4) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 4 !".formatted(args.length));
+        if(args.length != 5) {
+            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 5 !".formatted(args.length));
         }
         if(!args[1].equals("true") && !args[1].equals("false")){
             throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));

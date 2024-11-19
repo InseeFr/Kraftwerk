@@ -32,11 +32,20 @@ public class GenesisClient {
 	@Getter
 	private final ConfigProperties configProperties;
 
+	private final String authToken;
+
 
 	@Autowired
 	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.configProperties = configProperties;
+		this.authToken = null;
+	}
+
+	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties, String authToken) {
+		this.restTemplate = restTemplateBuilder.build();
+		this.configProperties = configProperties;
+		this.authToken = authToken;
 	}
 
 	public String pingGenesis(){
@@ -106,7 +115,7 @@ public class GenesisClient {
 	private HttpHeaders getHttpHeaders() {
 		//Auth
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", "Bearer " + getTokenValue());
+		httpHeaders.add("Authorization", authToken == null ? getTokenValue() : authToken);
 		return httpHeaders;
 	}
 
