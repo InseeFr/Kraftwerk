@@ -24,10 +24,29 @@ class UserInputsGenesisTest {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 
-		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), true);
 		//
 		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
 		assertNotNull(modeInputs.getDdiUrl());
+		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
+		assertNull(modeInputs.getParadataFolder());
+		assertNull(modeInputs.getModeVtlFile());
+		//
+		assertNull(userInputsGenesis.getVtlReconciliationFile());
+		assertNull(userInputsGenesis.getVtlTransformationsFile());
+		assertNull(userInputsGenesis.getVtlInformationLevelsFile());
+	}
+
+	@Test
+	void testReadValidUserInput_singleMode_lunatic_only() throws KraftwerkException {
+		List<Mode> modes = new ArrayList<>();
+		modes.add(Mode.F2F);
+
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), false);
+		//
+		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
+		assertNull(modeInputs.getDdiUrl());
+		assertNotNull(modeInputs.getLunaticFile());
 		assertEquals(DataFormat.LUNATIC_XML, modeInputs.getDataFormat());
 		assertNull(modeInputs.getParadataFolder());
 		assertNull(modeInputs.getModeVtlFile());
