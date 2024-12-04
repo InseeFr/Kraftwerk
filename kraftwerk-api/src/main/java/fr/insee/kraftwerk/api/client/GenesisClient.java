@@ -115,7 +115,7 @@ public class GenesisClient {
 	private HttpHeaders getHttpHeaders() {
 		//Auth
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", authToken == null ? getTokenValue() : authToken);
+		httpHeaders.add("Authorization", "Bearer " + (authToken == null ? getTokenValue() : authToken));
 		return httpHeaders;
 	}
 
