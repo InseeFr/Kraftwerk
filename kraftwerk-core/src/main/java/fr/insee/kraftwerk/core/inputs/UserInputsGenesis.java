@@ -22,21 +22,21 @@ public class UserInputsGenesis extends UserInputs{
 
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
 		super(inputDirectory, fileUtilsInterface);
 		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
-		computeInputs();
+		computeInputs(withDDI);
 	}
 
-	private void computeInputs() throws KraftwerkException {
+	private void computeInputs(boolean withDDI) throws KraftwerkException {
         UserInputsFile userInputsFile;
 		if(hasConfigFile){
             userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory, fileUtilsInterface);
             modeInputsMap = userInputsFile.getModeInputsMap();
 		}else{
             for (Mode mode : modes) {
-                ModeInputs modeInputs = getModeInputs(mode);
+                ModeInputs modeInputs = getModeInputs(mode, withDDI);
                 modeInputsMap.put(mode.name(), modeInputs);
             }
         }
@@ -47,10 +47,14 @@ public class UserInputsGenesis extends UserInputs{
      * @param mode mode to get inputs from
      * @return a ModeInputs object
      */
-    private ModeInputs getModeInputs(Mode mode) throws KraftwerkException {
+    private ModeInputs getModeInputs(Mode mode, boolean withDDI) throws KraftwerkException {
         ModeInputs modeInputs = new ModeInputs();
-        modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
-        modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
+        if (withDDI) {
+            modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
+        } else {
+            modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
+        }
+
         modeInputs.setDataMode(mode.name());
         if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
             modeInputs.setDataFormat("LUNATIC_XML");
