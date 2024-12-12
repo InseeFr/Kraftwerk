@@ -51,9 +51,8 @@ public class UserInputsGenesis extends UserInputs{
         ModeInputs modeInputs = new ModeInputs();
         if (withDDI) {
             modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
-        } else {
-            modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
         }
+		modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
 
         modeInputs.setDataMode(mode.name());
         if (mode == Mode.WEB || mode == Mode.TEL || mode == Mode.F2F) {
