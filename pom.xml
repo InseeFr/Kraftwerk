@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.0.8</version>
+	<version>3.1.0</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
@@ -69,6 +69,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
 		<!-- Tests -->
 		<!-- Unit testing with JUnit -->
 		<!-- (imported with Spring) -->

@@ -1,4 +1,9 @@
 # Changelog
+## 3.1.0 [2024-12-13]
+### Added
+- OIDC Authentication
+### Fixed
+- DDI required in genesis lunatic only endpoint
 
 ## 3.0.8 [2024-10-29] 
 ### Added
