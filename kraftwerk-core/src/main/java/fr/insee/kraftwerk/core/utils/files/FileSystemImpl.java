@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
@@ -32,6 +31,10 @@ public class FileSystemImpl implements FileUtilsInterface{
 	private static final String ARCHIVE = "Archive";
 
 	public FileSystemImpl(String defaultDirectory) {
+		if (defaultDirectory == null){
+			log.error("Can not find default directory");
+			return;
+		}
 		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
 	}
 
