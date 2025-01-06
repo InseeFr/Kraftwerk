@@ -25,6 +25,10 @@
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 		<skipSurefireReport>true</skipSurefireReport>
+		<sonar.coverage.exclusions>
+			src/main/java/fr/insee/kraftwerk/api/client/*,
+			src/main/java/fr/insee/kraftwerk/api/configuration/*
+		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
 		<pitest.version>1.17.2</pitest.version>
 		<pitest.junit.version>1.2.1</pitest.junit.version>
