@@ -572,6 +572,49 @@ public class MainDefinitions {
     }
 
 
+	@Then("In csv loop file for loop {string} for interrogationId {string} and iteration {int} we should have value " +
+			"{string} for " +
+			"field " +
+			"{string}")
+	public void check_loop_field_value(String loopName,
+									   String interrogationId,
+									   int iterationIndex,
+									   String expectedValue,
+									   String fieldName) throws IOException, CsvValidationException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
+		// get header
+		String[] header = csvReader.readNext();
+		//Assert fields existence
+		Assertions.assertThat(header).contains(Constants.ROOT_IDENTIFIER_NAME).contains(loopName).contains(fieldName);
+		int interrogationIdIndex = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
+		int loopNameIndex = Arrays.asList(header).indexOf(loopName);
+		int fieldIndex = Arrays.asList(header).indexOf(fieldName);
+
+		while(
+				csvReader.peek() != null
+				// Cursed condition to check if next line has specified interrogationId and Loop iteration
+				// (ex: "01,Loop-02" will be true if interrogationId = "01" and iterationIndex = 2)
+				&& !(
+					csvReader.peek()[interrogationIdIndex].equals(interrogationId)
+					&& Integer.parseInt(csvReader.peek()[loopNameIndex].split("-")[csvReader.peek()[loopNameIndex].split("-").length-1]) == iterationIndex
+				)
+		)
+		{
+			csvReader.readNext();
+		}
+
+		Assertions.assertThat(csvReader.peek()).isNotNull().hasSizeGreaterThan(fieldIndex);
+		String fieldContent = csvReader.peek()[fieldIndex];
+
+		//Check content
+		Assertions.assertThat(fieldContent).isEqualTo(expectedValue);
+
+		// Close reader
+		csvReader.close();
+	}
+
 	@AfterAll
 	public static void closeConnection() throws SQLException {
 		database.close();

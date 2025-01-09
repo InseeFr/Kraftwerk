@@ -45,9 +45,10 @@ Feature: Do we save correctly all data file by file?
     # - ExpectedLineCount : Expected row quantity
     # - ExpectedDataFieldCount : Expected field quantity
 
-      |Directory                        |LoopName         |ExpectedLineCount     |ExpectedDataFieldCount            |
-      |SAMPLETEST-MULTIPLEDATA-v1       |BOUCLE_PRENOMS   |11                     |222                               |
-      |SAMPLETEST-MULTIPLEDATA-v2       |BOUCLE_PRENOMS   |6                     |222                               |
+      |Directory                        |LoopName         |ExpectedLineCount     |ExpectedDataFieldCount           |
+      |SAMPLETEST-MULTIPLEDATA-v1       |BOUCLE_PRENOMS   |11                    |222                              |
+      |SAMPLETEST-MULTIPLEDATA-v2       |BOUCLE_PRENOMS   |6                     |222                              |
+      |SAMPLETEST-PARADATA-v1           |B_PRENOMREP      |3                     |1088                             |
 
   Scenario Outline: Do we create Parquet loop data file with the right structure
     Given Step 0 : We have some survey in directory "<Directory>"
@@ -61,6 +62,7 @@ Feature: Do we save correctly all data file by file?
     # - ExpectedLineCount : Expected row quantity
     # - ExpectedDataFieldCount : Expected field quantity
 
-      |Directory                            |LoopName         |ExpectedLineCount     |ExpectedDataFieldCount            |
-      |SAMPLETEST-MULTIPLEDATA-v1           |BOUCLE_PRENOMS   |10                     |222                               |
-      |SAMPLETEST-MULTIPLEDATA-v2           |BOUCLE_PRENOMS   |5                     |222                               |
+      |Directory                            |LoopName         |ExpectedLineCount     |ExpectedDataFieldCount        |
+      |SAMPLETEST-MULTIPLEDATA-v1           |BOUCLE_PRENOMS   |10                     |222                          |
+      |SAMPLETEST-MULTIPLEDATA-v2           |BOUCLE_PRENOMS   |5                     |222                           |
+      |SAMPLETEST-PARADATA-v1               |B_PRENOMREP      |3                     |1088                          |
