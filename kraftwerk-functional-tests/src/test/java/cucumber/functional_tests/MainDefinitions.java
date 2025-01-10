@@ -614,6 +614,37 @@ public class MainDefinitions {
 		// Close reader
 		csvReader.close();
 	}
+	@Then("In parquet loop file for loop {string} for interrogationId {string} and iteration {int} we should have " +
+			"value {string} for field {string}")
+	public void check_parquet_output_loop_table(String loopName,
+												String interrogationId,
+												int iterationIndex,
+												String expectedValue,
+												String fieldName) throws SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".parquet");
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+			//Select concerned line from database
+			ResultSet resultSet = statement.executeQuery(
+					("SELECT %s " +
+					"FROM '%s' " +
+					"WHERE %s = '%s' " +
+					"AND CAST(STRING_SPLIT(%s, '-')[len(STRING_SPLIT(%s, '-'))] AS BIGINT) = " +
+					"%s").formatted(
+							fieldName,
+							inDirectory.getFileName() + "_" + loopName,
+							Constants.ROOT_IDENTIFIER_NAME,
+							interrogationId,
+							loopName,
+							loopName,
+							iterationIndex
+					)
+			);
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
+		}
+	}
 
 	@AfterAll
 	public static void closeConnection() throws SQLException {
