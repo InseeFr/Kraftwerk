@@ -3,11 +3,15 @@ package fr.insee.kraftwerk.api.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
+import fr.insee.kraftwerk.core.data.model.SurveyMetadata;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -22,9 +26,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class GenesisClient {
 
 	private final RestTemplate restTemplate;
@@ -110,6 +117,52 @@ public class GenesisClient {
 				String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
+	}
+
+	public Map<String, MetadataModel> getMetadatas(String campaignId,
+												   List<String> questionnaireIds,
+												   List<String> modes
+	) throws JsonProcessingException {
+		Map<String, MetadataModel> metadataModelMap = new LinkedHashMap<>();
+
+		for(String questionnaireId : questionnaireIds){
+			for(String modeString : modes){
+				Mode mode = null;
+				try {
+					mode = Mode.getEnumFromModeName(modeString);
+				}catch (IllegalStateException e){
+					log.warn(e.getMessage());
+				}
+				if (mode == null){
+					continue; //Go to next mode
+				}
+				String url = String.format("%s/metdatas/get?campaignId=%s&questionnaireId=%s&mode=%s",
+						configProperties.getGenesisUrl(),
+						campaignId,
+						questionnaireId,
+						mode.getModeName()
+				);
+				ResponseEntity<String> response = restTemplate.exchange(url,
+						HttpMethod.GET,
+						new HttpEntity<>(getHttpHeaders()),
+						String.class);
+				if(response.getStatusCode().is2xxSuccessful()){
+					ObjectMapper objectMapper = new ObjectMapper();
+					SurveyMetadata surveyMetadata = objectMapper.readValue(
+							response.getBody(),
+							SurveyMetadata.class
+					);
+					MetadataModel metadataModel =
+							MetadataUtilsGenesis.getMetadataFromGenesisSurveyMetadata(surveyMetadata);
+
+					metadataModelMap.put(
+						mode.getModeName(),
+						metadataModel
+					);
+				}
+			}
+		}
+		return metadataModelMap;
 	}
 
 	private HttpHeaders getHttpHeaders() {

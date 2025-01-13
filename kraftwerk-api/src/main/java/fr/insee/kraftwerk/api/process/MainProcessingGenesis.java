@@ -83,11 +83,21 @@ public class MainProcessingGenesis {
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory,
 				client.getModes(idCampaign), fileUtilsInterface, withDDI);
 		if (!userInputs.getModes().isEmpty()) {
-            try {
-                metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
-			} catch (MetadataParserException e) {
-                throw new KraftwerkException(500, e.getMessage());
-            }
+			try {
+				log.info("Try to get metadatas from genesis database");
+				metadataModels = client.getMetadatas(
+						idCampaign,
+						client.getQuestionnaireModelIds(idCampaign),
+						userInputs.getModes()
+				);
+			}catch (Exception e){
+				log.warn("Got error during get metadatas : {} \n try to use local metadata...", e.getMessage());
+				try {
+					metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+				} catch (MetadataParserException mpe) {
+					throw new KraftwerkException(500, mpe.getMessage());
+				}
+			}
         } else {
             log.error("No source found for campaign {}", idCampaign);
 		}

@@ -9,6 +9,8 @@ import fr.insee.bpm.metadata.reader.ddi.DDIReader;
 import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.data.model.SurveyMetadata;
+import fr.insee.kraftwerk.core.data.model.SurveyMetadataVariable;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
@@ -77,6 +79,28 @@ public class MetadataUtilsGenesis {
 		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();
 		modeInputsMap.forEach((k, v) -> putToMetadataVariableFromLunatic(k,v,metadataModels, fileUtilsInterface));
 		return metadataModels;
+	}
+
+	public static MetadataModel getMetadataFromGenesisSurveyMetadata(SurveyMetadata surveyMetadata){
+		MetadataModel metadataModel = new MetadataModel();
+		for(Map.Entry<String, SurveyMetadataVariable> entry :surveyMetadata.variableDocumentMap().entrySet()){
+			SurveyMetadataVariable surveyMetadataVariable = entry.getValue();
+			Variable variable = new Variable(
+					surveyMetadataVariable.name(),
+					surveyMetadataVariable.group(),
+					surveyMetadataVariable.type(),
+					surveyMetadataVariable.sasFormat()
+					);
+			variable.setMaxLengthData(surveyMetadataVariable.maxLengthData());
+			variable.setQuestionName(surveyMetadataVariable.questionName());
+			variable.setInQuestionGrid(surveyMetadataVariable.isInQuestionGrid());
+
+			metadataModel.getVariables().putVariable(variable);
+			if(!metadataModel.hasGroup(surveyMetadataVariable.group().getName())){
+				metadataModel.putGroup(surveyMetadataVariable.group());
+			}
+		}
+		return metadataModel;
 	}
 
 	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
