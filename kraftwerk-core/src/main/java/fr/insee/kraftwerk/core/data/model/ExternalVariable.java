@@ -10,8 +10,7 @@ import java.util.List;
 @Getter
 public class ExternalVariable {
 
-	@JsonProperty("varId")
-	private String idVar;
+	private String varId;
 	private List<String> values;
 
 	public String getFirstValue(){

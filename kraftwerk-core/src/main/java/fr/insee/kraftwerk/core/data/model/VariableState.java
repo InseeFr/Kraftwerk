@@ -8,11 +8,8 @@ import java.util.List;
 @Data
 public class VariableState {
 
-	@JsonProperty("varId")
-	private String idVar;
-	@JsonProperty("loopId")
-	private String idLoop;
-	@JsonProperty("parentId")
-	private String idParent;
+	private String varId;
+	private String loopId;
+	private String parentId;
 	private List<String> values;
 }

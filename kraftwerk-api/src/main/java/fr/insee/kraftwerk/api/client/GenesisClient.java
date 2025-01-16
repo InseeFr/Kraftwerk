@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
+import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +55,13 @@ public class GenesisClient {
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
-	public List<SurveyUnitId> getSurveyUnitIds(String idQuestionnaire) {
+	public List<InterrogationId> getSurveyUnitIds(String idQuestionnaire) {
 		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(
+		ResponseEntity<InterrogationId[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
 				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitId[].class
+				InterrogationId[].class
 		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
@@ -79,9 +79,9 @@ public class GenesisClient {
 		return modes;
 	}
 
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String idQuestionnaire, List<SurveyUnitId> idUEs) {
+	public List<SurveyUnitUpdateLatest> getUEsLatestState(String idQuestionnaire, List<InterrogationId> interrogationIds) {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(idUEs, getHttpHeaders());
+		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.POST,
