@@ -47,22 +47,22 @@ public class BuildBindingsSequenceGenesis {
 		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> dataMode.equals(surveyUnit.getMode().getModeName())).toList();
 		for(SurveyUnitUpdateLatest surveyUnit : surveyUnitsFiltered) {
 			QuestionnaireData questionnaire = new QuestionnaireData();
-			questionnaire.setIdentifier(surveyUnit.getIdUE());
-			data.getIdSurveyUnits().add(surveyUnit.getIdUE());
+			questionnaire.setIdentifier(surveyUnit.getInterrogationId());
+			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
 			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
-				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
+				if (variableState.getLoopId().equals(Constants.ROOT_GROUP_NAME)){
 					// Not clean : deal with arrays (for now always a single value in array)
 					if (!variableState.getValues().isEmpty()){
-						answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
+						answers.putValue(variableState.getVarId(), variableState.getValues().getFirst());
 					}
 				} else {
-					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
+					addGroupVariables(data.getMetadataModel(), variableState.getVarId(), questionnaire.getAnswers(), variableState);
 				}
 			}
 			Map<String, String> externalVarToAdd = surveyUnit.getExternalVariables().stream().filter(extVar -> !extVar.getValues().isEmpty())
-					.collect(Collectors.toMap(ExternalVariable::getIdVar, ExternalVariable::getFirstValue));
+					.collect(Collectors.toMap(ExternalVariable::getVarId, ExternalVariable::getFirstValue));
 			answers.putValues(externalVarToAdd);
 
 			data.getQuestionnaires().add(questionnaire);
@@ -110,7 +110,7 @@ public class BuildBindingsSequenceGenesis {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getIdLoop());
+			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getLoopId());
 		}
 	}
 

@@ -33,29 +33,29 @@ class BuildBIndingsSequenceGenesisTest {
         //Create one document
         surveyUnits.clear();
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
-        surveyUnitUpdateLatest.setIdUE("0000001");
-        surveyUnitUpdateLatest.setIdCampaign("TESTCAMPAIGN");
-        surveyUnitUpdateLatest.setIdQuest("TESTQUEST");
+        surveyUnitUpdateLatest.setInterrogationId("0000001");
+        surveyUnitUpdateLatest.setCampaignId("TESTCAMPAIGN");
+        surveyUnitUpdateLatest.setQuestionnaireId("TESTQUEST");
         surveyUnitUpdateLatest.setMode(Mode.valueOf(dataMode));
 
         surveyUnitUpdateLatest.setVariablesUpdate(new ArrayList<>());
         VariableState variableState = new VariableState();
-        variableState.setIdVar("COLLVAR1");
-        variableState.setIdLoop(Constants.ROOT_GROUP_NAME);
+        variableState.setVarId("COLLVAR1");
+        variableState.setLoopId(Constants.ROOT_GROUP_NAME);
         variableState.setValues(new ArrayList<>());
         variableState.getValues().add("TEST1");
         surveyUnitUpdateLatest.getVariablesUpdate().add(variableState);
         variableState = new VariableState();
-        variableState.setIdVar("COLLVAR2");
-        variableState.setIdLoop("LOOP1");
-        variableState.setIdParent(Constants.ROOT_GROUP_NAME);
+        variableState.setVarId("COLLVAR2");
+        variableState.setLoopId("LOOP1");
+        variableState.setParentId(Constants.ROOT_GROUP_NAME);
         variableState.setValues(new ArrayList<>());
         variableState.getValues().add("TEST3");
         surveyUnitUpdateLatest.getVariablesUpdate().add(variableState);
 
         surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
         ExternalVariable externalVariable = new ExternalVariable();
-        externalVariable.setIdVar("EXTVAR1");
+        externalVariable.setVarId("EXTVAR1");
         externalVariable.setValues(new ArrayList<>());
         externalVariable.getValues().add("TEST2");
         surveyUnitUpdateLatest.getExternalVariables().add(externalVariable);
