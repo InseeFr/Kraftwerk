@@ -2,9 +2,8 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
-import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.data.model.VariableModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -51,18 +50,18 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getIdUE());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
-				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
+			for (VariableModel collectedVariables : surveyUnit.getCollectedVariables()){
+				if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
 					// Not clean : deal with arrays (for now always a single value in array)
-					if (!variableState.getValues().isEmpty()){
-						answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
+					if (!collectedVariables.getValues().isEmpty()){
+						answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValues().getFirst());
 					}
 				} else {
-					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
+					addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
 				}
 			}
 			Map<String, String> externalVarToAdd = surveyUnit.getExternalVariables().stream().filter(extVar -> !extVar.getValues().isEmpty())
-					.collect(Collectors.toMap(ExternalVariable::getIdVar, ExternalVariable::getFirstValue));
+					.collect(Collectors.toMap(VariableModel::getIdVar, VariableModel::getFirstValue));
 			answers.putValues(externalVarToAdd);
 
 			data.getQuestionnaires().add(questionnaire);
@@ -106,11 +105,11 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableState variableState) {
+	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getIdLoop());
+			groupData.putValue(variableModel.getValues().getFirst(), variableName, variableModel.getIdLoop());
 		}
 	}
 

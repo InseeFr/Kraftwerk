@@ -1,15 +1,15 @@
 package fr.insee.kraftwerk.core.data.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Setter
-@Getter
-public class ExternalVariable {
+@Data
+public class VariableModel {
 
 	private String idVar;
+	private String idLoop;
+	private String idParent;
 	private List<String> values;
 
 	public String getFirstValue(){

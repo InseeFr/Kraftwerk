@@ -264,7 +264,8 @@ public class SqlUtils {
      * @param filePath path of the file to import into duckdb
      */
     public static void readCsvFile(Statement statement, Path filePath, String delimiter) throws SQLException {
-        statement.execute(String.format("CREATE TABLE '%s' AS SELECT * FROM read_csv('%s', delim = '%s')", filePath.getFileName().toString().split("\\.")[0], filePath, delimiter));
+        statement.execute(String.format("CREATE OR REPLACE TABLE '%s' AS SELECT * FROM read_csv('%s', delim = '%s')",
+                filePath.getFileName().toString().split("\\.")[0], filePath, delimiter));
     }
 
     /**
@@ -273,7 +274,8 @@ public class SqlUtils {
      * @param filePath path of the file to import into duckdb
      */
     public static void readParquetFile(Statement statement, Path filePath) throws SQLException {
-        statement.execute(String.format("CREATE TABLE '%s' AS SELECT * FROM read_parquet('%s')", filePath.getFileName().toString().split("\\.")[0], filePath));
+        statement.execute(String.format("CREATE OR REPLACE TABLE '%s' AS SELECT * FROM read_parquet('%s')",
+                filePath.getFileName().toString().split("\\.")[0], filePath));
     }
 
 }

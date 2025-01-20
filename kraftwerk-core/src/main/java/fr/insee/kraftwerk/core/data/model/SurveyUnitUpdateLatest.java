@@ -11,6 +11,6 @@ public class SurveyUnitUpdateLatest {
 	private String idCampaign;
 	private String idUE;
 	private Mode mode;
-	private List<VariableState> variablesUpdate;
-	private List<ExternalVariable> externalVariables;
+	private List<VariableModel> collectedVariables;
+	private List<VariableModel> externalVariables;
 }
