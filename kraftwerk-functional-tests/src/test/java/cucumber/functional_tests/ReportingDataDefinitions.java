@@ -143,7 +143,7 @@ public class ReportingDataDefinitions {
             }
         }
 
-        // Survey unit existence assertion
+        // Interrogation existence assertion
         assertThat(concernedLine).isNotNull();
 
         // Count contact attempts and check date formats
@@ -192,7 +192,7 @@ public class ReportingDataDefinitions {
             }
         }
 
-        // Survey unit existence assertion
+        // Interrogation existence assertion
         assertThat(concernedLine).isNotNull();
 
         // Count contact attempts and check date formats
@@ -300,7 +300,7 @@ public class ReportingDataDefinitions {
         // Fetch concerned survey unit line from file
         String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
 
-        // Survey unit existence assertion
+        // Interrogation existence assertion
         assertThat(concernedLine).isNotNull();
 
         // Check OUTCOME_SPOTTING content
@@ -348,7 +348,7 @@ public class ReportingDataDefinitions {
 
         String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
 
-        // Survey unit existence assertion
+        // Interrogation existence assertion
         assertThat(concernedLine).isNotNull();
 
         // Check OUTCOME_SPOTTING content

@@ -73,15 +73,15 @@ public class MainProcessingGenesis {
 		this.withDDI = true;
 	}
 
-	public void init(String idCampaign) throws KraftwerkException {
+	public void init(String campaignId) throws KraftwerkException {
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
-		log.info("Kraftwerk main service started for campaign: {} {}", idCampaign, withDDI ? "with DDI": "without DDI");
+		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, withDDI ? "with DDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
-		inDirectory = controlInputSequenceGenesis.getInDirectory(idCampaign);
+		inDirectory = controlInputSequenceGenesis.getInDirectory(campaignId);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory,
-				client.getModes(idCampaign), fileUtilsInterface, withDDI);
+				client.getModes(campaignId), fileUtilsInterface, withDDI);
 		if (!userInputs.getModes().isEmpty()) {
             try {
                 metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
@@ -89,23 +89,23 @@ public class MainProcessingGenesis {
                 throw new KraftwerkException(500, e.getMessage());
             }
         } else {
-            log.error("No source found for campaign {}", idCampaign);
+            log.error("No source found for campaign {}", campaignId);
 		}
 	}
 
-	public void runMain(String idCampaign) throws KraftwerkException, IOException {
+	public void runMain(String campaignId) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
-		init(idCampaign);
+		init(campaignId);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = SqlUtils.openConnection()) {
 			this.database = tryDatabase.createStatement();
-			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(idCampaign);
+			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
 			}
 			for (String questionnaireId : questionnaireModelIds) {
-				List<InterrogationId> ids = client.getSurveyUnitIds(questionnaireId);
+				List<InterrogationId> ids = client.getInterrogationIds(questionnaireId);
 				List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
 				for (List<InterrogationId> listId : listIds) {
 					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
