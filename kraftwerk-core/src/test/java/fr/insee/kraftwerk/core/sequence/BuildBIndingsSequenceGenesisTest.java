@@ -46,7 +46,7 @@ class BuildBIndingsSequenceGenesisTest {
         surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
         variableModel = new VariableModel();
         variableModel.setIdVar("COLLVAR2");
-        variableModel.setIdLoop("LOOP1");
+        variableModel.setIdLoop("TESTLOOP_1");
         variableModel.setIdParent(Constants.ROOT_GROUP_NAME);
         variableModel.setValues(new ArrayList<>());
         variableModel.getValues().add("TEST3");
@@ -55,9 +55,24 @@ class BuildBIndingsSequenceGenesisTest {
         surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
         VariableModel externalVariable = new VariableModel();
         externalVariable.setIdVar("EXTVAR1");
+        externalVariable.setIdLoop(Constants.ROOT_GROUP_NAME);
         externalVariable.setValues(new ArrayList<>());
         externalVariable.getValues().add("TEST2");
         surveyUnitUpdateLatest.getExternalVariables().add(externalVariable);
+        VariableModel externalVariableInLoop_1 = new VariableModel();
+        externalVariableInLoop_1.setIdVar("EXTVAR2");
+        externalVariableInLoop_1.setIdLoop("TESTLOOP_1");
+        externalVariableInLoop_1.setIdParent(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop_1.setValues(new ArrayList<>());
+        externalVariableInLoop_1.getValues().add("VALUE_1");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop_1);
+        VariableModel externalVariableInLoop_2 = new VariableModel();
+        externalVariableInLoop_2.setIdVar("EXTVAR2");
+        externalVariableInLoop_2.setIdLoop("TESTLOOP_2");
+        externalVariableInLoop_2.setIdParent(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop_2.setValues(new ArrayList<>());
+        externalVariableInLoop_2.getValues().add("VALUE_2");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop_2);
 
         surveyUnits.add(surveyUnitUpdateLatest);
     }
@@ -86,6 +101,7 @@ class BuildBIndingsSequenceGenesisTest {
         Group group = new Group("TESTLOOP",Constants.ROOT_GROUP_NAME);
         metadata.getVariables().putVariable(new Variable("COLLVAR2", group, VariableType.STRING));
         metadata.getVariables().putVariable(new Variable("EXTVAR1", metadata.getRootGroup(), VariableType.STRING));
+        metadata.getVariables().putVariable(new Variable("EXTVAR2", group, VariableType.STRING));
         metadata.getGroups().put("TESTLOOP", group);
         Map<String, MetadataModel> modeMetadataMap = new HashMap<>();
         modeMetadataMap.put(dataMode,metadata);
