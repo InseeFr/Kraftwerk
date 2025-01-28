@@ -50,19 +50,8 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getIdUE());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			for (VariableModel collectedVariables : surveyUnit.getCollectedVariables()){
-				if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
-					// Not clean : deal with arrays (for now always a single value in array)
-					if (!collectedVariables.getValues().isEmpty()){
-						answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValues().getFirst());
-					}
-				} else {
-					addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
-				}
-			}
-			Map<String, String> externalVarToAdd = surveyUnit.getExternalVariables().stream().filter(extVar -> !extVar.getValues().isEmpty())
-					.collect(Collectors.toMap(VariableModel::getIdVar, VariableModel::getFirstValue));
-			answers.putValues(externalVarToAdd);
+			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
+			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
 
 			data.getQuestionnaires().add(questionnaire);
 		}
@@ -76,6 +65,19 @@ public class BuildBindingsSequenceGenesis {
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
+	}
+
+	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
+		for (VariableModel collectedVariables : surveyUnit) {
+			if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)) {
+				// Not clean : deal with arrays (for now always a single value in array)
+				if (!collectedVariables.getValues().isEmpty()) {
+					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValues().getFirst());
+				}
+			} else {
+				addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
+			}
+		}
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
