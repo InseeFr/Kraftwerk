@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.1</version>
+		<version>3.4.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
@@ -30,7 +30,7 @@
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.17.3</pitest.version>
+		<pitest.version>1.17.4</pitest.version>
 		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>
