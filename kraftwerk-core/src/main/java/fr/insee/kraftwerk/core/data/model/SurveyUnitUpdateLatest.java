@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.data.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public class SurveyUnitUpdateLatest {
 	private String idCampaign;
 	private String idUE;
 	private Mode mode;
-	private List<VariableState> variablesUpdate;
-	private List<ExternalVariable> externalVariables;
+	@JsonProperty("variablesUpdate")
+	private List<VariableModel> collectedVariables;
+	private List<VariableModel> externalVariables;
 }

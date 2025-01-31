@@ -2,9 +2,8 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
-import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.data.model.VariableModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
@@ -51,19 +50,8 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getIdUE());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			for (VariableState variableState : surveyUnit.getVariablesUpdate()){
-				if (variableState.getIdLoop().equals(Constants.ROOT_GROUP_NAME)){
-					// Not clean : deal with arrays (for now always a single value in array)
-					if (!variableState.getValues().isEmpty()){
-						answers.putValue(variableState.getIdVar(), variableState.getValues().getFirst());
-					}
-				} else {
-					addGroupVariables(data.getMetadataModel(), variableState.getIdVar(), questionnaire.getAnswers(), variableState);
-				}
-			}
-			Map<String, String> externalVarToAdd = surveyUnit.getExternalVariables().stream().filter(extVar -> !extVar.getValues().isEmpty())
-					.collect(Collectors.toMap(ExternalVariable::getIdVar, ExternalVariable::getFirstValue));
-			answers.putValues(externalVarToAdd);
+			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
+			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
 
 			data.getQuestionnaires().add(questionnaire);
 		}
@@ -77,6 +65,19 @@ public class BuildBindingsSequenceGenesis {
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
+	}
+
+	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
+		for (VariableModel collectedVariables : surveyUnit) {
+			if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)) {
+				// Not clean : deal with arrays (for now always a single value in array)
+				if (!collectedVariables.getValues().isEmpty()) {
+					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getFirstValue());
+				}
+			} else {
+				addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
+			}
+		}
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
@@ -106,11 +107,11 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableState variableState) {
+	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableState.getValues().getFirst(), variableName, variableState.getIdLoop());
+			groupData.putValue(variableModel.getFirstValue(), variableName, variableModel.getIdLoop());
 		}
 	}
 
