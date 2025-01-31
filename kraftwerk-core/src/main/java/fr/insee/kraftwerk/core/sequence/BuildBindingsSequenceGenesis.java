@@ -72,7 +72,7 @@ public class BuildBindingsSequenceGenesis {
 			if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)) {
 				// Not clean : deal with arrays (for now always a single value in array)
 				if (!collectedVariables.getValues().isEmpty()) {
-					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValues().getFirst());
+					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getFirstValue());
 				}
 			} else {
 				addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
@@ -111,7 +111,7 @@ public class BuildBindingsSequenceGenesis {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getValues().getFirst(), variableName, variableModel.getIdLoop());
+			groupData.putValue(variableModel.getFirstValue(), variableName, variableModel.getIdLoop());
 		}
 	}
 
