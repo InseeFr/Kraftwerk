@@ -59,20 +59,20 @@ class BuildBIndingsSequenceGenesisTest {
         externalVariable.setValues(new ArrayList<>());
         externalVariable.getValues().add("TEST2");
         surveyUnitUpdateLatest.getExternalVariables().add(externalVariable);
-        VariableModel externalVariableInLoop_1 = new VariableModel();
-        externalVariableInLoop_1.setIdVar("EXTVAR2");
-        externalVariableInLoop_1.setIdLoop("TESTLOOP_1");
-        externalVariableInLoop_1.setIdParent(Constants.ROOT_GROUP_NAME);
-        externalVariableInLoop_1.setValues(new ArrayList<>());
-        externalVariableInLoop_1.getValues().add("VALUE_1");
-        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop_1);
-        VariableModel externalVariableInLoop_2 = new VariableModel();
-        externalVariableInLoop_2.setIdVar("EXTVAR2");
-        externalVariableInLoop_2.setIdLoop("TESTLOOP_2");
-        externalVariableInLoop_2.setIdParent(Constants.ROOT_GROUP_NAME);
-        externalVariableInLoop_2.setValues(new ArrayList<>());
-        externalVariableInLoop_2.getValues().add("VALUE_2");
-        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop_2);
+        VariableModel externalVariableInLoop1 = new VariableModel();
+        externalVariableInLoop1.setIdVar("EXTVAR2");
+        externalVariableInLoop1.setIdLoop("TESTLOOP_1");
+        externalVariableInLoop1.setIdParent(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop1.setValues(new ArrayList<>());
+        externalVariableInLoop1.getValues().add("VALUE_1");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop1);
+        VariableModel externalVariableInLoop2 = new VariableModel();
+        externalVariableInLoop2.setIdVar("EXTVAR2");
+        externalVariableInLoop2.setIdLoop("TESTLOOP_2");
+        externalVariableInLoop2.setIdParent(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop2.setValues(new ArrayList<>());
+        externalVariableInLoop2.getValues().add("VALUE_2");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop2);
 
         surveyUnits.add(surveyUnitUpdateLatest);
     }
