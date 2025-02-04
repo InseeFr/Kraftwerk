@@ -1,4 +1,14 @@
 # Changelog
+
+## 3.1.1 [2025-01-31]
+### Added
+- External variables in loop\tables are now exported correctly
+### Updated
+- bpm : 1.0.5
+- pitest : 1.17.3
+- springboot : 3.4.2
+- springdoc : 2.8.4
+
 ## 3.1.0 [2024-12-13]
 ### Added
 - OIDC Authentication

@@ -12,6 +12,7 @@ public class SurveyUnitUpdateLatest {
 	private String campaignId;
 	private String interrogationId;
 	private Mode mode;
-	private List<VariableState> variablesUpdate;
-	private List<ExternalVariable> externalVariables;
+	@JsonProperty("variablesUpdate")
+	private List<VariableModel> collectedVariables;
+	private List<VariableModel> externalVariables;
 }

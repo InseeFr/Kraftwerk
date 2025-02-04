@@ -2,10 +2,9 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.data.model.ExternalVariable;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
-import fr.insee.kraftwerk.core.data.model.VariableState;
+import fr.insee.kraftwerk.core.data.model.VariableModel;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
@@ -38,27 +37,42 @@ class BuildBIndingsSequenceGenesisTest {
         surveyUnitUpdateLatest.setQuestionnaireId("TESTQUEST");
         surveyUnitUpdateLatest.setMode(Mode.valueOf(dataMode));
 
-        surveyUnitUpdateLatest.setVariablesUpdate(new ArrayList<>());
-        VariableState variableState = new VariableState();
-        variableState.setVarId("COLLVAR1");
-        variableState.setLoopId(Constants.ROOT_GROUP_NAME);
-        variableState.setValues(new ArrayList<>());
-        variableState.getValues().add("TEST1");
-        surveyUnitUpdateLatest.getVariablesUpdate().add(variableState);
-        variableState = new VariableState();
-        variableState.setVarId("COLLVAR2");
-        variableState.setLoopId("LOOP1");
-        variableState.setParentId(Constants.ROOT_GROUP_NAME);
-        variableState.setValues(new ArrayList<>());
-        variableState.getValues().add("TEST3");
-        surveyUnitUpdateLatest.getVariablesUpdate().add(variableState);
+        surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId("COLLVAR1");
+        variableModel.setLoopId(Constants.ROOT_GROUP_NAME);
+        variableModel.setValues(new ArrayList<>());
+        variableModel.getValues().add("TEST1");
+        surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
+        variableModel = new VariableModel();
+        variableModel.setVarId("COLLVAR2");
+        variableModel.setLoopId("TESTLOOP_1");
+        variableModel.setParentId(Constants.ROOT_GROUP_NAME);
+        variableModel.setValues(new ArrayList<>());
+        variableModel.getValues().add("TEST3");
+        surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
 
         surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
-        ExternalVariable externalVariable = new ExternalVariable();
+        VariableModel externalVariable = new VariableModel();
         externalVariable.setVarId("EXTVAR1");
+        externalVariable.setLoopId(Constants.ROOT_GROUP_NAME);
         externalVariable.setValues(new ArrayList<>());
         externalVariable.getValues().add("TEST2");
         surveyUnitUpdateLatest.getExternalVariables().add(externalVariable);
+        VariableModel externalVariableInLoop1 = new VariableModel();
+        externalVariableInLoop1.setVarId("EXTVAR2");
+        externalVariableInLoop1.setLoopId("TESTLOOP_1");
+        externalVariableInLoop1.setParentId(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop1.setValues(new ArrayList<>());
+        externalVariableInLoop1.getValues().add("VALUE_1");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop1);
+        VariableModel externalVariableInLoop2 = new VariableModel();
+        externalVariableInLoop2.setVarId("EXTVAR2");
+        externalVariableInLoop2.setLoopId("TESTLOOP_2");
+        externalVariableInLoop2.setParentId(Constants.ROOT_GROUP_NAME);
+        externalVariableInLoop2.setValues(new ArrayList<>());
+        externalVariableInLoop2.getValues().add("VALUE_2");
+        surveyUnitUpdateLatest.getExternalVariables().add(externalVariableInLoop2);
 
         surveyUnits.add(surveyUnitUpdateLatest);
     }
@@ -87,6 +101,7 @@ class BuildBIndingsSequenceGenesisTest {
         Group group = new Group("TESTLOOP",Constants.ROOT_GROUP_NAME);
         metadata.getVariables().putVariable(new Variable("COLLVAR2", group, VariableType.STRING));
         metadata.getVariables().putVariable(new Variable("EXTVAR1", metadata.getRootGroup(), VariableType.STRING));
+        metadata.getVariables().putVariable(new Variable("EXTVAR2", group, VariableType.STRING));
         metadata.getGroups().put("TESTLOOP", group);
         Map<String, MetadataModel> modeMetadataMap = new HashMap<>();
         modeMetadataMap.put(dataMode,metadata);

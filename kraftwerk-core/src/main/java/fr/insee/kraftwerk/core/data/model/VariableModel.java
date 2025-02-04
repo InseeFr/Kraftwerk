@@ -6,10 +6,14 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VariableState {
+public class VariableModel {
 
 	private String varId;
 	private String loopId;
 	private String parentId;
 	private List<String> values;
+
+	public String getFirstValue(){
+		return values.getFirst();
+	}
 }
