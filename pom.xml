@@ -5,28 +5,32 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.1.0</version>
+	<version>3.1.1</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.0</version>
+		<version>3.4.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>7.20.1</cucumber.version>
+		<cucumber.version>7.21.0</cucumber.version>
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.12</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 		<skipSurefireReport>true</skipSurefireReport>
+		<sonar.coverage.exclusions>
+			src/main/java/fr/insee/kraftwerk/api/client/*,
+			src/main/java/fr/insee/kraftwerk/api/configuration/*
+		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.17.2</pitest.version>
+		<pitest.version>1.17.4</pitest.version>
 		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>

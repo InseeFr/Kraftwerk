@@ -572,6 +572,80 @@ public class MainDefinitions {
     }
 
 
+	@Then("In csv loop file for loop {string} for interrogationId {string} and iteration {int} we should have value " +
+			"{string} for " +
+			"field " +
+			"{string}")
+	public void check_loop_field_value(String loopName,
+									   String interrogationId,
+									   int iterationIndex,
+									   String expectedValue,
+									   String fieldName) throws IOException, CsvValidationException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
+		// get header
+		String[] header = csvReader.readNext();
+		//Assert fields existence
+		Assertions.assertThat(header).contains(Constants.ROOT_IDENTIFIER_NAME).contains(loopName).contains(fieldName);
+		int interrogationIdIndex = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
+		int loopNameIndex = Arrays.asList(header).indexOf(loopName);
+		int fieldIndex = Arrays.asList(header).indexOf(fieldName);
+
+		while(
+				csvReader.peek() != null
+				// Cursed condition to check if next line has specified interrogationId and Loop iteration
+				// (ex: "01,Loop-02" will be true if interrogationId = "01" and iterationIndex = 2)
+				&& !(
+					csvReader.peek()[interrogationIdIndex].equals(interrogationId)
+					&& Integer.parseInt(csvReader.peek()[loopNameIndex].split("-")[csvReader.peek()[loopNameIndex].split("-").length-1]) == iterationIndex
+				)
+		)
+		{
+			csvReader.readNext();
+		}
+
+		Assertions.assertThat(csvReader.peek()).isNotNull().hasSizeGreaterThan(fieldIndex);
+		String fieldContent = csvReader.peek()[fieldIndex];
+
+		//Check content
+		Assertions.assertThat(fieldContent).isEqualTo(expectedValue);
+
+		// Close reader
+		csvReader.close();
+	}
+	@Then("In parquet loop file for loop {string} for interrogationId {string} and iteration {int} we should have " +
+			"value {string} for field {string}")
+	public void check_parquet_output_loop_table(String loopName,
+												String interrogationId,
+												int iterationIndex,
+												String expectedValue,
+												String fieldName) throws SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".parquet");
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, filePath);
+			//Select concerned line from database
+			ResultSet resultSet = statement.executeQuery(
+					("SELECT %s " +
+					"FROM '%s' " +
+					"WHERE %s = '%s' " +
+					"AND CAST(STRING_SPLIT(%s, '-')[len(STRING_SPLIT(%s, '-'))] AS BIGINT) = " +
+					"%s").formatted(
+							fieldName,
+							inDirectory.getFileName() + "_" + loopName,
+							Constants.ROOT_IDENTIFIER_NAME,
+							interrogationId,
+							loopName,
+							loopName,
+							iterationIndex
+					)
+			);
+			Assertions.assertThat(resultSet.next()).isTrue();
+			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
+		}
+	}
+
 	@AfterAll
 	public static void closeConnection() throws SQLException {
 		database.close();
