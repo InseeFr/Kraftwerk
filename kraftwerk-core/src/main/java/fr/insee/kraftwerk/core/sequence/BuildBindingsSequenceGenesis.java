@@ -70,10 +70,7 @@ public class BuildBindingsSequenceGenesis {
 	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
 		for (VariableModel collectedVariables : surveyUnit) {
 			if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)) {
-				// Not clean : deal with arrays (for now always a single value in array)
-				if (!collectedVariables.getValues().isEmpty()) {
-					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getFirstValue());
-				}
+					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValue());
 			} else {
 				addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
 			}
@@ -111,7 +108,7 @@ public class BuildBindingsSequenceGenesis {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getFirstValue(), variableName, variableModel.getIdLoop());
+			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIdLoop());
 		}
 	}
 
