@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BuildBindingsSequenceGenesis {
 
@@ -46,8 +45,8 @@ public class BuildBindingsSequenceGenesis {
 		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> dataMode.equals(surveyUnit.getMode().getModeName())).toList();
 		for(SurveyUnitUpdateLatest surveyUnit : surveyUnitsFiltered) {
 			QuestionnaireData questionnaire = new QuestionnaireData();
-			questionnaire.setIdentifier(surveyUnit.getIdUE());
-			data.getIdSurveyUnits().add(surveyUnit.getIdUE());
+			questionnaire.setIdentifier(surveyUnit.getInterrogationId());
+			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
@@ -69,10 +68,10 @@ public class BuildBindingsSequenceGenesis {
 
 	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
 		for (VariableModel collectedVariables : surveyUnit) {
-			if (collectedVariables.getIdLoop().equals(Constants.ROOT_GROUP_NAME)) {
-					answers.putValue(collectedVariables.getIdVar(), collectedVariables.getValue());
+			if (collectedVariables.getScope().equals(Constants.ROOT_GROUP_NAME)) {
+				answers.putValue(collectedVariables.getVarId(), collectedVariables.getValue());
 			} else {
-				addGroupVariables(data.getMetadataModel(), collectedVariables.getIdVar(), questionnaire.getAnswers(), collectedVariables);
+				addGroupVariables(data.getMetadataModel(), collectedVariables.getVarId(), questionnaire.getAnswers(), collectedVariables);
 			}
 		}
 	}
@@ -108,7 +107,7 @@ public class BuildBindingsSequenceGenesis {
 		if (models.getVariables().hasVariable(variableName)) {
 			String groupName = models.getVariables().getVariable(variableName).getGroupName();
 			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIdLoop());
+			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIteration() - 1);
 		}
 	}
 

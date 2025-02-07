@@ -8,9 +8,9 @@ import java.util.List;
 @Data
 public class SurveyUnitUpdateLatest {
 
-	private String idQuest;
-	private String idCampaign;
-	private String idUE;
+	private String questionnaireId;
+	private String campaignId;
+	private String interrogationId;
 	private Mode mode;
 	@JsonProperty("variablesUpdate")
 	private List<VariableModel> collectedVariables;

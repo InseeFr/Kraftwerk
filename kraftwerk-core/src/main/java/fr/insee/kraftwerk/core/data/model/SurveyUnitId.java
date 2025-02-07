@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 public class SurveyUnitId {
 
-	private String idUE;
+	private String interrogationId;
 
 }
