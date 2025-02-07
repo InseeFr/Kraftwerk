@@ -168,7 +168,7 @@ public class SASImportScript extends ImportScript {
 
     /**
      * Put the input formats for the third step.
-     * Example: input IdUE $ ADRESSE $ NHAB MAA2AT $;
+     * Example: input interrogationId $ ADRESSE $ NHAB MAA2AT $;
      *
      * @param listVariables a list of the variables with their format and length
      * @return a script with the input instructions

@@ -4,7 +4,7 @@ import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
+import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
@@ -105,9 +105,9 @@ public class MainProcessingGenesis {
 				throw new KraftwerkException(204, null);
 			}
 			for (String questionnaireId : questionnaireModelIds) {
-				List<SurveyUnitId> ids = client.getSurveyUnitIds(questionnaireId);
-				List<List<SurveyUnitId>> listIds = ListUtils.partition(ids, batchSize);
-				for (List<SurveyUnitId> listId : listIds) {
+				List<InterrogationId> ids = client.getInterrogationIds(questionnaireId);
+				List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
+				for (List<InterrogationId> listId : listIds) {
 					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
 					log.info("Number of documents retrieved from database : {}", suLatest.size());
 					vtlBindings = new VtlBindings();

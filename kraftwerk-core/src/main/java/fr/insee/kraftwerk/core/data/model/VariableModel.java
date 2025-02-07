@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.data.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data

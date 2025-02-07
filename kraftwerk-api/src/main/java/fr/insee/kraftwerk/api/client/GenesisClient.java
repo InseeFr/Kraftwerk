@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
+import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class GenesisClient {
 				url,
 				HttpMethod.GET,
 				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitId[].class
+				InterrogationId[].class
 		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
@@ -79,22 +79,10 @@ public class GenesisClient {
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
 	}
-
-	public List<SurveyUnitUpdateLatest> getUELatestState(String questionnaireId, SurveyUnitId suId) {
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s" +
-				"&interrogationId=%s", configProperties.getGenesisUrl(), questionnaireId, suId.getInterrogationId());
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
-				url,
-				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitUpdateLatest[].class
-		);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
-	}
-
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<SurveyUnitId> interrogationIds) {
+	
+	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
-		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
+		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.POST,
