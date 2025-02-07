@@ -55,10 +55,10 @@ public class GenesisClient {
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
-	public List<SurveyUnitId> getSurveyUnitIds(String questionnaireId) {
+	public List<InterrogationId> getInterrogationIds(String questionnaireId) {
 		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s",
 				configProperties.getGenesisUrl(), questionnaireId);
-		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(
+		ResponseEntity<InterrogationId[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
 				new HttpEntity<>(null, getHttpHeaders()),
