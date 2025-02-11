@@ -52,13 +52,14 @@ public class GenesisDefinitions {
         FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         try {
             fileUtilsInterface.deleteDirectory(outDirectory);
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
         database = SqlUtils.openConnection();
     }
 
-    @Given("We have a collected variable {string} in a document with CampaignId {string}, InterrogationId {string} with value {string}")
+    @Given("We have a collected variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
+            "with value {string}")
     public void add_collected_variable_document(String variableName, String campaignId, String interrogationId,
                                                 String value) {
 
@@ -73,16 +74,63 @@ public class GenesisDefinitions {
         surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
     }
 
-    @Given("We have a external variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
-            "with value {string}")
-    public void add_external_variable_document(String variableName, String campaignId, String interrogationId,
-                                                String value) {
+    @Given("We have a collected variable {string} in a loop named {string} iteration {int} in a document with " +
+            "CampaignId " +
+            "{string}, " +
+            "InterrogationId {string} with value {string}")
+    public void add_loop_collected_variable_document(String variableName,
+                                                     String loopName,
+                                                     int iteration,
+                                                     String campaignId, String interrogationId,
+                                                     String value) {
 
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
 
         VariableModel variableModel = new VariableModel();
         variableModel.setVarId(variableName);
+        variableModel.setScope(loopName);
+        variableModel.setIteration(iteration);
+        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
+    }
+
+    @Given("We have a external variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
+            "with value {string}")
+    public void add_external_variable_document(String variableName,
+                                               String campaignId,
+                                               String interrogationId,
+                                               String value) {
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
         variableModel.setIteration(1);
+        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getExternalVariables().add(variableModel);
+    }
+
+    @Given("We have a external variable {string} in a loop named {string} iteration {int} in a document with " +
+            "CampaignId " +
+            "{string}, " +
+            "InterrogationId {string} with value {string}")
+    public void add_loop_external_variable_document(String variableName,
+                                                    String loopName,
+                                                    int iteration,
+                                                    String campaignId,
+                                                    String interrogationId,
+                                                    String value
+    ) {
+
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
+        variableModel.setScope(loopName);
+        variableModel.setIteration(iteration);
         variableModel.setScope(Constants.ROOT_GROUP_NAME);
         variableModel.setValue(value);
 
@@ -96,7 +144,7 @@ public class GenesisDefinitions {
         ).toList();
 
         SurveyUnitUpdateLatest surveyUnitUpdateLatest;
-        if(mongoFiltered.isEmpty()){
+        if (mongoFiltered.isEmpty()) {
             surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
 
             surveyUnitUpdateLatest.setCampaignId(campaignId);
@@ -106,7 +154,7 @@ public class GenesisDefinitions {
 
             surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
             surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
-        }else{
+        } else {
             surveyUnitUpdateLatest = mongoFiltered.getFirst();
         }
         genesisClientStub.getMongoStub().add(surveyUnitUpdateLatest);
@@ -128,7 +176,8 @@ public class GenesisDefinitions {
     @Then("In root csv output file we should have {string} for survey unit {string}, column {string}")
     public void check_root_csv_output(String value, String interrogationId, String variableName) throws IOException,
             CsvValidationException {
-        Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+        Path executionOutDirectory =
+                outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
         CSVReader csvReader = getCSVReader(
                 executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
         // get header
@@ -137,14 +186,13 @@ public class GenesisDefinitions {
         int interrogationIdIndex = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
         int fieldIndex = Arrays.asList(header).indexOf(variableName);
 
-        while(
+        while (
                 csvReader.peek() != null
                         // Cursed condition to check if next line has specified interrogationId and Loop iteration
                         // (ex: "01,Loop-02" will be true if interrogationId = "01" and iterationIndex = 2)
                         && !(
                         csvReader.peek()[interrogationIdIndex].equals(interrogationId))
-        )
-        {
+        ) {
             csvReader.readNext();
         }
 
@@ -173,9 +221,11 @@ public class GenesisDefinitions {
 
     @Then("In root parquet output file we should have {string} for survey unit {string}, column {string}")
     public void check_root_parquet(String value, String interrogationId,
-                                                                       String variableName) throws SQLException {
-        Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-        Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".parquet");
+                                   String variableName) throws SQLException {
+        Path executionOutDirectory =
+                outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+        Path filePath = executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+                ".parquet");
         try (Statement statement = database.createStatement()) {
             SqlUtils.readParquetFile(statement, filePath);
             //Select concerned line from database

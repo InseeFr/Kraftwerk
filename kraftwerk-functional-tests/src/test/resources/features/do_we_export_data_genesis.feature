@@ -8,7 +8,7 @@ Feature: Do we save correctly all data from Genesis?
     Then In root csv output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value |
-      | TEST-TABLEAUX  |  AUTO203         | TABLEAU2A11  | 4     |
+      | TEST-TABLEAUX  |  AUTO11000       | TABLEAU2A11  | 4     |
 
 
   Scenario Outline: Genesis Collected Data export (parquet)
@@ -18,7 +18,7 @@ Feature: Do we save correctly all data from Genesis?
     Then In root parquet output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     Examples:
       | CampaignId      |  InterrogationId | VariableName | Value |
-      | TEST-TABLEAUX   |  AUTO203         | TABLEAU2A11  | 4     |
+      | TEST-TABLEAUX   |  AUTO11000       | TABLEAU2A11  | 4     |
 
   Scenario Outline: Genesis external Data export (csv)
     Given Step 0 : We have some survey in directory "<CampaignId>"
@@ -28,7 +28,7 @@ Feature: Do we save correctly all data from Genesis?
     Then In root csv output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value |
-      | TEST-TABLEAUX  |  AUTO203         | TABLEAU2A11  | 4     |
+      | TEST-TABLEAUX  |  AUTO11000       | TABLEAU2A11  | 4     |
 
 
   Scenario Outline: Genesis external Data export (parquet)
@@ -38,4 +38,4 @@ Feature: Do we save correctly all data from Genesis?
     Then In root parquet output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     Examples:
       | CampaignId      |  InterrogationId | VariableName | Value |
-      | TEST-TABLEAUX  |  AUTO203          | TABLEAU2A11  | 4     |
+      | TEST-TABLEAUX   |  AUTO11000       | TABLEAU2A11  | 4     |
