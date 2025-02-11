@@ -48,6 +48,13 @@ public class GenesisClient {
 		this.authToken = authToken;
 	}
 
+	//Constructor used for tests
+	public GenesisClient(ConfigProperties configProperties) {
+		restTemplate = null;
+		this.configProperties = configProperties;
+		this.authToken = null;
+	}
+
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
 		//Null requestEntity because health check is whitelisted

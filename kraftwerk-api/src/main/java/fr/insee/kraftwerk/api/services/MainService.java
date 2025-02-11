@@ -141,7 +141,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
+			fileUtilsInterface = new FileSystemImpl(configProperties.getDefaultDirectory());
 		}
 		return fileUtilsInterface;
 	}

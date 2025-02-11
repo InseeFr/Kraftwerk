@@ -73,6 +73,15 @@ public class MainProcessingGenesis {
 		this.withDDI = true;
 	}
 
+	public MainProcessingGenesis(GenesisClient genesisClient,
+								 ConfigProperties config,
+								 FileUtilsInterface fileUtilsInterface,
+								 boolean withDDI) {
+		this.client = genesisClient;
+		this.fileUtilsInterface = fileUtilsInterface;
+		this.withDDI = withDDI;
+	}
+
 	public void init(String campaignId) throws KraftwerkException {
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, withDDI ? "with DDI": "without DDI");
