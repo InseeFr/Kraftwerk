@@ -30,7 +30,7 @@
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.18.0</pitest.version>
+		<pitest.version>1.18.1</pitest.version>
 		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>
