@@ -74,7 +74,6 @@ public class MainProcessingGenesis {
 	}
 
 	public MainProcessingGenesis(GenesisClient genesisClient,
-								 ConfigProperties config,
 								 FileUtilsInterface fileUtilsInterface,
 								 boolean withDDI) {
 		this.client = genesisClient;

@@ -90,7 +90,7 @@ public class GenesisDefinitions {
         variableModel.setVarId(variableName);
         variableModel.setScope(loopName);
         variableModel.setIteration(iteration);
-        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setIdParent(Constants.ROOT_GROUP_NAME);
         variableModel.setValue(value);
 
         surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
@@ -131,7 +131,7 @@ public class GenesisDefinitions {
         variableModel.setVarId(variableName);
         variableModel.setScope(loopName);
         variableModel.setIteration(iteration);
-        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setIdParent(Constants.ROOT_GROUP_NAME);
         variableModel.setValue(value);
 
         surveyUnitUpdateLatest.getExternalVariables().add(variableModel);
@@ -166,11 +166,11 @@ public class GenesisDefinitions {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
                 genesisClientStub,
-                configStub,
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 true
         );
         mainProcessingGenesis.runMain(campaignId);
+        System.out.println();
     }
 
     @Then("In root csv output file we should have {string} for survey unit {string}, column {string}")
@@ -207,7 +207,7 @@ public class GenesisDefinitions {
     }
 
     //CSV Utilities
-    public CSVReader getCSVReader(Path filePath) throws IOException {
+    private CSVReader getCSVReader(Path filePath) throws IOException {
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
                 //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
