@@ -74,16 +74,16 @@ class XMLReportingDataParserTest {
 
 		// Check the reporting data is well captured
 		assertEquals(101, reportingData.getListReportingDataUE().size());
-		String idUE = "BLA000010";
+		String interrogationId = "BLA000010";
 		QuestionnaireData questionnaire = data.getQuestionnaires().stream()
-				.filter(questionnaireToSearch -> idUE.equals(questionnaireToSearch.getIdentifier())).findAny()
+				.filter(questionnaireToSearch -> interrogationId.equals(questionnaireToSearch.getIdentifier())).findAny()
 				.orElse(null);
 
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
 		assertEquals("REFUSAL", reportingData.getListReportingDataUE().getFirst().getStates().get(1).getStateType());
 		// Check the reporting data is correctly translated in the output
-		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + idUE).getValue("STATE_1"));
+		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + interrogationId).getValue("STATE_1"));
 
 
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.Mode;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitId;
+import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,13 @@ public class GenesisClient {
 		this.authToken = authToken;
 	}
 
+	//Constructor used for tests
+	public GenesisClient(ConfigProperties configProperties) {
+		restTemplate = null;
+		this.configProperties = configProperties;
+		this.authToken = null;
+	}
+
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
 		//Null requestEntity because health check is whitelisted
@@ -55,19 +62,20 @@ public class GenesisClient {
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
-	public List<SurveyUnitId> getSurveyUnitIds(String idQuestionnaire) {
-		String url = String.format("%s/idUEs/by-questionnaire?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		ResponseEntity<SurveyUnitId[]> response = restTemplate.exchange(
+	public List<InterrogationId> getInterrogationIds(String questionnaireId) {
+		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s",
+				configProperties.getGenesisUrl(), questionnaireId);
+		ResponseEntity<InterrogationId[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
 				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitId[].class
+				InterrogationId[].class
 		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-	public List<Mode> getModes(String idCampaign) {
-		String url = String.format("%s/modes/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
+	public List<Mode> getModes(String campaignId) {
+		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
@@ -78,21 +86,10 @@ public class GenesisClient {
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
 	}
-
-	public List<SurveyUnitUpdateLatest> getUELatestState(String idQuestionnaire, SurveyUnitId suId) {
-		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s&idUE=%s", configProperties.getGenesisUrl(), idQuestionnaire, suId.getIdUE());
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
-				url,
-				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitUpdateLatest[].class
-		);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
-	}
-
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String idQuestionnaire, List<SurveyUnitId> idUEs) {
-		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
-		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(idUEs, getHttpHeaders());
+	
+	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.POST,
@@ -102,8 +99,8 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-    public List<String> getQuestionnaireModelIds(String idCampaign) throws JsonProcessingException {
-		String url = String.format("%s/questionnaires/by-campaign?idCampaign=%s", configProperties.getGenesisUrl(), idCampaign);
+    public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException {
+		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = restTemplate.exchange(url,
 				HttpMethod.GET,
 				new HttpEntity<>(null, getHttpHeaders()),

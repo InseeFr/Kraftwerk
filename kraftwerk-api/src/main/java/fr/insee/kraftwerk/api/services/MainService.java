@@ -90,18 +90,18 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId) {
 		boolean withDDI = true;
-		return runWithGenesis(idCampaign, withDDI);
+		return runWithGenesis(campaignId, withDDI);
 	}
 
 
 	@PutMapping(value = "/main/genesis/lunatic-only")
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
-			@Parameter(description = "${param.idCampaign}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String idCampaign) {
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId) {
 		boolean withDDI = false;
-		return runWithGenesis(idCampaign, withDDI);
+		return runWithGenesis(campaignId, withDDI);
 	}
 
 	@NotNull
@@ -121,19 +121,19 @@ public class MainService extends KraftwerkService {
 	}
 
 	@NotNull
-	private ResponseEntity<String> runWithGenesis(String idCampaign, boolean withDDI) {
+	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
 
 		try {
-			mpGenesis.runMain(idCampaign);
+			mpGenesis.runMain(campaignId);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(idCampaign);
+		return ResponseEntity.ok(campaignId);
 	}
 
 	private @NotNull FileUtilsInterface getFileUtilsInterface() {
@@ -141,7 +141,7 @@ public class MainService extends KraftwerkService {
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
+			fileUtilsInterface = new FileSystemImpl(configProperties.getDefaultDirectory());
 		}
 		return fileUtilsInterface;
 	}

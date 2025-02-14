@@ -30,7 +30,7 @@ class DatasetSerializerTest {
             )
     );
     
-    String expectedJson = "{\"dataStructure\":[{\"name\":\"IdUE\",\"type\":\"STRING\",\"role\":\"IDENTIFIER\",\"nullable\":false},{\"name\":\"LIB_COMMUNE\",\"type\":\"STRING\",\"role\":\"MEASURE\",\"nullable\":true},{\"name\":\"INDIVIDU\",\"type\":\"STRING\",\"role\":\"IDENTIFIER\",\"nullable\":false},{\"name\":\"INDIVIDU.PRENOM\",\"type\":\"STRING\",\"role\":\"MEASURE\",\"nullable\":true},{\"name\":\"INDIVIDU.AGE\",\"type\":null,\"role\":\"MEASURE\",\"nullable\":true}],\"dataPoints\":[[\"UE001\",\"Lille\",\"INDIVIDU-1\",\"Jean\",30],[\"UE001\",\"Lille\",\"INDIVIDU-2\",\"Frédéric\",42],[\"UE004\",\"Amiens\",\"INDIVIDU-1\",\"David\",26],[\"UE005\",\"\",\"INDIVIDU-1\",\"Thibaud \",18]]}";
+    String expectedJson = "{\"dataStructure\":[{\"name\":\"interrogationId\",\"type\":\"STRING\",\"role\":\"IDENTIFIER\",\"nullable\":false},{\"name\":\"LIB_COMMUNE\",\"type\":\"STRING\",\"role\":\"MEASURE\",\"nullable\":true},{\"name\":\"INDIVIDU\",\"type\":\"STRING\",\"role\":\"IDENTIFIER\",\"nullable\":false},{\"name\":\"INDIVIDU.PRENOM\",\"type\":\"STRING\",\"role\":\"MEASURE\",\"nullable\":true},{\"name\":\"INDIVIDU.AGE\",\"type\":null,\"role\":\"MEASURE\",\"nullable\":true}],\"dataPoints\":[[\"UE001\",\"Lille\",\"INDIVIDU-1\",\"Jean\",30],[\"UE001\",\"Lille\",\"INDIVIDU-2\",\"Frédéric\",42],[\"UE004\",\"Amiens\",\"INDIVIDU-1\",\"David\",26],[\"UE005\",\"\",\"INDIVIDU-1\",\"Thibaud \",18]]}";
 
     @Test
     void testSerializeDataset() throws JsonProcessingException {
