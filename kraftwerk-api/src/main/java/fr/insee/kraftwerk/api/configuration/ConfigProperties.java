@@ -19,10 +19,9 @@ public class ConfigProperties {
 	private String authServerUrl;
 	@Value("${fr.insee.kraftwerk.oidc.realm}")
 	private String realm;
-	@Value("${fr.insee.kraftwerk.security.token.oidc-claim-role}")
+/*	@Value("${fr.insee.kraftwerk.security.token.oidc-claim-role}")
 	private String oidcClaimRole;
 	@Value("${fr.insee.kraftwerk.security.token.oidc-claim-username}")
-	private String oidcClaimUsername;
-	@Value("#{'${fr.insee.kraftwerk.security.whitelist-matchers}'.split(',')}")
-	private String[] whiteList;
+	private String oidcClaimUsername;*/
+
 }
