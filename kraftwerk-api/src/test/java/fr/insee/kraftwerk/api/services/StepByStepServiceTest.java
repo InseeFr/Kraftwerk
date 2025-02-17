@@ -45,7 +45,7 @@ class StepByStepServiceTest {
     private static final String URI_STEPS_UNIMODAL = URI_STEPS + "/unimodalProcessing?dataMode=WEB";
     private static final String URI_STEPS_MULTIMODAL = URI_STEPS + "/multimodalProcessing";
     private static final String URI_STEPS_BUILD_VTL_BINDINGS = URI_STEPS + "/buildVtlBindings";
-    //private static final String URI_STEPS_BUILD_VTL_BINDINGS_DATAMODE = URI_STEPS + "/buildVtlBindings/{dataMode}";
+    private static final String URI_STEPS_BUILD_VTL_BINDINGS_DATAMODE = URI_STEPS + "/buildVtlBindings/WEB";
     private static final String URI_ARCHIVE = URI_STEPS + "/archive";
 
     // Mock beans to replace actual service implementations
@@ -69,6 +69,7 @@ class StepByStepServiceTest {
                 Arguments.of(URI_STEPS_UNIMODAL),
                 Arguments.of(URI_STEPS_MULTIMODAL),
                 Arguments.of(URI_STEPS_BUILD_VTL_BINDINGS),
+                Arguments.of(URI_STEPS_BUILD_VTL_BINDINGS_DATAMODE),
                 Arguments.of(URI_ARCHIVE)
         );
     }
