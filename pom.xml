@@ -18,7 +18,7 @@
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>7.21.0</cucumber.version>
+		<cucumber.version>7.21.1</cucumber.version>
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.12</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
@@ -30,7 +30,7 @@
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.17.4</pitest.version>
+		<pitest.version>1.18.1</pitest.version>
 		<pitest.junit.version>1.2.1</pitest.junit.version>
 	
 	</properties>
