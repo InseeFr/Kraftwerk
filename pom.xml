@@ -110,12 +110,6 @@
 			<version>${cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>io.cucumber</groupId>
-			<artifactId>cucumber-spring</artifactId>
-			<version>${cucumber.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<!-- AssertJ -->
 		<!-- https://www.baeldung.com/introduction-to-assertj -->
 		<!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
