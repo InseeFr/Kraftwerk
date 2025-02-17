@@ -84,7 +84,7 @@ public class MainDefinitions {
 		try {
 			fileUtilsInterface.deleteDirectory(outDirectory);
 		} catch (Exception ignored){
-
+			//Ignored exception
 		}
 		database = SqlUtils.openConnection();
 	}
