@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.0 [2025-02-18]
+### Added
+- Adaptation to the new Genesis model
+### Fixed
+- Warning when cucumber tests are executed
+### Updated
+- pitest 1.18.2
+- springdoc 2.8.5
+- duckdb 1.2.0
+- cucumber 7.21.1
+
+
 ## 3.1.1 [2025-01-31]
 ### Added
 - External variables in loop\tables are now exported correctly
