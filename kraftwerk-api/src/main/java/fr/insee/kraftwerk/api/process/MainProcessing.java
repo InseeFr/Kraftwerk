@@ -217,7 +217,7 @@ public class MainProcessing {
 			return files;
 		}
 		if(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString()) == null){
-			log.warn(String.format("Data path given could not be identified as a file or folder: %s", dataPath));
+			log.warn("Data path given could not be identified as a file or folder: {}", dataPath);
 			return files;
 		}
 		if(Boolean.TRUE.equals(userInputsFile.getFileUtilsInterface().isDirectory(dataPath.toString()))){

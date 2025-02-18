@@ -122,13 +122,10 @@ public class XformsDataParser extends DataParser {
 											"Variable \"%s\" not expected in group \"%s\", corresponding values will be ignored.",
 											variableName, groupName));
 								}
-
 							}
-
 						}
 					}
 				}
-
 				data.addQuestionnaire(questionnaireData);
 			}
 		}

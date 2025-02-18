@@ -84,7 +84,7 @@ public class MainDefinitions {
 		try {
 			fileUtilsInterface.deleteDirectory(outDirectory);
 		} catch (Exception ignored){
-
+			//Ignored exception
 		}
 		database = SqlUtils.openConnection();
 	}
@@ -360,7 +360,7 @@ public class MainDefinitions {
 	}
 
 	@Then("Step 7 : We check that id {string} has value {string} for variable {string} in table {string}")
-	public void checkVariableValue(String idUE, String expectedValue, String variable, String tableName)
+	public void checkVariableValue(String interrogationId, String expectedValue, String variable, String tableName)
 			throws IOException, CsvValidationException {
 		if (tableName == null || tableName.isEmpty())
 			tableName = Constants.ROOT_GROUP_NAME;
@@ -375,14 +375,14 @@ public class MainDefinitions {
 		CSVReader csvReader = getCSVReader(outputReportingDataFile.toPath());
 		// get header
 		String[] header = csvReader.readNext();
-		int idUEPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
+		int interrogationIdPosition = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
 		int varPosition = Arrays.asList(header).indexOf(variable);
 
-		// get the line corresponding to idUE
+		// get the line corresponding to interrogationId
 		String[] line;
 		String value = null;
 		while ((line = csvReader.readNext()) != null) {
-			if (line[idUEPosition].equals(idUE))
+			if (line[interrogationIdPosition].equals(interrogationId))
 				value = line[varPosition];
 		}
 

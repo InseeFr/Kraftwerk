@@ -12,7 +12,7 @@
 #    # Parameters :
 #    # - Directory : Directory of test campaigns
 #    # - OutputFileName : Name of reporting data file (with .csv extension)
-#    # - SurveyUnitId : Survey unit identifier
+#    # - InterrogationId : Interrogation identifier
 #    # - FieldName : Expected field name
 #
 #|Directory                        |OutputFileName                    |TCMScriptName  |FieldName       |DatasetName |
