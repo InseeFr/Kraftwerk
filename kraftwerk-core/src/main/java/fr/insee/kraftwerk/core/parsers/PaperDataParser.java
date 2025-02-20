@@ -182,7 +182,7 @@ public class PaperDataParser extends DataParser {
 	}
 
 	/**
-	 * In paper datafiles, the identifier is like "[IdUE]_[row identifier]"
+	 * In paper datafiles, the identifier is like "[interrogationId]_[row identifier]"
 	 *
 	 * @param subGroupId The group level identifier for all variables of a given
 	 *                   questionnaire.

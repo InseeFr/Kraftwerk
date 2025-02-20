@@ -10,7 +10,7 @@ Feature: Do we save correctly all reporting data ?
     # Parameters :
     # - Directory : Directory of test campaigns
     # - OutputFileName : Name of reporting data file (with .csv extension)
-    # - ExpectedReportingDataFieldCount : Expected field quantity excluding IdUE
+    # - ExpectedReportingDataFieldCount : Expected field quantity excluding interrogationId
 
     |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
     |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
@@ -68,33 +68,33 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: The file has all the contact attempts of a certain type
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then For SurveyUnit "<SurveyUnitId>" we should have <ExpectedSpecificStatusCount> contact attempts with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
+    Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact attempts with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
     # - OutputFileName : Name of reporting data file (with .csv extension)
-    # - SurveyUnitId : Survey unit identifier
+    # - InterrogationId : Interrogation identifier
     # - ExpectedSpecificStatusCount : Expected count for said status
     # - ExpectedStatus : Expected status (in input file)
 
-      |Directory                        |OutputFileName                                    |SurveyUnitId |ExpectedSpecificStatusCount  |ExpectedStatus   |
+      |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003      |2                            |REF              |
 
   Scenario Outline: The file has all the contact states of a specific type
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then For SurveyUnit "<SurveyUnitId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
+    Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
     # - OutputFileName : Name of reporting data file (with .csv extension)
-    # - SurveyUnitId : Survey unit identifier
+    # - InterrogationId : Interrogation identifier
     # - ExpectedSpecificStatusCount : Expected count for said status
     # - ExpectedStatus : Expected status (in input file)
 
-      |Directory                        |OutputFileName                                    |SurveyUnitId |ExpectedSpecificStatusCount  |ExpectedStatus   |
+      |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
       |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002      |5                            |WFT              |
 
 
@@ -128,31 +128,31 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the new variables are computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
 
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
-    # - SurveyUnitId : Survey unit identifier
+    # - InterrogationId : Interrogation identifier
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedIdentification          |
+      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
       |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |DESTROY                         |
 
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then For SurveyUnit "<SurveyUnitId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
 
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
-    # - SurveyUnitId : Survey unit identifier
+    # - InterrogationId : Interrogation identifier
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |Directory                        |OutputFileName                                    |SurveyUnitId   |ExpectedOutcomeSpottingStatus   |
+      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedOutcomeSpottingStatus   |
       |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |TEST                            |
 
     #TODO Adapt this test when we have the correct TEL .vtl script

@@ -52,6 +52,7 @@ public class UserInputsGenesis extends UserInputs{
         if (withDDI) {
             modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
         }
+
 		modeInputs.setLunaticFile(findLunaticFile(inputDirectory.resolve(mode.name())));
 
         modeInputs.setDataMode(mode.name());
