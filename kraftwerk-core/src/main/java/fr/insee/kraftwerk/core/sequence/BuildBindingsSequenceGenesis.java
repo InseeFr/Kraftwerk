@@ -36,7 +36,7 @@ public class BuildBindingsSequenceGenesis {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path inDirectory) throws KraftwerkException {
+	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path specsDirectory) throws KraftwerkException {
 		SurveyRawData data = new SurveyRawData();
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
@@ -59,10 +59,10 @@ public class BuildBindingsSequenceGenesis {
 		}
 
 		/* Step 2.2 : Get paradata for the survey */
-		parseParadata(dataMode, data, inDirectory, fileUtilsInterface);
+		parseParadata(dataMode, data, specsDirectory, fileUtilsInterface);
 
 		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, inDirectory, fileUtilsInterface);
+		parseReportingData(dataMode, data, specsDirectory, fileUtilsInterface);
 
 		/* Step 2.4a : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
@@ -79,8 +79,8 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
-	private void parseParadata(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
-		Path paraDataPath = inDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
+	private void parseParadata(String dataMode, SurveyRawData data, Path specsDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
+		Path paraDataPath = specsDirectory.resolve(dataMode+Constants.PARADATA_FOLDER);
 		if (fileUtilsInterface.isFileExists(paraDataPath.toString())) {
 			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
