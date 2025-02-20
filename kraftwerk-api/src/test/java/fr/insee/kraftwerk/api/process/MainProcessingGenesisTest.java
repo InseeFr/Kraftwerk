@@ -54,7 +54,7 @@ class MainProcessingGenesisTest {
         doReturn(configProperties).when(mockClient).getConfigProperties();
 
         mockFileUtils = mock(FileUtilsInterface.class);
-        mainProcessing = Mockito.spy(new MainProcessingGenesis(mockClient, mockFileUtils));
+        mainProcessing = Mockito.spy(new MainProcessingGenesis(mockClient, mockFileUtils, true));
 
     }
 

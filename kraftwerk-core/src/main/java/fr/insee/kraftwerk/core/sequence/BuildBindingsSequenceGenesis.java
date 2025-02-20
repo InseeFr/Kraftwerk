@@ -18,12 +18,14 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
@@ -88,6 +90,7 @@ public class BuildBindingsSequenceGenesis {
 
 	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
+		log.info("Try to read reporting data from {}", reportingDataFile.toString());
 		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
 			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());
 			for (String file : listFiles) {
