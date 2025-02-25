@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,9 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GenesisClient {
@@ -32,27 +35,55 @@ public class GenesisClient {
 	@Getter
 	private final ConfigProperties configProperties;
 
-	private final String authToken;
+	private String serviceAccountToken;
 
 
 	@Autowired
 	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.configProperties = configProperties;
-		this.authToken = null;
+		this.serviceAccountToken = retrieveServiceAccountToken();
 	}
 
 	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties, String authToken) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.configProperties = configProperties;
-		this.authToken = authToken;
+		this.serviceAccountToken = retrieveServiceAccountToken();
 	}
 
 	//Constructor used for tests
 	public GenesisClient(ConfigProperties configProperties) {
 		restTemplate = null;
 		this.configProperties = configProperties;
-		this.authToken = null;
+		this.serviceAccountToken = retrieveServiceAccountToken();
+	}
+
+	private synchronized String retrieveServiceAccountToken() {
+		String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
+				configProperties.getKeycloakUrl(),
+				configProperties.getKeycloakRealm());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		String body = String.format("grant_type=client_credentials&client_id=%s&client_secret=%s",
+				configProperties.getServiceClientId(),
+				configProperties.getServiceClientSecret());
+
+		HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+		ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+		if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+			return (String) response.getBody().get("access_token");
+		} else {
+			throw new RuntimeException("Failed to retrieve service account token");
+		}
+	}
+
+
+	@Scheduled(fixedDelayString = "${service.token.refresh.interval:300000}")
+	public synchronized void refreshServiceAccountToken() {
+		this.serviceAccountToken = retrieveServiceAccountToken();
 	}
 
 	public String pingGenesis(){
@@ -112,13 +143,14 @@ public class GenesisClient {
 	private HttpHeaders getHttpHeaders() {
 		//Auth
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", "Bearer " + (authToken == null ? getTokenValue() : authToken));
+		httpHeaders.add("Authorization", "Bearer " + serviceAccountToken;
 		return httpHeaders;
 	}
 
-	private String getTokenValue() {
+	public void validateUserToken() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		JwtAuthenticationToken oauthToken = (JwtAuthenticationToken) authentication;
-		return oauthToken.getToken().getTokenValue();
+		if (!(authentication instanceof JwtAuthenticationToken)) {
+			throw new RuntimeException("Invalid authentication type");
+		}
 	}
 }
