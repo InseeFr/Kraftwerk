@@ -25,4 +25,9 @@ public class ConfigProperties {
 	private String oidcClaimUsername;
 	@Value("#{'${fr.insee.kraftwerk.security.whitelist-matchers}'.split(',')}")
 	private String[] whiteList;
+
+	@Value("${fr.insee.kraftwerk.oidc.service.client-id}")
+	private String serviceClientId;
+	@Value("${fr.insee.kraftwerk.oidc.service.client-secret}")
+	private String serviceClientSecret;
 }

@@ -82,7 +82,7 @@ public class KraftwerkBatch implements CommandLineRunner {
                     MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
                             configProperties,
                             fileSystem,
-                            genesisToken);
+                            true);
                     mainProcessingGenesis.runMain(inDirectory);
                 } else {
                     MainProcessing mainProcessing = new MainProcessing(

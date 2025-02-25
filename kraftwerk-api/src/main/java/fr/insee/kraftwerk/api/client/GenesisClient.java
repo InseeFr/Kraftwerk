@@ -35,61 +35,27 @@ public class GenesisClient {
 	@Getter
 	private final ConfigProperties configProperties;
 
-	private String serviceAccountToken;
-
 
 	@Autowired
 	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.configProperties = configProperties;
-		this.serviceAccountToken = retrieveServiceAccountToken();
-	}
-
-	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties, String authToken) {
-		this.restTemplate = restTemplateBuilder.build();
-		this.configProperties = configProperties;
-		this.serviceAccountToken = retrieveServiceAccountToken();
+		OidcService oidcService = new OidcService(configProperties);
+		this.restTemplate.getInterceptors().add(new GenesisAuthInterceptor(oidcService));
 	}
 
 	//Constructor used for tests
 	public GenesisClient(ConfigProperties configProperties) {
 		restTemplate = null;
 		this.configProperties = configProperties;
-		this.serviceAccountToken = retrieveServiceAccountToken();
-	}
-
-	private synchronized String retrieveServiceAccountToken() {
-		String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
-				configProperties.getKeycloakUrl(),
-				configProperties.getKeycloakRealm());
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-		String body = String.format("grant_type=client_credentials&client_id=%s&client_secret=%s",
-				configProperties.getServiceClientId(),
-				configProperties.getServiceClientSecret());
-
-		HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-		ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
-		if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-			return (String) response.getBody().get("access_token");
-		} else {
-			throw new RuntimeException("Failed to retrieve service account token");
-		}
-	}
-
-
-	@Scheduled(fixedDelayString = "${service.token.refresh.interval:300000}")
-	public synchronized void refreshServiceAccountToken() {
-		this.serviceAccountToken = retrieveServiceAccountToken();
 	}
 
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
+		// We use another restTemplate because we don't need a token to ping Genesis
+		RestTemplate restTemplateWithoutAuth = new RestTemplate();
 		//Null requestEntity because health check is whitelisted
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+		ResponseEntity<String> response = restTemplateWithoutAuth.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
@@ -99,7 +65,7 @@ public class GenesisClient {
 		ResponseEntity<InterrogationId[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				InterrogationId[].class
 		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
@@ -110,7 +76,7 @@ public class GenesisClient {
 		ResponseEntity<String[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				String[].class
 		);
 		List<Mode> modes = new ArrayList<>();
@@ -120,7 +86,7 @@ public class GenesisClient {
 	
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
-		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
+		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, null);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.POST,
@@ -134,23 +100,10 @@ public class GenesisClient {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = restTemplate.exchange(url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
 	}
 
-	private HttpHeaders getHttpHeaders() {
-		//Auth
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", "Bearer " + serviceAccountToken;
-		return httpHeaders;
-	}
-
-	public void validateUserToken() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (!(authentication instanceof JwtAuthenticationToken)) {
-			throw new RuntimeException("Invalid authentication type");
-		}
-	}
 }

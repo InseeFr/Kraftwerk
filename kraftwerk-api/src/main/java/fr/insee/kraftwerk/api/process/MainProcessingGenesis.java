@@ -67,12 +67,6 @@ public class MainProcessingGenesis {
 		this.withDDI = withDDI;
 	}
 
-	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, String authToken) {
-		this.client = new GenesisClient(new RestTemplateBuilder(), config, authToken);
-		this.fileUtilsInterface = fileUtilsInterface;
-		this.withDDI = true;
-	}
-
 	public MainProcessingGenesis(GenesisClient genesisClient,
 								 FileUtilsInterface fileUtilsInterface,
 								 boolean withDDI) {
