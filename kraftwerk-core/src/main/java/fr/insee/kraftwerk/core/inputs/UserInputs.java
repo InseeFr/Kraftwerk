@@ -13,6 +13,7 @@ import java.util.Map;
 public class UserInputs {
 
 	protected Path inputDirectory;
+	protected Path specsDirectory;
 	protected Map<String, ModeInputs> modeInputsMap = new HashMap<>();
 	protected Path vtlReconciliationFile;
 	protected Path vtlTransformationsFile;

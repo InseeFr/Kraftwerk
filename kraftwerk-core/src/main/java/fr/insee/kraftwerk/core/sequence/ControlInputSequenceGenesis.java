@@ -24,16 +24,16 @@ public class ControlInputSequenceGenesis {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	public Path getInDirectory(String inDirectoryParam) {
-		Path inDirectory = Paths.get(defaultDirectory,SPEC_FOLDER, inDirectoryParam);
-		hasConfigFile = verifyInDirectory(inDirectory);
-		return inDirectory;
+	public Path getSpecsDirectory(String specsDirectoryParam) {
+		Path specsDirectory = Paths.get(defaultDirectory,SPEC_FOLDER, specsDirectoryParam);
+		hasConfigFile = verifySpecsDirectory(specsDirectory);
+		return specsDirectory;
 	}
 
-	private boolean verifyInDirectory(Path inDirectory) {
+	private boolean verifySpecsDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
 		if (fileUtilsInterface.isFileExists(userInputFile.toString())) {
-			log.info(String.format("Found configuration file in campaign folder: %s", userInputFile));
+			log.info("Found configuration file in campaign folder: {}", userInputFile);
 		} else {
             log.info("No configuration file found in campaign folder: {}", inDirectory);
 			return false;

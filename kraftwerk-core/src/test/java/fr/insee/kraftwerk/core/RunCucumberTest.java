@@ -1,3 +1,4 @@
+package fr.insee.kraftwerk.core;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
