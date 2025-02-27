@@ -79,17 +79,6 @@ public class GenesisClient {
 		return modes;
 	}
 
-	public List<SurveyUnitUpdateLatest> getUELatestState(String idQuestionnaire, SurveyUnitId suId) {
-		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s&idUE=%s", configProperties.getGenesisUrl(), idQuestionnaire, suId.getIdUE());
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
-				url,
-				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
-				SurveyUnitUpdateLatest[].class
-		);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
-	}
-
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String idQuestionnaire, List<SurveyUnitId> idUEs) {
 		String url = String.format("%s/responses/simplified/by-list-ue-and-questionnaire/latest?idQuestionnaire=%s", configProperties.getGenesisUrl(), idQuestionnaire);
 		HttpEntity<List<SurveyUnitId>> request = new HttpEntity<>(idUEs, getHttpHeaders());
