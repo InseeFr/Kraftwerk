@@ -4,19 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,33 +28,27 @@ public class GenesisClient {
 	@Getter
 	private final ConfigProperties configProperties;
 
-	private final String authToken;
-
 
 	@Autowired
 	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.configProperties = configProperties;
-		this.authToken = null;
-	}
-
-	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties, String authToken) {
-		this.restTemplate = restTemplateBuilder.build();
-		this.configProperties = configProperties;
-		this.authToken = authToken;
+		OidcService oidcService = new OidcService(configProperties);
+		this.restTemplate.getInterceptors().add(new GenesisAuthInterceptor(oidcService));
 	}
 
 	//Constructor used for tests
 	public GenesisClient(ConfigProperties configProperties) {
 		restTemplate = null;
 		this.configProperties = configProperties;
-		this.authToken = null;
 	}
 
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
+		// We use another restTemplate because we don't need a token to ping Genesis
+		RestTemplate restTemplateWithoutAuth = new RestTemplate();
 		//Null requestEntity because health check is whitelisted
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+		ResponseEntity<String> response = restTemplateWithoutAuth.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
@@ -68,7 +58,7 @@ public class GenesisClient {
 		ResponseEntity<InterrogationId[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				InterrogationId[].class
 		);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
@@ -79,7 +69,7 @@ public class GenesisClient {
 		ResponseEntity<String[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				String[].class
 		);
 		List<Mode> modes = new ArrayList<>();
@@ -89,7 +79,7 @@ public class GenesisClient {
 	
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
-		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, getHttpHeaders());
+		HttpEntity<List<InterrogationId>> request = new HttpEntity<>(interrogationIds, null);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = restTemplate.exchange(
 				url,
 				HttpMethod.POST,
@@ -103,22 +93,10 @@ public class GenesisClient {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = restTemplate.exchange(url,
 				HttpMethod.GET,
-				new HttpEntity<>(null, getHttpHeaders()),
+				null,
 				String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
 	}
 
-	private HttpHeaders getHttpHeaders() {
-		//Auth
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", "Bearer " + (authToken == null ? getTokenValue() : authToken));
-		return httpHeaders;
-	}
-
-	private String getTokenValue() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		JwtAuthenticationToken oauthToken = (JwtAuthenticationToken) authentication;
-		return oauthToken.getToken().getTokenValue();
-	}
 }
