@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.1 [2025-02-27]
+### Fixed
+- Bug of expiration of user token : use a service account to communicate with other API
+### Updated
+- pitest-junit5-plugin 1.2.2
+- spingboot 3.4.3
+
 ## 3.2.0 [2025-02-18]
 ### Added
 - Adaptation to the new Genesis model
