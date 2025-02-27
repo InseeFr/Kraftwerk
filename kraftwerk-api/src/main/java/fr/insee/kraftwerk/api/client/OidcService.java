@@ -40,7 +40,7 @@ public class OidcService {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             serviceAccountToken = (String) response.getBody().get("access_token");
             Integer expiresIn = (Integer) response.getBody().get("expires_in");
             tokenExpirationTime = System.currentTimeMillis() + (expiresIn.longValue() * 1000);
