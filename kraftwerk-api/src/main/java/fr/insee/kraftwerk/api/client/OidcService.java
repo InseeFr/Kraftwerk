@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
 @Service
@@ -23,7 +25,7 @@ public class OidcService {
         this.configProperties = configProperties;
     }
 
-    private String retrieveServiceAccountToken() {
+    private void retrieveServiceAccountToken() throws IOException {
         String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
                 configProperties.getAuthServerUrl(),
                 configProperties.getRealm());
@@ -40,15 +42,17 @@ public class OidcService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return (String) response.getBody().get("access_token");
+            serviceAccountToken = (String) response.getBody().get("access_token");
+            Integer expiresIn = (Integer) response.getBody().get("expires_in");
+            tokenExpirationTime = System.currentTimeMillis() + (expiresIn.longValue() * 1000);
         } else {
-            throw new RuntimeException("Failed to retrieve service account token");
+            throw new IOException("Failed to retrieve service account token");
         }
     }
 
-    public String getServiceAccountToken() {
+    public String getServiceAccountToken() throws IOException {
         if (serviceAccountToken == null || System.currentTimeMillis() >= tokenExpirationTime) {
-            serviceAccountToken = retrieveServiceAccountToken();
+            retrieveServiceAccountToken();
         }
         return serviceAccountToken;
     }
