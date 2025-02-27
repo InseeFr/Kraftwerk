@@ -63,7 +63,6 @@ public class KraftwerkBatch implements CommandLineRunner {
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
                 String inDirectory = args[3];
-                String genesisToken = args[4];
 
                 //Kraftwerk service type related parameters
                 boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
@@ -120,8 +119,8 @@ public class KraftwerkBatch implements CommandLineRunner {
      * @throws IllegalArgumentException if invalid argument
      */
     private static void checkArgs(String[] args) throws IllegalArgumentException{
-        if(args.length != 5) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 5 !".formatted(args.length));
+        if(args.length != 4) {
+            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 4 !".formatted(args.length));
         }
         if(!args[1].equals("true") && !args[1].equals("false")){
             throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
