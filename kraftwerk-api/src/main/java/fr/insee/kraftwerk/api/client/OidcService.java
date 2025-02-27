@@ -48,7 +48,7 @@ public class OidcService {
 
     public String getServiceAccountToken() {
         if (serviceAccountToken == null || System.currentTimeMillis() >= tokenExpirationTime) {
-            retrieveServiceAccountToken();
+            serviceAccountToken = retrieveServiceAccountToken();
         }
         return serviceAccountToken;
     }
