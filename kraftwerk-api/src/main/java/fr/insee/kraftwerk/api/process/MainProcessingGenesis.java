@@ -109,15 +109,18 @@ public class MainProcessingGenesis {
 			for (String questionnaireId : questionnaireModelIds) {
 				List<InterrogationId> ids = client.getInterrogationIds(questionnaireId);
 				List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
+				int nbPartitions = listIds.size();
+				int indexPartition = 1;
 				for (List<InterrogationId> listId : listIds) {
 					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
-					log.info("Number of documents retrieved from database : {}", suLatest.size());
+					log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
 					vtlBindings = new VtlBindings();
 					unimodalProcess(suLatest);
 					multimodalProcess();
 					insertDatabase();
 					outputFileWriter();
 					writeErrors();
+					indexPartition++;
 				}
 			}
 		}catch (SQLException e){
