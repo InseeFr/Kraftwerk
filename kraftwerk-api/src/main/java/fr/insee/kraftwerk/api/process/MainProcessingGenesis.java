@@ -100,7 +100,7 @@ public class MainProcessingGenesis {
 		int batchSize = 1000;
 		init(campaignId);
 		//Try with resources to close database when done
-		try (Connection tryDatabase = SqlUtils.openConnection()) {
+		try (Connection tryDatabase = SqlUtils.openConnection("jdbc:duckdb:"+inDirectory+"/baseTemp.duckdb");) {
 			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
@@ -123,10 +123,12 @@ public class MainProcessingGenesis {
 					indexPartition++;
 				}
 			}
+			if (!database.isClosed()){database.close();}
 		}catch (SQLException e){
 			log.error(e.toString());
 			throw new KraftwerkException(500,"SQL error");
 		}
+		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {

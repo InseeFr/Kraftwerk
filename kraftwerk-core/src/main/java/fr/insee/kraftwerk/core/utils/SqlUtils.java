@@ -1,13 +1,14 @@
 package fr.insee.kraftwerk.core.utils;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdb.DuckDBConnection;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -139,6 +140,7 @@ public class SqlUtils {
         }
 
         DuckDBConnection duckDBConnection = (DuckDBConnection) database.getConnection();
+        log.debug("URL de connexion : {}", duckDBConnection.getMetaData().getURL());
         try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
             for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
                 appender.beginRow();
@@ -149,6 +151,7 @@ public class SqlUtils {
                 appender.endRow();
             }
         }
+        database.execute("CHECKPOINT;"); //FOrce to write data on disk
     }
 
     /**
@@ -203,7 +206,7 @@ public class SqlUtils {
      */
     public static Connection openConnection(String databaseURL) throws SQLException {
         return DriverManager.getConnection(databaseURL);
-    }
+}
 
     /**
      * Connect to DuckDB and retrieve column names of a table
@@ -278,4 +281,13 @@ public class SqlUtils {
                 filePath.getFileName().toString().split("\\.")[0], filePath));
     }
 
+    public static void deleteDatabaseFile(String databasePath) {
+        // Connection should be close before (after try-with-resources)
+        File dbFile = new File(databasePath);
+        try{
+            Files.delete(dbFile.toPath());
+        } catch (IOException e){
+            log.warn("❌ Can't delete DB File !");
+        }
+    }
 }
