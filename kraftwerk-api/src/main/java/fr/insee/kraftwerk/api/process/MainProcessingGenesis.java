@@ -118,11 +118,11 @@ public class MainProcessingGenesis {
 					unimodalProcess(suLatest);
 					multimodalProcess();
 					insertDatabase();
-					outputFileWriter();
 					writeErrors();
 					indexPartition++;
 				}
 			}
+			outputFileWriter();
 			if (!database.isClosed()){database.close();}
 		}catch (SQLException e){
 			log.error(e.toString());
