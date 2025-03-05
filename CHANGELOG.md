@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.2 [2025-03-05]
+### Fixed
+- Bug on large-scale surveys : fix in-memory duckdb
+- Bug on token check : if 401 we force the refresh of the token
+
 ## 3.2.1 [2025-02-27]
 ### Fixed
 - Bug of expiration of user token : use a service account to communicate with other API
