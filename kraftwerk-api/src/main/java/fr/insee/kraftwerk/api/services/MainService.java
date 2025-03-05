@@ -91,8 +91,7 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}", example = "1000")
-			@RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
 		boolean withDDI = true;
 		return runWithGenesis(campaignId, withDDI, batchSize);
 	}
@@ -102,8 +101,7 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}", example = "1000")
-			@RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
 		boolean withDDI = false;
 		return runWithGenesis(campaignId, withDDI, batchSize);
 	}
