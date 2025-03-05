@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.api.client;
 
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class OidcService {
 
     @Getter
@@ -24,7 +26,7 @@ public class OidcService {
         this.configProperties = configProperties;
     }
 
-    private void retrieveServiceAccountToken() throws IOException {
+    protected void retrieveServiceAccountToken() throws IOException {
         String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
                 configProperties.getAuthServerUrl(),
                 configProperties.getRealm());
@@ -49,7 +51,7 @@ public class OidcService {
         }
     }
 
-    public String getServiceAccountToken() throws IOException {
+    public synchronized String getServiceAccountToken() throws IOException {
         //We had a margin of 5 seconds for the expiration time
         if (serviceAccountToken == null || System.currentTimeMillis() >= tokenExpirationTime - 5000L) {
             retrieveServiceAccountToken();

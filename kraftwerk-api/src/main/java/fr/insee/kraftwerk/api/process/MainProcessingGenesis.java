@@ -98,6 +98,8 @@ public class MainProcessingGenesis {
 	public void runMain(String campaignId) throws KraftwerkException, IOException {
 		// We limit the size of the batch to 1000 survey units at a time
 		int batchSize = 1000;
+		//We delete database at start (in case there is already one)
+		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
 		init(campaignId);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = SqlUtils.openConnection("jdbc:duckdb:"+inDirectory+"/baseTemp.duckdb");) {
