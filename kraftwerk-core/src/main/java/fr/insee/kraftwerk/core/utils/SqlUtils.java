@@ -77,7 +77,7 @@ public class SqlUtils {
 
     private static String getCreateTableQuery(String datasetName, LinkedHashMap<String, VariableType> sqlSchema) {
         //CREATE query building
-        StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
+        StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE \"%s\" (", datasetName));
 
         for (Map.Entry<String, VariableType> column : sqlSchema.entrySet()) {
             createTableQuery.append("\"").append(column.getKey()).append("\"").append(" ").append(sqlSchema.get(column.getKey()).getSqlType());
@@ -119,10 +119,11 @@ public class SqlUtils {
      * @return list of table names
      */
     public static List<String> getTableNames(Statement statement) throws SQLException {
-        ResultSet resultSet = statement.executeQuery("SHOW TABLES");
         List<String> tableNames = new ArrayList<>();
-        while (resultSet.next()) {
-            tableNames.add(resultSet.getString("name"));
+        try (ResultSet resultSet = statement.executeQuery("SHOW TABLES")) {
+            while (resultSet.next()) {
+                tableNames.add(resultSet.getString("name"));
+            }
         }
         return tableNames;
     }
@@ -151,7 +152,7 @@ public class SqlUtils {
                 appender.endRow();
             }
         }
-        database.execute("CHECKPOINT;"); //FOrce to write data on disk
+        database.execute("CHECKPOINT;"); //Force to write data on disk
     }
 
     /**
@@ -216,10 +217,11 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static List<String> getColumnNames(Statement statement, String tableName) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName));
         List<String> columnNames = new ArrayList<>();
-        while (resultSet.next()) {
-            columnNames.add(resultSet.getString("column_name"));
+        try (ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName))) {
+            while (resultSet.next()) {
+                columnNames.add(resultSet.getString("column_name"));
+            }
         }
         return columnNames;
     }
@@ -232,10 +234,11 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static List<String> getColumnNames(Statement statement, String tableName, VariableType variableType) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM (DESCRIBE \"%s\") WHERE column_type = '%s'", tableName, variableType.getSqlType()));
         List<String> columnNames = new ArrayList<>();
-        while (resultSet.next()) {
-            columnNames.add(resultSet.getString("column_name"));
+        try (ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM (DESCRIBE \"%s\") WHERE column_type = '%s'", tableName, variableType.getSqlType()))){
+            while (resultSet.next()) {
+                columnNames.add(resultSet.getString("column_name"));
+            }
         }
         return columnNames;
     }
