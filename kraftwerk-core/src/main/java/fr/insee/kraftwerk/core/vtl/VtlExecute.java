@@ -168,10 +168,10 @@ public class VtlExecute {
                 log.warn("ScriptException - VTL instruction given is invalid and has been skipped : {}",vtlScript);
                 kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (NumberFormatException e) { 
-                log.warn("NumberFormatException - Corresponding variable could not be calculated.");
+                log.debug("NumberFormatException - Corresponding variable could not be calculated.");
                 kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (UnsupportedOperationException e) { 
-                log.warn("UnsupportedOperationException - Corresponding variable could not be calculated.");
+                log.debug("UnsupportedOperationException - Corresponding variable could not be calculated.");
                 kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (NullPointerException e) {
                 log.debug("NullPointerException - Probable cause: one of the operator used not yet supported by Trevas java library.");

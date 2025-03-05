@@ -90,18 +90,20 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId) {
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
 		boolean withDDI = true;
-		return runWithGenesis(campaignId, withDDI);
+		return runWithGenesis(campaignId, withDDI, batchSize);
 	}
 
 
 	@PutMapping(value = "/main/genesis/lunatic-only")
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId) {
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
 		boolean withDDI = false;
-		return runWithGenesis(campaignId, withDDI);
+		return runWithGenesis(campaignId, withDDI, batchSize);
 	}
 
 	@NotNull
@@ -121,13 +123,13 @@ public class MainService extends KraftwerkService {
 	}
 
 	@NotNull
-	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI) {
+	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, int batchSize) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
 
 		try {
-			mpGenesis.runMain(campaignId);
+			mpGenesis.runMain(campaignId, batchSize);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {

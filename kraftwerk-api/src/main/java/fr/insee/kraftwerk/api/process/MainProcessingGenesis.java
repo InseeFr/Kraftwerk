@@ -95,12 +95,13 @@ public class MainProcessingGenesis {
 		}
 	}
 
-	public void runMain(String campaignId) throws KraftwerkException, IOException {
-		// We limit the size of the batch to 1000 survey units at a time
-		int batchSize = 1000;
+	public void runMain(String campaignId, int batchSize) throws KraftwerkException, IOException {
+		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
+		//We delete database at start (in case there is already one)
+		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
 		init(campaignId);
 		//Try with resources to close database when done
-		try (Connection tryDatabase = SqlUtils.openConnection()) {
+		try (Connection tryDatabase = SqlUtils.openConnection("jdbc:duckdb:"+inDirectory+"/baseTemp.duckdb");) {
 			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
@@ -118,15 +119,17 @@ public class MainProcessingGenesis {
 					unimodalProcess(suLatest);
 					multimodalProcess();
 					insertDatabase();
-					outputFileWriter();
-					writeErrors();
 					indexPartition++;
 				}
 			}
+			outputFileWriter();
+			writeErrors();
+			if (!database.isClosed()){database.close();}
 		}catch (SQLException e){
 			log.error(e.toString());
 			throw new KraftwerkException(500,"SQL error");
 		}
+		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {

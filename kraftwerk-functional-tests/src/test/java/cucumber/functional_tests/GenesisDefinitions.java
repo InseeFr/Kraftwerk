@@ -169,7 +169,7 @@ public class GenesisDefinitions {
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 true
         );
-        mainProcessingGenesis.runMain(campaignId);
+        mainProcessingGenesis.runMain(campaignId,1000);
         System.out.println();
     }
 

@@ -1,13 +1,14 @@
 package fr.insee.kraftwerk.core.utils;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdb.DuckDBConnection;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,7 +77,7 @@ public class SqlUtils {
 
     private static String getCreateTableQuery(String datasetName, LinkedHashMap<String, VariableType> sqlSchema) {
         //CREATE query building
-        StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE '%s' (", datasetName));
+        StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE \"%s\" (", datasetName));
 
         for (Map.Entry<String, VariableType> column : sqlSchema.entrySet()) {
             createTableQuery.append("\"").append(column.getKey()).append("\"").append(" ").append(sqlSchema.get(column.getKey()).getSqlType());
@@ -118,10 +119,11 @@ public class SqlUtils {
      * @return list of table names
      */
     public static List<String> getTableNames(Statement statement) throws SQLException {
-        ResultSet resultSet = statement.executeQuery("SHOW TABLES");
         List<String> tableNames = new ArrayList<>();
-        while (resultSet.next()) {
-            tableNames.add(resultSet.getString("name"));
+        try (ResultSet resultSet = statement.executeQuery("SHOW TABLES")) {
+            while (resultSet.next()) {
+                tableNames.add(resultSet.getString("name"));
+            }
         }
         return tableNames;
     }
@@ -139,6 +141,7 @@ public class SqlUtils {
         }
 
         DuckDBConnection duckDBConnection = (DuckDBConnection) database.getConnection();
+        log.debug("URL de connexion : {}", duckDBConnection.getMetaData().getURL());
         try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
             for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
                 appender.beginRow();
@@ -149,6 +152,7 @@ public class SqlUtils {
                 appender.endRow();
             }
         }
+        database.execute("CHECKPOINT;"); //Force to write data on disk
     }
 
     /**
@@ -203,7 +207,7 @@ public class SqlUtils {
      */
     public static Connection openConnection(String databaseURL) throws SQLException {
         return DriverManager.getConnection(databaseURL);
-    }
+}
 
     /**
      * Connect to DuckDB and retrieve column names of a table
@@ -213,10 +217,11 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static List<String> getColumnNames(Statement statement, String tableName) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName));
         List<String> columnNames = new ArrayList<>();
-        while (resultSet.next()) {
-            columnNames.add(resultSet.getString("column_name"));
+        try (ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName))) {
+            while (resultSet.next()) {
+                columnNames.add(resultSet.getString("column_name"));
+            }
         }
         return columnNames;
     }
@@ -229,10 +234,11 @@ public class SqlUtils {
      * @throws SQLException if SQL error
      */
     public static List<String> getColumnNames(Statement statement, String tableName, VariableType variableType) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM (DESCRIBE \"%s\") WHERE column_type = '%s'", tableName, variableType.getSqlType()));
         List<String> columnNames = new ArrayList<>();
-        while (resultSet.next()) {
-            columnNames.add(resultSet.getString("column_name"));
+        try (ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM (DESCRIBE \"%s\") WHERE column_type = '%s'", tableName, variableType.getSqlType()))){
+            while (resultSet.next()) {
+                columnNames.add(resultSet.getString("column_name"));
+            }
         }
         return columnNames;
     }
@@ -278,4 +284,13 @@ public class SqlUtils {
                 filePath.getFileName().toString().split("\\.")[0], filePath));
     }
 
+    public static void deleteDatabaseFile(String databasePath) {
+        // Connection should be close before (after try-with-resources)
+        File dbFile = new File(databasePath);
+        try{
+            Files.delete(dbFile.toPath());
+        } catch (IOException e){
+            log.warn("❌ Can't delete DB File !");
+        }
+    }
 }
