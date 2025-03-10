@@ -6,9 +6,8 @@ Feature: Do we increment correctly the datasets file by file ?
     Then Step 5 : We check if we have <lineCount> lines
     Then Step 6 : We check if we have <variableCount> variables
     Then We check if there is only one header
-    Then Step 2 : We check root parquet output file has <parquetLineCount> lines and <variableCount> variables
+    Then Step 2 : We check root parquet output file has <lineCount> lines and <variableCount> variables
 
-    # linecount-1 because there is a final empty line in csv
     Examples:
-    | Directory                   | lineCount | parquetLineCount | variableCount |
-    | SAMPLETEST-MULTIPLEDATA-v1  | 7         | 6                | 136           |
+    | Directory                   | lineCount | variableCount |
+    | SAMPLETEST-MULTIPLEDATA-v1  | 7         | 136           |
