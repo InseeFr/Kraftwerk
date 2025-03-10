@@ -60,16 +60,22 @@ public class MainProcessingGenesis {
 	private Map<String, MetadataModel> metadataModels;
 
 	private final GenesisClient client;
+	private final ConfigProperties config;
 
 	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, boolean withDDI) {
+		this.config = config;
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.withDDI = withDDI;
 	}
 
-	public MainProcessingGenesis(GenesisClient genesisClient,
-								 FileUtilsInterface fileUtilsInterface,
-								 boolean withDDI) {
+	public MainProcessingGenesis(
+			ConfigProperties config,
+			GenesisClient genesisClient,
+		 	FileUtilsInterface fileUtilsInterface,
+		 	boolean withDDI
+	) {
+		this.config = config;
 		this.client = genesisClient;
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.withDDI = withDDI;
@@ -103,7 +109,9 @@ public class MainProcessingGenesis {
 		SqlUtils.deleteDatabaseFile(databasePath);
 		init(campaignId);
 		//Try with resources to close database when done
-		try (Connection tryDatabase = SqlUtils.openConnection(Path.of(databasePath))) {
+		try (Connection tryDatabase = config.isDuckDbInMemory() ?
+				SqlUtils.openConnection()
+				: SqlUtils.openConnection(Path.of(databasePath))) {
 			if(tryDatabase == null){
 				throw new KraftwerkException(500,"Error during internal database creation");
 			}

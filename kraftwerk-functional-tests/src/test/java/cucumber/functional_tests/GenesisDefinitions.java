@@ -165,6 +165,7 @@ public class GenesisDefinitions {
     public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+                configStub,
                 genesisClientStub,
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 true
