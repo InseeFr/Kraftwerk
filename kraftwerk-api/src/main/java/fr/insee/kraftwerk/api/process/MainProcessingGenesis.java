@@ -104,6 +104,9 @@ public class MainProcessingGenesis {
 		init(campaignId);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = SqlUtils.openConnection(Path.of(databasePath))) {
+			if(tryDatabase == null){
+				throw new KraftwerkException(500,"Error during internal database creation");
+			}
 			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
