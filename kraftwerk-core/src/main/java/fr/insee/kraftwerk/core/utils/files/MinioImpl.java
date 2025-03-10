@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -152,7 +153,7 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public void writeFile(String path, String toWrite, boolean replace) {
         InputStream inputStream = new ByteArrayInputStream(toWrite.getBytes());
-        writeFileOnMinio(path.replace("\\","/"), inputStream, toWrite.length());
+        writeFileOnMinio(path.replace("\\","/"), inputStream, toWrite.length(), false);
     }
 
     @Override
@@ -192,7 +193,7 @@ public class MinioImpl implements FileUtilsInterface {
     @Override
     public void moveFile(Path fileSystemPath, String dstMinioPath) throws KraftwerkException {
         try (InputStream inputStream = new FileInputStream(fileSystemPath.toFile())){
-            writeFileOnMinio(dstMinioPath.replace("\\","/"), inputStream, Files.size(fileSystemPath));
+            writeFileOnMinio(dstMinioPath.replace("\\","/"), inputStream, Files.size(fileSystemPath), true);
         } catch (Exception e) {
             throw new KraftwerkException(500, "Can't move file " + fileSystemPath + " to " + dstMinioPath.replace("\\","/"));
         }
@@ -235,9 +236,21 @@ public class MinioImpl implements FileUtilsInterface {
 
     //Utilities
 
-    private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize) {
+    private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize, boolean replace) {
         try {
-            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
+            if(replace || !isFileExists(minioPath)){
+                minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
+                return;
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try(InputStream alreadyExistingInputStream = readFile(minioPath)){
+                alreadyExistingInputStream.transferTo(baos);
+            }
+            inputStream.transferTo(baos);
+            InputStream appendedInputStream = new ByteArrayInputStream(baos.toByteArray());
+            int size = baos.size();
+            baos.close();
+            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(appendedInputStream, size, -1).object(minioPath.replace("\\","/")).build());
         } catch (Exception e) {
             log.error(e.toString());
         }

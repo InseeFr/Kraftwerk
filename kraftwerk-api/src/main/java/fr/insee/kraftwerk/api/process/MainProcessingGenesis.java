@@ -97,11 +97,13 @@ public class MainProcessingGenesis {
 
 	public void runMain(String campaignId, int batchSize) throws KraftwerkException, IOException {
 		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
+		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
+				campaignId));
 		//We delete database at start (in case there is already one)
-		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
+		SqlUtils.deleteDatabaseFile(databasePath);
 		init(campaignId);
 		//Try with resources to close database when done
-		try (Connection tryDatabase = SqlUtils.openConnection("jdbc:duckdb:"+inDirectory+"/baseTemp.duckdb");) {
+		try (Connection tryDatabase = SqlUtils.openConnection(Path.of(databasePath))) {
 			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
@@ -129,7 +131,7 @@ public class MainProcessingGenesis {
 			log.error(e.toString());
 			throw new KraftwerkException(500,"SQL error");
 		}
-		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
+		SqlUtils.deleteDatabaseFile(databasePath);
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {

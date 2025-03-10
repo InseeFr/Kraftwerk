@@ -290,7 +290,7 @@ public class SqlUtils {
         try{
             Files.delete(dbFile.toPath());
         } catch (IOException e){
-            log.warn("❌ Can't delete DB File !");
+            log.warn("❌ Can't delete DB File ! \n {}", e.toString());
         }
     }
 }
