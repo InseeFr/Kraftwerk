@@ -247,10 +247,12 @@ public class MinioImpl implements FileUtilsInterface {
                 alreadyExistingInputStream.transferTo(baos);
             }
             inputStream.transferTo(baos);
+            inputStream.close();
             InputStream appendedInputStream = new ByteArrayInputStream(baos.toByteArray());
             int size = baos.size();
             baos.close();
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(appendedInputStream, size, -1).object(minioPath.replace("\\","/")).build());
+            appendedInputStream.close();
         } catch (Exception e) {
             log.error(e.toString());
         }
