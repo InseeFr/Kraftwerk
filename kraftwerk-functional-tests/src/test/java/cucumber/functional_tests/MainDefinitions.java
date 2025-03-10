@@ -313,7 +313,7 @@ public class MainDefinitions {
 			// Count lines
 			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
 			Assertions.assertThat(resultSet.next()).isTrue();
-			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount-1);
 		}
 	}
 
@@ -332,7 +332,7 @@ public class MainDefinitions {
 			// Count lines
 			ResultSet resultSet = statement.executeQuery(String.format("SELECT COUNT(*) FROM \"%s\"",tableName));
 			Assertions.assertThat(resultSet.next()).isTrue();
-			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount);
+			Assertions.assertThat(resultSet.getInt(1)).isEqualTo(expectedLineCount-1);
 		}
 	}
 

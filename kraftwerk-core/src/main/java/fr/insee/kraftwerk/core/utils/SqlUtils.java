@@ -56,7 +56,11 @@ public class SqlUtils {
      * @param sqlSchema schema of dataset
      * @throws SQLException if sql error
      */
-    private static void createDataSQLTables(Statement statement, String datasetName, LinkedHashMap<String, VariableType> sqlSchema) throws SQLException {
+    private static void createDataSQLTables(
+            Statement statement,
+            String datasetName,
+            LinkedHashMap<String, VariableType> sqlSchema
+    ) throws SQLException {
 
         //Skip if no variable
         if (sqlSchema.isEmpty()) {
@@ -64,7 +68,7 @@ public class SqlUtils {
             return;
         }
 
-        //Skip CREATE if table already exists (ex: file-by-file)
+        //Don't CREATE if table already exists (ex: file-by-file)
         List<String> tableNames = getTableNames(statement);
         if (!tableNames.contains(datasetName)) {
             String createTableQuery = getCreateTableQuery(datasetName, sqlSchema);
@@ -72,15 +76,23 @@ public class SqlUtils {
             //Execute query
             log.debug("SQL Query : {}", createTableQuery);
             statement.execute(createTableQuery);
+            return;
         }
+        //add missing columns if necessary
+        LinkedHashMap<String, VariableType> variablesToAdd = getVariablesToAdd(statement, datasetName, sqlSchema);
+        if(variablesToAdd.isEmpty()){
+            return;
+        }
+        String updateTableQuery = getUpdateTableQuery(datasetName, variablesToAdd);
+        statement.execute(updateTableQuery);
     }
 
-    private static String getCreateTableQuery(String datasetName, LinkedHashMap<String, VariableType> sqlSchema) {
+    private static String getCreateTableQuery(String datasetName, LinkedHashMap<String, VariableType> variablesToAdd) {
         //CREATE query building
         StringBuilder createTableQuery = new StringBuilder(String.format("CREATE TABLE \"%s\" (", datasetName));
 
-        for (Map.Entry<String, VariableType> column : sqlSchema.entrySet()) {
-            createTableQuery.append("\"").append(column.getKey()).append("\"").append(" ").append(sqlSchema.get(column.getKey()).getSqlType());
+        for (Map.Entry<String, VariableType> column : variablesToAdd.entrySet()) {
+            createTableQuery.append("\"").append(column.getKey()).append("\"").append(" ").append(variablesToAdd.get(column.getKey()).getSqlType());
             createTableQuery.append(", ");
         }
 
@@ -88,6 +100,36 @@ public class SqlUtils {
         createTableQuery.delete(createTableQuery.length() - 2, createTableQuery.length());
         createTableQuery.append(")");
         return createTableQuery.toString();
+    }
+
+    private static LinkedHashMap<String, VariableType> getVariablesToAdd(
+            Statement statement,
+            String datasetName,
+            LinkedHashMap<String, VariableType> sqlSchema
+    ) throws SQLException {
+        LinkedHashMap<String,VariableType> variablesToAdd = new LinkedHashMap<>();
+        List<String> columnsAlreadyInDatabase = getColumnNames(statement, datasetName);
+        //Filter out variable names already in database table
+        for(String variableNameToAdd :
+                sqlSchema.keySet().stream().filter(variableName -> !columnsAlreadyInDatabase.contains(variableName)).toList()){
+            variablesToAdd.put(variableNameToAdd,sqlSchema.get(variableNameToAdd));
+        }
+        return variablesToAdd;
+    }
+
+    private static String getUpdateTableQuery(String datasetName, LinkedHashMap<String, VariableType> variablesToAdd) {
+        //ALTER TABLE query building
+        StringBuilder alterTableQuery = new StringBuilder();
+
+        for (Map.Entry<String, VariableType> column : variablesToAdd.entrySet()) {
+            alterTableQuery.append(String.format("ALTER TABLE \"%s\" ADD COLUMN \"", datasetName)).append(column.getKey()).append("\"").append(" ").append(variablesToAdd.get(column.getKey()).getSqlType());
+            alterTableQuery.append("; ");
+        }
+
+        //Remove last delimiter and replace by ";"
+        alterTableQuery.delete(alterTableQuery.length() - 2, alterTableQuery.length());
+        alterTableQuery.append(";");
+        return alterTableQuery.toString();
     }
 
     /**
