@@ -54,7 +54,7 @@ class MainProcessingGenesisTest {
         doReturn(configProperties).when(mockClient).getConfigProperties();
 
         mockFileUtils = mock(FileUtilsInterface.class);
-        mainProcessing = Mockito.spy(new MainProcessingGenesis(mockClient, mockFileUtils, true));
+        mainProcessing = Mockito.spy(new MainProcessingGenesis(configProperties, mockFileUtils, true));
 
     }
 
@@ -92,7 +92,7 @@ class MainProcessingGenesisTest {
                 .thenThrow(new SQLException("Test SQL Exception"));
 
         // Act & Assert
-        KraftwerkException thrown = assertThrows(KraftwerkException.class, () -> mainProcessing.runMain(idCampaign));
+        KraftwerkException thrown = assertThrows(KraftwerkException.class, () -> mainProcessing.runMain(idCampaign,100));
         assertEquals("SQL error", thrown.getMessage());
     }
 
