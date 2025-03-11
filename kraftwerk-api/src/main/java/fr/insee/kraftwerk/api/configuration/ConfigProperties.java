@@ -30,4 +30,7 @@ public class ConfigProperties {
 	private String serviceClientId;
 	@Value("${fr.insee.kraftwerk.oidc.service.client-secret}")
 	private String serviceClientSecret;
+
+	@Value("${fr.insee.kraftwerk.duckdb.use-memory}")
+	private boolean isDuckDbInMemory;
 }
