@@ -237,15 +237,13 @@ public class MinioImpl implements FileUtilsInterface {
     //Utilities
 
     private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize, boolean replace) {
-        try {
+        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
             if(replace || !isFileExists(minioPath)){
                 minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
                 return;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try(InputStream alreadyExistingInputStream = readFile(minioPath)){
-                alreadyExistingInputStream.transferTo(baos);
-            }
+            alreadyExistingInputStream.transferTo(baos);
             inputStream.transferTo(baos);
             inputStream.close();
             InputStream appendedInputStream = new ByteArrayInputStream(baos.toByteArray());

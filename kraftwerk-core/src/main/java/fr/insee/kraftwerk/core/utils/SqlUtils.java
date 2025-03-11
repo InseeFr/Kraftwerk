@@ -18,9 +18,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class SqlUtils {
@@ -108,12 +110,11 @@ public class SqlUtils {
             LinkedHashMap<String, VariableType> sqlSchema
     ) throws SQLException {
         LinkedHashMap<String,VariableType> variablesToAdd = new LinkedHashMap<>();
-        List<String> columnsAlreadyInDatabase = getColumnNames(statement, datasetName);
+        Set<String> columnsAlreadyInDatabase = new HashSet<>(getColumnNames(statement, datasetName));
         //Filter out variable names already in database table
-        for(String variableNameToAdd :
-                sqlSchema.keySet().stream().filter(variableName -> !columnsAlreadyInDatabase.contains(variableName)).toList()){
-            variablesToAdd.put(variableNameToAdd,sqlSchema.get(variableNameToAdd));
-        }
+        sqlSchema.keySet().stream()
+                .filter(variableName -> !columnsAlreadyInDatabase.contains(variableName))
+                .forEach(variableNameToAdd -> variablesToAdd.put(variableNameToAdd,sqlSchema.get(variableNameToAdd)));
         return variablesToAdd;
     }
 
