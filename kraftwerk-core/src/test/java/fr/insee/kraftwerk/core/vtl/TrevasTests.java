@@ -33,21 +33,23 @@ class TrevasTests {
                 Dataset.class);
         bindings.put("ds", dataset);
         //
-        String expression = "ds := ds [calc S2_MAA1AT := if (not(isnull(S2_MAA2AT)) \n" +
-                "and isnull(S2_MAA2ATC) and isnull(S2_MAA3AT) ) \n" +
-                "then S2_MAA2AT else (if (not(isnull(S2_MAA2AT)) \n" +
-                "and not(isnull(S2_MAA2ATC)) and isnull(S2_MAA3AT) ) \n" +
-                "then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA2ATC,integer)) and MARRIVC=\"2\" ) \n" +
-                "then S2_MAA2ATC else S2_MAA2AT) else (if (not(isnull(S2_MAA2AT)) and isnull(S2_MAA2ATC) \n" +
-                "and not(isnull(S2_MAA3AT)) ) then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA3AT,integer)) \n" +
-                "and MAA3=\"1\" ) then S2_MAA3AT else S2_MAA2AT) \n" +
-                "else (if (not(isnull(S2_MAA2AT)) and not(isnull(S2_MAA2ATC)) \n" +
-                "and not(isnull(S2_MAA3AT)) ) then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA3AT,integer)) \n" +
-                "and MAA3=\"1\" ) then (if (cast(S2_MAA3AT,integer)<cast(S2_MAA2ATC,integer) \n" +
-                "and MARRIVC=\"2\") then S2_MAA2ATC else S2_MAA3AT ) \n" +
-                "else (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA2ATC,integer)) \n" +
-                "and MARRIVC=\"2\") then S2_MAA2ATC else S2_MAA2AT ) ) else \"\" )))\n" +
-                "];";
+        String expression = """
+                ds := ds [calc S2_MAA1AT := if (not(isnull(S2_MAA2AT))
+                and isnull(S2_MAA2ATC) and isnull(S2_MAA3AT) )
+                then S2_MAA2AT else (if (not(isnull(S2_MAA2AT))
+                and not(isnull(S2_MAA2ATC)) and isnull(S2_MAA3AT) )
+                then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA2ATC,integer)) and MARRIVC=\"2\" )
+                then S2_MAA2ATC else S2_MAA2AT) else (if (not(isnull(S2_MAA2AT)) and isnull(S2_MAA2ATC)
+                and not(isnull(S2_MAA3AT)) ) then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA3AT,integer))
+                and MAA3=\"1\" ) then S2_MAA3AT else S2_MAA2AT)
+                else (if (not(isnull(S2_MAA2AT)) and not(isnull(S2_MAA2ATC))
+                and not(isnull(S2_MAA3AT)) ) then (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA3AT,integer))
+                and MAA3=\"1\" ) then (if (cast(S2_MAA3AT,integer)<cast(S2_MAA2ATC,integer)
+                and MARRIVC=\"2\") then S2_MAA2ATC else S2_MAA3AT )
+                else (if ((cast(S2_MAA2AT,integer)<cast(S2_MAA2ATC,integer))
+                and MARRIVC=\"2\") then S2_MAA2ATC else S2_MAA2AT ) ) else \"\" )))
+                ];
+                """;
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("vtl");
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 

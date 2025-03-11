@@ -110,7 +110,7 @@ public class MainService extends KraftwerkService {
 	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withAllReportingData, boolean withDDI) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -122,11 +122,12 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
+
 	@NotNull
 	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, int batchSize) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessingGenesis mpGenesis = new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
+		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, fileUtilsInterface);
 
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
@@ -138,7 +139,19 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(campaignId);
 	}
 
-	private @NotNull FileUtilsInterface getFileUtilsInterface() {
+
+
+
+	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, FileUtilsInterface fileUtilsInterface) {
+		return new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
+	}
+
+
+	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withAllReportingData, boolean withDDI, FileUtilsInterface fileUtilsInterface) {
+		return new MainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+	}
+
+	@NotNull FileUtilsInterface getFileUtilsInterface() {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
@@ -147,4 +160,6 @@ public class MainService extends KraftwerkService {
 		}
 		return fileUtilsInterface;
 	}
+
+	
 }
