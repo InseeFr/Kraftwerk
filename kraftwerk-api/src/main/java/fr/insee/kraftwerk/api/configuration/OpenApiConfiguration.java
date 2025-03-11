@@ -32,13 +32,13 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "fr.insee.kraftwerk.authentication", havingValue = "NONE")
+    @ConditionalOnProperty(name = "fr.insee.kraftwerk.security.authentication", havingValue = "NONE")
     public OpenAPI noAuthOpenAPI() {
         return customOpenAPI();
     }
 
     @Bean
-    @ConditionalOnProperty(name = "fr.insee.kraftwerk.authentication", havingValue = "OIDC")
+    @ConditionalOnProperty(name = "fr.insee.kraftwerk.security.authentication", havingValue = "OIDC")
     public OpenAPI oidcOpenAPI(ConfigProperties config) {
         String authUrl = config.getAuthServerUrl() + "/realms/" + config.getRealm() + "/protocol/openid-connect";
         return customOpenAPI()
