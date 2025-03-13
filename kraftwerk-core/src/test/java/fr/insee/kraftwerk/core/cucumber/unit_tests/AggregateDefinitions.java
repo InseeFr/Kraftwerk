@@ -1,4 +1,4 @@
-package cucumber.unit_tests;
+package fr.insee.kraftwerk.core.cucumber.unit_tests;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;

@@ -4,7 +4,6 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty"},
-                    glue = "cucumber")
+@CucumberOptions(plugin = {"pretty"}, glue = {"cucumber.functional_tests"})
 public class RunCucumberTest {
 }

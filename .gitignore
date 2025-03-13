@@ -36,3 +36,6 @@ src/test/resources/unit_tests/out/*
 !src/test/resources/unit_tests/out/.gitkeep
 kraftwerk-core/src/test/resources/unit_tests/out/*
 qodana.yaml
+*.duckdb
+/kraftwerk-api/src/test/resources/out/campaign1
+/kraftwerk-api/src/test/resources/temp

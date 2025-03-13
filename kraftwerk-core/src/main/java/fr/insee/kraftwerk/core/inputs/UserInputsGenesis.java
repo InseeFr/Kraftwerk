@@ -6,8 +6,8 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.JsonReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -22,8 +22,8 @@ public class UserInputsGenesis extends UserInputs{
 
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path inputDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
-		super(inputDirectory, fileUtilsInterface);
+	public UserInputsGenesis(boolean hasConfigFile, Path specsDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
+		super(specsDirectory, fileUtilsInterface);
 		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
 		computeInputs(withDDI);
@@ -32,7 +32,7 @@ public class UserInputsGenesis extends UserInputs{
 	private void computeInputs(boolean withDDI) throws KraftwerkException {
         UserInputsFile userInputsFile;
 		if(hasConfigFile){
-            userInputsFile = new UserInputsFile(inputDirectory.resolve(Constants.USER_INPUT_FILE), inputDirectory, fileUtilsInterface);
+            userInputsFile = new UserInputsFile(specsDirectory.resolve(Constants.USER_INPUT_FILE), specsDirectory, fileUtilsInterface);
             modeInputsMap = userInputsFile.getModeInputsMap();
 		}else{
             for (Mode mode : modes) {
