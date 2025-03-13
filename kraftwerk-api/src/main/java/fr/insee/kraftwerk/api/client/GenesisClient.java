@@ -37,9 +37,13 @@ public class GenesisClient {
 		this.restTemplate.getInterceptors().add(new GenesisAuthInterceptor(oidcService));
 	}
 
-	//Constructor used for tests
+	//Constructors used for tests
 	public GenesisClient(ConfigProperties configProperties) {
 		restTemplate = null;
+		this.configProperties = configProperties;
+	}
+	public GenesisClient(RestTemplate restTemplateForTest, ConfigProperties configProperties) {
+		restTemplate = restTemplateForTest;
 		this.configProperties = configProperties;
 	}
 
