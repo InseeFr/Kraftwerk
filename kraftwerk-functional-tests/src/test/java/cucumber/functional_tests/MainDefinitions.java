@@ -4,6 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
@@ -27,6 +28,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
+import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -78,6 +80,8 @@ public class MainDefinitions {
 	List<KraftwerkError> errors = new ArrayList<>();
 	static Connection database;
 
+	private boolean isUsingEncryption;
+
 	@BeforeAll
 	public static void clean() throws SQLException {
 		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
@@ -88,6 +92,12 @@ public class MainDefinitions {
 		}
 		database = SqlUtils.openConnection();
 	}
+
+	@Before
+	public void init(){
+		this.isUsingEncryption = false;
+	}
+
 
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
@@ -114,6 +124,12 @@ public class MainDefinitions {
 		else
 			Files.createFile(vtlPath);
 		Files.write(vtlPath,generatedVTL.getBytes());
+	}
+
+
+	@When("We want to encrypt output data at the end of process")
+	public void activateEncryption(){
+		this.isUsingEncryption = true;
 	}
 
 	@When("Step 1 : We initialize the input files")
@@ -645,6 +661,36 @@ public class MainDefinitions {
 			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
 		}
 	}
+
+	@Then("We should not be able to read the csv output file")
+	public void check_csv_encrypted() throws IOException{
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Assertions.assertThat(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+		).doesNotExist();
+
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
+		);
+		Assertions.assertThatThrownBy(csvReader::readAll).isInstanceOf(CsvException.class);
+	}
+
+	@Then("We should not be able to read the parquet output file")
+	public void check_parquet_encrypted() throws SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet");
+		Assertions.assertThat(filePath).doesNotExist();
+
+		Path encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+				".parquet.enc");
+		try (Statement statement = database.createStatement()) {
+			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
+		}
+    }
 
 	@AfterAll
 	public static void closeConnection() throws SQLException {
