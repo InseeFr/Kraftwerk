@@ -15,11 +15,11 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import stubs.ConfigStub;
 import stubs.GenesisClientStub;
 
@@ -44,7 +44,9 @@ public class GenesisDefinitions {
     ConfigStub configStub = new ConfigStub();
     GenesisClientStub genesisClientStub = new GenesisClientStub(configStub);
 
-    @BeforeEach
+    private boolean isUsingEncryption;
+
+    @Before
     public void clean() throws SQLException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         genesisClientStub.getMongoStub().clear();
@@ -56,6 +58,7 @@ public class GenesisDefinitions {
             //Ignored exception
         }
         database = SqlUtils.openConnection();
+        this.isUsingEncryption = false;
     }
 
     @Given("We have a collected variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
@@ -159,6 +162,11 @@ public class GenesisDefinitions {
         }
         genesisClientStub.getMongoStub().add(surveyUnitUpdateLatest);
         return surveyUnitUpdateLatest;
+    }
+
+    @Given("We want to encrypt output data at the end of genesis process")
+    public void activateEncryption(){
+        this.isUsingEncryption = true;
     }
 
     @When("We use the Genesis service with campaignId {string}")
