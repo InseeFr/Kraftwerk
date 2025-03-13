@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.api.process;
 
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
@@ -15,10 +14,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,6 +66,8 @@ class MainProcessingGenesisTest {
             @Override
             public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds){
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
+                surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
+                surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setMode(Mode.WEB);
                 return Collections.singletonList(surveyUnitUpdateLatest);
             }
@@ -86,24 +88,17 @@ class MainProcessingGenesisTest {
     void testInitLoadsMetadata() throws Exception {
         String idCampaign = "campaign1";
 
-        Map<String, MetadataModel> mockMetadata = Map.of("WEB", new MetadataModel());
-
-//        MetadataUtilsGenesis.setMetadata(mockMetadata); // Hypothèse d'une méthode setter pour injecter les données de test
-
         mainProcessing.init(idCampaign);
 
         assertNotNull(mainProcessing.getMetadataModels());
         assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
     }
 
-/* TODO fix me
    @Test
-    void testRunMainSQLException() {
+    void testRunMainOk() {
         String idCampaign = "campaign1";
-
-        KraftwerkException thrown = assertThrows(KraftwerkException.class, () -> mainProcessing.runMain(idCampaign, 100));
-        assertEquals("SQL error", thrown.getMessage());
+        assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
     }
-    */
+
 
 }
