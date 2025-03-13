@@ -51,7 +51,14 @@ class CalculatedProcessingTest {
         fooMetadataModel.getVariables().putVariable(new Variable("FOO3", fooMetadataModel.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
-        kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
     }
 
     @Test

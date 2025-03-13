@@ -46,7 +46,14 @@ public class CalculatedProcessingDefinition {
     private List<String> variableNamesList;
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-    KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+    KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+            null,
+            false,
+            false,
+            true,
+            false,
+            419430400L
+    );
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
     public List<String> listOfStrings(String arg){

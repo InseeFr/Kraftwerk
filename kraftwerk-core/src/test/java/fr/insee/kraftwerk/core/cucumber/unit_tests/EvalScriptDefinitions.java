@@ -18,7 +18,14 @@ public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+			null,
+			false,
+			false,
+			true,
+			false,
+			419430400L
+	);
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() {

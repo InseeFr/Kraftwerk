@@ -63,7 +63,14 @@ public class ImportScriptTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface);
 		groupProcessing.applyVtlTransformations("CAWI", null, kraftwerkExecutionContext);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface);
@@ -104,7 +111,14 @@ public class ImportScriptTest {
 
 	@Test
 	void numberTypeInDatasets() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))

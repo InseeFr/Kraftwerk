@@ -25,11 +25,15 @@ import static org.junit.Assert.assertTrue;
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-
-	public List<KraftwerkError> errors = new ArrayList<>();
-	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+			null,
+			false,
+			false,
+			true,
+			false,
+			419430400L
+	);
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset){

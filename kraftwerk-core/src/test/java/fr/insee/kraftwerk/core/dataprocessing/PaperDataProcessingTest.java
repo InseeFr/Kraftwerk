@@ -63,7 +63,14 @@ class PaperDataProcessingTest {
 	@Test
 	void testPaperDataProcessing() {
 		//
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 		MetadataModel metadataModel = new MetadataModel();
 		Group rootGroup = metadataModel.getRootGroup();
 		metadataModel.getVariables().putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));

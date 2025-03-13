@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.services;
 
 
+import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -9,6 +10,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,44 +59,48 @@ public class MainService extends KraftwerkService {
 	public ResponseEntity<String> mainService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/file-by-file")
 	@Operation(operationId = "main", summary = "${summary.fileByFile}", description = "${description.fileByFile}")
 	public ResponseEntity<String> mainFileByFile(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 	) {
 		boolean fileByFile = true;
 		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/lunatic-only")
 	@Operation(operationId = "mainLunaticOnly", summary = "${summary.mainLunaticOnly}", description = "${description.mainLunaticOnly}")
 	public ResponseEntity<String> mainLunaticOnly(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 	) {
 		boolean withDDI = false;
 		boolean fileByFile = false;
 		boolean withAllReportingData = false;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
-		return runWithGenesis(campaignId, withDDI, batchSize);
+		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
 	}
 
 
@@ -101,16 +108,18 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+	) {
 		boolean withDDI = false;
-		return runWithGenesis(campaignId, withDDI, batchSize);
+		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
 	}
 
 	@NotNull
-	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withAllReportingData, boolean withDDI) {
+	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withAllReportingData, boolean withDDI, boolean withEncryption) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, fileUtilsInterface);
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, withEncryption, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -124,10 +133,10 @@ public class MainService extends KraftwerkService {
 
 
 	@NotNull
-	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, int batchSize) {
+	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, fileUtilsInterface);
+		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
@@ -142,13 +151,36 @@ public class MainService extends KraftwerkService {
 
 
 
-	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, FileUtilsInterface fileUtilsInterface) {
-		return new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
+	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				withDDI,
+				withEncryption,
+				limitSize
+		);
+
+		return new MainProcessingGenesis(
+				configProperties,
+				new GenesisClient(new RestTemplateBuilder(), configProperties),
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 	}
 
 
-	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withAllReportingData, boolean withDDI, FileUtilsInterface fileUtilsInterface) {
-		return new MainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withAllReportingData, boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				fileByFile,
+				withAllReportingData,
+				withDDI,
+				withEncryption,
+				limitSize
+		);
+
+		return new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 	}
 
 	@NotNull FileUtilsInterface getFileUtilsInterface() {

@@ -25,7 +25,14 @@ class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+			null,
+			false,
+			false,
+			true,
+			false,
+			419430400L
+	);
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -74,7 +81,14 @@ class ReconciliationTest {
 	@BeforeEach
 	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 	}
 
 	@ParameterizedTest

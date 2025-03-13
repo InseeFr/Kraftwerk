@@ -49,7 +49,14 @@ class InformationLevelsTest {
 
 	@Test
 	void applyInformationLevelsProcessing() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
@@ -89,7 +96,14 @@ class InformationLevelsTest {
 	
 	@Test
 	void applyInformationLevelsProcessingWithPartialIdNUll() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDatasetWithPartialIdNull);

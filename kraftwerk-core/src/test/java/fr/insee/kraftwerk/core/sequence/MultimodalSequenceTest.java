@@ -30,7 +30,14 @@ class MultimodalSequenceTest {
     void setUp() {
         multimodalSequence = new MultimodalSequence();
         vtlBindings = new VtlBindings();
-        kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         fileUtilsInterface = new FileSystemImpl("defaultDir") {
             @Override
             public Path getTempVtlFilePath(UserInputs inputs, String processName, String datasetName) {

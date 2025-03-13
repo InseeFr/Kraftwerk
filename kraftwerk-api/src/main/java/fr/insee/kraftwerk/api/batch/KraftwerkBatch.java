@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.batch;
 
+import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -9,11 +10,13 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -63,6 +66,7 @@ public class KraftwerkBatch implements CommandLineRunner {
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
                 String inDirectory = args[3];
+                boolean withEncryption = Boolean.parseBoolean(args[4]);
 
                 //Kraftwerk service type related parameters
                 boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
@@ -77,20 +81,27 @@ public class KraftwerkBatch implements CommandLineRunner {
 
 
                 //Run kraftwerk
+                KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                        inDirectory,
+                        fileByFile,
+                        withAllReportingData,
+                        withDDI,
+                        withEncryption,
+                        limitSize
+                );
+
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
-                            configProperties,
-                            fileSystem,
-                            true);
+                        configProperties,
+                        new GenesisClient(new RestTemplateBuilder(), configProperties),
+                        fileSystem,
+                        kraftwerkExecutionContext
+                    );
                     mainProcessingGenesis.runMain(inDirectory,1000);
                 } else {
                     MainProcessing mainProcessing = new MainProcessing(
-                            inDirectory,
-                            fileByFile,
-                            withAllReportingData,
-                            withDDI,
+                            kraftwerkExecutionContext,
                             defaultDirectory,
-                            limitSize,
                             fileSystem);
                     mainProcessing.runMain();
                 }
@@ -119,14 +130,21 @@ public class KraftwerkBatch implements CommandLineRunner {
      * @throws IllegalArgumentException if invalid argument
      */
     private static void checkArgs(String[] args) throws IllegalArgumentException{
-        if(args.length != 4) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 4 !".formatted(args.length));
+        if(args.length != 5) {
+            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 5 !".formatted(args.length));
         }
-        if(!args[1].equals("true") && !args[1].equals("false")){
+        if(isNotBoolean(args[1])){
             throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
         }
-        if(!args[2].equals("true") && !args[2].equals("false")){
+        if(isNotBoolean(args[2])){
             throw new IllegalArgumentException("Invalid withAllReportingData boolean argument ! %s".formatted(args[2]));
         }
+        if(isNotBoolean(args[4])){
+            throw new IllegalArgumentException("Invalid withEncryption boolean argument ! %s".formatted(args[4]));
+        }
+    }
+
+    private static boolean isNotBoolean(String argToCheck){
+        return !argToCheck.equals("true") && !argToCheck.equals("false");
     }
 }

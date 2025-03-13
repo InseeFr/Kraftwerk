@@ -37,7 +37,14 @@ class GroupProcessingTest {
                         new Structured.Component("FOO2", Long.class, Dataset.Role.MEASURE)
                 )
         );
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
         //

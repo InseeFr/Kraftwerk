@@ -72,7 +72,14 @@ class TCMSequenceProcessingTest {
         metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_THLHAB.name()));
 
         // Errors list
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
 
         StringBuilder expectedScriptBuilder = new StringBuilder();
         for (TCMModuleEnum module : modules){

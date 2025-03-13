@@ -19,7 +19,14 @@ class KraftwerkExecutionContextTest {
     @Test
     void getFormattedString_test(){
         //GIVEN
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
         long start = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         long stop = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
@@ -42,7 +49,14 @@ class KraftwerkExecutionContextTest {
     @Test
     void addUniqueError_test(){
         //Given
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         KraftwerkError kraftwerkError = new ErrorVtlTransformation("test","test");
 
         //When
@@ -55,7 +69,14 @@ class KraftwerkExecutionContextTest {
     @Test
     void addUniqueError_2xSame_test(){
         //Given
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         KraftwerkError kraftwerkError = new ErrorVtlTransformation("test","test");
 
         //When
@@ -69,7 +90,14 @@ class KraftwerkExecutionContextTest {
     @Test
     void addUniqueError_2xDifferent_test(){
         //Given
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         KraftwerkError kraftwerkError = new ErrorVtlTransformation("test","test");
         KraftwerkError kraftwerkError2 = new ErrorVariableLength(new Variable("TESTVAR",new Group("TESTGROUP"), VariableType.STRING),"WEB");
 

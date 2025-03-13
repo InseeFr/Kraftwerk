@@ -28,7 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
-	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+			null,
+			false,
+			false,
+			true,
+			false,
+			419430400L
+	);
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
@@ -51,7 +58,14 @@ class VtlBindingsTest {
 	@BeforeEach
 	public void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				false,
+				true,
+				false,
+				419430400L
+		);
 	}
 
 	@Test

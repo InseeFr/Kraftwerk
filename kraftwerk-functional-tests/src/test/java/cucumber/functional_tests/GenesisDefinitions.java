@@ -15,6 +15,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -172,11 +173,21 @@ public class GenesisDefinitions {
     @When("We use the Genesis service with campaignId {string}")
     public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
+
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                isUsingEncryption,
+                419430400L
+        );
+
         MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
                 configStub,
                 genesisClientStub,
                 new FileSystemImpl(configStub.getDefaultDirectory()),
-                true
+                kraftwerkExecutionContext
         );
         mainProcessingGenesis.runMain(campaignId,1000);
         System.out.println();

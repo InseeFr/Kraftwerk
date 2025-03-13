@@ -79,6 +79,7 @@ public class MainDefinitions {
 	private ControlInputSequence controlInputSequence;
 	List<KraftwerkError> errors = new ArrayList<>();
 	static Connection database;
+	KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	boolean isUsingEncryption;
 
@@ -145,7 +146,16 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				true,
+				false,
+				false,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -153,7 +163,16 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				true,
+				true,
+				false,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -164,7 +183,17 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				true,
+				true,
+				isUsingEncryption,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -173,7 +202,17 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				false,
+				true,
+				isUsingEncryption,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -182,10 +221,28 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				false,
+				true,
+				isUsingEncryption,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 		await().atMost(2, TimeUnit.SECONDS);
-		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				false,
+				true,
+				isUsingEncryption,
+				419430400L
+		);
+		mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -194,8 +251,17 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), true,
-				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				true,
+				false,
+				true,
+				isUsingEncryption,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -206,9 +272,11 @@ public class MainDefinitions {
 			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
+						metadataModelMap.get(dataMode), withDDI, kraftwerkExecutionContext);
 				UnimodalSequence unimodal = new UnimodalSequence();
-				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModelMap,
+						new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			}
 		}
 	}
@@ -216,7 +284,8 @@ public class MainDefinitions {
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	}
 
 	@When("Step 4 : We export the final version")
@@ -224,7 +293,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, new KraftwerkExecutionContext(), statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		}
@@ -236,8 +305,18 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
-				419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectory.toString(),
+				false,
+				false,
+				false,
+				isUsingEncryption,
+				419430400L
+		);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory",
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 

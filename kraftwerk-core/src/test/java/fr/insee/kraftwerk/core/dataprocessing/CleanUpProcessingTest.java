@@ -76,7 +76,14 @@ class CleanUpProcessingTest {
         // Metadata variables object
         Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
         // Errors list
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
         //
         MetadataModel cawiMetadata = new MetadataModel();
         cawiMetadata.getVariables().putVariable(new Variable("FOO", cawiMetadata.getRootGroup(), VariableType.STRING));
