@@ -39,13 +39,13 @@ import java.util.Objects;
 import static cucumber.functional_tests.MainDefinitions.database;
 import static cucumber.functional_tests.MainDefinitions.outDirectory;
 
-public class GenesisDefinitions {
+class GenesisDefinitions {
 
     ConfigStub configStub = new ConfigStub();
     GenesisClientStub genesisClientStub = new GenesisClientStub(configStub);
 
     @BeforeEach
-    public void clean() throws SQLException {
+    void clean() throws SQLException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         genesisClientStub.getMongoStub().clear();
 
@@ -60,7 +60,7 @@ public class GenesisDefinitions {
 
     @Given("We have a collected variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
             "with value {string}")
-    public void add_collected_variable_document(String variableName, String campaignId, String interrogationId,
+    void add_collected_variable_document(String variableName, String campaignId, String interrogationId,
                                                 String value) {
 
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
@@ -78,7 +78,7 @@ public class GenesisDefinitions {
             "CampaignId " +
             "{string}, " +
             "InterrogationId {string} with value {string}")
-    public void add_loop_collected_variable_document(String variableName,
+    void add_loop_collected_variable_document(String variableName,
                                                      String loopName,
                                                      int iteration,
                                                      String campaignId, String interrogationId,
@@ -98,7 +98,7 @@ public class GenesisDefinitions {
 
     @Given("We have a external variable {string} in a document with CampaignId {string}, InterrogationId {string} " +
             "with value {string}")
-    public void add_external_variable_document(String variableName,
+    void add_external_variable_document(String variableName,
                                                String campaignId,
                                                String interrogationId,
                                                String value) {
@@ -117,7 +117,7 @@ public class GenesisDefinitions {
             "CampaignId " +
             "{string}, " +
             "InterrogationId {string} with value {string}")
-    public void add_loop_external_variable_document(String variableName,
+    void add_loop_external_variable_document(String variableName,
                                                     String loopName,
                                                     int iteration,
                                                     String campaignId,
@@ -162,7 +162,7 @@ public class GenesisDefinitions {
     }
 
     @When("We use the Genesis service with campaignId {string}")
-    public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
+    void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
         MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
                 configStub,
@@ -175,7 +175,7 @@ public class GenesisDefinitions {
     }
 
     @Then("In root csv output file we should have {string} for survey unit {string}, column {string}")
-    public void check_root_csv_output(String value, String interrogationId, String variableName) throws IOException,
+    void check_root_csv_output(String value, String interrogationId, String variableName) throws IOException,
             CsvValidationException {
         Path executionOutDirectory =
                 outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
@@ -221,7 +221,7 @@ public class GenesisDefinitions {
     }
 
     @Then("In root parquet output file we should have {string} for survey unit {string}, column {string}")
-    public void check_root_parquet(String value, String interrogationId,
+    void check_root_parquet(String value, String interrogationId,
                                    String variableName) throws SQLException {
         Path executionOutDirectory =
                 outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());

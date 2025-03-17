@@ -2,14 +2,14 @@ package fr.insee.kraftwerk.core.outputs.scripts;
 
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.McqVariable;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.PaperUcq;
 import fr.insee.bpm.metadata.model.UcqVariable;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
-import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.Variable;
-import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -47,7 +47,7 @@ public class ImportScriptTest {
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
 	@BeforeEach
-	public void initMetadata() {
+	void initMetadata() {
 		metadata = new LinkedHashMap<>();
 	}
 

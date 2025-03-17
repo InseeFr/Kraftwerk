@@ -49,7 +49,7 @@ class VtlBindingsTest {
 	);
 
 	@BeforeEach
-	public void initVtlBindings() {
+	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 	}

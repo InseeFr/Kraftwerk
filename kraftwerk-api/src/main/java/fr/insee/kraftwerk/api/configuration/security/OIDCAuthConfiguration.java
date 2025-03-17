@@ -79,7 +79,6 @@ public class OIDCAuthConfiguration {
             public Collection<GrantedAuthority> convert(Jwt source) {
 
                 String[] claimPath = inseeSecurityTokenProperties.getOidcClaimRole().split("\\.");
-                System.out.println("test");
                 Map<String, Object> claims = source.getClaims();
                 try {
 

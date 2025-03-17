@@ -65,10 +65,6 @@ public class LunaticJsonDataParser extends DataParser {
 			}
 			
 		}
-
-
-		// TODO Get each variable calculated and external 
-
 		data.addQuestionnaire(questionnaireData);
 	}
 
