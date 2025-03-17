@@ -1,5 +1,7 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,8 @@ public enum ContactOutcomeType {
   CONTACT_OUTCOME08("DCD", "Enquêté décédé"),
   CONTACT_OUTCOME09("NUH", "Logement ayant perdu son usage d'habitation"),
   CONTACT_OUTCOME10("NER", "Non enquêté pour cause exceptionnelle");
-  
+
+  @Getter
   private final String key;
   
   private final String value;
