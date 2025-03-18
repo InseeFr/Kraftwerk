@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,12 +75,7 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				fileByFile,
@@ -127,12 +123,7 @@ public class StepByStepService extends KraftwerkService {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
@@ -173,12 +164,7 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				false,
@@ -229,12 +215,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
 			)  {
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		//Read data in JSON file
 		Path inDirectory;
@@ -290,12 +271,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) throws KraftwerkException, SQLException {
-		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
-			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
-		}else{
-			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
-		}
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		Path inDirectory;
 		try {
@@ -339,17 +315,22 @@ public class StepByStepService extends KraftwerkService {
 
 	}
 
-
-	@PutMapping(value = "/archive")
-	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
-	public ResponseEntity<String> archiveService(
-			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
+	private @NotNull FileUtilsInterface getFileUtilsInterface() {
 		FileUtilsInterface fileUtilsInterface;
 		if(Boolean.TRUE.equals(useMinio)){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl(defaultDirectory);
 		}
+		return fileUtilsInterface;
+	}
+
+
+	@PutMapping(value = "/archive")
+	@Operation(operationId = "archive", summary = "${summary.archive}", description = "${description.archive}")
+	public ResponseEntity<String> archiveService(
+			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam) {
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		return archive(inDirectoryParam, fileUtilsInterface);
 	}

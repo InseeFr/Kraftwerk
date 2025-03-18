@@ -23,31 +23,31 @@ import java.util.List;
 
 class XmlSplitterTest {
 
-	static final String outDirectory = TestConstants.UNIT_TESTS_DUMP+"/split/";
+	static final String OUT_DIRECTORY = TestConstants.UNIT_TESTS_DUMP+"/split/";
 
 	static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@BeforeAll
 	static void cleanUpBeforeTests() throws Exception {
-		File file = new File(outDirectory);
+		File file = new File(OUT_DIRECTORY);
 		if (file.exists()) {
-			List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
+			List<String> splitFiles = fileUtilsInterface.listFileNames(OUT_DIRECTORY);
 			if (splitFiles != null){
 				for (String splitFile : splitFiles) {
-					if(!Files.deleteIfExists(Paths.get(outDirectory+splitFile))){
+					if(!Files.deleteIfExists(Paths.get(OUT_DIRECTORY+splitFile))){
 						System.out.println("File "+splitFile+" not deleted");
 					}
 				}
 			}
 		}
 		XmlSplitter.split(TestConstants.UNIT_TESTS_DIRECTORY+"/data/lunatic_xml/", "fake-lunatic-data-1.xml",
-				outDirectory,"SurveyUnit",2, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+				OUT_DIRECTORY,"SurveyUnit",2, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	}
 
 	@Test
 	@DisplayName("OutDirectory should contain 3 files")
 	void splitInThreeTest() {
-		List<String> splitFiles = fileUtilsInterface.listFileNames(outDirectory);
+		List<String> splitFiles = fileUtilsInterface.listFileNames(OUT_DIRECTORY);
 		Assertions.assertEquals(3, splitFiles.size());
 	}
 
@@ -56,7 +56,7 @@ class XmlSplitterTest {
 	void contains2SuTest() throws XMLStreamException, IOException {
 		int count = 0;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
-			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(outDirectory+"split1.xml"));
+			XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(OUT_DIRECTORY+"split1.xml"));
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
 				if (event.isStartElement()) {
