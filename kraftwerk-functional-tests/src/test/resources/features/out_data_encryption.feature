@@ -6,6 +6,7 @@ Feature: Output Data Encryption
     When Step 1 : We launch main service
     Then We should not be able to read the csv output file
     And We should not be able to read the parquet output file
+    And We should be able to decrypt the file
 
     Examples:
     # Parameters :
@@ -21,6 +22,7 @@ Feature: Output Data Encryption
     When Step 1 : We launch main service file by file
     Then We should not be able to read the csv output file
     And We should not be able to read the parquet output file
+    And We should be able to decrypt the file
 
     Examples:
     # Parameters :
@@ -38,6 +40,7 @@ Feature: Output Data Encryption
     When We use the Genesis service with campaignId "<CampaignId>"
     Then We should not be able to read the csv output file
     And We should not be able to read the parquet output file
+    And We should be able to decrypt the file (Genesis)
 
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value |

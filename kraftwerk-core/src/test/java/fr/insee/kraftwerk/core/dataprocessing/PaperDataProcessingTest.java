@@ -8,7 +8,7 @@ import fr.insee.bpm.metadata.model.VariablesMap;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -63,14 +63,7 @@ class PaperDataProcessingTest {
 	@Test
 	void testPaperDataProcessing() {
 		//
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				null,
-				false,
-				false,
-				true,
-				false,
-				419430400L
-		);
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 		MetadataModel metadataModel = new MetadataModel();
 		Group rootGroup = metadataModel.getRootGroup();
 		metadataModel.getVariables().putVariable(new Variable("FOO", rootGroup, VariableType.NUMBER));

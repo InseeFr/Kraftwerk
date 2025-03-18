@@ -4,13 +4,17 @@ package fr.insee.kraftwerk.api.services;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.VaultContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.libjavachiffrement.core.vault.VaultCaller;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,14 +40,16 @@ public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;
 	MinioClient minioClient;
+	VaultConfig vaultConfig;
 	boolean useMinio;
 
 
 	@Autowired
-	public MainService(ConfigProperties configProperties, MinioConfig minioConfig) {
+	public MainService(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
         super(configProperties, minioConfig);
         this.configProperties = configProperties;
 		this.minioConfig = minioConfig;
+		this.vaultConfig = vaultConfig;
 		useMinio = false;
 		if(minioConfig == null){
 			log.warn("Minio config null !");
@@ -152,13 +158,15 @@ public class MainService extends KraftwerkService {
 
 
 	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				null,
 				false,
 				false,
 				withDDI,
 				withEncryption,
-				limitSize
+				limitSize,
+				getVaultContext()
 		);
 
 		return new MainProcessingGenesis(
@@ -177,7 +185,8 @@ public class MainService extends KraftwerkService {
 				withAllReportingData,
 				withDDI,
 				withEncryption,
-				limitSize
+				limitSize,
+				getVaultContext()
 		);
 
 		return new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
@@ -193,5 +202,17 @@ public class MainService extends KraftwerkService {
 		return fileUtilsInterface;
 	}
 
+	private VaultContext getVaultContext() {
+		return VaultContext.builder()
+				.vaultCaller(
+						new VaultCaller(
+								vaultConfig.getRoleId(),
+								vaultConfig.getSecretId(),
+								Constants.VAULT_APPROLE_ENDPOINT
+						)
+				)
+				.vaultPath(vaultConfig.getVaultUri())
+				.build();
+	}
 	
 }

@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static cucumber.TestConstants.getKraftwerkExecutionContext;
 import static org.junit.jupiter.api.Assertions.*;
 
 // calculated_processing.feature
@@ -46,14 +47,7 @@ public class CalculatedProcessingDefinition {
     private List<String> variableNamesList;
 	
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-    KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-            null,
-            false,
-            false,
-            true,
-            false,
-            419430400L
-    );
+    KraftwerkExecutionContext kraftwerkExecutionContext = getKraftwerkExecutionContext();
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
     public List<String> listOfStrings(String arg){

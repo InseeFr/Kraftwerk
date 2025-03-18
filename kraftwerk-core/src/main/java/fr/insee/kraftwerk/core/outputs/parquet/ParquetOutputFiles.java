@@ -4,9 +4,10 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.EncryptionUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,8 +40,8 @@ public class ParquetOutputFiles extends OutputFiles {
 	 */
 
 	public ParquetOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database,
-							  FileUtilsInterface fileUtilsInterface) {
-		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
+							  FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext);
 	}
 
 	
@@ -52,14 +53,23 @@ public class ParquetOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
+						outputFileName(datasetName, kraftwerkExecutionContext), null);
 
 				Files.deleteIfExists(tmpOutputFile);
 				//Data export
 				getDatabase().execute(String.format("COPY %s TO '%s' (FORMAT PARQUET)", datasetName, tmpOutputFile));
 
 
-				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
+
+				//Encrypt file if requested
+				if(kraftwerkExecutionContext.isWithEncryption()) {
+					EncryptionUtils.encryptOutputFile(tmpOutputFile.toString(), outputFile, fileUtilsInterface, kraftwerkExecutionContext);
+					log.info(String.format("File: %s successfully written and encrypted", outputFile));
+					continue; //Go to next dataset to write
+				}
+
 				//Move to output folder
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
 				log.info(String.format("File: %s successfully written", outputFile));
@@ -91,9 +101,11 @@ public class ParquetOutputFiles extends OutputFiles {
 	 * Return the name of the file to be written from the dataset name.
 	 */
 	@Override
-	public String outputFileName(String datasetName) {
+	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		return path	+ PARQUET_EXTENSION;
+		return kraftwerkExecutionContext.isWithEncryption() ?
+			path + PARQUET_EXTENSION + EncryptionUtils.ENCRYPTED_FILE_EXTENSION
+			: path + PARQUET_EXTENSION;
 	}
 
 	public List<String> getAllOutputFileNames(String datasetName) {

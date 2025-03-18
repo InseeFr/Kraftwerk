@@ -4,7 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvException;
+import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
@@ -22,11 +22,14 @@ import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.libjavachiffrement.config.SymmetricEncryptionConfig;
+import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionException;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
@@ -146,14 +149,8 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				true,
-				false,
-				false,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		kraftwerkExecutionContext.setWithDDI(false);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
@@ -163,14 +160,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				true,
-				true,
-				false,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
@@ -184,14 +174,7 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				true,
-				true,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
@@ -203,14 +186,8 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				false,
-				true,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		kraftwerkExecutionContext.setWithAllReportingData(false);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
@@ -222,26 +199,12 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				false,
-				true,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 		await().atMost(2, TimeUnit.SECONDS);
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				false,
-				true,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 		mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
@@ -252,14 +215,7 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				true,
-				false,
-				true,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
@@ -295,7 +251,13 @@ public class MainDefinitions {
 			LocalDateTime localDateTime = LocalDateTime.now();
 			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			writeErrorsFile(inDirectory, localDateTime, errors);
-			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			outputFiles = new CsvOutputFiles(
+					outDirectory,
+					vtlBindings,
+					TestConstants.getKraftwerkExecutionContext(),
+					userInputs.getModes(),
+					statement,
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		}
 	}
 
@@ -306,14 +268,8 @@ public class MainDefinitions {
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
 
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				inDirectory.toString(),
-				false,
-				false,
-				false,
-				isUsingEncryption,
-				419430400L
-		);
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		kraftwerkExecutionContext.setWithDDI(false);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory",
 				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
@@ -327,7 +283,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -436,7 +392,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -607,7 +563,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -631,7 +587,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
 			String line = bufferedReader.readLine();
@@ -740,7 +696,7 @@ public class MainDefinitions {
 	}
 
 	@Then("We should not be able to read the csv output file")
-	public void check_csv_encrypted() throws IOException{
+	public void check_csv_encrypted() throws IOException, CsvValidationException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
 		Assertions.assertThat(
@@ -750,7 +706,13 @@ public class MainDefinitions {
 		CSVReader csvReader = getCSVReader(
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
 		);
-		Assertions.assertThatThrownBy(csvReader::readAll).isInstanceOf(CsvException.class);
+		try{
+			String[] header = csvReader.readNext();
+			Assertions.assertThat(header).doesNotContain(Constants.ROOT_IDENTIFIER_NAME);
+		}catch (CsvMalformedLineException e){
+			//Accepted exception
+			Assertions.assertThat(e).isInstanceOf(CsvMalformedLineException.class);
+		}
 	}
 
 	@Then("We should not be able to read the parquet output file")
@@ -764,8 +726,67 @@ public class MainDefinitions {
 		Path encryptedFilePath =
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
 						".parquet.enc");
+		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
 		try (Statement statement = database.createStatement()) {
 			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
+		}
+	}
+
+	@Then("We should be able to decrypt the file")
+	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig(
+				kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
+				kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+				null,
+				null,
+				String.format(Constants.STRING_FORMAT_VAULT_PATH,
+						Constants.TRUST_VAULT_PATH,
+						Constants.TRUST_AES_KEY_VAULT_PATH)
+		);
+
+		SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = new SymmetricEncryptionEndpoint(
+				symmetricEncryptionConfig
+		);
+
+		//Check CSV
+		Path encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".csv.enc");
+		Assertions.assertThat(encryptedFilePath).exists();
+
+		Assertions.assertThat(
+				new String(
+						symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath)),
+						StandardCharsets.UTF_8)
+				).contains(Constants.ROOT_IDENTIFIER_NAME);
+
+
+		//Check parquet
+		encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet.enc");
+		Assertions.assertThat(encryptedFilePath).exists();
+		Path decryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet");
+
+		Files.write(
+				decryptedFilePath,
+				symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath))
+		);
+
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, decryptedFilePath);
+			ResultSet resultSet = statement.executeQuery(
+					("SELECT %s " +
+							"FROM '%s' ").formatted(
+							Constants.ROOT_IDENTIFIER_NAME,
+							inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME
+					)
+			);
+			Assertions.assertThat(resultSet.next()).isTrue();
 		}
 	}
 

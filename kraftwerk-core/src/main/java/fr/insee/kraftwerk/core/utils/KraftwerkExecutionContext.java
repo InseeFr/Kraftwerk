@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.utils.log;
+package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -36,13 +36,17 @@ public class KraftwerkExecutionContext {
     private boolean withEncryption;
     private long limitSize;
 
+    // Vault
+    private VaultContext vaultContext;
+
     public KraftwerkExecutionContext(
             String inDirectoryParam,
             boolean fileByFile,
             boolean withAllReportingData,
             boolean withDDI,
             boolean withEncryption,
-            long limitSize
+            long limitSize,
+            VaultContext vaultContext
     ) {
         this.startTimeStamp = System.currentTimeMillis();
         this.executionDateTime = LocalDateTime.now();
@@ -56,6 +60,8 @@ public class KraftwerkExecutionContext {
         this.withDDI = withDDI;
         this.withEncryption = withEncryption;
         this.limitSize = limitSize;
+
+        this.vaultContext = vaultContext;
     }
 
     public String getFormattedString() {

@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.cucumber.unit_tests;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
@@ -9,15 +8,12 @@ import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,14 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-	KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-			null,
-			false,
-			false,
-			true,
-			false,
-			419430400L
-	);
+	KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset){

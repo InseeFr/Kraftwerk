@@ -12,6 +12,7 @@ import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -60,6 +61,8 @@ class ParquetOutputFilesTest {
 	@BeforeAll
     static void createInstance() throws SQLException {
 		testDatabase = SqlUtils.openConnection().createStatement();
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+
 		assertDoesNotThrow(() -> {
 			//
 			testUserInputs = new UserInputsFile(
@@ -76,7 +79,7 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("FROM_USER", testDataset);
 			//
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase);
-			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase, fileUtilsInterface);
+			outputFiles = new ParquetOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputs.getModes(), testDatabase, fileUtilsInterface, kraftwerkExecutionContext);
 		});
 	}
 

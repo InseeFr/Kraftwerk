@@ -3,14 +3,18 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.VaultContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.libjavachiffrement.core.vault.VaultCaller;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,8 @@ public class KraftwerkBatch implements CommandLineRunner {
     MinioConfig minioConfig;
     FileUtilsInterface fileSystem;
     MinioClient minioClient;
+
+    VaultConfig vaultConfig;
 
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
@@ -81,13 +87,23 @@ public class KraftwerkBatch implements CommandLineRunner {
 
 
                 //Run kraftwerk
+                VaultContext vaultContext = VaultContext.builder()
+                        .vaultCaller(new VaultCaller(
+                                vaultConfig.getRoleId(),
+                                vaultConfig.getSecretId(),
+                                Constants.VAULT_APPROLE_ENDPOINT
+                        ))
+                        .vaultPath(vaultConfig.getVaultUri())
+                        .build();
+
                 KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                         inDirectory,
                         fileByFile,
                         withAllReportingData,
                         withDDI,
                         withEncryption,
-                        limitSize
+                        limitSize,
+                        vaultContext
                 );
 
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {

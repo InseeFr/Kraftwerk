@@ -6,7 +6,7 @@ import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.kraftwerk.core.TestConstants;
@@ -51,14 +51,7 @@ class CalculatedProcessingTest {
         fooMetadataModel.getVariables().putVariable(new Variable("FOO3", fooMetadataModel.getRootGroup(), VariableType.STRING));
         //
         vtlBindings = new VtlBindings();
-        kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                false,
-                true,
-                false,
-                419430400L
-        );
+        kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
     }
 
     @Test

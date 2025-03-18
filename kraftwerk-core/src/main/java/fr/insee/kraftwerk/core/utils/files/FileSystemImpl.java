@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -143,6 +144,16 @@ public class FileSystemImpl implements FileUtilsInterface{
 		StandardOpenOption standardOpenOption = replace || !isFileExists(path) ? StandardOpenOption.CREATE : StandardOpenOption.APPEND;
 		try {
 			Files.write(Path.of(path), toWrite.getBytes(), standardOpenOption);
+		}catch (IOException e){
+			log.error(e.toString());
+		}
+	}
+
+	@Override
+	public void writeFile(String path, InputStream inputStream, boolean replace) {
+		createDirectoryIfNotExist(Path.of(path).getParent());
+		try (FileOutputStream fileOutputStream = new FileOutputStream(path, !replace)){
+			inputStream.transferTo(fileOutputStream);
 		}catch (IOException e){
 			log.error(e.toString());
 		}

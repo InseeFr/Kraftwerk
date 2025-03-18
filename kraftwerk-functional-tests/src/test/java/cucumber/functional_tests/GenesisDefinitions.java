@@ -15,7 +15,10 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.libjavachiffrement.config.SymmetricEncryptionConfig;
+import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionException;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -28,6 +31,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,6 +50,7 @@ public class GenesisDefinitions {
     GenesisClientStub genesisClientStub = new GenesisClientStub(configStub);
 
     private boolean isUsingEncryption;
+    KraftwerkExecutionContext kraftwerkExecutionContext;
 
     @Before
     public void clean() throws SQLException {
@@ -174,14 +179,9 @@ public class GenesisDefinitions {
     public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
 
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                false,
-                true,
-                isUsingEncryption,
-                419430400L
-        );
+        kraftwerkExecutionContext =
+                TestConstants.getKraftwerkExecutionContext(null, isUsingEncryption);
+
 
         MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
                 configStub,
@@ -261,6 +261,64 @@ public class GenesisDefinitions {
             );
             Assertions.assertThat(resultSet.next()).isTrue();
             Assertions.assertThat(resultSet.getString(variableName)).isNotNull().isEqualTo(value);
+        }
+    }
+
+    @Then("We should be able to decrypt the file \\(Genesis)")
+    public void check_genesis_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
+        Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+        SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig(
+                kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
+                kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+                null,
+                null,
+                String.format(Constants.STRING_FORMAT_VAULT_PATH,
+                        Constants.TRUST_VAULT_PATH,
+                        Constants.TRUST_AES_KEY_VAULT_PATH)
+        );
+
+        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = new SymmetricEncryptionEndpoint(
+                symmetricEncryptionConfig
+        );
+
+        //Check CSV
+        Path encryptedFilePath =
+                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+                        ".csv.enc");
+        Assertions.assertThat(encryptedFilePath).exists();
+
+        Assertions.assertThat(
+                new String(
+                        symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath)),
+                        StandardCharsets.UTF_8)
+        ).contains(Constants.ROOT_IDENTIFIER_NAME);
+
+
+        //Check parquet
+        encryptedFilePath =
+                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+                        ".parquet.enc");
+        Assertions.assertThat(encryptedFilePath).exists();
+        Path decryptedFilePath =
+                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+                        ".parquet");
+
+        Files.write(
+                decryptedFilePath,
+                symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath))
+        );
+
+        try (Statement statement = database.createStatement()) {
+            SqlUtils.readParquetFile(statement, decryptedFilePath);
+            ResultSet resultSet = statement.executeQuery(
+                    ("SELECT %s " +
+                            "FROM '%s' ").formatted(
+                            Constants.ROOT_IDENTIFIER_NAME,
+                            outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME
+                    )
+            );
+            Assertions.assertThat(resultSet.next()).isTrue();
         }
     }
 }

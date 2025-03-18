@@ -10,7 +10,7 @@ import java.util.Set;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -49,14 +49,7 @@ class InformationLevelsTest {
 
 	@Test
 	void applyInformationLevelsProcessing() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				null,
-				false,
-				false,
-				true,
-				false,
-				419430400L
-		);
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
@@ -96,14 +89,7 @@ class InformationLevelsTest {
 	
 	@Test
 	void applyInformationLevelsProcessingWithPartialIdNUll() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				null,
-				false,
-				false,
-				true,
-				false,
-				419430400L
-		);
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 		//
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDatasetWithPartialIdNull);

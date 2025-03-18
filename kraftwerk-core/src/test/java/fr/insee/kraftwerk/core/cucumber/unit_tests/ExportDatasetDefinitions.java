@@ -6,7 +6,7 @@ import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlJsonDatasetWriter;
@@ -43,14 +43,7 @@ public class ExportDatasetDefinitions {
 
 	@When("I try to import the dataset named {string}")
 	public void importDataset(String nameDataset) {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-				null,
-				false,
-				false,
-				true,
-				false,
-				419430400L
-		);
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes

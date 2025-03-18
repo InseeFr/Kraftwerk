@@ -7,7 +7,7 @@ import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -37,14 +37,7 @@ class GroupProcessingTest {
                         new Structured.Component("FOO2", Long.class, Dataset.Role.MEASURE)
                 )
         );
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                false,
-                true,
-                false,
-                419430400L
-        );
+        KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
         //

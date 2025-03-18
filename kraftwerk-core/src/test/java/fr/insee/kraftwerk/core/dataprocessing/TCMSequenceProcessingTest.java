@@ -5,7 +5,7 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Sequence;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -72,14 +72,7 @@ class TCMSequenceProcessingTest {
         metadataModel.getSequences().add(new Sequence(TCMSequenceEnum.TCM_THLHAB.name()));
 
         // Errors list
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                false,
-                true,
-                false,
-                419430400L
-        );
+        KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
         StringBuilder expectedScriptBuilder = new StringBuilder();
         for (TCMModuleEnum module : modules){

@@ -7,7 +7,7 @@ import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.outputs.parquet.ParquetOutputFiles;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
@@ -59,7 +59,8 @@ public class WriterSequence {
 									 Statement database,
 									 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		/* Step 5.3 : write parquet output tables */
-		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface);
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,
+				new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface, kraftwerkExecutionContext);
 		parquetOutputFiles.writeOutputTables();
 		parquetOutputFiles.writeImportScripts(metadataModels, kraftwerkExecutionContext);
 	}

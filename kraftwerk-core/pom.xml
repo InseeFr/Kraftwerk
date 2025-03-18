@@ -18,6 +18,7 @@
 		<trevas.version>1.8.0</trevas.version>
 		<duckdb.version>1.2.1</duckdb.version>
 		<bpm.version>1.0.6</bpm.version>
+		<lib_java_chiffrement.version>1.3.0</lib_java_chiffrement.version>
 	</properties>
 
 
@@ -120,5 +121,12 @@
 			<artifactId>bpm</artifactId>
 			<version>${bpm.version}</version>
 		</dependency>
-	</dependencies>
+
+		<!-- Encryption Library -->
+		<dependency>
+			<groupId>fr.insee.lib_java_chiffrement</groupId>
+			<artifactId>lib_java_chiffrement_core</artifactId>
+			<version>${lib_java_chiffrement.version}</version>
+		</dependency>
+    </dependencies>
 </project>

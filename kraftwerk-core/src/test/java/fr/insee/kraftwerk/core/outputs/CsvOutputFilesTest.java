@@ -9,6 +9,7 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -72,7 +73,12 @@ class CsvOutputFilesTest {
 			//
 			database = SqlUtils.openConnection();
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database.createStatement());
-			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP), vtlBindings, testUserInputsFile.getModes(), database.createStatement(), fileUtilsInterface);
+			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP),
+					vtlBindings,
+					TestConstants.getKraftwerkExecutionContext(),
+					testUserInputsFile.getModes(),
+					database.createStatement(),
+					fileUtilsInterface);
 		});
 	}
 
@@ -106,7 +112,10 @@ class CsvOutputFilesTest {
 
 		outputFiles.writeOutputTables();
 
-		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
+		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(),
+				outputFiles.outputFileName("RACINE",
+				outputFiles.getKraftwerkExecutionContext())
+		);
 		racinePath = racinePath.resolveSibling(racinePath.getFileName());
 		File f = racinePath.toFile();
 		assertTrue(f.exists());

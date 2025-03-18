@@ -9,7 +9,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -18,6 +18,7 @@ import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -76,14 +77,7 @@ class CleanUpProcessingTest {
         // Metadata variables object
         Map<String, MetadataModel> metadatas = new LinkedHashMap<>();
         // Errors list
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                false,
-                true,
-                false,
-                419430400L
-        );
+        KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
         //
         MetadataModel cawiMetadata = new MetadataModel();
         cawiMetadata.getVariables().putVariable(new Variable("FOO", cawiMetadata.getRootGroup(), VariableType.STRING));

@@ -18,7 +18,7 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,7 +86,8 @@ public class StepByStepService extends KraftwerkService {
 				withAllReportingData,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				null
 		);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
@@ -139,7 +140,8 @@ public class StepByStepService extends KraftwerkService {
 				withAllReportingData,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				null
 		);
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 		try {
@@ -183,7 +185,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				null
 		);
 
 		//Read data in JSON file
@@ -252,7 +255,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				null
 		);
 
 
@@ -306,7 +310,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				null
 		);
 
 		// Read all bindings necessary to produce output

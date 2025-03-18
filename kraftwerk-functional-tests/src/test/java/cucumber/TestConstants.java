@@ -1,5 +1,10 @@
 package cucumber;
 
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.VaultContext;
+import org.jetbrains.annotations.NotNull;
+import stubs.VaultContextStub;
+
 /**
  * Class to create static variables giving path for test resources.
  */
@@ -19,4 +24,33 @@ public class TestConstants {
   public static final String SAMPLETEST_REPORTINGDATA_DDI = SAMPLETEST_REPORTINGDATA_FOLDER + "/ddi-sampletest-v1-tel.xml";
   public static final String SAMPLETEST_REPORTINGDATA_DDI_URL = "TODO";
   public static final String SAMPLETEST_REPORTINGDATA_LUNATIC_JSON = SAMPLETEST_REPORTINGDATA_FOLDER + "/lunatic/sampletest_tel.json";
+
+
+    @NotNull
+    public static KraftwerkExecutionContext getKraftwerkExecutionContext() {
+        return new KraftwerkExecutionContext(
+                null,
+                false,
+                true,
+                true,
+                false,
+                419430400L,
+                null
+        );
+    }
+
+    @NotNull
+    public static KraftwerkExecutionContext getKraftwerkExecutionContext(String inDirectory, boolean withEncryption) {
+        return new KraftwerkExecutionContext(
+                inDirectory,
+                false,
+                true,
+                true,
+                withEncryption,
+                419430400L,
+                withEncryption ?
+                new VaultContextStub()
+                        : null
+        );
+    }
 }
