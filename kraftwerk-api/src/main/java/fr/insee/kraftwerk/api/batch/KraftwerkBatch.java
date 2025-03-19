@@ -41,7 +41,7 @@ public class KraftwerkBatch implements CommandLineRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -50,6 +50,7 @@ public class KraftwerkBatch implements CommandLineRunner {
         }else{
             fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
+        this.vaultConfig = vaultConfig;
     }
 
     @Override
@@ -68,11 +69,12 @@ public class KraftwerkBatch implements CommandLineRunner {
                 //2. Integrate all reporting datas (false or true)
                 //3. Campaign name
                 //4. Authentication token for Genesis
+                //5. Encrypt at end (false or true)
                 KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
                 String inDirectory = args[3];
-                boolean withEncryption = Boolean.parseBoolean(args[4]);
+                boolean withEncryption = Boolean.parseBoolean(args[5]);
 
                 //Kraftwerk service type related parameters
                 boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
@@ -146,8 +148,8 @@ public class KraftwerkBatch implements CommandLineRunner {
      * @throws IllegalArgumentException if invalid argument
      */
     private static void checkArgs(String[] args) throws IllegalArgumentException{
-        if(args.length != 5) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 5 !".formatted(args.length));
+        if(args.length != 6) {
+            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 6 !".formatted(args.length));
         }
         if(isNotBoolean(args[1])){
             throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
@@ -155,8 +157,8 @@ public class KraftwerkBatch implements CommandLineRunner {
         if(isNotBoolean(args[2])){
             throw new IllegalArgumentException("Invalid withAllReportingData boolean argument ! %s".formatted(args[2]));
         }
-        if(isNotBoolean(args[4])){
-            throw new IllegalArgumentException("Invalid withEncryption boolean argument ! %s".formatted(args[4]));
+        if(isNotBoolean(args[5])){
+            throw new IllegalArgumentException("Invalid withEncryption boolean argument ! %s".formatted(args[5]));
         }
     }
 
