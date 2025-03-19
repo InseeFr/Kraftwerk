@@ -166,7 +166,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 					.orElseThrow(() -> new KraftwerkException(404, "No file (%s) found in ".formatted(regex) + directory)).toString();
 		}catch (IOException e){
 			log.error(e.toString());
-			return null;
+			throw new KraftwerkException(500, "IO error when looking for regex matching %s file in %s%n%s".formatted(regex, directory, e.toString()));
 		}
 	}
 
