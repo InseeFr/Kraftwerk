@@ -331,7 +331,7 @@ public class SqlUtils {
         // Connection should be close before (after try-with-resources)
         File dbFile = new File(databasePath);
         try{
-            Files.delete(dbFile.toPath());
+            Files.deleteIfExists(dbFile.toPath());
         } catch (IOException e){
             log.warn("❌ Can't delete DB File ! \n {}", e.toString());
         }
