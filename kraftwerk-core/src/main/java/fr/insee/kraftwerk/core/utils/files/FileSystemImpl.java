@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
@@ -32,6 +31,10 @@ public class FileSystemImpl implements FileUtilsInterface{
 	private static final String ARCHIVE = "Archive";
 
 	public FileSystemImpl(String defaultDirectory) {
+		if (defaultDirectory == null){
+			log.error("Can not find default directory");
+			return;
+		}
 		System.setProperty("java.io.tmpdir", Paths.get(defaultDirectory,"temp","currentExecution").toString());
 	}
 
@@ -41,7 +44,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 		String fileWithTime = "kraftwerk-" + DateUtils.getCurrentTimeStamp() + ".json";
 		File file2 = inDirectory.resolve(fileWithTime).toFile();
 		if (file2.exists()) {
-			log.warn(String.format("Trying to rename '%s' to '%s', but second file already exists.", file, file2));
+			log.warn("Trying to rename '{}' to '{}', but second file already exists.", file, file2);
 			log.warn("Timestamped input file will be over-written.");
 			try {
 				Files.delete(file2.toPath());
@@ -108,7 +111,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 		try {
 			if (Files.notExists(path)) {
 				Files.createDirectories(path);
-				log.info(String.format("Created folder: %s", path));
+				log.info("Created folder: {}", path);
 			}
 		} catch (IOException e) {
 			log.error("Permission refused to create folder: {} : {}", path.getParent(), e);

@@ -52,7 +52,7 @@ public class MainProcessingGenesis {
 
 	/* SPECIFIC VARIABLES */
 	@Getter
-	private Path inDirectory;
+	private Path specsDirectory;
 	/**
 	 * Map by mode
 	 */
@@ -60,29 +60,36 @@ public class MainProcessingGenesis {
 	private Map<String, MetadataModel> metadataModels;
 
 	private final GenesisClient client;
+	private final ConfigProperties config;
 
 	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, boolean withDDI) {
+		this.config = config;
 		this.client = new GenesisClient(new RestTemplateBuilder(), config);
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.withDDI = withDDI;
 	}
 
-	public MainProcessingGenesis(GenesisClient genesisClient,
-								 FileUtilsInterface fileUtilsInterface,
-								 boolean withDDI) {
+	public MainProcessingGenesis(
+			ConfigProperties config,
+			GenesisClient genesisClient,
+		 	FileUtilsInterface fileUtilsInterface,
+		 	boolean withDDI
+	) {
+		this.config = config;
 		this.client = genesisClient;
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.withDDI = withDDI;
 	}
 
 	public void init(String campaignId) throws KraftwerkException {
+
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, withDDI ? "with DDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
-		inDirectory = controlInputSequenceGenesis.getInDirectory(campaignId);
+		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), inDirectory,
+		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), specsDirectory,
 				client.getModes(campaignId), fileUtilsInterface, withDDI);
 		if (!userInputs.getModes().isEmpty()) {
             try {
@@ -97,11 +104,18 @@ public class MainProcessingGenesis {
 
 	public void runMain(String campaignId, int batchSize) throws KraftwerkException, IOException {
 		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
+		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
+				campaignId));
 		//We delete database at start (in case there is already one)
-		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
+		SqlUtils.deleteDatabaseFile(databasePath);
 		init(campaignId);
 		//Try with resources to close database when done
-		try (Connection tryDatabase = SqlUtils.openConnection("jdbc:duckdb:"+inDirectory+"/baseTemp.duckdb");) {
+		try (Connection tryDatabase = config.isDuckDbInMemory() ?
+				SqlUtils.openConnection()
+				: SqlUtils.openConnection(Path.of(databasePath))) {
+			if(tryDatabase == null){
+				throw new KraftwerkException(500,"Error during internal database creation");
+			}
 			this.database = tryDatabase.createStatement();
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
@@ -129,13 +143,13 @@ public class MainProcessingGenesis {
 			log.error(e.toString());
 			throw new KraftwerkException(500,"SQL error");
 		}
-		SqlUtils.deleteDatabaseFile(inDirectory+"/baseTemp.duckdb");
+		SqlUtils.deleteDatabaseFile(databasePath);
 	}
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, inDirectory);
+			buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, specsDirectory);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
 		}
@@ -157,12 +171,12 @@ public class MainProcessingGenesis {
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
-		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
+		TextFileWriter.writeErrorsFile(specsDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 	}
 
 }

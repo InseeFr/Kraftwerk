@@ -1,10 +1,10 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -33,8 +33,8 @@ public abstract class ReportingDataParser {
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
-	protected void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData,
-												boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
+	public void integrateReportingDataIntoUE(SurveyRawData surveyRawData, ReportingData reportingData,
+                                             boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.maxStates = countMaxStates(reportingData);
 		this.maxAttempts = countMaxAttempts(reportingData);

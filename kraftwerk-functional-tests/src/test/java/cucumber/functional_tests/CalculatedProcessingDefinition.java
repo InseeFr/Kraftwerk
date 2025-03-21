@@ -2,14 +2,14 @@ package cucumber.functional_tests;
 
 import cucumber.TestConstants;
 import fr.insee.bpm.exceptions.MetadataParserException;
+import fr.insee.bpm.metadata.model.CalculatedVariables;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
+import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.CalculatedProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.bpm.metadata.model.CalculatedVariables;
-import fr.insee.bpm.metadata.reader.ddi.DDIReader;
-import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.parsers.DataParser;
 import fr.insee.kraftwerk.core.parsers.LunaticXmlDataParser;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -29,9 +29,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // calculated_processing.feature
 public class CalculatedProcessingDefinition {
@@ -58,7 +63,6 @@ public class CalculatedProcessingDefinition {
     public void setUpCampaignPacks() {
         //Sample test campaign (with reporting data)
         campaignPacks.put(TestConstants.SAMPLETEST_REPORTINGDATA_CAMPAIGN_NAME, new HashMap<>());
-        //TODO Put other sample test campaigns once they are ready
     }
     @Given("I read data from campaign {string}, mode {string}")
     public void getCampaignFiles(String campaignName, String dataMode) throws MalformedURLException, KraftwerkException, URISyntaxException, MetadataParserException {
