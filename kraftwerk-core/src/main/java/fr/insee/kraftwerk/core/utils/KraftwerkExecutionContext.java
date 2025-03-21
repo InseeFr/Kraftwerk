@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.core.utils.log;
+package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
@@ -17,6 +17,8 @@ import java.util.Map;
 @Setter
 public class KraftwerkExecutionContext {
 
+    //Execution statistics
+
     private LocalDateTime executionDateTime;
 
     private long startTimeStamp;
@@ -26,12 +28,40 @@ public class KraftwerkExecutionContext {
 
     private List<KraftwerkError> errors;
 
-    public KraftwerkExecutionContext() {
+    //Parameters
+    private String inDirectoryParam;
+    private boolean fileByFile;
+    private boolean withAllReportingData;
+    private boolean withDDI;
+    private boolean withEncryption;
+    private long limitSize;
+
+    // Vault
+    private VaultContext vaultContext;
+
+    public KraftwerkExecutionContext(
+            String inDirectoryParam,
+            boolean fileByFile,
+            boolean withAllReportingData,
+            boolean withDDI,
+            boolean withEncryption,
+            long limitSize,
+            VaultContext vaultContext
+    ) {
         this.startTimeStamp = System.currentTimeMillis();
         this.executionDateTime = LocalDateTime.now();
         this.lineCountByTableMap = new HashMap<>();
         this.okFileNames = new ArrayList<>();
         this.errors = new ArrayList<>();
+
+        this.inDirectoryParam = inDirectoryParam;
+        this.fileByFile = fileByFile;
+        this.withAllReportingData = withAllReportingData;
+        this.withDDI = withDDI;
+        this.withEncryption = withEncryption;
+        this.limitSize = limitSize;
+
+        this.vaultContext = vaultContext;
     }
 
     public String getFormattedString() {
