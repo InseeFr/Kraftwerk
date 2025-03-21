@@ -38,7 +38,7 @@ public class OidcService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        String body = String.format("grant_type=client_credentials&client_id=%s&client_secret=%s",
+        String body = String.format("grant_type=client_credentials&client_id=%s&client_secret=%s&scope=openid profile roles",
                 configProperties.getServiceClientId(),
                 configProperties.getServiceClientSecret());
 
