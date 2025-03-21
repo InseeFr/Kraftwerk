@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.1 [2025-03-21]
+### Fixed
+- Bug : no roles in token of service account
+
 ## 3.3.0 [2025-03-21]
 ### Added
 - Role-based permissions to endpoints
