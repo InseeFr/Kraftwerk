@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.3.0 [2025-03-21]
+### Added
+- Role-based permissions to endpoints
+- New tests
+
+### Fixed
+- DuckDb in-memory (for docker)
+
+### Updated
+- springboot 3.4.4
+- pitest-maven 1.19.0
+- duckdb-jdbc 1.2.1
+
 ## 3.2.2 [2025-03-05]
 ### Fixed
 - Bug on large-scale surveys : fix in-memory duckdb
