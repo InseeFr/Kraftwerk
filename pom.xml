@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.2.2</version>
+	<version>3.3.1</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>3.4.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
@@ -30,7 +30,7 @@
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.18.2</pitest.version>
+		<pitest.version>1.19.0</pitest.version>
 		<pitest.junit.version>1.2.2</pitest.junit.version>
 	
 	</properties>
