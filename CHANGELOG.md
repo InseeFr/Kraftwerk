@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.2 [2025-03-25]
+### Fixed
+- Bug with scheduler : add a role for it
+
+### Updated
+- springdoc-openapi-starter-webmvc-ui : 2.8.6
+
 ## 3.3.1 [2025-03-21]
 ### Fixed
 - Bug : no roles in token of service account
