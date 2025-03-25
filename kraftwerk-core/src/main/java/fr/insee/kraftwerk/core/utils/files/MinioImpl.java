@@ -242,11 +242,15 @@ public class MinioImpl implements FileUtilsInterface {
     //Utilities
 
     private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize, boolean replace) {
-        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
+        try{
             if(replace || !isFileExists(minioPath)){
                 minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
                 return;
             }
+        }catch (Exception e) {
+            log.error(e.toString());
+        }
+        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             alreadyExistingInputStream.transferTo(baos);
             inputStream.transferTo(baos);
@@ -262,11 +266,16 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     private void writeFileOnMinio(String minioPath, InputStream inputStream, boolean replace) {
-        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
-            if(replace || !isFileExists(minioPath)){
-                minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, -1, 10485760).object(minioPath.replace("\\","/")).build());
+        try {
+            if (replace || !isFileExists(minioPath)) {
+                minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, -1, 10485760).object(minioPath.replace("\\", "/")).build());
                 return;
             }
+        }catch (Exception e) {
+            log.error(e.toString());
+        }
+
+        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             alreadyExistingInputStream.transferTo(baos);
             inputStream.transferTo(baos);
