@@ -24,6 +24,8 @@ public class RoleConfiguration {
     private List<String> adminClaims;
     @Value("#{'${app.role.user.claims}'.split(',')}")
     private List<String> userClaims;
+    @Value("#{'${app.role.scheduler.claims}'.split(',')}")
+    private List<String> schedulerClaims;
 
     public Map<String, List<String>> getRolesByClaim() {
         return rolesByClaim;
@@ -39,6 +41,7 @@ public class RoleConfiguration {
     static RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
                 .role(ApplicationRole.ADMIN.toString()).implies(ApplicationRole.USER.toString())
+                .role(ApplicationRole.ADMIN.toString()).implies(ApplicationRole.SCHEDULER.toString())
                 .build();
     }
 
@@ -55,16 +58,20 @@ public class RoleConfiguration {
 
         rolesByClaim = new HashMap<>();
 
-        // Ajout des claims pour le rôle ADMIN
+        // Add claims for the ADMIN role
         adminClaims.forEach(claim -> rolesByClaim
                 .computeIfAbsent(claim, k -> new ArrayList<>())
                 .add(String.valueOf(ApplicationRole.ADMIN)));
 
-        // Ajout des claims pour le rôle USER
+        // Add claims for the USER role
         userClaims.forEach(claim -> rolesByClaim
                 .computeIfAbsent(claim, k -> new ArrayList<>())
                 .add(String.valueOf(ApplicationRole.USER)));
 
+        // Add claims for the SCHEDULER role
+        schedulerClaims.forEach(claim -> rolesByClaim
+                .computeIfAbsent(claim, k -> new ArrayList<>())
+                .add(String.valueOf(ApplicationRole.SCHEDULER)));
 
         log.info("Roles configuration : {}", rolesByClaim);
     }

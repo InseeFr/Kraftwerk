@@ -54,7 +54,7 @@ public class OIDCAuthConfiguration {
         }
         http
                 .authorizeHttpRequests(configurer -> configurer
-                        .requestMatchers("/main/**").hasRole(String.valueOf(ApplicationRole.USER))
+                        .requestMatchers("/main/**").hasAnyRole(String.valueOf(ApplicationRole.USER),String.valueOf(ApplicationRole.SCHEDULER))
                         .requestMatchers("/steps/**").hasRole(String.valueOf(ApplicationRole.ADMIN))
                         .requestMatchers("/split/**").hasRole(String.valueOf(ApplicationRole.ADMIN))
                         .anyRequest().authenticated()
