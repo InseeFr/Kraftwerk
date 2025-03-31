@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.utils;
 
-import fr.insee.libjavachiffrement.core.vault.VaultCaller;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
