@@ -1,7 +1,7 @@
 package stubs;
 
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.libjavachiffrement.core.vault.VaultCaller;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import lombok.Getter;
 
 import javax.crypto.KeyGenerator;

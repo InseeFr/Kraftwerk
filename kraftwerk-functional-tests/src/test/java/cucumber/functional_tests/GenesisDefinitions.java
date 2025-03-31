@@ -12,13 +12,12 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableModel;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
-import fr.insee.libjavachiffrement.config.SymmetricEncryptionConfig;
-import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionEndpoint;
-import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionException;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -267,20 +266,8 @@ public class GenesisDefinitions {
     @Then("We should be able to decrypt the file \\(Genesis)")
     public void check_genesis_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
         Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(kraftwerkExecutionContext);
 
-        SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig(
-                kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
-                kraftwerkExecutionContext.getVaultContext().getVaultPath(),
-                null,
-                null,
-                String.format(Constants.STRING_FORMAT_VAULT_PATH,
-                        Constants.TRUST_VAULT_PATH,
-                        Constants.TRUST_AES_KEY_VAULT_PATH)
-        );
-
-        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = new SymmetricEncryptionEndpoint(
-                symmetricEncryptionConfig
-        );
 
         //Check CSV
         Path encryptedFilePath =
@@ -321,4 +308,5 @@ public class GenesisDefinitions {
             Assertions.assertThat(resultSet.next()).isTrue();
         }
     }
+
 }
