@@ -39,3 +39,4 @@ qodana.yaml
 *.duckdb
 /kraftwerk-api/src/test/resources/out/campaign1
 /kraftwerk-api/src/test/resources/temp
+kraftwerk-api/src/main/resources/application-local_integration_test.properties
