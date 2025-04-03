@@ -46,7 +46,7 @@ jobs:
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@499642b4a194e52a38a0950b38de5474bca85c5e
+      uses: advanced-security/maven-dependency-submission-action@17ef6767aee0deaadb4794c3de9d569bff5c1aab
 
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v2.3.6
