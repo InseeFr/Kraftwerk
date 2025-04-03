@@ -40,3 +40,4 @@ qodana.yaml
 /kraftwerk-api/src/test/resources/out/campaign1
 /kraftwerk-api/src/test/resources/temp
 /kraftwerk-functional-tests/src/test/resources/temp/currentExecution
+kraftwerk-api/src/main/resources/application-local_integration_test.properties
