@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;

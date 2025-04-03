@@ -64,12 +64,12 @@ public class GenesisClient {
 			}
 		} catch (RestClientResponseException e) {
 			HttpStatusCode statusCode = e.getStatusCode();
-            throw new KraftwerkException(500,String.format("Unabled to reach Genesis API, http code received : %d",statusCode.value()));
+            throw new KraftwerkException(500,String.format("Unable to reach Genesis API, http code received : %d",statusCode.value()));
 		}
 	}
 
 	public String pingGenesis(){
-		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
+		String url = String.format("%shealth-check", configProperties.getGenesisUrl());
 		// We use another restTemplate because we don't need a token to ping Genesis
 		RestTemplate restTemplateWithoutAuth = new RestTemplate();
 		//Null requestEntity because health check is whitelisted
