@@ -78,7 +78,7 @@ public class GenesisClient {
 	}
 
 	public List<InterrogationId> getInterrogationIds(String questionnaireId) throws KraftwerkException {
-		String url = String.format("%sinterrogations/by-questionnaire?questionnaireId=%s",
+		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s",
 				configProperties.getGenesisUrl(), questionnaireId);
 		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
