@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(classes = KraftwerkApi.class)
-@ActiveProfiles("local_integration_test")
+@ActiveProfiles("integration_test")
 @Slf4j
 class GenesisIntegrationTest {
 
