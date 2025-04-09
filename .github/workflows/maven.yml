@@ -43,6 +43,8 @@ jobs:
       
     - name: Build Kraftwerk with Maven
       run: mvn -B clean package --file pom.xml
+      env:
+        CI_PUBLIC: true
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
