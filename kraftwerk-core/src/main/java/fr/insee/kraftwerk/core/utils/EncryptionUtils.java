@@ -9,6 +9,7 @@ import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
 import fr.insee.libjavachiffrement.vault.VaultConfig;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 
 @UtilityClass
 @Component
+@Profile("default-with-private-lib")
 public class EncryptionUtils {
     public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
     private static final String VAULT_NAME = "filiere_enquetes";
