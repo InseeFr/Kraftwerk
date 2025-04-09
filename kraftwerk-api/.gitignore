@@ -1,2 +1,3 @@
 # Config
 src/main/resources/kraftwerk.properties
+src/main/resources/application-integration_test.properties
