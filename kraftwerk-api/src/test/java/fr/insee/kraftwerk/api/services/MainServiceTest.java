@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.core.encryption.VaultContext;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,9 +48,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "ci-public"})
 @AutoConfigureMockMvc
 @Import(TestConfig.class)
+@ComponentScan(basePackages = {"fr.insee.kraftwerk.core.encryption"})
 class MainServiceTest {
 
     @Autowired
@@ -82,6 +85,9 @@ class MainServiceTest {
     ConfigProperties configProperties = new ConfigProperties();
     MinioConfig minioConfig;
     VaultConfig vaultConfig;
+
+    @Autowired
+    private VaultContext vaultContext;
 
 
     /**
@@ -210,7 +216,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
@@ -231,7 +237,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
@@ -254,7 +260,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
@@ -275,7 +281,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
@@ -298,7 +304,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
@@ -319,7 +325,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
@@ -342,7 +348,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
@@ -364,7 +370,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
@@ -385,7 +391,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
@@ -407,7 +413,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
@@ -429,7 +435,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
@@ -450,7 +456,7 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, vaultContext));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);

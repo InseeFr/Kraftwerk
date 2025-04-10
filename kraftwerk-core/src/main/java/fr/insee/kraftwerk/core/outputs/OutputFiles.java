@@ -1,10 +1,11 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public abstract class OutputFiles {
 
 	protected final KraftwerkExecutionContext kraftwerkExecutionContext;
 
+	protected final EncryptionUtils encryptionUtils;
+
+
 	/**
 	 * When an instance is created, the output folder is created.
 	 * 
@@ -39,14 +43,16 @@ public abstract class OutputFiles {
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
 	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database,
-						  FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext) {
+						  FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext, EncryptionUtils encryptionUtils) {
 		this.vtlBindings = vtlBindings;
 		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
 		this.database = database;
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
+		this.encryptionUtils = encryptionUtils;
 		createOutputFolder();
+
 	}
 
 	/** Create output folder if doesn't exist. */

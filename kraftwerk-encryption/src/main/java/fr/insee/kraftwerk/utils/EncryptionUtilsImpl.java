@@ -1,13 +1,13 @@
-package fr.insee.kraftwerk.core.utils;
+package fr.insee.kraftwerk.utils;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.libjavachiffrement.config.CipherConfig;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
 import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
 import fr.insee.libjavachiffrement.vault.VaultConfig;
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -15,31 +15,27 @@ import org.springframework.stereotype.Component;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-@UtilityClass
+@Profile("!ci-public")
 @Component
-@Profile("default-with-private-lib")
-public class EncryptionUtils {
-    public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
+public class EncryptionUtilsImpl implements EncryptionUtils {
     private static final String VAULT_NAME = "filiere_enquetes";
     private static final String VAULT_PROPERTY_NAME = "value";
+
+    public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
 
     private static final int ENCRYPTION_BUFFER_SIZE = 8192;
 
 
     /**
-     * Encrypts a output file
+     * Encrypts an output file
      * @param tmpOutputFile temporary Kraftwerk output file to encrypt
      * @param fileUtilsInterface file system interface to use to save file
      * @throws KraftwerkException if any problem
      */
-    public static void encryptOutputFile(
-            String tmpOutputFile,
-            String outputFile,
-            FileUtilsInterface fileUtilsInterface,
-            KraftwerkExecutionContext kraftwerkExecutionContext
+    public InputStream encryptOutputFile(
+            Path pathOfFileToEncrypt, KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
         //Check if vault parameters are in context
         if(kraftwerkExecutionContext.getVaultContext().getVaultCaller() == null){
@@ -50,22 +46,15 @@ public class EncryptionUtils {
         }
 
         SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = getSymmetricEncryptionEndpoint(kraftwerkExecutionContext);
-        Path tmpOutputFilePath = Path.of(tmpOutputFile);
 
-        try(FileInputStream fileInputStream = new FileInputStream(tmpOutputFilePath.toFile());
+        try(FileInputStream fileInputStream = new FileInputStream(pathOfFileToEncrypt.toFile());
             InputStream outInputStream = symmetricEncryptionEndpoint.getEncryptedInputStream(fileInputStream,
                     ENCRYPTION_BUFFER_SIZE)
         ){
-            fileUtilsInterface.writeFile(outputFile, outInputStream, true);
+                return  outInputStream;
         }catch (IOException e){
             throw new KraftwerkException(500,
                     "IO Exception during encryption : %s !".formatted(e.toString()));
-        }
-        try{
-            Files.delete(tmpOutputFilePath);
-        } catch (IOException e) {
-            throw new KraftwerkException(500,
-                    "IO Exception during temp file deletion : %s !".formatted(e.toString()));
         }
 
     }
@@ -86,5 +75,10 @@ public class EncryptionUtils {
                 Constants.TRUST_VAULT_PATH,
                 Constants.TRUST_AES_KEY_VAULT_PATH));
         return new SymmetricEncryptionEndpoint(keyContext, cipherConfig);
+    }
+
+    @Override
+    public String getEncryptedFileExtension() {
+        return ENCRYPTED_FILE_EXTENSION;
     }
 }

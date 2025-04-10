@@ -1,15 +1,15 @@
 package fr.insee.kraftwerk.core.outputs;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtilsStub;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -75,10 +75,11 @@ class CsvOutputFilesTest {
 			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, database.createStatement());
 			outputFiles = new CsvOutputFiles(Paths.get(TestConstants.UNIT_TESTS_DUMP),
 					vtlBindings,
-					TestConstants.getKraftwerkExecutionContext(),
 					testUserInputsFile.getModes(),
 					database.createStatement(),
-					fileUtilsInterface);
+					fileUtilsInterface,
+					TestConstants.getKraftwerkExecutionContext(),
+					new EncryptionUtilsStub());
 		});
 	}
 

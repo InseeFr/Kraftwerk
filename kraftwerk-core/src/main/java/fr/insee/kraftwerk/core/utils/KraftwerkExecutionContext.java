@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.encryption.VaultContext;
 import lombok.Getter;
 import lombok.Setter;
 

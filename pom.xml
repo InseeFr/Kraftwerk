@@ -38,6 +38,7 @@
 		<module>kraftwerk-core</module>
 		<module>kraftwerk-api</module>
         <module>kraftwerk-functional-tests</module>
+        <module>kraftwerk-encryption</module>
     </modules>
 	<dependencies>
 		<!-- Spring -->
@@ -211,4 +212,22 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- Exclude kraftwerk-encryption for public CI -->
+		<profile>
+			<id>ci-public</id>
+			<activation>
+				<property>
+					<name>ci-public</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<module>kraftwerk-core</module>
+				<module>kraftwerk-api</module>
+				<module>kraftwerk-functional-tests</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>

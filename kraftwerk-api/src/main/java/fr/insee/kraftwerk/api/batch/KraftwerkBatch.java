@@ -7,14 +7,12 @@ import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
-import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.encryption.VaultContext;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
-import fr.insee.kraftwerk.core.utils.VaultContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.libjavachiffrement.vault.VaultCaller;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,7 @@ public class KraftwerkBatch implements CommandLineRunner {
     MinioClient minioClient;
 
     VaultConfig vaultConfig;
+    VaultContext vaultContext;
 
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
@@ -41,7 +40,7 @@ public class KraftwerkBatch implements CommandLineRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, VaultContext vaultContext) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -51,6 +50,7 @@ public class KraftwerkBatch implements CommandLineRunner {
             fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
         this.vaultConfig = vaultConfig;
+        this.vaultContext=vaultContext;
     }
 
     @Override
@@ -89,15 +89,6 @@ public class KraftwerkBatch implements CommandLineRunner {
 
 
                 //Run kraftwerk
-                VaultContext vaultContext = VaultContext.builder()
-                        .vaultCaller(new VaultCaller(
-                                vaultConfig.getRoleId(),
-                                vaultConfig.getSecretId(),
-                                Constants.VAULT_APPROLE_ENDPOINT
-                        ))
-                        .vaultPath(vaultConfig.getVaultUri())
-                        .build();
-
                 KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                         inDirectory,
                         fileByFile,

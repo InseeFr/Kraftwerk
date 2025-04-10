@@ -1,16 +1,16 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
-import fr.insee.kraftwerk.core.utils.EncryptionUtils;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -40,8 +41,8 @@ public class CsvOutputFiles extends OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
-		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext);
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext, EncryptionUtils encryptionUtils) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext, encryptionUtils);
 	}
 
 
@@ -106,19 +107,15 @@ public class CsvOutputFiles extends OutputFiles {
 
 					//Encrypt file if requested
 					if(kraftwerkExecutionContext.isWithEncryption()) {
-						EncryptionUtils.encryptOutputFile(
-								tmpOutputFile.toString(),
-								outputFile,
-								fileUtilsInterface,
-								kraftwerkExecutionContext
-						);
-						log.info(String.format("File: %s successfully written and encrypted", outputFile));
+						InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
+						getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
+						log.info("File: {} successfully written and encrypted", outputFile);
 						continue; //Go to next dataset to write
 					}
 				}
 				//Move to output folder
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
-				log.info(String.format("File: %s successfully written", outputFile));
+				log.info("File: {} successfully written", outputFile);
 			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}
@@ -208,7 +205,7 @@ public class CsvOutputFiles extends OutputFiles {
 	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		String output = getOutputFolder().getParent().getFileName() + "_" + datasetName + ".csv";
 		return kraftwerkExecutionContext.isWithEncryption() ?
-				output + EncryptionUtils.ENCRYPTED_FILE_EXTENSION
+				output + encryptionUtils.getEncryptedFileExtension()
 				: output;
 	}
 

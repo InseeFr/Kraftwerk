@@ -27,6 +27,8 @@ import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
@@ -251,12 +253,10 @@ public class MainDefinitions {
 			outputFiles = new CsvOutputFiles(
 					outDirectory,
 					vtlBindings,
+					TestConstants.getKraftwerkExecutionContext(),
 					userInputs.getModes(),
 					statement,
-					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
-					TestConstants.getKraftwerkExecutionContext(),
-					null
-			);
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		}
 	}
 
@@ -728,6 +728,52 @@ public class MainDefinitions {
 		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
 		try (Statement statement = database.createStatement()) {
 			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
+		}
+	}
+
+	@Then("We should be able to decrypt the file")
+	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(kraftwerkExecutionContext);
+
+		//Check CSV
+		Path encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".csv.enc");
+		Assertions.assertThat(encryptedFilePath).exists();
+
+		Assertions.assertThat(
+				new String(
+						symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath)),
+						StandardCharsets.UTF_8)
+				).contains(Constants.ROOT_IDENTIFIER_NAME);
+
+
+		//Check parquet
+		encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet.enc");
+		Assertions.assertThat(encryptedFilePath).exists();
+		Path decryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet");
+
+		Files.write(
+				decryptedFilePath,
+				symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath))
+		);
+
+		try (Statement statement = database.createStatement()) {
+			SqlUtils.readParquetFile(statement, decryptedFilePath);
+			ResultSet resultSet = statement.executeQuery(
+					("SELECT %s " +
+							"FROM '%s' ").formatted(
+							Constants.ROOT_IDENTIFIER_NAME,
+							inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME
+					)
+			);
+			Assertions.assertThat(resultSet.next()).isTrue();
 		}
 	}
 
