@@ -253,10 +253,11 @@ public class MainDefinitions {
 			outputFiles = new CsvOutputFiles(
 					outDirectory,
 					vtlBindings,
-					TestConstants.getKraftwerkExecutionContext(),
 					userInputs.getModes(),
 					statement,
-					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+					TestConstants.getKraftwerkExecutionContext(),
+					null);
 		}
 	}
 

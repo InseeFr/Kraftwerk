@@ -1,11 +1,13 @@
 package fr.insee.kraftwerk.vault;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
+import fr.insee.libjavachiffrement.vault.VaultConfig;
+import org.junit.jupiter.api.Test;
 
-public class RealVaultContextTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class RealVaultContextTest {
 	@Test
-	public void RealVaultContext() {
+	void RealVaultContext() {
 		VaultConfig vaultConfig = null;
 		RealVaultContext expected = new RealVaultContext(null);
 		RealVaultContext actual = new RealVaultContext(vaultConfig);

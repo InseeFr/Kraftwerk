@@ -32,6 +32,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+            <artifactId>kraftwerk-api</artifactId>
+            <version>${kraftwerk.version}</version>
+        </dependency>
 
         <!-- Encryption Library -->
         <dependency>
@@ -39,5 +44,6 @@
             <artifactId>lib_java_chiffrement_core</artifactId>
             <version>${lib_java_chiffrement.version}</version>
         </dependency>
+
     </dependencies>
 </project>

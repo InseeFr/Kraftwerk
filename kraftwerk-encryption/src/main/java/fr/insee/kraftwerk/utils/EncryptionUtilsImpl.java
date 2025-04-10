@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.libjavachiffrement.config.CipherConfig;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
 import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import fr.insee.libjavachiffrement.vault.VaultConfig;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
@@ -65,7 +66,7 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
                 null,
                 null,
                 new VaultConfig(
-                        kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
+                        (VaultCaller) kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
                         kraftwerkExecutionContext.getVaultContext().getVaultPath(),
                         VAULT_NAME,
                         VAULT_PROPERTY_NAME)
