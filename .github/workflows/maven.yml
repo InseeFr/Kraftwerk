@@ -42,7 +42,7 @@ jobs:
         cd ..
       
     - name: Build Kraftwerk with Maven
-      run: mvn -B clean package --file pom.xml  -Dci-public=true
+      run: mvn -B clean package --file pom.xml  -Dci-public=true -Dspring.profiles.active=ci-public -Pci-public
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
