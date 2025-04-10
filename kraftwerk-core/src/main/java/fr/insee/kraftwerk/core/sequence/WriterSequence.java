@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.encryption.ApplicationContextProvider;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtilsStub;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
@@ -22,7 +23,11 @@ public class WriterSequence {
 
 	public WriterSequence() {
 		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
-		outputFilesFactory = context.getBean(OutputFilesFactory.class);
+		if (context == null){
+			outputFilesFactory = new OutputFilesFactory(new EncryptionUtilsStub());
+		}else {
+			outputFilesFactory = context.getBean(OutputFilesFactory.class);
+		}
 	}
 
 	public void writeOutputFiles(Path inDirectory,

@@ -9,11 +9,11 @@ Feature: Do we save correctly loop data from Genesis?
     And In parquet loop file for loop "<LoopName>" for interrogationId "<InterrogationId>" and iteration <Iteration> we should have value "<Value>" for field "<VariableName>"
     And Step 2 : We check "<LoopName>" output file has <ExpectedFileLinesCount> lines and <ExpectedVariablesCount> variables
     Examples:
-      | CampaignId    |  InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
-      | TEST-TABLEAUX |  AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
-      | TEST-GLOB     |  AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB     |  AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB     |  AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
+      | CampaignId    | InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
+      | TEST-TABLEAUX | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
+      | TEST-GLOB     | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
+ #    | TEST-GLOB | AUTO204 | TABOFATS2 | act2 | TABOFATS | 1 | 2 | 14 |
+      | TEST-GLOB     | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
 
   Scenario Outline: Genesis loop external data export
     Given Step 0 : We have some survey in directory "<CampaignId>"

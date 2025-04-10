@@ -11,6 +11,6 @@ public class VaultContextStubForTests implements VaultContext {
 
     @Override
     public Object getVaultCaller() {
-        return new VaultCallerStub();
+        return null;
     }
 }
