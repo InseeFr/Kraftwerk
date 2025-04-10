@@ -28,7 +28,10 @@ public final class Constants {
     private Constants() {}
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
-	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
+
+	// Normalized name for VTL user scripts when using Genesis data
+	public static final String USER_VTL_UNIMODAL_SCRIPT_NAME = "script_unimodal.vtl";
+	public static final String USER_VTL_FINAL_SCRIPT_NAME = "script_final.vtl";
 
 	// ----- Main resources folders
 	public static final String RESOURCES_FOLDER = "src/main/resources";

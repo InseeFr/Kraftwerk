@@ -85,12 +85,11 @@ public class MainProcessingGenesis {
 
 		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, withDDI ? "with DDI": "without DDI");
-		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
+		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
 		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), specsDirectory,
-				client.getModes(campaignId), fileUtilsInterface, withDDI);
+		userInputs = new UserInputsGenesis(specsDirectory, client.getModes(campaignId), fileUtilsInterface, withDDI);
 		if (!userInputs.getModes().isEmpty()) {
             try {
                 metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);

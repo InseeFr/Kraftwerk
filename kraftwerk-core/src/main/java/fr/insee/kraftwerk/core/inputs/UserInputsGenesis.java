@@ -18,28 +18,24 @@ import java.util.List;
 @Log4j2
 public class UserInputsGenesis extends UserInputs{
 
-	private final boolean hasConfigFile;
-
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path specsDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
+	public UserInputsGenesis(Path specsDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
 		super(specsDirectory, fileUtilsInterface);
-		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
 		computeInputs(withDDI);
 	}
 
 	private void computeInputs(boolean withDDI) throws KraftwerkException {
-        UserInputsFile userInputsFile;
-		if(hasConfigFile){
-            userInputsFile = new UserInputsFile(specsDirectory.resolve(Constants.USER_INPUT_FILE), specsDirectory, fileUtilsInterface);
-            modeInputsMap = userInputsFile.getModeInputsMap();
-		}else{
-            for (Mode mode : modes) {
-                ModeInputs modeInputs = getModeInputs(mode, withDDI);
-                modeInputsMap.put(mode.name(), modeInputs);
-            }
-        }
+		for (Mode mode : modes) {
+			ModeInputs modeInputs = getModeInputs(mode, withDDI);
+			modeInputsMap.put(mode.name(), modeInputs);
+		}
+		// Add user VTL script on final data (information levels step) if exists
+		Path scriptFinalPath = inputDirectory.resolve(Constants.USER_VTL_FINAL_SCRIPT_NAME);
+		if (fileUtilsInterface.isFileExists(scriptFinalPath.toString())){
+			setVtlInformationLevelsFile(scriptFinalPath);
+		}
 	}
 
     /**
@@ -62,44 +58,25 @@ public class UserInputsGenesis extends UserInputs{
             // Not implemented yet
             modeInputs.setDataFormat("OTHER");
         }
-        if (hasConfigFile) {
-            modeInputs.setModeVtlFile(getModeVtlFile(mode));
-        }
+		modeInputs.setModeVtlFile(getModeVtlFile(mode));
         return modeInputs;
     }
 
-    private Path getModeVtlFile(Mode mode) throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
-		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
-		try {
-			JsonNode userInputs = JsonReader.read(userInputFile, fileUtilsInterface);
-			JsonNode filesNode = userInputs.get("survey_data");
-			for (JsonNode fileNode : filesNode) {
-				String dataMode = readField(fileNode, "data_mode");
-				if (dataMode == null) {break;}
-				if (dataMode.equals(mode.name())) {
-					return fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
-				}
-			}
-		} catch (IOException e) {
-			log.error("Unable to read user input file: {} , {}", userInputFile, e);
-			throw new UnknownDataFormatException(e.getMessage());
+	/**
+	 * Build the path to the unimodal user script for the requested mode if it exists
+	 * @param mode mode requested
+	 * @return Path to the script
+	 */
+    private Path getModeVtlFile(Mode mode) {
+		Path scriptPath = inputDirectory.resolve(mode.name()).resolve(Constants.USER_VTL_UNIMODAL_SCRIPT_NAME);
+		if (fileUtilsInterface.isFileExists(scriptPath.toString())){
+			return scriptPath;
 		}
 		return null;
 	}
 
 	public List<String> getModes() {
 		return new ArrayList<>(modeInputsMap.keySet());
-	}
-
-	private String readField(JsonNode node, String field) throws MissingMandatoryFieldException {
-		JsonNode value = node.get(field);
-		if (value != null) {
-			String text = value.asText();
-			if (!(text.isEmpty() || text.equals("null"))) {
-				return text;
-			}
-		}
-		return null;
 	}
 
 	/**
