@@ -13,16 +13,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class RealVaultContext implements VaultContext { // Cannot use record because of stub subclass
 
-    private final VaultCaller vaultCaller;
-    private final String vaultPath;
+    private VaultCaller vaultCaller;
+    private String vaultPath;
 
     public RealVaultContext(VaultConfig vaultConfig) {
-        this.vaultCaller = new VaultCaller(
-                vaultConfig.getVaultName(),
-                vaultConfig.getVaultSecretPropertyName(),
-                Constants.VAULT_APPROLE_ENDPOINT
-        );
-        this.vaultPath =  vaultConfig.getVaultPath();
+        if (vaultConfig != null) {
+            this.vaultCaller = new VaultCaller(
+                    vaultConfig.getVaultName(),
+                    vaultConfig.getVaultSecretPropertyName(),
+                    Constants.VAULT_APPROLE_ENDPOINT
+            );
+            this.vaultPath = vaultConfig.getVaultPath();
+        }
     }
 
 }
