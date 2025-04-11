@@ -13,32 +13,14 @@ public class ControlInputSequenceGenesis {
 
 	String defaultDirectory;
 	private static final String SPEC_FOLDER = "specs";
-	private final FileUtilsInterface fileUtilsInterface;
 
-	@Getter
-	boolean hasConfigFile = true;
-
-	public ControlInputSequenceGenesis(String defaultDirectory, FileUtilsInterface fileUtilsInterface) {
+	public ControlInputSequenceGenesis(String defaultDirectory) {
 		super();
 		this.defaultDirectory = defaultDirectory;
-		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
 	public Path getSpecsDirectory(String specsDirectoryParam) {
-		Path specsDirectory = Paths.get(defaultDirectory,SPEC_FOLDER, specsDirectoryParam);
-		hasConfigFile = verifySpecsDirectory(specsDirectory);
-		return specsDirectory;
-	}
-
-	private boolean verifySpecsDirectory(Path inDirectory) {
-		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
-		if (fileUtilsInterface.isFileExists(userInputFile.toString())) {
-			log.info("Found configuration file in campaign folder: {}", userInputFile);
-		} else {
-            log.info("No configuration file found in campaign folder: {}", inDirectory);
-			return false;
-		}
-		return true;
+		return Paths.get(defaultDirectory,SPEC_FOLDER, specsDirectoryParam);
 	}
 
 }
