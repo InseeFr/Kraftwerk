@@ -12,7 +12,7 @@ Feature: Do we save correctly loop data from Genesis?
       | CampaignId    | InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
       | TEST-TABLEAUX | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
       | TEST-GLOB     | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
- #    | TEST-GLOB | AUTO204 | TABOFATS2 | act2 | TABOFATS | 1 | 2 | 14 |
+      | TEST-GLOB     | AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
       | TEST-GLOB     | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
 
   Scenario Outline: Genesis loop external data export
