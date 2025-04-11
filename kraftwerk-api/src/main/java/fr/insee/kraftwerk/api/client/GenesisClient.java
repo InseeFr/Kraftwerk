@@ -69,7 +69,7 @@ public class GenesisClient {
 	}
 
 	public String pingGenesis(){
-		String url = String.format("%shealth-check", configProperties.getGenesisUrl());
+		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
 		// We use another restTemplate because we don't need a token to ping Genesis
 		RestTemplate restTemplateWithoutAuth = new RestTemplate();
 		//Null requestEntity because health check is whitelisted
