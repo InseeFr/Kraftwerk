@@ -32,9 +32,11 @@ public class UserInputsGenesis extends UserInputs{
 			modeInputsMap.put(mode.name(), modeInputs);
 		}
 		// Add user VTL script on final data (information levels step) if exists
-		Path scriptFinalPath = inputDirectory.resolve(Constants.USER_VTL_FINAL_SCRIPT_NAME);
-		if (fileUtilsInterface.isFileExists(scriptFinalPath.toString())){
-			setVtlInformationLevelsFile(scriptFinalPath);
+		try {
+			setVtlInformationLevelsFile(Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory),Constants.SCRIPT_FINAL_REGEX)));
+		} catch (KraftwerkException e) {
+			// Script is optional, if not found the program should continue normally
+			log.debug("No final script found in specs directory");
 		}
 	}
 
@@ -68,11 +70,11 @@ public class UserInputsGenesis extends UserInputs{
 	 * @return Path to the script
 	 */
     private Path getModeVtlFile(Mode mode) {
-		Path scriptPath = inputDirectory.resolve(mode.name()).resolve(Constants.USER_VTL_UNIMODAL_SCRIPT_NAME);
-		if (fileUtilsInterface.isFileExists(scriptPath.toString())){
-			return scriptPath;
-		}
-		return null;
+		try {
+			return Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory.resolve(mode.name())),Constants.SCRIPT_UNIMODAL_REGEX));
+		} catch (KraftwerkException e) {
+            return null;
+        }
 	}
 
 	public List<String> getModes() {
