@@ -38,6 +38,7 @@
 		<module>kraftwerk-core</module>
 		<module>kraftwerk-api</module>
         <module>kraftwerk-functional-tests</module>
+        <module>kraftwerk-encryption</module>
     </modules>
 	<dependencies>
 		<!-- Spring -->
