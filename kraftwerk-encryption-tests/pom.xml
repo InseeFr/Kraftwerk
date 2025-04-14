@@ -9,8 +9,8 @@
         <version>3.3.2</version>
     </parent>
 
-    <artifactId>kraftwerk-encryption</artifactId>
-    <name>kraftwerk-encryption</name>
+    <artifactId>kraftwerk-encryption-tests</artifactId>
+    <name>kraftwerk-encryption-tests</name>
     <packaging>jar</packaging>
 
     <properties>
@@ -31,12 +31,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>fr.insee.kraftwerk</groupId>-->
-<!--            <artifactId>kraftwerk-api</artifactId>-->
-<!--            <version>${kraftwerk.version}</version>-->
-<!--            <classifier>app-to-import</classifier>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+             <artifactId>kraftwerk-api</artifactId>
+             <version>${kraftwerk.version}</version>
+             <classifier>app-to-import</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+            <artifactId>kraftwerk-encryption</artifactId>
+            <version>${kraftwerk.version}</version>
+        </dependency>
 
         <!-- Encryption Library -->
         <dependency>
@@ -44,7 +50,6 @@
             <artifactId>lib_java_chiffrement_core</artifactId>
             <version>${lib_java_chiffrement.version}</version>
         </dependency>
-
 
     </dependencies>
 </project>

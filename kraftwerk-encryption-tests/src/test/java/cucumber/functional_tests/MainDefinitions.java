@@ -59,9 +59,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,9 +66,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // Main example
 public class MainDefinitions {
 
-	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
-	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
-	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
+	Path inDirectory = Paths.get(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY);
+	static Path outDirectory = Paths.get(TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
+	Path tempDirectory = Paths.get(TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	UserInputsFile userInputs;
 	String campaignName = "";
 	VtlBindings vtlBindings = new VtlBindings();
@@ -103,7 +100,7 @@ public class MainDefinitions {
 
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
-		outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
+		outDirectory = Paths.get(TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 
 		this.campaignName = campaignDirectoryName;
 		inDirectory = inDirectory.resolve(campaignName);
@@ -216,7 +213,7 @@ public class MainDefinitions {
 
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
-		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 

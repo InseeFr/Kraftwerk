@@ -29,6 +29,7 @@
 			</exclusions>
 		</dependency>
 
+
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,4 +97,36 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>with-encryption</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>fr.insee.kraftwerk</groupId>
+					<artifactId>kraftwerk-encryption</artifactId>
+					<version>${kraftwerk.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>ci-public</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+				<!-- Remove encryption with provided -->
+<!--				<dependency>-->
+<!--					<groupId>fr.insee.kraftwerk</groupId>-->
+<!--					<artifactId>kraftwerk-encryption</artifactId>-->
+<!--					<version>${kraftwerk.version}</version>-->
+<!--					<scope>provided</scope>-->
+<!--					<optional>true</optional>-->
+<!--				</dependency>-->
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

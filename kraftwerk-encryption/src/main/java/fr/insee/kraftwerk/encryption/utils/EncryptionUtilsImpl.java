@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.utils;
+package fr.insee.kraftwerk.encryption.utils;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.encryption.EncryptionUtils;

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Profile("ci-public")
+@Profile({"ci-public", "test"})
 @AllArgsConstructor
 @Component
 public class VaultContextStub implements VaultContext{

@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ import java.io.IOException;
 @RestController
 @Slf4j
 @Tag(name = "${tag.main}")
+@ConditionalOnBean(VaultContext.class)
 public class MainService extends KraftwerkService {
 
 	ConfigProperties configProperties;

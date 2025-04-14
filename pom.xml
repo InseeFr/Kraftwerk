@@ -39,6 +39,7 @@
 		<module>kraftwerk-api</module>
         <module>kraftwerk-functional-tests</module>
         <module>kraftwerk-encryption</module>
+        <module>kraftwerk-encryption-tests</module>
     </modules>
 	<dependencies>
 		<!-- Spring -->

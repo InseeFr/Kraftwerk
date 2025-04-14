@@ -1,4 +1,4 @@
-package fr.insee.kraftwerk.vault;
+package fr.insee.kraftwerk.encryption.vault;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.encryption.VaultContext;
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Getter
-@Profile("!ci-public")
 @Component
+@Profile("!ci-public")
 public class RealVaultContext implements VaultContext { // Cannot use record because of stub subclass
 
     private VaultCaller vaultCaller;

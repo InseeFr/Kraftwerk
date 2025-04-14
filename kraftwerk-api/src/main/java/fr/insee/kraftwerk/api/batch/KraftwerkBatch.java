@@ -18,11 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@ConditionalOnBean(VaultContext.class)
 public class KraftwerkBatch implements CommandLineRunner {
 
     ConfigProperties configProperties;
