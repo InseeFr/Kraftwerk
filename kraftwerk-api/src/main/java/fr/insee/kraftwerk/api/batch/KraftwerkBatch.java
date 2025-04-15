@@ -8,18 +8,23 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
 import fr.insee.kraftwerk.core.encryption.VaultContext;
+import fr.insee.kraftwerk.core.encryption.VaultContextStub;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
+import fr.insee.kraftwerk.encryption.vault.RealVaultContext;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 @Component
 @Slf4j
@@ -40,7 +45,7 @@ public class KraftwerkBatch implements CommandLineRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, VaultContext vaultContext) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -50,7 +55,15 @@ public class KraftwerkBatch implements CommandLineRunner {
             fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
         this.vaultConfig = vaultConfig;
-        this.vaultContext=vaultContext;
+        if (!Arrays.asList(env.getActiveProfiles()).contains("ci-public")) {
+            this.vaultContext = new RealVaultContext(
+                    vaultConfig.getRoleId(),
+                    vaultConfig.getSecretId(),
+                    vaultConfig.getVaultUri()
+            );
+        } else {
+            this.vaultContext = new VaultContextStub(); // ou null si pas utilisé
+        }
     }
 
     @Override

@@ -28,7 +28,6 @@ import java.nio.file.Paths;
  * Class that provide method to use the Trevas library.
  */
 @Log4j2
-@Service
 public class VtlExecute {
 
     /** Mapper to convert json files into VTL Datasets. */

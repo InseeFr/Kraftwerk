@@ -8,11 +8,16 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Arrays;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
+@ComponentScan(basePackages = {
+		"fr.insee.kraftwerk.api",
+		"fr.insee.kraftwerk.encryption"
+})
 @EnableConfigurationProperties(MinioConfig.class)
 @Slf4j
 public class KraftwerkApi extends SpringBootServletInitializer {
