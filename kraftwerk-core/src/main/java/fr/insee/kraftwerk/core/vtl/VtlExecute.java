@@ -6,7 +6,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
@@ -28,7 +28,6 @@ import java.nio.file.Paths;
  * Class that provide method to use the Trevas library.
  */
 @Log4j2
-@Service
 public class VtlExecute {
 
     /** Mapper to convert json files into VTL Datasets. */

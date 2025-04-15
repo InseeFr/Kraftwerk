@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fr.insee.kraftwerk</groupId>
+        <artifactId>kraftwerk</artifactId>
+        <version>3.3.2</version>
+    </parent>
+
+    <artifactId>kraftwerk-encryption-tests</artifactId>
+    <name>kraftwerk-encryption-tests</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <lib_java_chiffrement.version>1.3.1</lib_java_chiffrement.version>
+        <kraftwerk.version>3.3.2</kraftwerk.version>
+    </properties>
+    <dependencies>
+
+        <!-- Kraftwerk Core -->
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+            <artifactId>kraftwerk-core</artifactId>
+            <version>${kraftwerk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+             <artifactId>kraftwerk-api</artifactId>
+             <version>${kraftwerk.version}</version>
+             <classifier>app-to-import</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insee.kraftwerk</groupId>
+            <artifactId>kraftwerk-encryption</artifactId>
+            <version>${kraftwerk.version}</version>
+        </dependency>
+
+        <!-- Encryption Library -->
+        <dependency>
+            <groupId>fr.insee.lib_java_chiffrement</groupId>
+            <artifactId>lib_java_chiffrement_core</artifactId>
+            <version>${lib_java_chiffrement.version}</version>
+        </dependency>
+
+    </dependencies>
+</project>
