@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.configuration.security;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,10 +28,7 @@ public class RoleConfiguration {
     @Value("#{'${app.role.scheduler.claims}'.split(',')}")
     private List<String> schedulerClaims;
 
-    public Map<String, List<String>> getRolesByClaim() {
-        return rolesByClaim;
-    }
-
+    @Getter
     private Map<String, List<String>> rolesByClaim;
 
     //Defines a role hierarchy
