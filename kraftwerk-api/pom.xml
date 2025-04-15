@@ -117,16 +117,7 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			<dependencies>
-				<!-- Remove encryption with provided -->
-				<dependency>
-					<groupId>fr.insee.kraftwerk</groupId>
-					<artifactId>kraftwerk-encryption</artifactId>
-					<version>${kraftwerk.version}</version>
-					<scope>provided</scope>
-					<optional>true</optional>
-				</dependency>
-			</dependencies>
+			<!-- Does not include  kraftwerk-encryption-->
 		</profile>
 	</profiles>
 </project>
