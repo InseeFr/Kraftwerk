@@ -70,9 +70,6 @@ public class KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		
-		/* Step 4.3 : move kraftwerk.json to a secondary folder */
-		fileUtilsInterface.renameInputFile(inDirectory);
 
 		/* Step 4.4 : move differential data to a secondary folder */
 		try {
@@ -80,7 +77,10 @@ public class KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		
+
+		/* Step 4.5 : rename in-place "kraftwerk.json" ->  "kraftwerk-<timestamp>.json" */
+		fileUtilsInterface.renameInputFile(inDirectory);
+
 		//delete temp directory
 		Path tempOutputPath = FileUtilsInterface.transformToTemp(inDirectory);
 		try {
