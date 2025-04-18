@@ -18,13 +18,12 @@ import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,9 +45,7 @@ public class MainProcessingGenesis {
 	private final FileUtilsInterface fileUtilsInterface;
 	private Statement database;
 
-	private final boolean withDDI;
-
-	private KraftwerkExecutionContext kraftwerkExecutionContext;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/* SPECIFIC VARIABLES */
 	@Getter
@@ -62,38 +59,31 @@ public class MainProcessingGenesis {
 	private final GenesisClient client;
 	private final ConfigProperties config;
 
-	public MainProcessingGenesis(ConfigProperties config, FileUtilsInterface fileUtilsInterface, boolean withDDI) {
-		this.config = config;
-		this.client = new GenesisClient(new RestTemplateBuilder(), config);
-		this.fileUtilsInterface = fileUtilsInterface;
-		this.withDDI = withDDI;
-	}
-
 	public MainProcessingGenesis(
 			ConfigProperties config,
 			GenesisClient genesisClient,
 		 	FileUtilsInterface fileUtilsInterface,
-		 	boolean withDDI
+			KraftwerkExecutionContext kraftwerkExecutionContext
 	) {
 		this.config = config;
 		this.client = genesisClient;
 		this.fileUtilsInterface = fileUtilsInterface;
-		this.withDDI = withDDI;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 	public void init(String campaignId) throws KraftwerkException {
-
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
-		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, withDDI ? "with DDI": "without DDI");
+		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
+				? "with DDI": "without " +
+				"DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
 		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
 		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), specsDirectory,
-				client.getModes(campaignId), fileUtilsInterface, withDDI);
+				client.getModes(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
 		if (!userInputs.getModes().isEmpty()) {
             try {
-                metadataModels = withDDI ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+                metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
 			} catch (MetadataParserException e) {
                 throw new KraftwerkException(500, e.getMessage());
             }

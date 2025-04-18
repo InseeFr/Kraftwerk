@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +82,17 @@ class MainProcessingGenesisTest {
             }
         };
 
-        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, true);
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L,
+                null
+        );
+
+        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
     @Test

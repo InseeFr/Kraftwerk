@@ -18,7 +18,7 @@ import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,14 +69,24 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "buildVtlBindings", summary = "${summary.buildVtlBindings}", description = "${description.buildVtlBindings}")
 	public ResponseEntity<String> buildVtlBindings(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
-			) {
+			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue =
+					"true") boolean withAllReportingData
+	) {
 		//Read data files
 		boolean fileByFile = false;
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				fileByFile,
+				withAllReportingData,
+				withDDI,
+				false,
+				limitSize,
+				null
+		);
 
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -86,7 +96,6 @@ public class StepByStepService extends KraftwerkService {
 		//Process
 		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
 			try{
@@ -116,8 +125,16 @@ public class StepByStepService extends KraftwerkService {
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				fileByFile,
+				withAllReportingData,
+				withDDI,
+				false,
+				limitSize,
+				null
+		);
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -148,7 +165,15 @@ public class StepByStepService extends KraftwerkService {
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
 			)  {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				false,
+				false,
+				true,
+				false,
+				limitSize,
+				null
+		);
 
 		//Read data in JSON file
 		Path inDirectory;
@@ -205,7 +230,15 @@ public class StepByStepService extends KraftwerkService {
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				false,
+				false,
+				true,
+				false,
+				limitSize,
+				null
+		);
 
 
 		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
@@ -247,7 +280,15 @@ public class StepByStepService extends KraftwerkService {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		VtlBindings vtlBindings = new VtlBindings();
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				inDirectoryParam,
+				false,
+				false,
+				true,
+				false,
+				limitSize,
+				null
+		);
 
 		// Read all bindings necessary to produce output
 		String path = FileUtilsInterface.transformToTemp(inDirectory).toString();

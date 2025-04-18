@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.TestUtils;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -80,6 +81,7 @@ class MainServiceTest {
 
     ConfigProperties configProperties = new ConfigProperties();
     MinioConfig minioConfig;
+    VaultConfig vaultConfig;
 
 
     /**
@@ -208,13 +210,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -229,13 +231,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -252,13 +254,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -273,13 +275,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -296,13 +298,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -317,13 +319,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -340,13 +342,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -362,13 +364,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -383,13 +385,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
 
         // THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -405,13 +407,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -427,13 +429,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -448,13 +450,13 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
 
         // THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

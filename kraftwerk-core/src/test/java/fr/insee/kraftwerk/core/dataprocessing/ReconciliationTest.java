@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -25,7 +25,7 @@ class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -74,7 +74,7 @@ class ReconciliationTest {
 	@BeforeEach
 	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	}
 
 	@ParameterizedTest
