@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.utils.VaultContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
-import fr.insee.libjavachiffrement.core.vault.VaultCaller;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

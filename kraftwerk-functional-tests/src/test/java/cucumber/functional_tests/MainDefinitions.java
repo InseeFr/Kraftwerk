@@ -27,9 +27,11 @@ import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import fr.insee.libjavachiffrement.config.SymmetricEncryptionConfig;
-import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionEndpoint;
-import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionException;
+import fr.insee.libjavachiffrement.config.CipherConfig;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
+import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
+import fr.insee.libjavachiffrement.vault.VaultConfig;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
@@ -85,6 +87,9 @@ public class MainDefinitions {
 	KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	boolean isUsingEncryption;
+
+	private static final String VAULT_NAME = "filiere_enquetes";
+	private static final String VAULT_PROPERTY_NAME = "value";
 
 	@BeforeAll
 	public static void clean() throws SQLException {
@@ -736,19 +741,21 @@ public class MainDefinitions {
 	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-		SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig(
-				kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
-				kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+		CipherConfig cipherConfig =new CipherConfig(
 				null,
 				null,
+				new VaultConfig(
+						kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
+						kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+						VAULT_NAME,
+						VAULT_PROPERTY_NAME)
+		);
+		SymmetricKeyContext keyContext = new SymmetricKeyContext(
 				String.format(Constants.STRING_FORMAT_VAULT_PATH,
 						Constants.TRUST_VAULT_PATH,
-						Constants.TRUST_AES_KEY_VAULT_PATH)
-		);
+						Constants.TRUST_AES_KEY_VAULT_PATH));
 
-		SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = new SymmetricEncryptionEndpoint(
-				symmetricEncryptionConfig
-		);
+		SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = new SymmetricEncryptionEndpoint(keyContext, cipherConfig);
 
 		//Check CSV
 		Path encryptedFilePath =

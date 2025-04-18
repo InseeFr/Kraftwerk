@@ -3,8 +3,11 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.libjavachiffrement.config.SymmetricEncryptionConfig;
-import fr.insee.libjavachiffrement.core.symmetricencryption.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.config.CipherConfig;
+import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
+import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
+import fr.insee.libjavachiffrement.vault.VaultConfig;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -68,15 +71,19 @@ public class EncryptionUtils {
 
     @NotNull
     private static SymmetricEncryptionEndpoint getSymmetricEncryptionEndpoint(KraftwerkExecutionContext kraftwerkExecutionContext) {
-        SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig(
-                kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
-                kraftwerkExecutionContext.getVaultContext().getVaultPath(),
-                VAULT_NAME,
-                VAULT_PROPERTY_NAME,
+        CipherConfig cipherConfig =new CipherConfig(
+                null,
+                null,
+                new VaultConfig(
+                        kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
+                        kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+                        VAULT_NAME,
+                        VAULT_PROPERTY_NAME)
+        );
+        SymmetricKeyContext keyContext = new SymmetricKeyContext(
                 String.format(Constants.STRING_FORMAT_VAULT_PATH,
                         Constants.TRUST_VAULT_PATH,
-                        Constants.TRUST_AES_KEY_VAULT_PATH)
-        );
-        return new SymmetricEncryptionEndpoint(symmetricEncryptionConfig);
+                        Constants.TRUST_AES_KEY_VAULT_PATH));
+        return new SymmetricEncryptionEndpoint(keyContext, cipherConfig);
     }
 }

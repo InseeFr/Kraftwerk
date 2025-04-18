@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
-import fr.insee.libjavachiffrement.core.vault.VaultCaller;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
