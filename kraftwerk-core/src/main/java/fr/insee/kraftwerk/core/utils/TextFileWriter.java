@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;

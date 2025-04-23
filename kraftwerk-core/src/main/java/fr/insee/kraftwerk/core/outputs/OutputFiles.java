@@ -4,7 +4,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,18 +30,22 @@ public abstract class OutputFiles {
 	private final Statement database;
 	protected final FileUtilsInterface fileUtilsInterface;
 
+	protected final KraftwerkExecutionContext kraftwerkExecutionContext;
+
 	/**
 	 * When an instance is created, the output folder is created.
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
+	protected OutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database,
+						  FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		this.vtlBindings = vtlBindings;
 		setOutputDatasetNames(modes);
 		outputFolder = outDirectory;
 		this.database = database;
 		this.fileUtilsInterface = fileUtilsInterface;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 		createOutputFolder();
 	}
 
@@ -72,7 +76,7 @@ public abstract class OutputFiles {
 	/**
 	 * Return the name of the file to be written from the dataset name.
 	 */
-	public String outputFileName(String datasetName) {
+	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		// implemented in subclasses
 		return datasetName;
 	}
