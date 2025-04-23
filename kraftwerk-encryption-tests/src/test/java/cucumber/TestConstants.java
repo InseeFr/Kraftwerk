@@ -33,7 +33,6 @@ public class TestConstants {
         );
     }
 
-
     @NotNull
     public static KraftwerkExecutionContext getKraftwerkExecutionContext(String inDirectory, boolean withEncryption) {
         return new KraftwerkExecutionContext(
@@ -49,8 +48,12 @@ public class TestConstants {
 
     public static @NotNull SymmetricEncryptionEndpoint getSymmetricEncryptionEndpointForTest(KraftwerkExecutionContext kraftwerkExecutionContext) {
         VaultConfig vaultConfigTest = new VaultConfig(
-                (VaultCaller) kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
-                kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+                new VaultCaller(
+                        "roleId",
+                        "secretId",
+                        Constants.VAULT_APPROLE_ENDPOINT
+                ),
+               "Vault path",
                 "VAULT_NAME",
                 "VAULT_PROPERTY_NAME");
         CipherConfig cipherConfig = new CipherConfig(null, null, vaultConfigTest);

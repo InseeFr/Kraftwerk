@@ -48,8 +48,8 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
 
     /**
      * Encrypts an output file
-     * @param tmpOutputFile temporary Kraftwerk output file to encrypt
-     * @param fileUtilsInterface file system interface to use to save file
+     * @param pathOfFileToEncrypt temporary Kraftwerk output file to encrypt
+     * @param kraftwerkExecutionContext Context
      * @throws KraftwerkException if any problem
      */
     public InputStream encryptOutputFile(
