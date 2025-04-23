@@ -22,8 +22,7 @@ public class TestConstants {
 				true,
 				true,
 				false,
-				419430400L,
-				null
+				419430400L
 		);
 	}
 
