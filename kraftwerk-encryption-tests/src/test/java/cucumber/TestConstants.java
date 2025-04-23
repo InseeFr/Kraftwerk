@@ -8,7 +8,6 @@ import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
 import fr.insee.libjavachiffrement.vault.VaultCaller;
 import fr.insee.libjavachiffrement.vault.VaultConfig;
 import org.jetbrains.annotations.NotNull;
-import stubs.VaultContextStubForTests;
 
 /**
  * Class to create static variables giving path for test resources.

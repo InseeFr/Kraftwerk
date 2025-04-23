@@ -2,7 +2,6 @@ package cucumber;
 
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import org.jetbrains.annotations.NotNull;
-import stubs.VaultContextStubForTests;
 
 /**
  * Class to create static variables giving path for test resources.
@@ -33,8 +32,7 @@ public class TestConstants {
                 true,
                 true,
                 false,
-                419430400L,
-                null
+                419430400L
         );
     }
 
@@ -46,10 +44,7 @@ public class TestConstants {
                 true,
                 true,
                 withEncryption,
-                419430400L,
-                withEncryption ?
-                new VaultContextStubForTests()
-                        : null
+                419430400L
         );
     }
 

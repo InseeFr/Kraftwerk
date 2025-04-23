@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.api.integration_tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.kraftwerk.api.KraftwerkApi;
+import fr.insee.kraftwerk.KraftwerkApi;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
