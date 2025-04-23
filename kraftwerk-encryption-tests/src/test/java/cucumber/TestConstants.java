@@ -29,8 +29,7 @@ public class TestConstants {
                 true,
                 true,
                 false,
-                419430400L,
-                null
+                419430400L
         );
     }
 
@@ -43,10 +42,7 @@ public class TestConstants {
                 true,
                 true,
                 withEncryption,
-                419430400L,
-                withEncryption ?
-                        new VaultContextStubForTests()
-                        : null
+                419430400L
         );
     }
 
