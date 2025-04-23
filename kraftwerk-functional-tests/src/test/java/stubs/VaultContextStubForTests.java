@@ -1,7 +1,5 @@
 package stubs;
 
-import fr.insee.kraftwerk.core.encryption.VaultContext;
-
 public class VaultContextStubForTests implements VaultContext {
 
     @Override

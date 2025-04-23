@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
-import fr.insee.kraftwerk.core.encryption.VaultContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,8 +36,6 @@ public class KraftwerkExecutionContext {
     private boolean withEncryption;
     private long limitSize;
 
-    // Vault
-    private VaultContext vaultContext;
 
     public KraftwerkExecutionContext(
             String inDirectoryParam,
@@ -46,9 +43,7 @@ public class KraftwerkExecutionContext {
             boolean withAllReportingData,
             boolean withDDI,
             boolean withEncryption,
-            long limitSize,
-            VaultContext vaultContext
-    ) {
+            long limitSize) {
         this.startTimeStamp = System.currentTimeMillis();
         this.executionDateTime = LocalDateTime.now();
         this.lineCountByTableMap = new HashMap<>();
@@ -62,7 +57,6 @@ public class KraftwerkExecutionContext {
         this.withEncryption = withEncryption;
         this.limitSize = limitSize;
 
-        this.vaultContext = vaultContext;
     }
 
     public String getFormattedString() {

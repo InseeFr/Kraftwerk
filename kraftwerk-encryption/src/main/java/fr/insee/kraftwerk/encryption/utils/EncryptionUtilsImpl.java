@@ -9,8 +9,10 @@ import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
 import fr.insee.libjavachiffrement.symmetric.SymmetricKeyContext;
 import fr.insee.libjavachiffrement.vault.VaultCaller;
 import fr.insee.libjavachiffrement.vault.VaultConfig;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.annotation.Profile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
@@ -18,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
-@Profile("!ci-public")
 @Component
+@Slf4j
 public class EncryptionUtilsImpl implements EncryptionUtils {
     private static final String VAULT_NAME = "filiere_enquetes";
     private static final String VAULT_PROPERTY_NAME = "value";
@@ -27,6 +29,21 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
     public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
 
     private static final int ENCRYPTION_BUFFER_SIZE = 8192;
+
+    private final VaultCaller vaultCaller;
+    @NonNull
+    private final String vaultPath;
+
+    public EncryptionUtilsImpl(@Value("${fr.insee.kraftwerk.encryption.vault.app-role.role-id}") String roleId, @Value("${fr.insee.kraftwerk.encryption.vault.app-role.secret-id}") String secretId, @Value("${fr.insee.kraftwerk.encryption.vault.uri}") String vaultPath) {
+        log.debug("vaultPath : {}", vaultPath);
+        this.vaultPath = vaultPath;
+        this.vaultCaller =  new VaultCaller(
+                roleId,
+                secretId,
+                Constants.VAULT_APPROLE_ENDPOINT
+        );
+
+    }
 
 
     /**
@@ -38,15 +55,7 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
     public InputStream encryptOutputFile(
             Path pathOfFileToEncrypt, KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
-        //Check if vault parameters are in context
-        if(kraftwerkExecutionContext.getVaultContext().getVaultCaller() == null){
-            throw new KraftwerkException(500, "Cannot encrypt, Vault is not configured properly : Vault caller null");
-        }
-        if(kraftwerkExecutionContext.getVaultContext().getVaultPath() == null){
-            throw new KraftwerkException(500, "Cannot encrypt, Vault is not configured properly : Vault path null");
-        }
-
-        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = getSymmetricEncryptionEndpoint(kraftwerkExecutionContext);
+        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = getSymmetricEncryptionEndpoint();
 
         try(FileInputStream fileInputStream = new FileInputStream(pathOfFileToEncrypt.toFile());
             InputStream outInputStream = symmetricEncryptionEndpoint.getEncryptedInputStream(fileInputStream,
@@ -61,13 +70,13 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
     }
 
     @NotNull
-    private static SymmetricEncryptionEndpoint getSymmetricEncryptionEndpoint(KraftwerkExecutionContext kraftwerkExecutionContext) {
+    private SymmetricEncryptionEndpoint getSymmetricEncryptionEndpoint() {
         CipherConfig cipherConfig =new CipherConfig(
                 null,
                 null,
                 new VaultConfig(
-                        (VaultCaller) kraftwerkExecutionContext.getVaultContext().getVaultCaller(),
-                        kraftwerkExecutionContext.getVaultContext().getVaultPath(),
+                        vaultCaller,
+                        vaultPath,
                         VAULT_NAME,
                         VAULT_PROPERTY_NAME)
         );

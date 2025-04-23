@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public interface EncryptionUtils {
 
 
-        public InputStream encryptOutputFile(
+        InputStream encryptOutputFile(
                 Path pathOfFileToEncrypt, KraftwerkExecutionContext kraftwerkExecutionContext
         ) throws KraftwerkException;
 
