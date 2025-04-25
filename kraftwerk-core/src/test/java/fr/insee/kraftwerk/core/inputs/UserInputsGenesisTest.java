@@ -24,7 +24,7 @@ class UserInputsGenesisTest {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 
-		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), true);
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), true);
 		//
 		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
 		assertNotNull(modeInputs.getDdiUrl());
@@ -42,7 +42,7 @@ class UserInputsGenesisTest {
 		List<Mode> modes = new ArrayList<>();
 		modes.add(Mode.F2F);
 
-		UserInputsGenesis userInputsGenesis = new UserInputsGenesis(false, inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), false);
+		UserInputsGenesis userInputsGenesis = new UserInputsGenesis( inputSamplesDirectory.resolve("Valid"), modes, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), false);
 		//
 		ModeInputs modeInputs = userInputsGenesis.getModeInputs("F2F");
 		assertNull(modeInputs.getDdiUrl());
