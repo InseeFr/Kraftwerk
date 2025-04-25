@@ -72,7 +72,7 @@ public class BuildBindingsSequence {
 		}
 	}
 
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
+	public void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
 		Path reportingDataFile = modeInputs.getReportingDataFile();
 		if (reportingDataFile != null) {
 			ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());

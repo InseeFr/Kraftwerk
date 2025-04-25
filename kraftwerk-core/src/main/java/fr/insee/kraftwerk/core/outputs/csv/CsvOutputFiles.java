@@ -48,6 +48,10 @@ public class CsvOutputFiles extends OutputFiles {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, Statement database, FileUtilsInterface fileUtilsInterface) {
+		super(outDirectory, vtlBindings, new ArrayList<>(), database, fileUtilsInterface);
+		this.kraftwerkExecutionContext = null;
+	}
 
 
 	/**

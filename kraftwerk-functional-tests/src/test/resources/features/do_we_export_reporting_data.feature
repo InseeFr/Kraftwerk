@@ -79,7 +79,7 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedStatus : Expected status (in input file)
 
       |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003      |2                            |REF              |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003         |2                            |REF              |
 
   Scenario Outline: The file has all the contact states of a specific type
     Given Step 0 : We have some survey in directory "<Directory>"
@@ -95,7 +95,7 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedStatus : Expected status (in input file)
 
       |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002      |5                            |WFT              |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002         |5                            |WFT              |
 
 
   Scenario Outline: The root file doesn't have any reporting data
@@ -138,9 +138,9 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
       |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |DESTROY                         |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                         |
 
-  Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
+  Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly using a standard VTL file
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
@@ -153,6 +153,28 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
       |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedOutcomeSpottingStatus   |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001        |TEST                            |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                            |
 
     #TODO Adapt this test when we have the correct TEL .vtl script
+
+  Scenario Outline: Reporting data only export (main paths)
+    Given Step 0 : We have some survey in directory "<Directory>"
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
+    Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    And The output file "<RootOutputFileName>" should not exist
+    Examples:
+      |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount |RootOutputFileName                     |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+
+  Scenario Outline: Reporting data only export (genesis paths)
+    Given Step 0 : We have some survey in directory "<Directory>"
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service with genesis input path with mode "TEL"
+    Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    And The output file "<RootOutputFileName>" should not exist
+    Examples:
+      |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount |RootOutputFileName                     |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv |0000002           |IDENTIFIED             |WFT             | 5                           |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |

@@ -9,8 +9,10 @@ import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.api.process.ReportingDataProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -28,7 +30,6 @@ import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.BeforeAll;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -55,9 +56,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
+import static cucumber.TestConstants.TEST_RESOURCES_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // Main example
 public class MainDefinitions {
 
-	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
+	static Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	UserInputsFile userInputs;
@@ -73,6 +76,7 @@ public class MainDefinitions {
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
 	Map<String, MetadataModel> metadataModelMap;
+	String reportingDataPathParam;
 
 	private ControlInputSequence controlInputSequence;
 	List<KraftwerkError> errors = new ArrayList<>();
@@ -91,6 +95,7 @@ public class MainDefinitions {
 
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
+		inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 		outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 
 		this.campaignName = campaignDirectoryName;
@@ -114,6 +119,11 @@ public class MainDefinitions {
 		else
 			Files.createFile(vtlPath);
 		Files.write(vtlPath,generatedVTL.getBytes());
+	}
+
+	@Given("We have reporting data file in {string}")
+	public void get_reporting_data_file(String reportingDataPathParam) {
+		this.reportingDataPathParam = reportingDataPathParam;
 	}
 
 	@When("Step 1 : We initialize the input files")
@@ -225,6 +235,39 @@ public class MainDefinitions {
 		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
 				419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
+	}
+
+	@When("We clean the test VTL script named {string}")
+	public void clean_vtl(String vtlScriptName) throws IOException {
+		Path vtlPath = Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm").resolve(vtlScriptName + ".vtl");
+		Path bkpPath = vtlPath.getParent().resolve(vtlScriptName + ".bkp");
+
+		Files.deleteIfExists(vtlPath);
+
+		if(Files.exists(bkpPath)) // Put backup back
+			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
+
+		Files.deleteIfExists(bkpPath);
+	}
+
+	@When("We launch reporting data service")
+	public void launch_reporting_data_service() throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		reportingDataProcessing.runProcessMain(fileUtilsInterface,
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
+	}
+
+	@When("We launch reporting data service with genesis input path with mode {string}")
+	public void launch_reporting_data_service(String modeParam) throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		reportingDataProcessing.runProcessGenesis(fileUtilsInterface, Mode.valueOf(modeParam),
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -466,19 +509,6 @@ public class MainDefinitions {
 		assertThat(header).isNotEmpty().doesNotContain(fieldName);
 	}
 
-	@When("We clean the test VTL script named {string}")
-	public void clean_vtl(String vtlScriptName) throws IOException {
-		Path vtlPath = Path.of(Constants.VTL_FOLDER_PATH).resolve("tcm").resolve(vtlScriptName + ".vtl");
-		Path bkpPath = vtlPath.getParent().resolve(vtlScriptName + ".bkp");
-
-		Files.deleteIfExists(vtlPath);
-
-		if(Files.exists(bkpPath)) // Put backup back
-			Files.copy(bkpPath,bkpPath.getParent().resolve(vtlScriptName + ".vtl"));
-
-		Files.deleteIfExists(bkpPath);
-	}
-
 
 	@Then("We should have a metadata model with {int} variables")
 	public void check_variables_count(int nbVariablesExpected) {
@@ -487,7 +517,7 @@ public class MainDefinitions {
 		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
 	}
 
-	@And("We should have {int} of type STRING")
+	@Then("We should have {int} of type STRING")
 	public void check_string_variables_count(int nbStringVariablesExpected) {
 		String mode = userInputs.getModes().getFirst();
 		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
@@ -644,6 +674,13 @@ public class MainDefinitions {
 			Assertions.assertThat(resultSet.next()).isTrue();
 			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
 		}
+	}
+
+	@Then("The output file {string} should not exist")
+	public void check_file_not_exist(String outputFileName) {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Assertions.assertThat(executionOutDirectory.resolve(outputFileName)).doesNotExist();
 	}
 
 	@AfterAll
