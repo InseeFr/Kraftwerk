@@ -3,14 +3,20 @@ package fr.insee.kraftwerk.api.process;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
+import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
+import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
 import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
+import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.Getter;
@@ -63,6 +69,18 @@ public class ReportingDataProcessing {
         VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
         VtlBindings vtlBindings = new VtlBindings();
         vtlExecute.convertToVtlDataset(surveyRawData, Constants.REPORTING_DATA_GROUP_NAME, vtlBindings);
+
+        /* Step 2.5 : Apply reporting data VTL transformations */
+        DataProcessing dataProcessing = DataProcessingManager.getProcessingClass(
+                DataFormat.LUNATIC_XML,
+                vtlBindings,
+                new MetadataModel(),
+                fileUtilsInterface);
+        dataProcessing.applyVtlTransformations(
+                Constants.REPORTING_DATA_GROUP_NAME,
+                Path.of(Constants.VTL_FOLDER_PATH)
+                        .resolve("reporting_datas.vtl"),
+                new KraftwerkExecutionContext());
 
         try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
             try(Statement writeDatabase = writeDatabaseConnection.createStatement()){

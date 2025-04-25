@@ -163,10 +163,11 @@ Feature: Do we save correctly all reporting data ?
     When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
     And The output file "<RootOutputFileName>" should not exist
     Examples:
-      |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount |RootOutputFileName                     |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+      |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           | TEST                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
 
   Scenario Outline: Reporting data only export (genesis paths)
     Given Step 0 : We have some survey in directory "<Directory>"
@@ -174,7 +175,8 @@ Feature: Do we save correctly all reporting data ?
     When We launch reporting data service with genesis input path with mode "TEL"
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
     And The output file "<RootOutputFileName>" should not exist
     Examples:
-      |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount |RootOutputFileName                     |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv |0000002           |IDENTIFIED             |WFT             | 5                           |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+      |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv |0000002           |IDENTIFIED             |WFT             | 5                           | TEST                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
