@@ -33,7 +33,6 @@ public class UserInputsGenesis extends UserInputs{
 		}
 		// Add user VTL script on final data (information levels step) if exists
 		try {
-			log.info("Path of script_final : {}", Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory),Constants.SCRIPT_FINAL_REGEX)).toString());
 			setVtlInformationLevelsFile(Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory),Constants.SCRIPT_FINAL_REGEX)));
 		} catch (KraftwerkException e) {
 			// Script is optional, if not found the program should continue normally

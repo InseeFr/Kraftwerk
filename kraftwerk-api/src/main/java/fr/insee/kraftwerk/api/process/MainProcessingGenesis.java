@@ -155,7 +155,7 @@ public class MainProcessingGenesis {
 	}
 
 	/* Step 3 : multimodal VTL data processing */
-	private void multimodalProcess() {
+	private void multimodalProcess() throws KraftwerkException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels,
 				fileUtilsInterface);

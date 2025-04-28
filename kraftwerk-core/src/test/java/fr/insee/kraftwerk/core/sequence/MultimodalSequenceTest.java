@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -48,7 +49,7 @@ class MultimodalSequenceTest {
     }
 
     @Test
-    void testMultimodalProcessing() {
+    void testMultimodalProcessing() throws KraftwerkException {
         // Vérifier que le dossier temporaire existe
         new File("target/tmp").mkdirs();
 
