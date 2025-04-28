@@ -28,19 +28,17 @@ public class WriterSequence {
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
 
-		writeCsvFiles(inDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+		writeCsvFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
-	public void writeCsvFiles(Path inDirectory,
+	public void writeCsvFiles(Path outDirectory,
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
 								 Map<String, MetadataModel> metadataModels,
 								 KraftwerkExecutionContext kraftwerkExecutionContext,
 								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
-		//Write CSV
-		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
 		/* Step 5.1 : write csv output tables */
 		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, kraftwerkExecutionContext, new ArrayList<>(modeInputsMap.keySet()),
 				database, fileUtilsInterface);

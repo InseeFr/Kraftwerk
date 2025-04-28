@@ -84,6 +84,41 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, int workersNumbers, int workerId,
+															  long blockSize, long page) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire/%s/paginated?totalSize=%s&workersNumbers=%s&workerId=%s&blockSize=%s&page=%s",
+				configProperties.getGenesisUrl(), questionnaireId, totalSize, workersNumbers, workerId, blockSize, page);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+
+
+	/**
+	 * @author Adrien Marchal
+	 */
+	public Long countInterrogationIds(String questionnaireId) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire/%s/count", configProperties.getGenesisUrl(), questionnaireId);
+		ResponseEntity<Long> response = makeApiCall(url,HttpMethod.GET,null, Long.class);
+		return response.getBody() != null ? response.getBody() : null;
+	}
+
+
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<String> getDistinctModesByQuestionnaire(String questionnaireId) throws KraftwerkException {
+		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+		ResponseEntity<String[]> response = makeApiCall(url,HttpMethod.GET,null, String[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
+
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
@@ -97,6 +132,29 @@ public class GenesisClient {
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) throws KraftwerkException {
+		//Convert Array into String
+		StringBuilder sbModes = new StringBuilder();
+		int index = 0;
+		for(String mode : modes) {
+			sbModes.append(mode);
+			if(modes.size() > index + 1 ) {
+				sbModes.append(",");
+			}
+			index++;
+		}
+
+		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latestV2?questionnaireId=%s&modes=%s",
+				configProperties.getGenesisUrl(), questionnaireId, sbModes.toString());
+		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
 
     public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
