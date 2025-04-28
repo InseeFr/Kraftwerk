@@ -315,6 +315,18 @@ public class ReportingDataDefinitions {
         assertThat(contentToCheck).isEqualTo(expectedValue);
     }
 
+    public static CSVReader getReader(Path filePath) throws IOException {
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
+                //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
+                //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
+                .build();
+        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
+                //.withSkipLines(1) // (uncomment to ignore header)
+                .withCSVParser(parser)
+                .build();
+    }
+
     public String[] fetchConcernedSurveyUnitLineFromFile(String surveyUnitId, List<String[]> content) {
         String[] concernedLine = null;
         for (String[] line : content) {
@@ -326,15 +338,35 @@ public class ReportingDataDefinitions {
         return concernedLine;
     }
 
-    public static CSVReader getReader(Path filePath) throws IOException {
-        CSVParser parser = new CSVParserBuilder()
-                .withSeparator(Constants.CSV_OUTPUTS_SEPARATOR)
-                //.withQuoteChar(Constants.CSV_OUTPUTS_QUOTE_CHAR)
-                //.withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
-                .build();
-        return new CSVReaderBuilder(new FileReader(filePath.toFile(), StandardCharsets.UTF_8))
-                //.withSkipLines(1) // (uncomment to ignore header)
-                .withCSVParser(parser)
-                .build();
+    @Then("In a file named {string} in directory {string} we should only have {string} in the {string} field")
+    public void check_content_root(String fileName, String directory, String expectedValue, String expectedField) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+        CSVReader csvReader = getReader(
+                Path.of(executionOutDirectory + "/" + fileName)
+        );
+
+        // Get file content
+        List<String[]> content = csvReader.readAll();
+        csvReader.close();
+
+        // Get header
+        String[] header = content.get(0);
+
+        // field existence assertion
+        assertThat(header).contains(expectedField);
+
+        content.removeFirst();
+        // Check content
+        for(String[] line : content){
+            int i = 0;
+            for (String csvElement : line) {
+                if (header[i].equals(expectedField)) {
+                    assertThat(csvElement).isEqualTo(expectedValue);
+                }
+                i++;
+            }
+        }
     }
 }

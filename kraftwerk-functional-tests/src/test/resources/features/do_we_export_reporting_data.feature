@@ -52,7 +52,7 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the file have a correct date format
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then In file named "<OutputFileName>" in directory "<Directory>" we should have the date format "<ExpectedDateFormat>" for field "<FieldName>"
+    Then In file named "<OutputFileName>" in directory "<Directory>" we should have the date format "yyyy-MM-dd-hh-mm-ss" for field "<FieldName>"
 
     Examples:
     # Parameters :
@@ -60,9 +60,9 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedDateformat : Expected date format in file
 
-      |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
-      |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
+      |Directory                        |OutputFileName                                      |FieldName             |
+      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv       |STATE_1_DATE          |
+      |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv  |Report_DATE_COLLECTE  |
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
@@ -157,3 +157,51 @@ Feature: Do we save correctly all reporting data ?
       |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                            |
 
     #TODO Adapt this test when we have the correct TEL .vtl script
+
+
+  Scenario Outline: Does the InseeSampleIdentifiers variables are exported correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoGrap>" in the "NoGrap" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoLog>" in the "NoLog" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNole>" in the "Nole" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
+    Examples:
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               |
+
+  Scenario Outline: Does the ClosingCause variables are exported correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
+    Examples:
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedClosingCause | ExpectedClosingCauseDate |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | NPA                  | 2025-02-18-09-25-57      |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | ROW                  | 2025-02-18-09-25-48      |
+
+  Scenario Outline: Does the variables are exported correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedIdentificationConfiguration>" in the "IdentificationConfiguration" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "individualStatus" field
+    Examples:
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedIdentificationConfiguration | ExpectedIndividualStatus |
+      |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   | INDTEL                              | SAME_ADDRESS             |
+      |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL986_tech    | INDTEL                              | OTHER_ADDRESS            |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     | INDF2F                              | SAME_ADDRESS             |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F03_tech     | INDF2F                              | SAME_ADDRESS             |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     | INDF2F                              | OTHER_ADDRESS            |
+
+  Scenario Outline: Does the interviewerCanProcess variables are exported correctly
+    Given Step 0 : We have some survey in directory "<Directory>"
+    When Step 1 : We launch main service
+    Then In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedIdentificationConfiguration>" in the "IdentificationConfiguration" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "interviewerCanProcess" field
+    Examples:
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedIdentificationConfiguration | ExpectedInterviewerCanProcess |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     | INDF2F                              | NO                            |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F16_tech     | INDF2F                              | YES                           |
+      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     | INDF2F                              | YES                           |
