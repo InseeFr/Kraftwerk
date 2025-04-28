@@ -71,8 +71,8 @@ public final class Constants {
 	public static final int DB_CONNECTION_TRY_COUNT = 10;
 	public static final String DDI_FILE_REGEX = "ddi[\\w,\\s-]+\\.xml";
 	public static final String LUNATIC_FILE_REGEX = "lunatic[\\w,\\s-]+\\.json";
-	public static final String SCRIPT_UNIMODAL_REGEX= "^script_unimodal[\\w-]*\\.vtl$";
-	public static final String SCRIPT_FINAL_REGEX= "^script_final[\\w-]*\\.vtl$";
+	public static final String SCRIPT_UNIMODAL_REGEX= "script_unimodal[\\w-]*\\.vtl$";
+	public static final String SCRIPT_FINAL_REGEX= "script_final[\\w-]*\\.vtl$";
 
 
 	// ----- Explicit Variables Names
