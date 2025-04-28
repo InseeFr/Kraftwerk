@@ -68,7 +68,6 @@ public class WriterSequence {
 								 KraftwerkExecutionContext kraftwerkExecutionContext,
 								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
-		//Write CSV
 		/* Step 5.1 : write csv output tables */
 		OutputFiles csvOutputFiles = outputFilesFactory.createCsv(outDirectory, vtlBindings,
 				new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface, kraftwerkExecutionContext);

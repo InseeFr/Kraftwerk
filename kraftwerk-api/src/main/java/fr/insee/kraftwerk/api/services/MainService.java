@@ -106,6 +106,20 @@ public class MainService extends KraftwerkService {
 	}
 
 
+	//========= OPTIMISATIONS PERFS (START) ==========
+	@PutMapping(value = "/main/genesisV2")
+	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesisV2(
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
+			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId) {
+		boolean withDDI = true;
+		return runWithGenesisV2(campaignId, withDDI, batchSize, workersNumbers, workerId);
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
+
 	@PutMapping(value = "/main/genesis/lunatic-only")
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
@@ -136,6 +150,7 @@ public class MainService extends KraftwerkService {
 
 	@NotNull
 	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
+		long totalDurationStartTimeStamp = System.currentTimeMillis();
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
@@ -147,8 +162,34 @@ public class MainService extends KraftwerkService {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
+		long totalDurationEndTimeStamp = System.currentTimeMillis();
+		long totalDurationDeltaTimeStamp = totalDurationEndTimeStamp - totalDurationStartTimeStamp;
+		log.info("=================== TOTAL DURATION (runWithGenesis) =================== : {}", totalDurationDeltaTimeStamp);
 		return ResponseEntity.ok(campaignId);
 	}
+
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	@NotNull
+	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, int batchSize, int workersNumbers, int workerId) {
+		long totalDurationV2StartTimeStamp = System.currentTimeMillis();
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+
+		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, fileUtilsInterface);
+
+		try {
+			mpGenesis.runMainV2(campaignId, batchSize, workersNumbers, workerId);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		long totalDurationV2EndTimeStamp = System.currentTimeMillis();
+		long totalDurationV2DeltaTimeStamp = totalDurationV2EndTimeStamp - totalDurationV2StartTimeStamp;
+		log.info("=================== TOTAL DURATION (runWithGenesisV2) ================= : {}", totalDurationV2DeltaTimeStamp);
+		return ResponseEntity.ok(campaignId);
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 
