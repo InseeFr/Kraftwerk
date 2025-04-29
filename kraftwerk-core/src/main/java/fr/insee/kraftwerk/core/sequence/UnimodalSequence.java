@@ -9,6 +9,7 @@ import fr.insee.bpm.metadata.model.VariablesMap;
 import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.*;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class UnimodalSequence {
 
 	public void applyUnimodalSequence(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
-									  KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
+									  KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		String vtlGenerate;
 

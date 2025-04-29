@@ -146,7 +146,7 @@ public class StepByStepService extends KraftwerkService {
 	public ResponseEntity<String> unimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam,
 			@Parameter(description = "${param.dataMode}", required = true) @RequestParam  String dataMode
-			)  {
+			) throws KraftwerkException {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
@@ -189,7 +189,7 @@ public class StepByStepService extends KraftwerkService {
 	@Operation(operationId = "multimodalProcessing", summary = "${summary.multimodalProcessing}", description = "${description.multimodalProcessing}")
 	public ResponseEntity<String> multimodalProcessing(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam
-			)  {
+			) throws KraftwerkException {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		//Read data in JSON file

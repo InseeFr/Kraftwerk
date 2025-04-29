@@ -36,7 +36,7 @@ public class UserInputsGenesis extends UserInputs{
 			setVtlInformationLevelsFile(Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory),Constants.SCRIPT_FINAL_REGEX)));
 		} catch (KraftwerkException e) {
 			// Script is optional, if not found the program should continue normally
-			log.debug("No final script found in specs directory");
+			log.info("No final script found in specs directory");
 		}
 	}
 

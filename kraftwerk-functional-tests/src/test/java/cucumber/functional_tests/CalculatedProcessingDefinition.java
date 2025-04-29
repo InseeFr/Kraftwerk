@@ -82,7 +82,7 @@ public class CalculatedProcessingDefinition {
     }
 
     @When("I process calculated variables")
-    public void readCampaignData() {
+    public void readCampaignData() throws KraftwerkException {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
