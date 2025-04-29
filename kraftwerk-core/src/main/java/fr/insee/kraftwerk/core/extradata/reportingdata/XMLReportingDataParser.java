@@ -36,6 +36,9 @@ public class XMLReportingDataParser extends ReportingDataParser {
         } catch (NullPointerException e) {
             throw new NullException();
         }
+
+        String identificationConfiguration = getElementValueIfExists(root, "IdentificationConfiguration");
+
         // Read information on each survey unit
         List<Element> surveyUnitsNodeList = getSurveyUnitList(root);
 
@@ -46,6 +49,8 @@ public class XMLReportingDataParser extends ReportingDataParser {
             Element identifierElement = surveyUnitElement.getFirstChildElement("Id");
             String identifier = identifierElement.getValue();
             reportingDataUE.setIdentifier(identifier);
+
+            reportingDataUE.setIdentificationConfiguration(identificationConfiguration);
 
             Element interviewerIdentifierElement = surveyUnitElement.getFirstChildElement("InterviewerId");
             String interviewerIdentifier = Constants.REPORTING_DATA_INTERVIEWER_ID_NULL_PLACEHOLDER + identifier;
@@ -196,8 +201,12 @@ public class XMLReportingDataParser extends ReportingDataParser {
             reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
         }
 
-        if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null) {
-            reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+        if (identificationElement.getFirstChildElement(Constants.INDIVIDUAL_STATUS) != null) {
+            reportingDataUE.getIdentification().setIndividualStatus(identificationElement.getFirstChildElement(Constants.INDIVIDUAL_STATUS).getValue());
+        }
+
+        if (identificationElement.getFirstChildElement(Constants.INTERVIEWER_CAN_PROCESS) != null) {
+            reportingDataUE.getIdentification().setInterviewerCanProcess(identificationElement.getFirstChildElement(Constants.INTERVIEWER_CAN_PROCESS).getValue());
         }
     }
 

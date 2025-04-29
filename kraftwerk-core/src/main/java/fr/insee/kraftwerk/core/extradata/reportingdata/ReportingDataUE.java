@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 @Getter
 public class ReportingDataUE {
   private String identifier;
+
+  private String identificationConfiguration;
   
   private List<State> states;
   

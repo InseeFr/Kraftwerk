@@ -54,6 +54,9 @@ public abstract class ReportingDataParser {
 		Variable variableOrganization = new Variable(Constants.ORGANIZATION_UNIT_ID_NAME, reportingDataGroup,
 				VariableType.STRING, "50");
 		surveyRawData.putVariable(variableOrganization);
+		Variable variableIdentificationConfig = new Variable(Constants.IDENTIFICATION_CONFIGURATION, reportingDataGroup,
+				VariableType.STRING, "20");
+		surveyRawData.putVariable(variableIdentificationConfig);
 		surveyRawData
 				.putVariable(new Variable(Constants.ADRESS_RGES_NAME, reportingDataGroup, VariableType.STRING, "2"));
 		surveyRawData
@@ -116,6 +119,12 @@ public abstract class ReportingDataParser {
 		Variable variableOccupant = new Variable(Constants.OCCUPANT_NAME, reportingDataGroup, VariableType.STRING,
 				"50");
 		surveyRawData.putVariable(variableOccupant);
+		Variable variableIndividualStatus = new Variable(Constants.INDIVIDUAL_STATUS, reportingDataGroup, VariableType.STRING,
+				"50");
+		surveyRawData.putVariable(variableIndividualStatus);
+		Variable variableInterviewerCanProcess = new Variable(Constants.INTERVIEWER_CAN_PROCESS, reportingDataGroup, VariableType.STRING,
+				"50");
+		surveyRawData.putVariable(variableInterviewerCanProcess);
 		Variable variableOutcomeSpotting = new Variable(Constants.OUTCOME_SPOTTING, reportingDataGroup, VariableType.STRING,
 				"50");
 		surveyRawData.putVariable(variableOutcomeSpotting);
@@ -165,6 +174,11 @@ public abstract class ReportingDataParser {
 			missingQuestionnaireIds.add(reportingDataUE.getIdentifier());
 		}
 		// TODO Find another way than Constants.REPORTING_DATA_PREFIX_NAME +
+		if (reportingDataUE.getIdentificationConfiguration() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.IDENTIFICATION_CONFIGURATION, reportingDataUE.getIdentificationConfiguration());
+		}
 		// reportingDataUE.getIdentifier() to fill the identifier field
 		if (reportingDataUE.getInterviewerId() != null)
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
@@ -246,6 +260,12 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OCCUPANT_NAME, reportingDataUE.getIdentification().getOccupant());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.INDIVIDUAL_STATUS, reportingDataUE.getIdentification().getIndividualStatus());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.INTERVIEWER_CAN_PROCESS, reportingDataUE.getIdentification().getInterviewerCanProcess());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OUTCOME_SPOTTING, reportingDataUE.getIdentification().getOutcomeSpotting());
