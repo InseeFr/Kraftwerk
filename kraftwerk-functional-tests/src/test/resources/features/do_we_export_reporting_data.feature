@@ -159,28 +159,20 @@ Feature: Do we save correctly all reporting data ?
     #TODO Adapt this test when we have the correct TEL .vtl script
 
 
-  Scenario Outline: Does the InseeSampleIdentifiers variables are exported correctly
+  Scenario Outline: Does the ClosingCause and InseeSampleIdentifiers variables are exported correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoGrap>" in the "NoGrap" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoLog>" in the "NoLog" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNole>" in the "Nole" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
-    Examples:
-      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               |
-
-  Scenario Outline: Does the ClosingCause variables are exported correctly
-    Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
     Examples:
-      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedClosingCause | ExpectedClosingCauseDate |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | NPA                  | 2025-02-18-09-25-57      |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | ROW                  | 2025-02-18-09-25-48      |
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |
 
   Scenario Outline: Does the identification configuration, individual status and can process variables are exported correctly
     Given Step 0 : We have some survey in directory "<Directory>"
