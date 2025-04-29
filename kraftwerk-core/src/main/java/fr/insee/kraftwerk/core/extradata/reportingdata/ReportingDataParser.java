@@ -67,6 +67,13 @@ public abstract class ReportingDataParser {
 				.putVariable(new Variable(Constants.ADRESS_NOI_NAME, reportingDataGroup, VariableType.STRING, "2"));
 		surveyRawData.putVariable(
 				new Variable(Constants.ADRESS_ID_STAT_INSEE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOGRAP, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOLOG, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOLE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.AUTRE, reportingDataGroup, VariableType.STRING, "15"));
+
+
+
 		for (int k = 1; k <= this.maxStates; k++) {
 			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataGroup,
 					VariableType.STRING, "50");
@@ -190,6 +197,26 @@ public abstract class ReportingDataParser {
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.ADRESS_ID_STAT_INSEE,
 							reportingDataUE.getInseeSampleIdentifier().getIdStatInsee());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOGRAP,
+							reportingDataUE.getInseeSampleIdentifier().getNograp());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOGRAP,
+							reportingDataUE.getInseeSampleIdentifier().getNograp());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOLOG,
+							reportingDataUE.getInseeSampleIdentifier().getNolog());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOLE,
+							reportingDataUE.getInseeSampleIdentifier().getNole());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.AUTRE,
+							reportingDataUE.getInseeSampleIdentifier().getAutre());
 		}
 		if (!reportingDataUE.getStates().isEmpty()) {
 			addStates(reportingDataUE, questionnaire);

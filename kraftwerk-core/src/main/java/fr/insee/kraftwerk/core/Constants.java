@@ -131,7 +131,12 @@ public final class Constants {
 
 	public static final String OUTCOME_SPOTTING = "outcome_spotting";
 	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + SURVEY_VALIDATION_DATE_NAME;
-	
+
+	public static final String NOGRAP = "NoGrap";
+	public static final String NOLOG = "NoLog";
+	public static final String NOLE = "Nole";
+	public static final String AUTRE = "Autre";
+
 	// ------ Pairwise variables
 	
 	public static final int MAX_LINKS_ALLOWED = 21;

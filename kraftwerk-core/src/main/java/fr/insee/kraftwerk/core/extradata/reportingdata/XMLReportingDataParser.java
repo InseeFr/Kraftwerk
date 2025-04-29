@@ -154,7 +154,17 @@ public class XMLReportingDataParser extends ReportingDataParser {
             reportingDataUE.getInseeSampleIdentifier().setEc(addressElement.getFirstChildElement("Ec").getValue());
             reportingDataUE.getInseeSampleIdentifier().setBs(addressElement.getFirstChildElement("Bs").getValue());
             reportingDataUE.getInseeSampleIdentifier().setNoi(addressElement.getFirstChildElement("Noi").getValue());
+            reportingDataUE.getInseeSampleIdentifier().setNograp(getElementValueIfExists(addressElement, "Nograp"));
+            reportingDataUE.getInseeSampleIdentifier().setNolog(getElementValueIfExists(addressElement, "Nolog"));
+            reportingDataUE.getInseeSampleIdentifier().setNole(getElementValueIfExists(addressElement, "Nole"));
+            reportingDataUE.getInseeSampleIdentifier().setAutre(getElementValueIfExists(addressElement, "Autre"));
         }
+    }
+
+    private String getElementValueIfExists(Element rootElement, String childName) {
+        Element childElement = rootElement.getFirstChildElement(childName);
+        if(childElement == null) return null;
+        return childElement.getValue();
     }
 
     private void getIdentification(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
