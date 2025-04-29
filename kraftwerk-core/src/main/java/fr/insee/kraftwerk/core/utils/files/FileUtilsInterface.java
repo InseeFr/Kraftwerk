@@ -76,7 +76,7 @@ public interface FileUtilsInterface {
     /**
      * Find the file in the folder of a campaign
      * @param directory directory where the file should be
-     * @param fileRegex regex of the path to match
+     * @param fileRegex regex of the file to match
      * @return Path of the file
      * @throws KraftwerkException if no file found
      */
