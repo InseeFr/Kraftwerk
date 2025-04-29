@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.4 [2025-04-29}
+### Fixed
+- Resolve problem concerning the reading of vtl files on MinIo
+
 ## 3.3.3 [2025-04-25]
 ### Added
 - Add possibility to read VTL script when using Genesis data
