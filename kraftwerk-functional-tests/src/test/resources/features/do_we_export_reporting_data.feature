@@ -13,9 +13,9 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding interrogationId
 
     |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
+    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |84                                |
+    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |84                                |
+    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |40                                |
 
 
 
