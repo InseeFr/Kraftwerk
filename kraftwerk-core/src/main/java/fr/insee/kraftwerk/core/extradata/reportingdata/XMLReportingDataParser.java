@@ -11,6 +11,10 @@ import nu.xom.Element;
 import nu.xom.Elements;
 
 import java.nio.file.Path;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +104,9 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
             //Get survey validation date from states
             setSurveyValidationDate(reportingDataUE);
+
+            //Get closing cause
+            getClosingCause(surveyUnitElement, reportingDataUE);
 
             reportingData.addReportingDataUE(reportingDataUE);
         }
@@ -222,5 +229,57 @@ public class XMLReportingDataParser extends ReportingDataParser {
         }
         if (validationState != null)
             reportingDataUE.setSurveyValidationDateTimeStamp(validationState.getTimestamp());
+    }
+
+    private void getClosingCause(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
+        Element closingCauseNode = surveyUnitElement.getFirstChildElement("ClosingCause");
+        if (closingCauseNode == null) {
+            return;
+        }
+
+        ReportingDataClosingCause reportingDataClosingCause = new ReportingDataClosingCause();
+
+        //Type
+        Element typeNode = closingCauseNode.getFirstChildElement("type");
+        if(typeNode != null){
+            try{
+                reportingDataClosingCause.setClosingCauseValue(
+                        ClosingCauseValue.valueOf(typeNode.getValue())
+                );
+            }catch (IllegalArgumentException e){
+                log.warn(
+                        "Invalid closing cause type for interrogation {} ! " +
+                        "Found {} instead of one of {}",
+                    reportingDataUE.getIdentifier(), typeNode.getValue(), ClosingCauseValue.values()
+                );
+            }
+        }
+
+        //Date
+        //Expects a Long Unix milliseconds timestamp
+        Element dateNode = closingCauseNode.getFirstChildElement("date");
+        if (dateNode != null) {
+            try {
+                reportingDataClosingCause.setClosingCauseDate(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(
+                                        Long.parseLong(dateNode.getValue())
+                                ),
+                                ZoneId.of("UTC")
+                        )
+                );
+            }catch (NumberFormatException nfe){
+                log.warn("Invalid closing cause date format for interrogation {} !" +
+                        "Found {} while it requires a UNIX millisecond timestamp",
+                        reportingDataUE.getIdentifier(), dateNode.getValue()
+                        );
+            }
+            catch (DateTimeException e){
+                log.warn("Error during closing cause date for interrogation {} ! " + e,
+                        reportingDataUE.getIdentifier()
+                        );
+            }
+        }
+        reportingDataUE.setReportingDataClosingCause(reportingDataClosingCause);
     }
 }

@@ -72,6 +72,9 @@ public abstract class ReportingDataParser {
 		surveyRawData.putVariable(new Variable(Constants.NOLE, reportingDataGroup, VariableType.STRING, "15"));
 		surveyRawData.putVariable(new Variable(Constants.AUTRE, reportingDataGroup, VariableType.STRING, "15"));
 
+		surveyRawData.putVariable(new Variable(Constants.CLOSING_CAUSE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.CLOSING_CAUSE_DATE, reportingDataGroup, VariableType.STRING,
+				"15"));
 
 
 		for (int k = 1; k <= this.maxStates; k++) {
@@ -253,6 +256,17 @@ public abstract class ReportingDataParser {
 		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
 					reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getSurveyValidationDateTimeStamp()),ZoneId.of("CET"))));
+		}
+		if(reportingDataUE.getReportingDataClosingCause() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.CLOSING_CAUSE,
+							reportingDataUE.getReportingDataClosingCause().getClosingCauseValue().toString());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.CLOSING_CAUSE_DATE,
+							reportingDataUE.getReportingDataClosingCause().getClosingCauseDate()
+									.format(DateTimeFormatter.ofPattern(Constants.REPORTING_DATA_OUTPUT_DATE_FORMAT)));
 		}
 	}
 

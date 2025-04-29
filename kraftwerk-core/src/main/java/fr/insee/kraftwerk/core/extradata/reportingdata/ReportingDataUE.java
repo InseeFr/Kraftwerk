@@ -30,6 +30,7 @@ public class ReportingDataUE {
   private List<Comment> comments;
 
   private Long surveyValidationDateTimeStamp;
+  private ReportingDataClosingCause reportingDataClosingCause;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();

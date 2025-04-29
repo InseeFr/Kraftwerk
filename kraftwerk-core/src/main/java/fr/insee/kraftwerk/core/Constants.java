@@ -137,6 +137,10 @@ public final class Constants {
 	public static final String NOLE = "Nole";
 	public static final String AUTRE = "Autre";
 
+	public static final String CLOSING_CAUSE = "ClosingCause";
+
+	public static final String CLOSING_CAUSE_DATE = "ClosingCause_Date";
+
 	// ------ Pairwise variables
 	
 	public static final int MAX_LINKS_ALLOWED = 21;
