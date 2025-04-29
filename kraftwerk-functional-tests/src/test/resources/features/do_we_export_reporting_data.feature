@@ -193,7 +193,5 @@ Feature: Do we save correctly all reporting data ?
       |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   | INDTEL                              | SAME_ADDRESS             |                               |
       |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    | INDTEL                              | OTHER_ADDRESS            |                               |
       |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     | INDF2F                              | SAME_ADDRESS             |                               |
-      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F03_tech     | INDF2F                              | SAME_ADDRESS             |                               |
       |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     | INDF2F                              | OTHER_ADDRESS            | YES                           |
       |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     | INDF2F                              | OTHER_ADDRESS            | NO                            |
-      |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F16_tech     | INDF2F                              | OTHER_ADDRESS            | YES                           |
