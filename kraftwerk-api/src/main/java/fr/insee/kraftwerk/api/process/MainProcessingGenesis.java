@@ -178,6 +178,9 @@ public class MainProcessingGenesis {
 
 
 	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
 	public void runMainV2(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
 		log.info("(V2) Batch size of interrogations retrieved from Genesis: {}", batchSize);
 		long preProcessStartTimeStamp = System.currentTimeMillis();
@@ -214,7 +217,7 @@ public class MainProcessingGenesis {
 				long totalSize = client.countInterrogationIds(questionnaireId);
 				//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
 				long blockNb = totalSize < batchSize ? 1 : totalSize / batchSize;
-				log.info("====> (V2) BLOCKS NUMBER TO PROCESS for questionnaireId {} ============== : {}", questionnaireId, blockNb);
+				log.info("====> (V2) BLOCKS NUMBER TO PROCESS for questionnaireId {} : {}", questionnaireId, blockNb);
 
 				long queryGetModesByQuestionnaireIdStartTimeStamp = System.currentTimeMillis();
 				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
@@ -260,7 +263,7 @@ public class MainProcessingGenesis {
 			long mainLoopDeltaTimeStamp = mainLoopEndTimeStamp - mainLoopStartTimeStamp;
 			log.info("====> (V2) MainLoop duration : {}", mainLoopDeltaTimeStamp);
 
-			outputFileWriter();
+			outputFileWriterV2();
 			writeErrors();
 			if (!database.isClosed()){database.close();}
 		}catch (SQLException e){
@@ -299,6 +302,17 @@ public class MainProcessingGenesis {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	/* Step 5 : Write output files */
+	private void outputFileWriterV2() throws KraftwerkException {
+		WriterSequence writerSequence = new WriterSequence();
+		writerSequence.writeOutputFilesV2(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {
