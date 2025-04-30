@@ -98,6 +98,9 @@ public class MainService extends KraftwerkService {
 
 
 	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
 	@PutMapping(value = "/main/genesisV2")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisV2(
@@ -159,6 +162,9 @@ public class MainService extends KraftwerkService {
 
 
 	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
 	@NotNull
 	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, int batchSize, int workersNumbers, int workerId) {
 		long totalDurationV2StartTimeStamp = System.currentTimeMillis();

@@ -26,6 +26,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class to manage the writing of CSV output tables.
@@ -115,6 +117,174 @@ public class CsvOutputFiles extends OutputFiles {
 			}
         }
 	}
+
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 * Method to write CSV output tables from datasets that are in the bindings.
+	 */
+	@Override
+	public void writeOutputTablesV2() throws KraftwerkException {
+		for (String datasetName : getDatasetToCreate()) {
+			try {
+				//Temporary file
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
+
+				//Get column names
+				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
+				if(columnNames.isEmpty()){
+					log.warn("dataset {} is empty !", datasetName);
+					return;
+				}
+
+				//Get boolean columns names
+				List<String> boolColumnNames = SqlUtils.getColumnNames(getDatabase(), datasetName, VariableType.BOOLEAN);
+				//Get indexes of boolean columns
+				List<Integer> boolColumnIndexes = new ArrayList<>();
+
+				//Create file with double quotes header
+				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+
+				//Data export into temp file
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
+				this.getDatabase().execute(exportCsvQuery.toString());
+
+				//!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
+				String[] regExPatternsTab = regExPatterns(columnNames, boolColumnNames, boolColumnIndexes);
+				log.info(String.format("sbRegExPatternToFind : %s", regExPatternsTab[0]));
+				log.info(String.format("sbRegExPatternReplacement : %s", regExPatternsTab[1]));
+
+
+				//In order to be aware of the process progress, we count how much lines the file contains & how many blocks must be processed
+				int totalLinesNumber = 0;
+				int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
+					while (bufferedReader.readLine() != null) {
+						totalLinesNumber++;
+					}
+					bufferedReader.close();
+				}
+				int totalBlocksNumber = totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK == 0 ? 1 : totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK;
+				log.info(String.format("%s lines (%s blocks)", totalLinesNumber, totalBlocksNumber));
+
+				// => READING DATA FROM ".tmpdata" file BY BLOCK OF 50 LINES AND WRITING FORMATTED DATA INTO ".tmp" file
+				int currentBlockNumber = 1;
+				StringBuilder sbInput = new StringBuilder();
+				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
+					String line = bufferedReader.readLine();
+					int nbReadLinesInBlock = 1;
+					int currentReadLine = 1;
+					while(line != null || currentReadLine <= (totalLinesNumber + 1) ){
+
+						//fill in "sbInput" before processing it
+						if( (nbReadLinesInBlock - 1) < INPUT_FILE_LINE_NUMBER_BLOCK) {
+							// => READ CASE FROM INPUT FILE (".tmpdata" file)
+							sbInput.append(line);
+							sbInput.append("\n");
+							//read new line for next loop
+							line = bufferedReader.readLine();
+							nbReadLinesInBlock++;
+							currentReadLine++;
+						}
+						//process "sbInput" when block is full
+						else {
+							// => WRITE CASE INTO OUTPUT FILE (".tmp" file)
+							log.info(String.format("Processing %s / %s (line %s read)", currentBlockNumber, totalBlocksNumber, currentReadLine));
+							String result = null;
+
+							Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
+							Matcher m0 = p0.matcher(sbInput.toString());
+							//System.out.println("Original String0: " + sbInput.toString()); //For debug purposes
+							result = m0.replaceAll(regExPatternsTab[1]);
+							//System.out.println("Modified String0: " + result); //For debug purposes
+
+							//free RAM as soon as possible -> empty "sbInput"
+							sbInput.delete(0, sbInput.length());
+
+							Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
+
+							//reset index AT THE END
+							nbReadLinesInBlock = 1;
+							//increment block number for next loop
+							currentBlockNumber++;
+						}
+					}
+				}
+
+				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
+
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info(String.format("File: %s successfully written", outputFile));
+				//Count rows for functional log
+				if (kraftwerkExecutionContext != null) {
+					try(ResultSet countResult =
+								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
+						countResult.next();
+						kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
+					}
+				}
+			} catch (SQLException | IOException e) {
+				throw new KraftwerkException(500, e.toString());
+			}
+		}
+	}
+
+
+	private String[] regExPatterns(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+		String[] result = new String[2];
+
+		//MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
+		//1) dynamically set regEx Pattern
+		StringBuilder sbRegExPatternToFind = new StringBuilder();
+		//sbRegExPatternToFind.append("^"); //DO NOT ADD THIS AS IT WILL ONLY PROCESS THE 1ST LINE!
+		StringBuilder sbRegExPatternReplacement = new StringBuilder();
+		int colIndex = 0;
+		if(boolColumnNames.isEmpty()) {
+			//If no boolean column at all, we simply add double quotes to all fields
+			for(String colName : columnNames) {
+				sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+				sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
+				if( (colIndex + 1) < columnNames.size()) {
+					sbRegExPatternToFind.append(";");
+					sbRegExPatternReplacement.append(";");
+				}
+				colIndex++;
+			}
+		} else {
+			//if there are boolColumns
+			log.warn("boolColumns NOT EMPTY !");
+			//for each column, we check if it is a boolean column or not
+			for(String colName : columnNames) {
+				if(boolColumnIndexes.contains(colIndex)) {
+					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+					//we don't add double quotes in case of boolean column
+					sbRegExPatternReplacement.append("$").append(colIndex + 1);
+				} else {
+					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+					//we add double quotes in case of boolean column
+					sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
+				}
+				if( (colIndex + 1) < columnNames.size()) {
+					sbRegExPatternToFind.append(";");
+					sbRegExPatternReplacement.append(";");
+				}
+				colIndex++;
+			}
+		}
+
+		//fill-in result object
+		result[0] = sbRegExPatternToFind.toString();
+		result[1] = sbRegExPatternReplacement.toString();
+
+		return result;
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
+
 
 	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames) {
 		StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
