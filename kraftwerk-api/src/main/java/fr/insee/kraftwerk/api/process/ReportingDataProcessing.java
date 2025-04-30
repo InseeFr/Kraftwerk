@@ -5,7 +5,6 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
-import fr.insee.kraftwerk.core.dataprocessing.UnimodalDataProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
@@ -14,7 +13,6 @@ import fr.insee.kraftwerk.core.sequence.BuildBindingsSequence;
 import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -88,6 +86,7 @@ public class ReportingDataProcessing {
                 insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
                 WriterSequence writerSequence = new WriterSequence();
                 writerSequence.writeCsvFiles(inOrSpecDirectory,
+                        "_REPORTING_DATA_ONLY",
                         vtlBindings,
                         writeDatabase,
                         fileUtilsInterface
