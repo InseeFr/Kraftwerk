@@ -210,7 +210,7 @@ public class MainDefinitions {
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() {
+	public void aggregate_datasets() throws KraftwerkException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	}

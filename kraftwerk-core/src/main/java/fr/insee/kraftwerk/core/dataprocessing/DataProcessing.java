@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.utils.TextFileReader;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -8,6 +8,8 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 
@@ -35,11 +37,11 @@ public abstract class DataProcessing {
 
     public abstract String getStepName();
 
-    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext){
+    public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
         // First step
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         // Second step
-        if(userVtlInstructionsPath == null || !userVtlInstructionsPath.toFile().exists()){
+        if(userVtlInstructionsPath == null || !fileUtilsInterface.isFileExists(userVtlInstructionsPath.toString())){
             log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
                     bindingName, getStepName()));
             return automatedVtlInstructions;
@@ -67,8 +69,13 @@ public abstract class DataProcessing {
         return automatedInstructions.toString();
     }
 
-    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext){
-        String vtlScript = TextFileReader.readFromPath(userVtlInstructionsPath, fileUtilsInterface);
+    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
+        String vtlScript;
+        try (InputStream inputStream = fileUtilsInterface.readFile(userVtlInstructionsPath.toString())){
+            vtlScript = new String(inputStream.readAllBytes());
+        } catch ( IOException e){
+            throw new KraftwerkException(500, "Reading error on vtl script");
+        }
         log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
                 vtlScript));
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.3.2</version>
+		<version>3.3.4</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -96,7 +96,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.5.0-M3</version>
+			<version>4.5.0</version>
 		</dependency>
 
 		<!-- S3 -->
