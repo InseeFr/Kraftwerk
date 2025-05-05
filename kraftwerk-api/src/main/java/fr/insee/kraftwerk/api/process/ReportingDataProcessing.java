@@ -68,7 +68,7 @@ public class ReportingDataProcessing {
         VtlBindings vtlBindings = new VtlBindings();
         vtlExecute.convertToVtlDataset(surveyRawData, Constants.REPORTING_DATA_GROUP_NAME, vtlBindings);
 
-        /* Step 2.5 : Apply reporting data VTL transformations */
+        /* Apply reporting data VTL transformations */
         DataProcessing dataProcessing = DataProcessingManager.getProcessingClass(
                 DataFormat.LUNATIC_XML,
                 vtlBindings,

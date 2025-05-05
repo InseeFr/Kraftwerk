@@ -55,10 +55,7 @@ public class BuildBindingsSequence {
 		/* Step 2.2 : Get paradata for the survey */
 		parseParadata(modeInputs, data);
 
-		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(modeInputs, data);
-
-		/* Step 2.4a : Convert data object to a VTL Dataset */
+		/* Step 2.3 : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}

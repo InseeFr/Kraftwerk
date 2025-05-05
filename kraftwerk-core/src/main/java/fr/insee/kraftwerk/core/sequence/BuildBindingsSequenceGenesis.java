@@ -61,10 +61,7 @@ public class BuildBindingsSequenceGenesis {
 		/* Step 2.2 : Get paradata for the survey */
 		parseParadata(dataMode, data, specsDirectory, fileUtilsInterface);
 
-		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(dataMode, data, specsDirectory, fileUtilsInterface);
-
-		/* Step 2.4a : Convert data object to a VTL Dataset */
+		/* Step 2.3 : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
@@ -85,25 +82,6 @@ public class BuildBindingsSequenceGenesis {
 			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
-		}
-	}
-
-	private void parseReportingData(String dataMode, SurveyRawData data, Path inDirectory, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
-		Path reportingDataFile = inDirectory.resolve(dataMode+Constants.REPORTING_DATA_FOLDER);
-		log.info("Try to read reporting data from {}", reportingDataFile.toString());
-		if (fileUtilsInterface.isFileExists(reportingDataFile.toString())) {
-			List<String> listFiles = fileUtilsInterface.listFileNames(reportingDataFile.toString());
-			for (String file : listFiles) {
-				ReportingData reportingData = new ReportingData(reportingDataFile.resolve(file), new ArrayList<>());
-				if (file.contains(".xml")) {
-					XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-					xMLReportingDataParser.parseReportingData(reportingData, data, true);
-
-				} else if (file.contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
-					cSVReportingDataParser.parseReportingData(reportingData, data, true);
-				}
-			}
 		}
 	}
 
