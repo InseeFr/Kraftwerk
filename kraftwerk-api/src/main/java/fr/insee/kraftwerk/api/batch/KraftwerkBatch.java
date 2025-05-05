@@ -83,8 +83,12 @@ public class KraftwerkBatch implements CommandLineRunner {
                 }
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     archiveAtEnd = false;
-
                 }
+                //========= OPTIMISATIONS PERFS (START) ==========
+                if (kraftwerkServiceType == KraftwerkServiceType.GENESISV2) {
+                    archiveAtEnd = false;
+                }
+                //========= OPTIMISATIONS PERFS (END) ==========
 
 
                 //Run kraftwerk
@@ -104,7 +108,17 @@ public class KraftwerkBatch implements CommandLineRunner {
                         kraftwerkExecutionContext
                     );
                     mainProcessingGenesis.runMain(inDirectory,1000);
-                } else {
+                }
+                //========= OPTIMISATIONS PERFS (START) ==========
+                else if (kraftwerkServiceType == KraftwerkServiceType.GENESISV2) {
+                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+                            configProperties,
+                            fileSystem,
+                            true);
+                    mainProcessingGenesis.runMainV2(inDirectory,1000, workersNumber, workerId);
+                }
+                //========= OPTIMISATIONS PERFS (END) ==========
+                else {
                     MainProcessing mainProcessing = new MainProcessing(
                             kraftwerkExecutionContext,
                             defaultDirectory,
