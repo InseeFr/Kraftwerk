@@ -15,10 +15,10 @@ import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,13 +73,12 @@ public class MainProcessingGenesis {
 
 	public void init(String campaignId) throws KraftwerkException {
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
-				? "with DDI": "without " +
-				"DDI");
-		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory(), fileUtilsInterface);
+				? "with DDI": "without DDI");
+		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
 		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(controlInputSequenceGenesis.isHasConfigFile(), specsDirectory,
+		userInputs = new UserInputsGenesis(specsDirectory,
 				client.getModes(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
 		if (!userInputs.getModes().isEmpty()) {
             try {
@@ -146,7 +145,7 @@ public class MainProcessingGenesis {
 	}
 
 	/* Step 3 : multimodal VTL data processing */
-	private void multimodalProcess() {
+	private void multimodalProcess() throws KraftwerkException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels,
 				fileUtilsInterface);
