@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.3.2</version>
+		<version>3.3.4</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>12.5</version>
+			<version>12.6</version>
 		</dependency>
 		<!-- XML oriented test dependency -->
 		<!-- https://www.xmlunit.org/ -->
@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>5.10</version>
+			<version>5.11</version>
 		</dependency>
 
 		<!-- VTL 2 with Trevas -->
@@ -96,7 +96,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.5.0-M3</version>
+			<version>4.5.0</version>
 		</dependency>
 
 		<!-- S3 -->

@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -25,7 +26,7 @@ public class AggregateDefinitions {
 	KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
 	@Given("We have some VTLBindings named {string} and {string}")
-	public void initialize(String firstDataset, String secondDataset){
+	public void initialize(String firstDataset, String secondDataset) throws KraftwerkException {
 		// create datasets
 		SurveyRawData fakeCawiData = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		SurveyRawData fakePapiData = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -43,7 +44,7 @@ public class AggregateDefinitions {
 	}
 
 	@When("I try to aggregate the bindings")
-	public void collect_variables() {
+	public void collect_variables() throws KraftwerkException {
 		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		reconciliationProcessing.applyVtlTransformations(
 				"MULTIMODE", null,kraftwerkExecutionContext);

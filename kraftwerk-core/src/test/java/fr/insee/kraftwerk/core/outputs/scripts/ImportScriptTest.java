@@ -10,6 +10,7 @@ import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -51,7 +52,7 @@ public class ImportScriptTest {
 		metadata = new LinkedHashMap<>();
 	}
 
-	private void instantiateMap() {
+	private void instantiateMap() throws KraftwerkException {
 		metadata.put("CAWI", createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		srdWeb.setMetadataModel(createCompleteFakeVariablesMap());
@@ -75,7 +76,7 @@ public class ImportScriptTest {
 	}
 
 	@Test
-	void getAllLengthTest() {
+	void getAllLengthTest() throws KraftwerkException {
 		instantiateMap();
 		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadata);
 		assertEquals("50", listVariables.get("LAST_NAME").getSasFormat());

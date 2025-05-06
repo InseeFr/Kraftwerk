@@ -28,7 +28,10 @@ public final class Constants {
     private Constants() {}
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
-	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
+
+	// Normalized name for VTL user scripts when using Genesis data
+	public static final String USER_VTL_UNIMODAL_SCRIPT_NAME = "script_unimodal.vtl";
+	public static final String USER_VTL_FINAL_SCRIPT_NAME = "script_final.vtl";
 
 	// ----- Main resources folders
 	public static final String RESOURCES_FOLDER = "src/main/resources";
@@ -68,6 +71,8 @@ public final class Constants {
 	public static final int DB_CONNECTION_TRY_COUNT = 10;
 	public static final String DDI_FILE_REGEX = "ddi[\\w,\\s-]+\\.xml";
 	public static final String LUNATIC_FILE_REGEX = "lunatic[\\w,\\s-]+\\.json";
+	public static final String SCRIPT_UNIMODAL_REGEX= "script_unimodal[\\w-]*\\.vtl$";
+	public static final String SCRIPT_FINAL_REGEX= "script_final[\\w-]*\\.vtl$";
 
 
 	// ----- Explicit Variables Names
