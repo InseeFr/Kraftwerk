@@ -55,12 +55,11 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "main", summary = "${summary.main}", description = "${description.main}")
 	public ResponseEntity<String> mainService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
-			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData
+			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI);
 	}
 
 	@PutMapping(value = "/main/file-by-file")
@@ -70,9 +69,8 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd
 	) {
 		boolean fileByFile = true;
-		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI);
 	}
 
 	@PutMapping(value = "/main/lunatic-only")
@@ -83,8 +81,7 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		boolean fileByFile = false;
-		boolean withAllReportingData = false;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI);
 	}
 
 	@PutMapping(value = "/main/genesis")
@@ -107,10 +104,10 @@ public class MainService extends KraftwerkService {
 	}
 
 	@NotNull
-	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withAllReportingData, boolean withDDI) {
+	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, fileUtilsInterface);
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -139,16 +136,12 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(campaignId);
 	}
 
-
-
-
 	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, FileUtilsInterface fileUtilsInterface) {
 		return new MainProcessingGenesis(configProperties, fileUtilsInterface, withDDI);
 	}
 
-
-	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withAllReportingData, boolean withDDI, FileUtilsInterface fileUtilsInterface) {
-		return new MainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withDDI, FileUtilsInterface fileUtilsInterface) {
+		return new MainProcessing(inDirectoryParam, fileByFile, withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 	}
 
 	@NotNull FileUtilsInterface getFileUtilsInterface() {

@@ -26,12 +26,10 @@ import java.util.ArrayList;
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
-	private final boolean withAllReportingData;
 	private final FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequence(boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
+	public BuildBindingsSequence(FileUtilsInterface fileUtilsInterface) {
 		vtlExecute = new VtlExecute(fileUtilsInterface);
-		this.withAllReportingData = withAllReportingData;
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
@@ -69,21 +67,4 @@ public class BuildBindingsSequence {
 		}
 	}
 
-	public void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
-		Path reportingDataFile = modeInputs.getReportingDataFile();
-		if (reportingDataFile != null) {
-			ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
-			if (reportingDataFile.toString().contains(".xml")) {
-				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-
-			} else if (reportingDataFile.toString().contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
-					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-			}
-		}
-	}
-
-
-	
 }

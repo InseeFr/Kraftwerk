@@ -87,7 +87,6 @@ public class KraftwerkBatch implements CommandLineRunner {
                     MainProcessing mainProcessing = new MainProcessing(
                             inDirectory,
                             fileByFile,
-                            withAllReportingData,
                             withDDI,
                             defaultDirectory,
                             limitSize,

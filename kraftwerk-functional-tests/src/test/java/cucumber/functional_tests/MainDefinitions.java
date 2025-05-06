@@ -60,7 +60,6 @@ import static cucumber.TestConstants.FUNCTIONAL_TESTS_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static cucumber.TestConstants.TEST_RESOURCES_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -141,7 +140,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -149,7 +148,7 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -169,7 +168,7 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -199,7 +198,7 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
@@ -232,7 +231,7 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
+		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, "defaultDirectory",
 				419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}

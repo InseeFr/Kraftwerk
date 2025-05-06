@@ -6,6 +6,9 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessingManager;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
+import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
@@ -24,6 +27,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 @Getter
 @Slf4j
@@ -61,8 +65,7 @@ public class ReportingDataProcessing {
         ModeInputs modeInputs = new ModeInputs();
         modeInputs.setReportingDataFile(reportingDataFilePath);
 
-        BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, fileUtilsInterface);
-        buildBindingsSequence.parseReportingData(modeInputs, surveyRawData);
+        parseReportingData(modeInputs, surveyRawData, fileUtilsInterface);
 
         VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
         VtlBindings vtlBindings = new VtlBindings();
@@ -95,6 +98,21 @@ public class ReportingDataProcessing {
         }catch (SQLException e){
             log.error(e.toString());
             throw new KraftwerkException(500, "SQL Error");
+        }
+    }
+
+    public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+        Path reportingDataFile = modeInputs.getReportingDataFile();
+        if (reportingDataFile != null) {
+            ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
+            if (reportingDataFile.toString().contains(".xml")) {
+                XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
+                xMLReportingDataParser.parseReportingData(reportingData, data, true);
+
+            } else if (reportingDataFile.toString().contains(".csv")) {
+                CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
+                cSVReportingDataParser.parseReportingData(reportingData, data, true);
+            }
         }
     }
 }

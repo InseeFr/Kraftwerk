@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.extradata;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
@@ -25,7 +26,7 @@ class XMLReportingDataParserTest {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@Test
-	void parseReportingDataTest() throws NullException {
+	void parseReportingDataTest() throws KraftwerkException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -63,7 +64,7 @@ class XMLReportingDataParserTest {
 	}
 
 	@Test
-	void parseMoogReportingDataTest() throws NullException {
+	void parseMoogReportingDataTest() throws KraftwerkException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();

@@ -1,12 +1,15 @@
 package cucumber.functional_tests;
 
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
-import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
-import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static fr.insee.kraftwerk.core.Constants.STATE_SUFFIX_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
+import com.opencsv.exceptions.CsvValidationException;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
+import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
+import io.cucumber.java.en.Then;
 
 import java.io.File;
 import java.io.FileReader;
@@ -20,17 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvException;
-import com.opencsv.exceptions.CsvValidationException;
-
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
-import io.cucumber.java.en.Then;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
+import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
+import static fr.insee.kraftwerk.core.Constants.STATE_SUFFIX_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 
 // These definitions are used in do_we_export_contact_attempts feature

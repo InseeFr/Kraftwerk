@@ -32,7 +32,6 @@ public class MainProcessing {
 
 	private final ControlInputSequence controlInputSequence;
 	private final boolean fileByFile;
-	private final boolean withAllReportingData;
 	private final boolean withDDI;
 
 
@@ -58,11 +57,10 @@ public class MainProcessing {
 
 	private final long limitSize;
 
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
+	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withDDI, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
-		this.withAllReportingData = withAllReportingData;
 		this.withDDI=withDDI;
 		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
@@ -73,7 +71,6 @@ public class MainProcessing {
 		super();
 		this.inDirectoryParam = inDirectoryParam;
 		this.fileByFile = fileByFile;
-		this.withAllReportingData = !fileByFile;
 		this.withDDI=true;
 		this.limitSize = limitSize;
 		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
@@ -139,7 +136,7 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws KraftwerkException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionContext);

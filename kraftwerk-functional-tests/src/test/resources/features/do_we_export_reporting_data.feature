@@ -3,7 +3,8 @@ Feature: Do we save correctly all reporting data ?
 
   Scenario Outline: Do we create reporting data file with the right structure
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then We should have a file named "<OutputFileName>" in directory "<Directory>" with <ExpectedReportingDataFieldCount> reporting data fields
 
     Examples:
@@ -11,17 +12,17 @@ Feature: Do we save correctly all reporting data ?
     # - Directory : Directory of test campaigns
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding interrogationId
-
-    |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
-    |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
-    |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
 
 
 
   Scenario Outline: Do we have the good amount of lines
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then We should have <ExpectedTotalCount> lines different than header in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -30,28 +31,14 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedTotalCount : Expected line count (other than header)
 
-      |Directory                        |OutputFileName                                    |ExpectedTotalCount |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |4                  |
-
-
-  Scenario Outline: Do we have the good amount of lines when we exclude non-respondents
-    Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service with an export of reporting data only for survey respondents
-    Then We should have <ExpectedTotalCount> lines different than header in a file named "<OutputFileName>" in directory "<Directory>"
-
-    Examples:
-    # Parameters :
-    # - Directory : Directory of test campaigns
-    # - OutputFileName : Name of reporting data file (with .csv extension)
-    # - ExpectedTotalCount : Expected line count (other than header)
-
-      |Directory                        |OutputFileName                                    |ExpectedTotalCount |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |3                  |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |ExpectedTotalCount |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |4                  |
 
 
   Scenario Outline: Does the file have a correct date format
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then In file named "<OutputFileName>" in directory "<Directory>" we should have the date format "<ExpectedDateFormat>" for field "<FieldName>"
 
     Examples:
@@ -60,14 +47,15 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedDateformat : Expected date format in file
 
-      |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
-      |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact attempts with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -78,12 +66,13 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedSpecificStatusCount : Expected count for said status
     # - ExpectedStatus : Expected status (in input file)
 
-      |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003         |2                            |REF              |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000003         |2                            |REF              |
 
   Scenario Outline: The file has all the contact states of a specific type
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
 
     Examples:
@@ -94,40 +83,13 @@ Feature: Do we save correctly all reporting data ?
     # - ExpectedSpecificStatusCount : Expected count for said status
     # - ExpectedStatus : Expected status (in input file)
 
-      |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002         |5                            |WFT              |
-
-
-  Scenario Outline: The root file doesn't have any reporting data
-    Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
-    Then We shouldn't have any reporting data in "<RootFileName>" in directory "<Directory>"
-
-    Examples:
-    # Parameters :
-    # - Directory : Directory of test campaigns
-    # - RootFileName : Name of root file (with .csv extension)
-
-      |Directory                        |RootFileName                               |
-      |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_RACINE.csv     |
-      |SAMPLETEST-DATAONLY-v1           |SAMPLETEST-DATAONLY-v1_RACINE.csv          |
-
-  Scenario Outline: If there is no reporting data, there is no reporting data file
-    Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
-    Then We shouldn't have any reporting data file in directory "<Directory>"
-
-  Examples:
-  # Parameters :
-  # - Directory : Directory of test campaigns
-
-    |Directory                        |
-    |SAMPLETEST-DATAONLY-v1           |
-
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002         |5                            |WFT              |
 
   Scenario Outline: Does the new variables are computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
 
     Examples:
@@ -137,12 +99,13 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                         |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                         |
 
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly using a standard VTL file
     Given Step 0 : We have some survey in directory "<Directory>"
-    When Step 1 : We launch main service
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
 
     Examples:
@@ -152,8 +115,8 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedOutcomeSpottingStatus   |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                            |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedOutcomeSpottingStatus   |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                            |
 
     #TODO Adapt this test when we have the correct TEL .vtl script
 

@@ -76,7 +76,7 @@ public class StepByStepService extends KraftwerkService {
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -84,7 +84,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
 
@@ -117,7 +117,7 @@ public class StepByStepService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
-		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withAllReportingData,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
+		MainProcessing mp = new MainProcessing(inDirectoryParam, fileByFile,withDDI, defaultDirectory, limitSize, fileUtilsInterface);
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -125,7 +125,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, kraftwerkExecutionContext);
 		} catch (KraftwerkException e) {

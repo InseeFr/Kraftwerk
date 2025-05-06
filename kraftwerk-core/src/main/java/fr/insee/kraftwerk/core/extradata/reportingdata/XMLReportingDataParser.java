@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -23,14 +24,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
         super(fileUtilsInterface);
     }
 
-    public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws NullException {
+    public void parseReportingData(ReportingData reportingData, SurveyRawData data, boolean withAllReportingData) throws KraftwerkException {
         Path filePath = reportingData.getFilepath();
         readFile(filePath);
         Element root;
         try {
             root = this.document.getRootElement();
         } catch (NullPointerException e) {
-            throw new NullException();
+            throw new KraftwerkException(500,"Reporting data file not found");
         }
         // Read information on each survey unit
         List<Element> surveyUnitsNodeList = getSurveyUnitList(root);
