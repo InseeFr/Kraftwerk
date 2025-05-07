@@ -10,8 +10,10 @@ import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.api.process.ReportingDataProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -30,7 +32,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
@@ -67,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // Main example
 public class MainDefinitions {
 
-	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
+	static Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	UserInputsFile userInputs;
@@ -75,6 +77,7 @@ public class MainDefinitions {
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
 	Map<String, MetadataModel> metadataModelMap;
+	String reportingDataPathParam;
 
 	private ControlInputSequence controlInputSequence;
 	List<KraftwerkError> errors = new ArrayList<>();
@@ -101,6 +104,7 @@ public class MainDefinitions {
 
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
+		inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 		outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 
 		this.campaignName = campaignDirectoryName;
@@ -129,6 +133,11 @@ public class MainDefinitions {
 	@Given("We want to encrypt output data at the end of process")
 	public void activateEncryption(){
 		this.isUsingEncryption = true;
+	}
+
+	@Given("We have reporting data file in {string}")
+	public void get_reporting_data_file(String reportingDataPathParam) {
+		this.reportingDataPathParam = reportingDataPathParam;
 	}
 
 	@When("Step 1 : We initialize the input files")
@@ -222,7 +231,7 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
@@ -273,6 +282,26 @@ public class MainDefinitions {
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory",
 				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
+	}
+
+	@When("We launch reporting data service")
+	public void launch_reporting_data_service() throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		reportingDataProcessing.runProcessMain(fileUtilsInterface,
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
+	}
+
+	@When("We launch reporting data service with genesis input path with mode {string}")
+	public void launch_reporting_data_service(String modeParam) throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		reportingDataProcessing.runProcessGenesis(fileUtilsInterface, Mode.valueOf(modeParam),
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -535,7 +564,7 @@ public class MainDefinitions {
 		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
 	}
 
-	@And("We should have {int} of type STRING")
+	@Then("We should have {int} of type STRING")
 	public void check_string_variables_count(int nbStringVariablesExpected) {
 		String mode = userInputs.getModes().getFirst();
 		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
@@ -731,10 +760,15 @@ public class MainDefinitions {
 		}
 	}
 
+	@Then("The output file {string} should not exist")
+	public void check_file_not_exist(String outputFileName) {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Assertions.assertThat(executionOutDirectory.resolve(outputFileName)).doesNotExist();
+	}
+
 	@AfterAll
 	public static void closeConnection() throws SQLException {
 		database.close();
 	}
-
-
 }

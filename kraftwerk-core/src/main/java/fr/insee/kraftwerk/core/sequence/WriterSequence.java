@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.nio.file.Path;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class WriterSequence {
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
-	public void writeCsvFiles(Path inDirectory,
+	private void writeCsvFiles(Path inDirectory,
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
 								 Map<String, MetadataModel> metadataModels,
@@ -58,6 +59,18 @@ public class WriterSequence {
 		csvOutputFiles.writeOutputTables();
 		/* Step 5.2 : write scripts to import csv tables in several languages */
 		csvOutputFiles.writeImportScripts(metadataModels, kraftwerkExecutionContext);
+	}
+
+	public void writeCsvFiles(Path inDirectory,
+							   String outDirectorySuffix,
+							   VtlBindings vtlBindings,
+							   Statement database,
+							   FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		//Write CSV
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
+		/* Step 5.1 : write csv output tables */
+		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, database, fileUtilsInterface);
+		csvOutputFiles.writeOutputTables();
 	}
 
 

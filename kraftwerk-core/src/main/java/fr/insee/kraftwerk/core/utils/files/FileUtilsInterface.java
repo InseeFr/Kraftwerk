@@ -25,6 +25,13 @@ public interface FileUtilsInterface {
         return transformToOther(inDirectory, "out").resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)));
     }
 
+    static Path transformToOut(Path inDirectory, LocalDateTime localDateTime, String outDirectorySuffix) {
+        return transformToOther(inDirectory, "out").resolve(
+                localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN))
+                + outDirectorySuffix
+        );
+    }
+
     /**
      * Change /some/path/in/campaign-name to /some/path/temp/campaign-name
      */

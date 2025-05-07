@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
@@ -90,7 +91,6 @@ public class KraftwerkBatch implements CommandLineRunner {
                 KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                         inDirectory,
                         fileByFile,
-                        withAllReportingData,
                         withDDI,
                         withEncryption,
                         limitSize

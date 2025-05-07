@@ -217,11 +217,11 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false, false);
+        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -238,11 +238,11 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig,env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false, false);
+        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -261,7 +261,7 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig,env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
@@ -282,7 +282,7 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
@@ -305,7 +305,7 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
@@ -326,7 +326,7 @@ class MainServiceTest {
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN

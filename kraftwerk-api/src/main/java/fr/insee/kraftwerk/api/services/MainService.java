@@ -64,12 +64,11 @@ public class MainService extends KraftwerkService {
 	public ResponseEntity<String> mainService(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
 			@Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-			@Parameter(description = "${param.withAllReportingData}", required = false) @RequestParam(defaultValue = "true") boolean withAllReportingData,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/file-by-file")
@@ -80,9 +79,8 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 	) {
 		boolean fileByFile = true;
-		boolean withAllReportingData = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/lunatic-only")
@@ -94,8 +92,7 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		boolean fileByFile = false;
-		boolean withAllReportingData = false;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withAllReportingData, withDDI, withEncryption);
+		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
 	@PutMapping(value = "/main/genesis")
@@ -121,10 +118,10 @@ public class MainService extends KraftwerkService {
 	}
 
 	@NotNull
-	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withAllReportingData, boolean withDDI, boolean withEncryption) {
+	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withAllReportingData, withDDI, withEncryption, fileUtilsInterface);
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
 		try {
 			mp.runMain();
 		} catch (KraftwerkException e) {
@@ -176,11 +173,10 @@ public class MainService extends KraftwerkService {
 	}
 
 
-	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withAllReportingData, boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				fileByFile,
-				withAllReportingData,
 				withDDI,
 				withEncryption,
 				limitSize

@@ -26,12 +26,10 @@ import java.util.ArrayList;
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
-	private final boolean withAllReportingData;
 	private final FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequence(boolean withAllReportingData, FileUtilsInterface fileUtilsInterface) {
+	public BuildBindingsSequence(FileUtilsInterface fileUtilsInterface) {
 		vtlExecute = new VtlExecute(fileUtilsInterface);
-		this.withAllReportingData = withAllReportingData;
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 
@@ -55,10 +53,7 @@ public class BuildBindingsSequence {
 		/* Step 2.2 : Get paradata for the survey */
 		parseParadata(modeInputs, data);
 
-		/* Step 2.3 : Get reportingData for the survey */
-		parseReportingData(modeInputs, data);
-
-		/* Step 2.4a : Convert data object to a VTL Dataset */
+		/* Step 2.3 : Convert data object to a VTL Dataset */
 		data.setDataMode(dataMode);
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
@@ -72,21 +67,4 @@ public class BuildBindingsSequence {
 		}
 	}
 
-	private void parseReportingData(ModeInputs modeInputs, SurveyRawData data) throws KraftwerkException {
-		Path reportingDataFile = modeInputs.getReportingDataFile();
-		if (reportingDataFile != null) {
-			ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
-			if (reportingDataFile.toString().contains(".xml")) {
-				XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-				xMLReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-
-			} else if (reportingDataFile.toString().contains(".csv")) {
-					CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
-					cSVReportingDataParser.parseReportingData(reportingData, data, withAllReportingData);
-			}
-		}
-	}
-
-
-	
 }

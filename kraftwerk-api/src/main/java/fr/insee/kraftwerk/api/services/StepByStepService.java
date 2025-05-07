@@ -79,13 +79,13 @@ public class StepByStepService extends KraftwerkService {
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				fileByFile,
-				withAllReportingData,
 				withDDI,
 				false,
 				limitSize
 		);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
+
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -93,7 +93,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
@@ -124,15 +124,16 @@ public class StepByStepService extends KraftwerkService {
 		boolean withDDI = true;
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
+
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				fileByFile,
-				withAllReportingData,
 				withDDI,
 				false,
 				limitSize
 		);
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
+
 		try {
 			mp.init();
 		} catch (KraftwerkException e) {
@@ -140,7 +141,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, kraftwerkExecutionContext);
 		} catch (KraftwerkException e) {
@@ -165,7 +166,6 @@ public class StepByStepService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
-				false,
 				false,
 				true,
 				false,
@@ -230,7 +230,6 @@ public class StepByStepService extends KraftwerkService {
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
 				false,
-				false,
 				true,
 				false,
 				limitSize
@@ -278,7 +277,6 @@ public class StepByStepService extends KraftwerkService {
 		VtlBindings vtlBindings = new VtlBindings();
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
-				false,
 				false,
 				true,
 				false,
