@@ -202,7 +202,7 @@ public class ReportingDataDefinitions {
             String fieldName = header[i];
 
             // Increment if valid
-            if (element.equals(StateType.getStateType(expectedStatus)) // the field content matches with expected
+            if (element.equals(expectedStatus) // the field content matches with expected
                     && fieldName.startsWith(STATE_SUFFIX_NAME) // is a contact attempt field
                     && !fieldName.contains("DATE")) { // not the attempt date field
                 actualSpecificStatusCount++;
@@ -277,8 +277,9 @@ public class ReportingDataDefinitions {
         assertThat(header).doesNotContainAnyElementsOf(Arrays.asList(reportingDataFields));
     }
 
-    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the outcome_spotting field")
-    public void check_outcome_spotting_result(String surveyUnitId, String fileName, String directory, String expectedOutcomeSpotting) throws IOException, CsvException {
+    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the {string} field")
+    public void check_content(String surveyUnitId, String fileName, String directory, String expectedValue,
+                                     String expectedField) throws IOException, CsvException {
         Path executionOutDirectory = outDirectory.resolve(directory);
         executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
@@ -293,74 +294,25 @@ public class ReportingDataDefinitions {
         // Get header
         String[] header = content.get(0);
 
-        // OUTCOME_SPOTTING field existence assertion
-        assertThat(header).contains("outcome_spotting");
-
-        // Fetch concerned survey unit line from file
-        String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
-
-        // Interrogation existence assertion
-        assertThat(concernedLine).isNotNull();
-
-        // Check OUTCOME_SPOTTING content
-        int i = 0;
-        String outcomeSpottingContent = null;
-        for (String element : concernedLine) {
-            if (header[i].equals("outcome_spotting")) {
-                outcomeSpottingContent = element;
-                break;
-            }
-            i++;
-        }
-        assertThat(outcomeSpottingContent).isEqualTo(expectedOutcomeSpotting);
-    }
-
-	public String[] fetchConcernedSurveyUnitLineFromFile(String surveyUnitId, List<String[]> content) {
-		String[] concernedLine = null;
-        for (String[] line : content) {
-            if (line[0].equals(surveyUnitId)) {
-                concernedLine = line;
-                break;
-            }
-        }
-		return concernedLine;
-	}
-
-    @Then("For SurveyUnit {string} in a file named {string} in directory {string} we should have {string} in the identification field")
-    public void check_identification(String surveyUnitId, String fileName, String directory, String expectedValue) throws IOException, CsvException {
-        Path executionOutDirectory = outDirectory.resolve(directory);
-        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-        CSVReader csvReader = getReader(
-                Path.of(executionOutDirectory + "/" + fileName)
-        );
-
-        // Get file content
-        List<String[]> content = csvReader.readAll();
-        csvReader.close();
-
-        // Get header
-        String[] header = content.get(0);
-
-        // OUTCOME_SPOTTING field existence assertion
-        assertThat(header).contains(Constants.IDENTIFICATION_NAME);
+        // field existence assertion
+        assertThat(header).contains(expectedField);
 
         String[] concernedLine = fetchConcernedSurveyUnitLineFromFile(surveyUnitId, content);
 
         // Interrogation existence assertion
         assertThat(concernedLine).isNotNull();
 
-        // Check OUTCOME_SPOTTING content
+        // Check content
         int i = 0;
-        String identificationContent = null;
-        for (String element : concernedLine) {
-            if (header[i].equals(Constants.IDENTIFICATION_NAME)) {
-                identificationContent = element;
+        String contentToCheck = null;
+        for (String csvElement : concernedLine) {
+            if (header[i].equals(expectedField)) {
+                contentToCheck = csvElement;
                 break;
             }
             i++;
         }
-        assertThat(identificationContent).isEqualTo(expectedValue);
+        assertThat(contentToCheck).isEqualTo(expectedValue);
     }
 
     public static CSVReader getReader(Path filePath) throws IOException {
@@ -373,5 +325,48 @@ public class ReportingDataDefinitions {
                 //.withSkipLines(1) // (uncomment to ignore header)
                 .withCSVParser(parser)
                 .build();
+    }
+
+    public String[] fetchConcernedSurveyUnitLineFromFile(String surveyUnitId, List<String[]> content) {
+        String[] concernedLine = null;
+        for (String[] line : content) {
+            if (line[0].equals(surveyUnitId)) {
+                concernedLine = line;
+                break;
+            }
+        }
+        return concernedLine;
+    }
+
+    @Then("In a file named {string} in directory {string} we should only have {string} in the {string} field")
+    public void check_content_root(String fileName, String directory, String expectedValue, String expectedField) throws IOException, CsvException {
+        Path executionOutDirectory = outDirectory.resolve(directory);
+        executionOutDirectory = executionOutDirectory.resolve(Objects.requireNonNull(new File(executionOutDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+        CSVReader csvReader = getReader(
+                Path.of(executionOutDirectory + "/" + fileName)
+        );
+
+        // Get file content
+        List<String[]> content = csvReader.readAll();
+        csvReader.close();
+
+        // Get header
+        String[] header = content.get(0);
+
+        // field existence assertion
+        assertThat(header).contains(expectedField);
+
+        content.removeFirst();
+        // Check content
+        for(String[] line : content){
+            int i = 0;
+            for (String csvElement : line) {
+                if (header[i].equals(expectedField)) {
+                    assertThat(csvElement).isEqualTo(expectedValue);
+                }
+                i++;
+            }
+        }
     }
 }

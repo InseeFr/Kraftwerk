@@ -101,6 +101,7 @@ public final class Constants {
 
 	// ----- Reporting Variables Names
 	public static final String REPORTING_DATA_PREFIX_NAME = "Report_";
+	public static final String IDENTIFICATION_CONFIGURATION = "IdentificationConfiguration";
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String COMMENT_PREFIX_NAME = "COMMENT";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
@@ -128,10 +129,20 @@ public final class Constants {
 	public static final String SITUATION_NAME = "situation";
 	public static final String CATEGORY_NAME = "category";
 	public static final String OCCUPANT_NAME = "occupant";
-
+	public static final String INDIVIDUAL_STATUS = "individualStatus";
+	public static final String INTERVIEWER_CAN_PROCESS = "interviewerCanProcess";
 	public static final String OUTCOME_SPOTTING = "outcome_spotting";
 	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + SURVEY_VALIDATION_DATE_NAME;
-	
+
+	public static final String NOGRAP = "NoGrap";
+	public static final String NOLOG = "NoLog";
+	public static final String NOLE = "Nole";
+	public static final String AUTRE = "Autre";
+
+	public static final String CLOSING_CAUSE = "ClosingCause";
+
+	public static final String CLOSING_CAUSE_DATE = "ClosingCause_Date";
+
 	// ------ Pairwise variables
 	
 	public static final int MAX_LINKS_ALLOWED = 21;
