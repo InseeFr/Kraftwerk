@@ -23,8 +23,20 @@ public class InseeSampleIdentifier {
   
   @Getter
   private String bs;
-  
+
   private String noi;
+
+  @Getter
+  private String nograp;
+
+  @Getter
+  private String nolog;
+
+  @Getter
+  private String nole;
+
+  @Getter
+  private String autre;
   
    public String getRges() {
     return String.format("%02d", Integer.valueOf(Integer.parseInt(rges)));
