@@ -193,7 +193,6 @@ public class MainDefinitions {
 		deleteDirectory(tempDirectory.toFile());
 
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
-		kraftwerkExecutionContext.setWithAllReportingData(false);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();

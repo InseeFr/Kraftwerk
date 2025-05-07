@@ -183,7 +183,6 @@ public class MainDefinitions {
 		deleteDirectory(tempDirectory.toFile());
 
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
-		kraftwerkExecutionContext.setWithAllReportingData(false);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
@@ -221,7 +220,7 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
@@ -234,7 +233,7 @@ public class MainDefinitions {
 	}
 
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
-	public void aggregate_datasets() {
+	public void aggregate_datasets() throws KraftwerkException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
 
 		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));

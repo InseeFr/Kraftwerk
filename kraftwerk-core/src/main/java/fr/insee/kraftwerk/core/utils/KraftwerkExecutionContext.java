@@ -31,7 +31,6 @@ public class KraftwerkExecutionContext {
     //Parameters
     private String inDirectoryParam;
     private boolean fileByFile;
-    private boolean withAllReportingData;
     private boolean withDDI;
     private boolean withEncryption;
     private long limitSize;
