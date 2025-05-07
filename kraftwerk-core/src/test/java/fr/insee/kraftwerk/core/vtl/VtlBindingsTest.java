@@ -8,7 +8,7 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VtlBindingsTest {
 
 	private VtlBindings vtlBindings;
-	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
 
@@ -51,7 +51,7 @@ class VtlBindingsTest {
 	@BeforeEach
 	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	}
 
 	@Test

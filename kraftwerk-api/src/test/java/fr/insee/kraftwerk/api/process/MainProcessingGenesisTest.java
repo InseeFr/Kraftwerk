@@ -1,16 +1,21 @@
 package fr.insee.kraftwerk.api.process;
 
+import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,15 +27,17 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "ci-public"})
 @SpringBootTest
+@AutoConfigureMockMvc
+@Import(TestConfig.class)
+@ComponentScan(basePackages = {"fr.insee.kraftwerk.core.encryption", "fr.insee.kraftwerk.core.outputs"})
 class MainProcessingGenesisTest {
 
     private ConfigProperties configProperties;
-    private GenesisClient genesisClient;
-    private FileUtilsInterface fileUtils;
     private MainProcessingGenesis mainProcessing;
     private RestTemplate restTemplate;
+
 
     @BeforeEach
     void setUp() {
@@ -46,7 +53,7 @@ class MainProcessingGenesisTest {
             }
         };
 
-        genesisClient = new GenesisClient(restTemplate,configProperties) {
+        GenesisClient genesisClient = new GenesisClient(restTemplate, configProperties) {
             @Override
             public List<Mode> getModes(String idCampaign) {
                 return Collections.singletonList(Mode.WEB);
@@ -58,13 +65,13 @@ class MainProcessingGenesisTest {
             }
 
             @Override
-            public List<InterrogationId> getInterrogationIds(String questionnaireId){
+            public List<InterrogationId> getInterrogationIds(String questionnaireId) {
                 return Collections.singletonList(new InterrogationId());
 
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds){
+            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
@@ -74,14 +81,23 @@ class MainProcessingGenesisTest {
         };
 
 
-        fileUtils = new FileSystemImpl("defaultDir") {
+        FileUtilsInterface fileUtils = new FileSystemImpl("defaultDir") {
             @Override
             public String findFile(String directory, String fileName) {
                 return "src/test/resources/ddi-SAMPLETEST-DATAONLY-v1.xml";
             }
         };
 
-        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, true);
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                false,
+                true,
+                false,
+                419430400L
+        );
+
+        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
     @Test

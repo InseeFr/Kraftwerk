@@ -24,7 +24,7 @@ jobs:
 
       - name: Get source version
         id: version-step
-        run: echo "newTag=v$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+        run: echo "newTag=v$(mvn -f pom-public.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
       - name: Print source version
         run: echo ${{ steps.version-step.outputs.newTag }}

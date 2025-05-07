@@ -141,6 +141,13 @@ public final class Constants {
 	public static final String PAIRWISE_GROUP_NAME = "LIENS";
 	public static final String SAME_AXIS_VALUE = "0";
 	public static final String NO_PAIRWISE_VALUE = "99";
+
+	// ------ Vault variables
+	public static final String TRUST_VAULT_PATH = "trust_key";
+	public static final String TRUST_AES_KEY_VAULT_PATH = "aes_key";
+	public static final String STRING_FORMAT_VAULT_PATH = "chiffrement/%s/%s";
+
+	public static final String VAULT_APPROLE_ENDPOINT = "approle_produit";
 	
 	// ---------- Functions
 	// ---------- Get a file
