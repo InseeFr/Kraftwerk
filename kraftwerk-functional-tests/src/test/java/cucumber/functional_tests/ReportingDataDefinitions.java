@@ -202,7 +202,7 @@ public class ReportingDataDefinitions {
             String fieldName = header[i];
 
             // Increment if valid
-            if (element.equals(StateType.getStateType(expectedStatus)) // the field content matches with expected
+            if (element.equals(expectedStatus) // the field content matches with expected
                     && fieldName.startsWith(STATE_SUFFIX_NAME) // is a contact attempt field
                     && !fieldName.contains("DATE")) { // not the attempt date field
                 actualSpecificStatusCount++;

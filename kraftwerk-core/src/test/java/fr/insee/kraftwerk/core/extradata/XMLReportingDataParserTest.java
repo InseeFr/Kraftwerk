@@ -44,9 +44,9 @@ class XMLReportingDataParserTest {
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
 		assertEquals("ANV", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
-		// Check the reporting data is correctly translated in the output
-		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
-		assertEquals("UE finalisée", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
+		// Check the reporting data is correctly reported in the output (no more transformation of modalities)
+		assertEquals("ANV", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
+		assertEquals("FIN", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
 
 		// Null interviewrIds checks
 		//Check interviewerId placeholder value on TNL1102000278
@@ -83,8 +83,8 @@ class XMLReportingDataParserTest {
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
 		assertEquals("REFUSAL", reportingData.getListReportingDataUE().getFirst().getStates().get(1).getStateType());
-		// Check the reporting data is correctly translated in the output
-		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + interrogationId).getValue("STATE_1"));
+		// Check the reporting data is correctly reported in the output (no more transformation of modalities)
+		assertEquals("INITLA", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + interrogationId).getValue("STATE_1"));
 
 
 

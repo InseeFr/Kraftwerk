@@ -328,8 +328,7 @@ public abstract class ReportingDataParser {
 		for (int k = 1; k <= reportingDataUE.size(); k++) {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
-							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
+					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataUE.getStates().get(k - 1).getStateType());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
@@ -337,8 +336,7 @@ public abstract class ReportingDataParser {
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-				.putValue(Constants.LAST_STATE_NAME, StateType.getStateType(
-						(reportingDataUE.getStates().getLast()).getStateType()));
+				.putValue(Constants.LAST_STATE_NAME, reportingDataUE.getStates().getLast().getStateType());
 	}
 
 	private void addComments(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {
