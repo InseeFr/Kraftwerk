@@ -30,7 +30,6 @@ public class TestConstants {
                 null,
                 false,
                 true,
-                true,
                 false,
                 419430400L
         );
@@ -41,7 +40,6 @@ public class TestConstants {
         return new KraftwerkExecutionContext(
                 inDirectory,
                 false,
-                true,
                 true,
                 withEncryption,
                 419430400L

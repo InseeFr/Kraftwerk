@@ -16,7 +16,7 @@ import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.Getter;
@@ -80,7 +80,7 @@ public class ReportingDataProcessing {
                 Constants.REPORTING_DATA_GROUP_NAME,
                 Path.of(Constants.VTL_FOLDER_PATH)
                         .resolve("reporting_datas.vtl"),
-                new KraftwerkExecutionContext());
+                null);
 
         try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
             try(Statement writeDatabase = writeDatabaseConnection.createStatement()){

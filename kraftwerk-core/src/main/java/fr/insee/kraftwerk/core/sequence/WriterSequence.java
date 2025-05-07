@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.OutputFilesFactory;
+import fr.insee.kraftwerk.core.outputs.csv.CsvOutputFiles;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -62,14 +63,14 @@ public class WriterSequence {
 	}
 
 	public void writeCsvFiles(Path inDirectory,
-							   String outDirectorySuffix,
-							   VtlBindings vtlBindings,
-							   Statement database,
-							   FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+							  String outDirectorySuffix,
+							  VtlBindings vtlBindings,
+							  Statement database,
+							  FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		//Write CSV
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
 		/* Step 5.1 : write csv output tables */
-		OutputFiles csvOutputFiles = new CsvOutputFiles(outDirectory, vtlBindings, database, fileUtilsInterface);
+		OutputFiles csvOutputFiles = outputFilesFactory.createCsv(outDirectory, vtlBindings, new ArrayList<>(), database, fileUtilsInterface,null);
 		csvOutputFiles.writeOutputTables();
 	}
 
