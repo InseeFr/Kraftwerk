@@ -40,7 +40,6 @@ public class KraftwerkExecutionContext {
     public KraftwerkExecutionContext(
             String inDirectoryParam,
             boolean fileByFile,
-            boolean withAllReportingData,
             boolean withDDI,
             boolean withEncryption,
             long limitSize) {
@@ -52,7 +51,6 @@ public class KraftwerkExecutionContext {
 
         this.inDirectoryParam = inDirectoryParam;
         this.fileByFile = fileByFile;
-        this.withAllReportingData = withAllReportingData;
         this.withDDI = withDDI;
         this.withEncryption = withEncryption;
         this.limitSize = limitSize;

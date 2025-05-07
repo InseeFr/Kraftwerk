@@ -158,7 +158,6 @@ public class MainService extends KraftwerkService {
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				null,
 				false,
-				false,
 				withDDI,
 				withEncryption,
 				limitSize
