@@ -4,13 +4,16 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.api.process.ReportingDataProcessing;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.metadata.MetadataUtils;
@@ -21,14 +24,14 @@ import fr.insee.kraftwerk.core.sequence.ControlInputSequence;
 import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
 import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import io.cucumber.java.AfterAll;
+import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -55,6 +58,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static cucumber.TestConstants.FUNCTIONAL_TESTS_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
@@ -65,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // Main example
 public class MainDefinitions {
 
-	Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
+	static Path inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 	static Path outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 	Path tempDirectory = Paths.get(FUNCTIONAL_TESTS_TEMP_DIRECTORY);
 	UserInputsFile userInputs;
@@ -73,10 +77,14 @@ public class MainDefinitions {
 	VtlBindings vtlBindings = new VtlBindings();
 	OutputFiles outputFiles;
 	Map<String, MetadataModel> metadataModelMap;
+	String reportingDataPathParam;
 
 	private ControlInputSequence controlInputSequence;
 	List<KraftwerkError> errors = new ArrayList<>();
 	static Connection database;
+	KraftwerkExecutionContext kraftwerkExecutionContext;
+
+	boolean isUsingEncryption;
 
 	@BeforeAll
 	public static void clean() throws SQLException {
@@ -89,8 +97,14 @@ public class MainDefinitions {
 		database = SqlUtils.openConnection();
 	}
 
+	@Before
+	public void init(){
+		this.isUsingEncryption = false;
+	}
+
 	@Given("Step 0 : We have some survey in directory {string}")
 	public void launch_all_steps(String campaignDirectoryName) {
+		inDirectory = Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY);
 		outDirectory = Paths.get(FUNCTIONAL_TESTS_OUTPUT_DIRECTORY);
 
 		this.campaignName = campaignDirectoryName;
@@ -116,6 +130,16 @@ public class MainDefinitions {
 		Files.write(vtlPath,generatedVTL.getBytes());
 	}
 
+	@Given("We want to encrypt output data at the end of process")
+	public void activateEncryption(){
+		this.isUsingEncryption = true;
+	}
+
+	@Given("We have reporting data file in {string}")
+	public void get_reporting_data_file(String reportingDataPathParam) {
+		this.reportingDataPathParam = reportingDataPathParam;
+	}
+
 	@When("Step 1 : We initialize the input files")
 	public void initialize_input_files() throws KraftwerkException {
 		System.out.println("InDirectory value : " + inDirectory);
@@ -131,7 +155,10 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with lunatic specification only")
 	public void initialize_metadata_model_with_lunatic() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		kraftwerkExecutionContext.setWithDDI(false);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -139,7 +166,9 @@ public class MainDefinitions {
 
 	@When("Step 1 : We initialize metadata model with DDI specification only")
 	public void initialize_metadata_model_with_DDI() throws KraftwerkException {
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.init();
 		userInputs=mp.getUserInputsFile();
 		metadataModelMap=mp.getMetadataModels();
@@ -150,7 +179,10 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -159,7 +191,10 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false,false,true, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -168,10 +203,14 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 		await().atMost(2, TimeUnit.SECONDS);
-		mp = new MainProcessing(inDirectory.toString(), false, "defaultDirectory", 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -180,8 +219,10 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), true,
-				Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), 419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
 	}
 
@@ -189,12 +230,14 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(true, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
-				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings, metadataModelMap.get(dataMode), withDDI, null);
+				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
+						metadataModelMap.get(dataMode), withDDI, kraftwerkExecutionContext);
 				UnimodalSequence unimodal = new UnimodalSequence();
-				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+				unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModelMap,
+						new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			}
 		}
 	}
@@ -202,7 +245,8 @@ public class MainDefinitions {
 	@When("Step 3 : We aggregate each unimodal dataset into a multimodal dataset")
 	public void aggregate_datasets() throws KraftwerkException {
 		MultimodalSequence multimodalSequence = new MultimodalSequence();
-		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, new KraftwerkExecutionContext(), metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModelMap, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	}
 
 	@When("Step 4 : We export the final version")
@@ -210,9 +254,17 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, new KraftwerkExecutionContext(), statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			writeErrorsFile(inDirectory, localDateTime, errors);
-			outputFiles = new CsvOutputFiles(outDirectory, vtlBindings, userInputs.getModes(), statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			outputFiles = new CsvOutputFiles(
+					outDirectory,
+					vtlBindings,
+					userInputs.getModes(),
+					statement,
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+					TestConstants.getKraftwerkExecutionContext(),
+					null
+			);
 		}
 	}
 
@@ -222,9 +274,34 @@ public class MainDefinitions {
 		// We clean the output and the temp directory
 		deleteDirectory(outDirectory.toFile());
 		deleteDirectory(tempDirectory.toFile());
-		MainProcessing mp = new MainProcessing(inDirectory.toString(), false, false, false, "defaultDirectory",
-				419430400L, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		kraftwerkExecutionContext.setWithDDI(false);
+
+		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory",
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 		mp.runMain();
+	}
+
+	@When("We launch reporting data service")
+	public void launch_reporting_data_service() throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
+		reportingDataProcessing.runProcessMain(fileUtilsInterface,
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
+	}
+
+	@When("We launch reporting data service with genesis input path with mode {string}")
+	public void launch_reporting_data_service(String modeParam) throws KraftwerkException {
+		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		reportingDataProcessing.runProcessGenesis(fileUtilsInterface, Mode.valueOf(modeParam),
+				FUNCTIONAL_TESTS_DIRECTORY,
+				campaignName,
+				reportingDataPathParam);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -234,7 +311,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -343,7 +420,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -487,7 +564,7 @@ public class MainDefinitions {
 		assertThat(nbVariables).isEqualTo(nbVariablesExpected);
 	}
 
-	@And("We should have {int} of type STRING")
+	@Then("We should have {int} of type STRING")
 	public void check_string_variables_count(int nbStringVariablesExpected) {
 		String mode = userInputs.getModes().getFirst();
 		int nbStringVariables = metadataModelMap.get(mode).getVariables().getVariables().values().stream().filter(v -> v.getType()== VariableType.STRING).toArray().length;
@@ -514,7 +591,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		// Get reader to read the root table written in outputs
 		System.out.println("Check output file path : " + filePath);
@@ -538,7 +615,7 @@ public class MainDefinitions {
 
 		Path filePath = outputFiles == null ?
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME));
+				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
 		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
 			String line = bufferedReader.readLine();
@@ -644,6 +721,50 @@ public class MainDefinitions {
 			Assertions.assertThat(resultSet.next()).isTrue();
 			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
 		}
+	}
+
+	@Then("We should not be able to read the csv output file")
+	public void check_csv_encrypted() throws IOException, CsvValidationException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
+		Assertions.assertThat(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
+		).doesNotExist();
+
+		CSVReader csvReader = getCSVReader(
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
+		);
+		try{
+			String[] header = csvReader.readNext();
+			Assertions.assertThat(header).doesNotContain(Constants.ROOT_IDENTIFIER_NAME);
+		}catch (CsvMalformedLineException e){
+			//Accepted exception
+			Assertions.assertThat(e).isInstanceOf(CsvMalformedLineException.class);
+		}
+	}
+
+	@Then("We should not be able to read the parquet output file")
+	public void check_parquet_encrypted() throws SQLException {
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Path filePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet");
+		Assertions.assertThat(filePath).doesNotExist();
+
+		Path encryptedFilePath =
+				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
+						".parquet.enc");
+		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
+		try (Statement statement = database.createStatement()) {
+			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
+		}
+	}
+
+	@Then("The output file {string} should not exist")
+	public void check_file_not_exist(String outputFileName) {
+		// Go to first datetime folder
+		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+		Assertions.assertThat(executionOutDirectory.resolve(outputFileName)).doesNotExist();
 	}
 
 	@AfterAll

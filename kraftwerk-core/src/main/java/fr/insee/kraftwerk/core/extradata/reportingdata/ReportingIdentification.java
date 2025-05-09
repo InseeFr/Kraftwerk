@@ -14,6 +14,8 @@ public class ReportingIdentification {
     private String situation;
     private String category;
     private String occupant;
+    private String individualStatus;
+    private String interviewerCanProcess;
 
     public String getOutcomeSpotting(){
         if (StringUtils.isEmpty(identification)){return null;}

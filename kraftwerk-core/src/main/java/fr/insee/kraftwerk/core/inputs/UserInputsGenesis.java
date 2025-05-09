@@ -85,7 +85,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * Find the DDI file in the folder of a campaign
 	 * @param specDirectory directory where the DDI file should be
 	 * @return Path of the DDI file
-	 * @throws IOException – if an I/O error is thrown when accessing the starting file
+	 * @throws KraftwerkException – if an error is thrown when accessing the starting file
 	 */
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException {
 		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.DDI_FILE_REGEX));
@@ -95,7 +95,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * Find the Lunatic file in the folder of a campaign
 	 * @param specDirectory  directory where the Lunatic file should be
 	 * @return Path of the Lunatic file
-	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
+	 * @throws KraftwerkException  – if an error is thrown when accessing the starting file
 	 */
 	public Path findLunaticFile(Path specDirectory) throws KraftwerkException {
 		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.LUNATIC_FILE_REGEX));

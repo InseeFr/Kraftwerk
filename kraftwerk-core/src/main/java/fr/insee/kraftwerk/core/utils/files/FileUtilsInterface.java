@@ -25,6 +25,13 @@ public interface FileUtilsInterface {
         return transformToOther(inDirectory, "out").resolve(localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN)));
     }
 
+    static Path transformToOut(Path inDirectory, LocalDateTime localDateTime, String outDirectorySuffix) {
+        return transformToOther(inDirectory, "out").resolve(
+                localDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN))
+                + outDirectorySuffix
+        );
+    }
+
     /**
      * Change /some/path/in/campaign-name to /some/path/temp/campaign-name
      */
@@ -58,6 +65,14 @@ public interface FileUtilsInterface {
      * @param replace true if overwrite, false if append
      */
     void writeFile(String path, String toWrite, boolean replace);
+
+    /**
+     * Write stream into a file
+     * @param path path of the destination file
+     * @param inputStream String to write
+     * @param replace true if overwrite, false if append
+     */
+    void writeFile(String path, InputStream inputStream, boolean replace);
 
     /**
      * Move file from local file system to another path

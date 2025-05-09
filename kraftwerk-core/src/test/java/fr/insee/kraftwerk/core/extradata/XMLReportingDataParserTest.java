@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.extradata;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingDataUE;
@@ -19,13 +20,14 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class XMLReportingDataParserTest {
 
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
 	@Test
-	void parseReportingDataTest() throws NullException {
+	void parseReportingDataTest() throws KraftwerkException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -43,9 +45,9 @@ class XMLReportingDataParserTest {
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
 		assertEquals("ANV", reportingData.getListReportingDataUE().get(0).getStates().get(1).getStateType());
-		// Check the reporting data is correctly translated in the output
-		assertEquals("Affectée, non visible enquêteur", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
-		assertEquals("UE finalisée", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
+		// Check the reporting data is correctly reported in the output (no more transformation of modalities)
+		assertEquals("ANV", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue("STATE_2"));
+		assertEquals("FIN", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + "TNL1102000275").getValue(Constants.LAST_STATE_NAME));
 
 		// Null interviewrIds checks
 		//Check interviewerId placeholder value on TNL1102000278
@@ -63,7 +65,7 @@ class XMLReportingDataParserTest {
 	}
 
 	@Test
-	void parseMoogReportingDataTest() throws NullException {
+	void parseMoogReportingDataTest() throws KraftwerkException {
 		XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
 
 		SurveyRawData data = SurveyRawDataTest.createFakePapiSurveyRawData();
@@ -82,8 +84,8 @@ class XMLReportingDataParserTest {
 		// Check the reporting data's values are well captured
 		// Second state of the first UE
 		assertEquals("REFUSAL", reportingData.getListReportingDataUE().getFirst().getStates().get(1).getStateType());
-		// Check the reporting data is correctly translated in the output
-		assertEquals("Questionnaire initialisé", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + interrogationId).getValue("STATE_1"));
+		// Check the reporting data is correctly reported in the output (no more transformation of modalities)
+		assertEquals("INITLA", questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + interrogationId).getValue("STATE_1"));
 
 
 
