@@ -65,12 +65,13 @@ public class WriterSequence {
 	public void writeCsvFiles(Path inDirectory,
 							  String outDirectorySuffix,
 							  VtlBindings vtlBindings,
+							  KraftwerkExecutionContext kraftwerkExecutionContext,
 							  Statement database,
 							  FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		//Write CSV
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
 		/* Step 5.1 : write csv output tables */
-		OutputFiles csvOutputFiles = outputFilesFactory.createCsv(outDirectory, vtlBindings, new ArrayList<>(), database, fileUtilsInterface,null);
+		OutputFiles csvOutputFiles = outputFilesFactory.createCsv(outDirectory, vtlBindings, new ArrayList<>(), database, fileUtilsInterface,kraftwerkExecutionContext);
 		csvOutputFiles.writeOutputTables();
 	}
 

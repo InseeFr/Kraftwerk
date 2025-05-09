@@ -287,6 +287,7 @@ public class MainDefinitions {
 	public void launch_reporting_data_service() throws KraftwerkException {
 		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 		ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 		reportingDataProcessing.runProcessMain(fileUtilsInterface,
 				FUNCTIONAL_TESTS_DIRECTORY,
 				campaignName,

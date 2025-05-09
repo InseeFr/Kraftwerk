@@ -76,11 +76,12 @@ public class ReportingDataProcessing {
                 vtlBindings,
                 new MetadataModel(),
                 fileUtilsInterface);
+        KraftwerkExecutionContext context = new KraftwerkExecutionContext("",false,true,false,0L);
         dataProcessing.applyVtlTransformations(
                 Constants.REPORTING_DATA_GROUP_NAME,
                 Path.of(Constants.VTL_FOLDER_PATH)
                         .resolve("reporting_datas.vtl"),
-                null);
+                context);
 
         try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
             try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
@@ -90,6 +91,7 @@ public class ReportingDataProcessing {
                 writerSequence.writeCsvFiles(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
+                        context,
                         writeDatabase,
                         fileUtilsInterface
                 );

@@ -13,9 +13,9 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding interrogationId
       |ReportingDataFile                  |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |75                                |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |75                                |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |31                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |84                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |84                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |40                                |
 
 
 
@@ -90,7 +90,7 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
 
     Examples:
     # Parameters :
@@ -106,7 +106,7 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
 
     Examples:
     # Parameters :
@@ -125,8 +125,8 @@ Feature: Do we save correctly all reporting data ?
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
@@ -137,8 +137,8 @@ Feature: Do we save correctly all reporting data ?
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service with genesis input path with mode "TEL"
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the identification field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the outcome_spotting field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
