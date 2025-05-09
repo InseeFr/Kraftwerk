@@ -61,13 +61,12 @@ public class ReportingDataService extends KraftwerkService{
     public ResponseEntity<String> processReportingDataGenesis(
             @Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE)
             @RequestBody String campaignId,
-            @Parameter(description = "${param.reportingDataFilePath}", required = true)
-            @RequestParam String reportingDataFilePath,
+            @RequestParam String reportingDataFileName,
             @Parameter(description = "${param.dataMode}", required = true)
             @RequestParam Mode mode
     ){
         FolderSystem folderSystem = FolderSystem.GENESIS;
-        return launchReportingDataProcessing(reportingDataFilePath, campaignId, folderSystem, mode);
+        return launchReportingDataProcessing("reporting/"+reportingDataFileName, campaignId, folderSystem, mode);
     }
 
     private ResponseEntity<String> launchReportingDataProcessing(String reportingDataFilePath, String campaignId,
