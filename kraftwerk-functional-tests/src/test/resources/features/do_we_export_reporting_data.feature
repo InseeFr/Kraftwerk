@@ -177,11 +177,11 @@ Feature: Do we save correctly all reporting data ?
   Scenario Outline: Does the identification configuration, individual status and can process variables are exported correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
-    Then In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedIdentificationConfiguration>" in the "IdentificationConfiguration" field
+    Then In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedTypeSpotting>" in the "TYPE_SPOTTING" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "individualStatus" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "interviewerCanProcess" field
     Examples:
-      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedIdentificationConfiguration | ExpectedIndividualStatus | ExpectedInterviewerCanProcess |
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedTypeSpotting                | ExpectedIndividualStatus | ExpectedInterviewerCanProcess |
       |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   | INDTEL                              | SAME_ADDRESS             |                               |
       |SAMPLETEST-REPORTINGDATA-V4      |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    | INDTEL                              | OTHER_ADDRESS            |                               |
       |SAMPLETEST-REPORTINGDATA-V5      |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     | INDF2F                              | SAME_ADDRESS             |                               |
