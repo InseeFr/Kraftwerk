@@ -86,7 +86,7 @@ Feature: Do we save correctly all reporting data ?
       |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
       |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002         |5                            |WFT              |
 
-  Scenario Outline: Does the variables are computed correctly
+  Scenario Outline: Does the identification variables are computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
@@ -142,6 +142,23 @@ Feature: Do we save correctly all reporting data ?
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
       |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           | TEST                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+
+  Scenario Outline: Reporting data new variables export
+    Given Step 0 : We have some survey in directory "<Directory>"
+    And We have reporting data file in "<ReportingDataFile>"
+    When We launch reporting data service
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoGrap>" in the "NoGrap" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoLog>" in the "NoLog" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNole>" in the "Nole" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
+    Examples:
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate | ExpectedOccupant |
+      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          | IDENTIFIED       |
+      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |                  |
+      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |                  |
 
   Scenario Outline: Reporting data only export (genesis paths)
     Given Step 0 : We have some survey in directory "<Directory>"
