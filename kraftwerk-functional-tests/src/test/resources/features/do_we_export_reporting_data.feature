@@ -86,12 +86,14 @@ Feature: Do we save correctly all reporting data ?
       |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId |ExpectedSpecificStatusCount  |ExpectedStatus   |
       |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv     |0000002         |5                            |WFT              |
 
-  Scenario Outline: Does the new variables are computed correctly
+  Scenario Outline: Does the variables are computed correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
-
+    And In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedTypeSpotting>" in the "TYPE_SPOTTING" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "individualStatus" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "interviewerCanProcess" field
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
@@ -99,8 +101,15 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                         |
+      |ReportingDataFile                  |Directory                         |OutputFileName                                    |InterrogationId   |ExpectedIdentification | ExpectedTypeSpotting   | ExpectedIndividualStatus | ExpectedInterviewerCanProcess |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2       |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                |                        |                          |                               |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    |                       | INDTEL                 | OTHER_ADDRESS            |                               |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   |                       | INDTEL                 | SAME_ADDRESS             |                               |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     |                       | INDF2F                 | SAME_ADDRESS             |                               |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     |                       | INDF2F                 | OTHER_ADDRESS            | YES                           |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     |                       | INDF2F                 | OTHER_ADDRESS            | NO                            |
+
+
 
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly using a standard VTL file
     Given Step 0 : We have some survey in directory "<Directory>"
