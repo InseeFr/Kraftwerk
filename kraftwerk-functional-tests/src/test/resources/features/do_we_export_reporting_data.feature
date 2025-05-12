@@ -126,7 +126,9 @@ Feature: Do we save correctly all reporting data ?
     When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "identification"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "outcome_spotting"
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
@@ -138,7 +140,9 @@ Feature: Do we save correctly all reporting data ?
     When We launch reporting data service with genesis input path with mode "TEL"
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "identification"
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "outcome_spotting"
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |

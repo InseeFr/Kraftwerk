@@ -95,6 +95,12 @@ public class ReportingDataProcessing {
                         writeDatabase,
                         fileUtilsInterface
                 );
+                writerSequence.writeParquetFiles(inOrSpecDirectory,
+                        "_REPORTING_DATA_ONLY",
+                        vtlBindings,
+                        writeDatabase,
+                        fileUtilsInterface
+                );
             }
         }catch (SQLException e){
             log.error(e.toString());

@@ -90,4 +90,15 @@ public class WriterSequence {
 		parquetOutputFiles.writeOutputTables();
 		parquetOutputFiles.writeImportScripts(metadataModels, kraftwerkExecutionContext);
 	}
+
+	public void writeParquetFiles(Path inDirectory,
+								  String outDirectorySuffix,
+								  VtlBindings vtlBindings,
+								  Statement database,
+								  FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		/* Step 5.3 : write parquet output tables */
+		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
+		OutputFiles parquetOutputFiles = new ParquetOutputFiles(outDirectory, vtlBindings,  new ArrayList<>(), database, fileUtilsInterface);
+		parquetOutputFiles.writeOutputTables();
+	}
 }

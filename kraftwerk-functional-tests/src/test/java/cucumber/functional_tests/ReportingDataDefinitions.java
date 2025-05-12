@@ -9,7 +9,9 @@ import com.opencsv.exceptions.CsvValidationException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
 import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
+import fr.insee.kraftwerk.core.utils.SqlUtils;
 import io.cucumber.java.en.Then;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,6 +19,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -368,5 +374,35 @@ public class ReportingDataDefinitions {
                 i++;
             }
         }
+    }
+    
+    @Then("In parquet reporting data file in directory {string} for interrogationId {string} we should have " +
+            "value {string} for field {string}")
+    public void check_parquet_output_loop_table(String directory,
+                                                String interrogationId,
+                                                String expectedValue,
+                                                String fieldName) throws SQLException {
+        Path directoryPath = outDirectory.resolve(directory);
+        Path executionOutDirectory = directoryPath
+                        .resolve(Objects.requireNonNull(new File(String.valueOf(directoryPath)).listFiles(File::isDirectory))[0].getName());
+        Path filePath = executionOutDirectory.resolve(directory + "_REPORTINGDATA.parquet");
+        Connection database = SqlUtils.openConnection();
+        try (Statement statement = database.createStatement()) {
+            SqlUtils.readParquetFile(statement, filePath);
+            //Select concerned line from database
+            ResultSet resultSet = statement.executeQuery(
+                    ("SELECT %s " +
+                            "FROM '%s' " +
+                            "WHERE %s = '%s'").formatted(
+                            fieldName,
+                            directory + "_REPORTINGDATA",
+                            Constants.ROOT_IDENTIFIER_NAME,
+                            interrogationId
+                    )
+            );
+            Assertions.assertThat(resultSet.next()).isTrue();
+            Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
+        }
+        database.close();
     }
 }
