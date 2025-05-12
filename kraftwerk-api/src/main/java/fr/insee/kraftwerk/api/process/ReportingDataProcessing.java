@@ -14,9 +14,9 @@ import fr.insee.kraftwerk.core.parsers.DataFormat;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
 import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.Getter;
@@ -88,16 +88,11 @@ public class ReportingDataProcessing {
                 InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
                 insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
                 WriterSequence writerSequence = new WriterSequence();
-                writerSequence.writeCsvFiles(inOrSpecDirectory,
+                writerSequence.writeOutputFiles(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
+                        modeInputs,
                         context,
-                        writeDatabase,
-                        fileUtilsInterface
-                );
-                writerSequence.writeParquetFiles(inOrSpecDirectory,
-                        "_REPORTING_DATA_ONLY",
-                        vtlBindings,
                         writeDatabase,
                         fileUtilsInterface
                 );
