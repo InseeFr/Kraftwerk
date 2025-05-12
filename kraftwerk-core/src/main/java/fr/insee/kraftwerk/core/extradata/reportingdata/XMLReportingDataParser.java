@@ -198,6 +198,10 @@ public class XMLReportingDataParser extends ReportingDataParser {
             reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
         }
 
+        if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null) {
+            reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+        }
+
         if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null) {
             reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
         }
