@@ -129,6 +129,8 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     When Step 1 : We launch main service
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
+
 
     Examples:
     # Parameters :
@@ -137,8 +139,10 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification          |
-      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                         |
+      |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedIdentification | ExpectedOccupant |
+      |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                |                  |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       |IDENTIFIED             | IDENTIFIED       |
+
 
 
   Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly
@@ -168,12 +172,11 @@ Feature: Do we save correctly all reporting data ?
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
     Examples:
-      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate | ExpectedOccupant |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          | IDENTIFIED       |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |                  |
-      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |                  |
+      |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |
+      |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |
 
   Scenario Outline: Does the identification configuration, individual status and can process variables are exported correctly
     Given Step 0 : We have some survey in directory "<Directory>"
