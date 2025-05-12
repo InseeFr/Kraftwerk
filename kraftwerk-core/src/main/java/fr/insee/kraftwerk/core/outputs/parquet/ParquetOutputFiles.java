@@ -70,6 +70,19 @@ public class ParquetOutputFiles extends OutputFiles {
 	}
 
 
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 * Method to write output tables from datasets that are in the bindings.
+	 */
+	@Override
+	public void writeOutputTablesV2() throws KraftwerkException {
+		//No changes between V1 & V2 for parquet files
+		writeOutputTables();
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
+
 	@Override
 	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		// Assemble required info to write scripts

@@ -84,4 +84,14 @@ public abstract class OutputFiles {
 		// implemented in subclasses
 	}
 
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 * Method to write output tables from datasets that are in the bindings.
+	 */
+	public void writeOutputTablesV2() throws KraftwerkException {
+		// implemented in subclasses
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
 }
