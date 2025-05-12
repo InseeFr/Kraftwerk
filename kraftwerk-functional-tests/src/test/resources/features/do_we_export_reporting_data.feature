@@ -94,6 +94,9 @@ Feature: Do we save correctly all reporting data ?
     And In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedTypeSpotting>" in the "TYPE_SPOTTING" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "individualStatus" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "interviewerCanProcess" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
+
+
     Examples:
     # Parameters :
     # - Directory : Directory of test campaigns
@@ -101,13 +104,14 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |ReportingDataFile                  |Directory                         |OutputFileName                                    |InterrogationId   |ExpectedIdentification | ExpectedTypeSpotting   | ExpectedIndividualStatus | ExpectedInterviewerCanProcess |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2       |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                |                        |                          |                               |
-      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    |                       | INDTEL                 | OTHER_ADDRESS            |                               |
-      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   |                       | INDTEL                 | SAME_ADDRESS             |                               |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     |                       | INDF2F                 | SAME_ADDRESS             |                               |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     |                       | INDF2F                 | OTHER_ADDRESS            | YES                           |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     |                       | INDF2F                 | OTHER_ADDRESS            | NO                            |
+      |ReportingDataFile                  |Directory                         |OutputFileName                                    |InterrogationId   |ExpectedIdentification | ExpectedTypeSpotting   | ExpectedIndividualStatus | ExpectedInterviewerCanProcess | ExpectedOccupant |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2       |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                |                        |                          |                               |                  |
+      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3       |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       |IDENTIFIED             |                        |                          |                               | IDENTIFIED       |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    |                       | INDTEL                 | OTHER_ADDRESS            |                               |                  |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   |                       | INDTEL                 | SAME_ADDRESS             |                               |                  |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     |                       | INDF2F                 | SAME_ADDRESS             |                               |                  |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     |                       | INDF2F                 | OTHER_ADDRESS            | YES                           |                  |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     |                       | INDF2F                 | OTHER_ADDRESS            | NO                            |                  |
 
 
 
@@ -153,12 +157,11 @@ Feature: Do we save correctly all reporting data ?
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
     Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
     Examples:
-      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate | ExpectedOccupant |
-      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          | IDENTIFIED       |
-      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |                  |
-      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |                  |
+      |ReportingDataFile |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate |
+      |reporting_us.xml  |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          |
+      |reporting_us.xml  |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160878       | 3                | 2              | 1            |               | NPA                  | 2025-02-18-09-25-57      |
+      |reporting_us.xml  |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |79P10160880       | 0                | 0              | 0            |               | ROW                  | 2025-02-18-09-25-48      |
 
   Scenario Outline: Reporting data only export (genesis paths)
     Given Step 0 : We have some survey in directory "<Directory>"
