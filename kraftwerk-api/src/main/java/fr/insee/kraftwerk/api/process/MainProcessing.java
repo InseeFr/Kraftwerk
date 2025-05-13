@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.sequence.WriterSequence;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -31,13 +31,9 @@ import java.util.Map;
 public class MainProcessing {
 
 	private final ControlInputSequence controlInputSequence;
-	private final boolean fileByFile;
-	private final boolean withAllReportingData;
-	private final boolean withDDI;
 
 
 	/* SPECIFIC VARIABLES */
-	private final String inDirectoryParam;
 	@Getter
 	private Path inDirectory;
 	
@@ -46,7 +42,7 @@ public class MainProcessing {
 	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
-	private KraftwerkExecutionContext kraftwerkExecutionContext;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 	private final FileUtilsInterface fileUtilsInterface;
 
 	
@@ -56,26 +52,13 @@ public class MainProcessing {
 	@Getter
 	private Map<String, MetadataModel> metadataModels;
 
-	private final long limitSize;
-
-	public MainProcessing(String inDirectoryParam, boolean fileByFile,boolean withAllReportingData,boolean withDDI, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
+	public MainProcessing(
+			KraftwerkExecutionContext kraftwerkExecutionContext,
+			String defaultDirectory,
+			FileUtilsInterface fileUtilsInterface
+	) {
 		super();
-		this.inDirectoryParam = inDirectoryParam;
-		this.fileByFile = fileByFile;
-		this.withAllReportingData = withAllReportingData;
-		this.withDDI=withDDI;
-		this.limitSize = limitSize;
-		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
-		this.fileUtilsInterface = fileUtilsInterface;
-	}
-	
-	public MainProcessing(String inDirectoryParam, boolean fileByFile, String defaultDirectory, long limitSize, FileUtilsInterface fileUtilsInterface) {
-		super();
-		this.inDirectoryParam = inDirectoryParam;
-		this.fileByFile = fileByFile;
-		this.withAllReportingData = !fileByFile;
-		this.withDDI=true;
-		this.limitSize = limitSize;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 		controlInputSequence = new ControlInputSequence(defaultDirectory, fileUtilsInterface);
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
@@ -109,28 +92,29 @@ public class MainProcessing {
 
 	/* Step 1 : Init */
 	public void init() throws KraftwerkException {
-		kraftwerkExecutionContext = new KraftwerkExecutionContext(); //Init logger
-
-		inDirectory = controlInputSequence.getInDirectory(inDirectoryParam);
+		inDirectory = controlInputSequence.getInDirectory(kraftwerkExecutionContext.getInDirectoryParam());
 
 		String campaignName = inDirectory.getFileName().toString();
 		log.info("Kraftwerk main service started for campaign: {}", campaignName);
 
 		userInputsFile = controlInputSequence.getUserInputs(inDirectory, fileUtilsInterface);
 
-		metadataModels = withDDI ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface) : MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap(), fileUtilsInterface);
+		metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(),
+				fileUtilsInterface) :
+				MetadataUtils.getMetadataFromLunatic(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 
-		userInputsFileList = getUserInputsFile(userInputsFile, fileByFile);
+		userInputsFileList = getUserInputsFile(userInputsFile, kraftwerkExecutionContext.isFileByFile());
 
 		// Check size of data files and throw an exception if it is too big .Limit is 400 Mo for one processing (one file or data folder if not file by file).
 		//In case of file-by-file processing we check the size of each file.
-		if (Boolean.TRUE.equals(fileByFile)) {
+		if (Boolean.TRUE.equals(kraftwerkExecutionContext.isFileByFile())) {
 			for (UserInputsFile userInputs : userInputsFileList) {
-				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than 400Mo.", limitSize);
+				isDataTooBig(userInputs,"At least one file size is greater than 400Mo. Split data files greater than " +
+						"400Mo.", kraftwerkExecutionContext.getLimitSize());
 			}
 		}else{
 			//In case of main processing we check the folder
-			isDataTooBig(userInputsFile,"Data folder size is greater than 400Mo. Use file-by-file processing.", limitSize);
+			isDataTooBig(userInputsFile,"Data folder size is greater than 400Mo. Use file-by-file processing.", kraftwerkExecutionContext.getLimitSize());
 		}
 
 
@@ -139,10 +123,11 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws KraftwerkException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(withAllReportingData, fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
-			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, withDDI, kraftwerkExecutionContext);
+			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, kraftwerkExecutionContext.isWithDDI(),
+					kraftwerkExecutionContext);
 			UnimodalSequence unimodal = new UnimodalSequence();
 			unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, kraftwerkExecutionContext,
 					metadataModels,

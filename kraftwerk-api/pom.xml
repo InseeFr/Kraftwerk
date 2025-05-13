@@ -29,6 +29,7 @@
 			</exclusions>
 		</dependency>
 
+
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -81,6 +82,42 @@
 					<layout>JAR</layout>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<printSummary>true</printSummary>
+					<includes>
+						<include>**Test.java</include>
+					</includes>
+					<excludes>
+						<exclude>**IntegrationTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>with-encryption</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>fr.insee.kraftwerk</groupId>
+					<artifactId>kraftwerk-encryption</artifactId>
+					<version>${kraftwerk.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>ci-public</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<!-- Does not include  kraftwerk-encryption-->
+		</profile>
+	</profiles>
 </project>

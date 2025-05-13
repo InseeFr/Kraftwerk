@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 @Getter
 public class ReportingDataUE {
   private String identifier;
+
+  private String identificationConfiguration;
   
   private List<State> states;
   
@@ -30,6 +32,7 @@ public class ReportingDataUE {
   private List<Comment> comments;
 
   private Long surveyValidationDateTimeStamp;
+  private ReportingDataClosingCause reportingDataClosingCause;
   
   public ReportingDataUE() {
     this.states = new ArrayList<>();
