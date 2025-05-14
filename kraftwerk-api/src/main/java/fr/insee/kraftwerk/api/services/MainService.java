@@ -153,7 +153,6 @@ public class MainService extends KraftwerkService {
 
 	@NotNull
 	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
-		long totalDurationStartTimeStamp = System.currentTimeMillis();
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
@@ -165,9 +164,6 @@ public class MainService extends KraftwerkService {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		long totalDurationEndTimeStamp = System.currentTimeMillis();
-		long totalDurationDeltaTimeStamp = totalDurationEndTimeStamp - totalDurationStartTimeStamp;
-		log.info("=================== TOTAL DURATION (runWithGenesis) =================== : {}", totalDurationDeltaTimeStamp);
 		return ResponseEntity.ok(campaignId);
 	}
 
@@ -178,7 +174,6 @@ public class MainService extends KraftwerkService {
 	 */
 	@NotNull
 	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, int batchSize, int workersNumbers, int workerId) {
-		long totalDurationV2StartTimeStamp = System.currentTimeMillis();
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, fileUtilsInterface);
@@ -190,9 +185,6 @@ public class MainService extends KraftwerkService {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		long totalDurationV2EndTimeStamp = System.currentTimeMillis();
-		long totalDurationV2DeltaTimeStamp = totalDurationV2EndTimeStamp - totalDurationV2StartTimeStamp;
-		log.info("=================== TOTAL DURATION (runWithGenesisV2) ================= : {}", totalDurationV2DeltaTimeStamp);
 		return ResponseEntity.ok(campaignId);
 	}
 	//========= OPTIMISATIONS PERFS (END) ==========
