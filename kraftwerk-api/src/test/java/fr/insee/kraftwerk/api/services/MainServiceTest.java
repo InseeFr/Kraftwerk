@@ -396,6 +396,78 @@ class MainServiceTest {
         assertEquals("IO error", response.getBody());
     }
 
+
+    //========= OPTIMISATIONS PERFS (START) ==========
+    /**
+     * @author Adrien Marchal
+     */
+    /*** Main Genesis ***/
+
+    @Test
+    void testMainGenesisV2_Success() throws Exception {
+        String idCampaign = "test-campaign-id";
+
+        // Mock the dependencies
+        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
+        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doNothing().when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
+
+        // WHEN
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+
+        // THEN
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(idCampaign, response.getBody());
+    }
+
+    @Test
+    void testMainGenesisV2_KraftwerkException() throws Exception {
+        String idCampaign = "test-campaign-id";
+        KraftwerkException exception = new KraftwerkException( HttpStatus.BAD_REQUEST.value(), "Kraftwerk error");
+
+
+        // Mock the dependencies
+        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
+        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
+
+        // WHEN
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Kraftwerk error", response.getBody());
+    }
+
+    @Test
+    void testMainGenesisV2_IOException() throws Exception {
+        String idCampaign = "test-campaign-id";
+        IOException exception = new IOException("IO error");
+
+        // Mock the dependencies
+        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
+        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        mainService  = Mockito.spy(new MainService(configProperties,minioConfig));
+        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),any(FileUtilsInterface.class));
+        doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
+
+        // WHEN
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+
+        // THEN
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("IO error", response.getBody());
+    }
+    //========= OPTIMISATIONS PERFS (END) ==========
+
+
     /*** Main Genesis Lunatic Only***/
 
     @Test

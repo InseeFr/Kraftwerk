@@ -151,14 +151,11 @@ public class CsvOutputFiles extends OutputFiles {
 				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
-				if(!boolColumnNames.isEmpty()) {
-					log.warn("boolColumns NOT EMPTY !");
-				}
 
 				//!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
 				String[] regExPatternsTab = regExPatterns(columnNames, boolColumnNames, boolColumnIndexes);
-				log.info(String.format("sbRegExPatternToFind : %s", regExPatternsTab[0]));
-				log.info(String.format("sbRegExPatternReplacement : %s", regExPatternsTab[1]));
+				log.info("sbRegExPatternToFind : {}", regExPatternsTab[0]);
+				log.info("sbRegExPatternReplacement : {}", regExPatternsTab[1]);
 
 
 				//In order to be aware of the process progress, we count how much lines the file contains & how many blocks must be processed
@@ -168,10 +165,9 @@ public class CsvOutputFiles extends OutputFiles {
 					while (bufferedReader.readLine() != null) {
 						totalLinesNumber++;
 					}
-					bufferedReader.close();
-				}
+                }
 				int totalBlocksNumber = totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK == 0 ? 1 : totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK;
-				log.info(String.format("%s lines (%s blocks)", totalLinesNumber, totalBlocksNumber));
+				log.info("{} lines ({} blocks)", totalLinesNumber, totalBlocksNumber);
 
 				// => READING DATA FROM ".tmpdata" file BY BLOCK OF 50 LINES AND WRITING FORMATTED DATA INTO ".tmp" file
 				int currentBlockNumber = 1;
@@ -195,14 +191,12 @@ public class CsvOutputFiles extends OutputFiles {
 						//process "sbInput" when block is full
 						else {
 							// => WRITE CASE INTO OUTPUT FILE (".tmp" file)
-							log.info(String.format("Processing %s / %s (line %s read)", currentBlockNumber, totalBlocksNumber, currentReadLine));
-							String result = null;
+							log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
+							String result;
 
 							Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
 							Matcher m0 = p0.matcher(sbInput.toString());
-							//System.out.println("Original String0: " + sbInput.toString()); //For debug purposes
 							result = m0.replaceAll(regExPatternsTab[1]);
-							//System.out.println("Modified String0: " + result); //For debug purposes
 
 							//free RAM as soon as possible -> empty "sbInput"
 							sbInput.delete(0, sbInput.length());
@@ -215,23 +209,17 @@ public class CsvOutputFiles extends OutputFiles {
 								//1) Process empty entries in boolean columns
 								Pattern p1 = Pattern.compile("\"######\"", Pattern.CASE_INSENSITIVE);
 								Matcher m1 = p1.matcher(result);
-								//System.out.println("Original String1: " + result); //For debug purposes
 								result = m1.replaceAll("\"\"");
-								//System.out.println("Modified String1: " + result); //For debug purposes
 
 								//2) process "true" values
 								Pattern p2 = Pattern.compile("\"###true###\"", Pattern.CASE_INSENSITIVE);
 								Matcher m2 = p2.matcher(result);
-								//System.out.println("Original String2: " + result); //For debug purposes
 								result = m2.replaceAll("1");
-								//System.out.println("Modified String2: " + result); //For debug purposes
 
 								//3) process "false" values
 								Pattern p3 = Pattern.compile("\"###false###\"", Pattern.CASE_INSENSITIVE);
 								Matcher m3 = p3.matcher(result);
-								//System.out.println("Original String3: " + result); //For debug purposes
 								result = m3.replaceAll("0");
-								//System.out.println("Modified String3: " + result); //For debug purposes
 							}
 
 							Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
@@ -249,7 +237,7 @@ public class CsvOutputFiles extends OutputFiles {
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
 				//Move to output folder
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
-				log.info(String.format("File: %s successfully written", outputFile));
+				log.info("File: {} successfully written", outputFile);
 				//Count rows for functional log
 				if (kraftwerkExecutionContext != null) {
 					try(ResultSet countResult =
