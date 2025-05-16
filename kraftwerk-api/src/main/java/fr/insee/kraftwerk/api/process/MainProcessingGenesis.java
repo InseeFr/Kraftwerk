@@ -72,7 +72,6 @@ public class MainProcessingGenesis {
 	}
 
 	public void init(String campaignId) throws KraftwerkException {
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
 				? "with DDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
