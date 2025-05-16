@@ -116,6 +116,7 @@ public class MainProcessingGenesis {
 				int nbPartitions = listIds.size();
 				int indexPartition = 1;
 				for (List<InterrogationId> listId : listIds) {
+					log.info("=============== PROCESS BLOCK N°{} ==============", indexPartition);
 					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
 					log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
 					vtlBindings = new VtlBindings();
@@ -134,6 +135,72 @@ public class MainProcessingGenesis {
 		}
 		SqlUtils.deleteDatabaseFile(databasePath);
 	}
+
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	public void runMainV2(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
+		log.info("(V2) Batch size of interrogations retrieved from Genesis: {}", batchSize);
+		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
+				campaignId));
+		//We delete database at start (in case there is already one)
+		SqlUtils.deleteDatabaseFile(databasePath);
+		init(campaignId);
+		//Try with resources to close database when done
+		try (Connection tryDatabase = config.isDuckDbInMemory() ?
+				SqlUtils.openConnection()
+				: SqlUtils.openConnection(Path.of(databasePath))) {
+			if(tryDatabase == null){
+				throw new KraftwerkException(500,"Error during internal database creation");
+			}
+			this.database = tryDatabase.createStatement();
+
+			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
+			if (questionnaireModelIds.isEmpty()) {
+				throw new KraftwerkException(204, null);
+			}
+
+			for (String questionnaireId : questionnaireModelIds) {
+				//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
+				long totalSize = client.countInterrogationIds(questionnaireId);
+				//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
+				long blockNb = totalSize < batchSize ? 1 : totalSize / batchSize;
+				log.info("====> (V2) BLOCKS NUMBER TO PROCESS for questionnaireId {} : {}", questionnaireId, blockNb);
+
+				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
+
+				for (int indexPartition = 0; indexPartition < blockNb; indexPartition++) {
+					log.info("=============== (V2) PROCESS BLOCK N°{} ==============", indexPartition);
+
+					//USING PAGINATION INSTEAD
+					List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, workersNumbers, workerId,
+																					batchSize, indexPartition);
+
+					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
+					//Free RAM with unused List in the rest of the loop.
+					ids = null;
+
+					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, blockNb);
+					vtlBindings = new VtlBindings();
+
+					unimodalProcess(suLatest);
+					multimodalProcess();
+					insertDatabase();
+				}
+			}
+			outputFileWriterV2();
+			writeErrors();
+			if (!database.isClosed()){database.close();}
+		}catch (SQLException e){
+			log.error(e.toString());
+			throw new KraftwerkException(500,"SQL error");
+		}
+		SqlUtils.deleteDatabaseFile(databasePath);
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
@@ -162,6 +229,17 @@ public class MainProcessingGenesis {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
+
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	/* Step 5 : Write output files */
+	private void outputFileWriterV2() throws KraftwerkException {
+		WriterSequence writerSequence = new WriterSequence();
+		writerSequence.writeOutputFilesV2(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {

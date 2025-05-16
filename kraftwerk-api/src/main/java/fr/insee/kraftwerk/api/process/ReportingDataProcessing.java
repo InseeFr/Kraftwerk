@@ -88,7 +88,17 @@ public class ReportingDataProcessing {
                 InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
                 insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
                 WriterSequence writerSequence = new WriterSequence();
+                /*
                 writerSequence.writeOutputFiles(inOrSpecDirectory,
+                        "_REPORTING_DATA_ONLY",
+                        vtlBindings,
+                        modeInputs,
+                        context,
+                        writeDatabase,
+                        fileUtilsInterface
+                );
+                */
+                writerSequence.writeOutputFilesV2(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
                         modeInputs,

@@ -115,5 +115,16 @@ class MainProcessingGenesisTest {
         assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
     }
 
+    //========= OPTIMISATIONS PERFS (START) ==========
+    /**
+     * @author Adrien Marchal
+     */
+    @Test
+    void testRunMainV2Ok() {
+        String idCampaign = "campaign1";
+        assertDoesNotThrow(() -> mainProcessing.runMainV2(idCampaign, 100, 1, 1));
+    }
+    //========= OPTIMISATIONS PERFS (END) ==========
+
 
 }
