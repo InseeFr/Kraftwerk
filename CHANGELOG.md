@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.3.4 [2025-04-29}
+### Fixed
+- Resolve problem concerning the reading of vtl files on MinIo
+
+## 3.3.3 [2025-04-25]
+### Added
+- Add possibility to read VTL script when using Genesis data
+
+### Updated
+- springboot 3.4.5
+- commons-collections4 4.5.0
+- duckdb 1.2.2.0
+- pitest-maven 1.9.1
+- jacoco-maven-plugin 0.8.13
+
 ## 3.3.2 [2025-03-25]
 ### Fixed
 - Bug with scheduler : add a role for it

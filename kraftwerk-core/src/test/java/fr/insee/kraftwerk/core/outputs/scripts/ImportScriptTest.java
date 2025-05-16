@@ -10,13 +10,14 @@ import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.dataprocessing.GroupProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.vtl.model.Dataset;
@@ -51,7 +52,7 @@ public class ImportScriptTest {
 		metadata = new LinkedHashMap<>();
 	}
 
-	private void instantiateMap() {
+	private void instantiateMap() throws KraftwerkException {
 		metadata.put("CAWI", createCompleteFakeVariablesMap());
 		SurveyRawData srdWeb = SurveyRawDataTest.createFakeCawiSurveyRawData();
 		srdWeb.setMetadataModel(createCompleteFakeVariablesMap());
@@ -63,7 +64,7 @@ public class ImportScriptTest {
 		vtlExecute.convertToVtlDataset(srdPaper, "PAPI", vtlBindings);
 
 		// add group prefixes
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface);
 		groupProcessing.applyVtlTransformations("CAWI", null, kraftwerkExecutionContext);
 		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface);
@@ -73,9 +74,9 @@ public class ImportScriptTest {
 		tableScriptInfo = new TableScriptInfo("MULTIMODE", "TEST", dataStructure, metadata);
 		
 	}
-	
+
 	@Test
-	void getAllLengthTest() {
+	void getAllLengthTest() throws KraftwerkException {
 		instantiateMap();
 		Map<String, Variable> listVariables = ImportScript.getAllLength(dataStructure, metadata);
 		assertEquals("50", listVariables.get("LAST_NAME").getSasFormat());
@@ -104,7 +105,7 @@ public class ImportScriptTest {
 
 	@Test
 	void numberTypeInDatasets() {
-		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 		Dataset ds = new InMemoryDataset(
 				List.of(List.of(1L)),
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))

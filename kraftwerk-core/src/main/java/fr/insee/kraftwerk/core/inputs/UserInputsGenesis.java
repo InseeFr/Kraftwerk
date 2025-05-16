@@ -18,28 +18,26 @@ import java.util.List;
 @Log4j2
 public class UserInputsGenesis extends UserInputs{
 
-	private final boolean hasConfigFile;
-
 	private final List<Mode> modes;
 
-	public UserInputsGenesis(boolean hasConfigFile, Path specsDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
+	public UserInputsGenesis(Path specsDirectory, List<Mode> modes, FileUtilsInterface fileUtilsInterface, boolean withDDI) throws KraftwerkException {
 		super(specsDirectory, fileUtilsInterface);
-		this.hasConfigFile = hasConfigFile;
 		this.modes=modes;
 		computeInputs(withDDI);
 	}
 
 	private void computeInputs(boolean withDDI) throws KraftwerkException {
-        UserInputsFile userInputsFile;
-		if(hasConfigFile){
-            userInputsFile = new UserInputsFile(specsDirectory.resolve(Constants.USER_INPUT_FILE), specsDirectory, fileUtilsInterface);
-            modeInputsMap = userInputsFile.getModeInputsMap();
-		}else{
-            for (Mode mode : modes) {
-                ModeInputs modeInputs = getModeInputs(mode, withDDI);
-                modeInputsMap.put(mode.name(), modeInputs);
-            }
-        }
+		for (Mode mode : modes) {
+			ModeInputs modeInputs = getModeInputs(mode, withDDI);
+			modeInputsMap.put(mode.name(), modeInputs);
+		}
+		// Add user VTL script on final data (information levels step) if exists
+		try {
+			setVtlInformationLevelsFile(Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory),Constants.SCRIPT_FINAL_REGEX)));
+		} catch (KraftwerkException e) {
+			// Script is optional, if not found the program should continue normally
+			log.info("No final script found in specs directory");
+		}
 	}
 
     /**
@@ -62,51 +60,32 @@ public class UserInputsGenesis extends UserInputs{
             // Not implemented yet
             modeInputs.setDataFormat("OTHER");
         }
-        if (hasConfigFile) {
-            modeInputs.setModeVtlFile(getModeVtlFile(mode));
-        }
+		modeInputs.setModeVtlFile(getModeVtlFile(mode));
         return modeInputs;
     }
 
-    private Path getModeVtlFile(Mode mode) throws UnknownDataFormatException, MissingMandatoryFieldException, KraftwerkException {
-		Path userInputFile = inputDirectory.resolve(Constants.USER_INPUT_FILE);
+	/**
+	 * Build the path to the unimodal user script for the requested mode if it exists
+	 * @param mode mode requested
+	 * @return Path to the script
+	 */
+    private Path getModeVtlFile(Mode mode) {
 		try {
-			JsonNode userInputs = JsonReader.read(userInputFile, fileUtilsInterface);
-			JsonNode filesNode = userInputs.get("survey_data");
-			for (JsonNode fileNode : filesNode) {
-				String dataMode = readField(fileNode, "data_mode");
-				if (dataMode == null) {break;}
-				if (dataMode.equals(mode.name())) {
-					return fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
-				}
-			}
-		} catch (IOException e) {
-			log.error("Unable to read user input file: {} , {}", userInputFile, e);
-			throw new UnknownDataFormatException(e.getMessage());
-		}
-		return null;
+			return Path.of(fileUtilsInterface.findFile(String.valueOf(inputDirectory.resolve(mode.name())),Constants.SCRIPT_UNIMODAL_REGEX));
+		} catch (KraftwerkException e) {
+            return null;
+        }
 	}
 
 	public List<String> getModes() {
 		return new ArrayList<>(modeInputsMap.keySet());
 	}
 
-	private String readField(JsonNode node, String field) throws MissingMandatoryFieldException {
-		JsonNode value = node.get(field);
-		if (value != null) {
-			String text = value.asText();
-			if (!(text.isEmpty() || text.equals("null"))) {
-				return text;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Find the DDI file in the folder of a campaign
 	 * @param specDirectory directory where the DDI file should be
 	 * @return Path of the DDI file
-	 * @throws IOException – if an I/O error is thrown when accessing the starting file
+	 * @throws KraftwerkException – if an error is thrown when accessing the starting file
 	 */
 	public Path findDDIFile(Path specDirectory) throws KraftwerkException {
 		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.DDI_FILE_REGEX));
@@ -116,7 +95,7 @@ public class UserInputsGenesis extends UserInputs{
 	 * Find the Lunatic file in the folder of a campaign
 	 * @param specDirectory  directory where the Lunatic file should be
 	 * @return Path of the Lunatic file
-	 * @throws IOException  – if an I/O error is thrown when accessing the starting file
+	 * @throws KraftwerkException  – if an error is thrown when accessing the starting file
 	 */
 	public Path findLunaticFile(Path specDirectory) throws KraftwerkException {
 		return Path.of(fileUtilsInterface.findFile(String.valueOf(specDirectory),Constants.LUNATIC_FILE_REGEX));

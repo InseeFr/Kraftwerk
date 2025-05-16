@@ -1,15 +1,16 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.OutputFiles;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -34,7 +36,6 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
-	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -42,15 +43,9 @@ public class CsvOutputFiles extends OutputFiles {
 	 * @param outDirectory Out directory defined in application properties.
 	 * @param vtlBindings  Vtl bindings where datasets are stored.
 	 */
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
-		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
-		this.kraftwerkExecutionContext = null;
+	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext, EncryptionUtils encryptionUtils) {
+		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext, encryptionUtils);
 	}
-	public CsvOutputFiles(Path outDirectory, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, List<String> modes, Statement database, FileUtilsInterface fileUtilsInterface) {
-		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface);
-		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
-	}
-
 
 	/**
 	 * Method to write CSV output tables from datasets that are in the bindings.
@@ -61,7 +56,8 @@ public class CsvOutputFiles extends OutputFiles {
 			try {
 				//Temporary file
 				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
+						outputFileName(datasetName, kraftwerkExecutionContext), null);
 
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
@@ -100,18 +96,27 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
 
-				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
-				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
-				log.info(String.format("File: %s successfully written", outputFile));
-				//Count rows for functional log
+
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
 				if (kraftwerkExecutionContext != null) {
+					//Count rows for functional log
 					try(ResultSet countResult =
 								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
 						countResult.next();
                         kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
 					}
+
+					//Encrypt file if requested
+					if(kraftwerkExecutionContext.isWithEncryption()) {
+						InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
+						getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
+						log.info("File: {} successfully written and encrypted", outputFile);
+						continue; //Go to next dataset to write
+					}
 				}
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info("File: {} successfully written", outputFile);
 			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}
@@ -370,7 +375,7 @@ public class CsvOutputFiles extends OutputFiles {
 		// Assemble required info to write scripts
 		List<TableScriptInfo> tableScriptInfoList = new ArrayList<>();
 		for (String datasetName : getDatasetToCreate()) {
-			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName),
+			TableScriptInfo tableScriptInfo = new TableScriptInfo(datasetName, outputFileName(datasetName, kraftwerkExecutionContext),
 					getVtlBindings().getDataset(datasetName).getDataStructure(), metadataModels);
 			tableScriptInfoList.add(tableScriptInfo);
 		}
@@ -388,8 +393,11 @@ public class CsvOutputFiles extends OutputFiles {
 	 * Return the name of the file to be written from the dataset name.
 	 */
 	@Override
-	public String outputFileName(String datasetName) {
-		return getOutputFolder().getParent().getFileName() + "_" + datasetName + ".csv";
+	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
+		String output = getOutputFolder().getParent().getFileName() + "_" + datasetName + ".csv";
+		return kraftwerkExecutionContext.isWithEncryption() ?
+				output + encryptionUtils.getEncryptedFileExtension()
+				: output;
 	}
 
 }

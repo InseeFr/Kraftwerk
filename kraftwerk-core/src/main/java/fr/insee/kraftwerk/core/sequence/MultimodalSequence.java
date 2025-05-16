@@ -7,10 +7,11 @@ import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class MultimodalSequence {
 	
-	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
+	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */

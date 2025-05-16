@@ -2,10 +2,12 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,7 @@ class MultimodalSequenceTest {
     void setUp() {
         multimodalSequence = new MultimodalSequence();
         vtlBindings = new VtlBindings();
-        kraftwerkExecutionContext = new KraftwerkExecutionContext();
+        kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
         fileUtilsInterface = new FileSystemImpl("defaultDir") {
             @Override
             public Path getTempVtlFilePath(UserInputs inputs, String processName, String datasetName) {
@@ -48,7 +50,7 @@ class MultimodalSequenceTest {
     }
 
     @Test
-    void testMultimodalProcessing() {
+    void testMultimodalProcessing() throws KraftwerkException {
         // Vérifier que le dossier temporaire existe
         new File("target/tmp").mkdirs();
 

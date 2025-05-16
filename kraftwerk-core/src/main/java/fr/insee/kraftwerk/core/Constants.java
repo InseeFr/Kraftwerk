@@ -28,7 +28,10 @@ public final class Constants {
     private Constants() {}
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
-	public static final String USER_VTL_INPUT_FILE = "kraftwerk-vtl.json";
+
+	// Normalized name for VTL user scripts when using Genesis data
+	public static final String USER_VTL_UNIMODAL_SCRIPT_NAME = "script_unimodal.vtl";
+	public static final String USER_VTL_FINAL_SCRIPT_NAME = "script_final.vtl";
 
 	// ----- Main resources folders
 	public static final String RESOURCES_FOLDER = "src/main/resources";
@@ -68,6 +71,8 @@ public final class Constants {
 	public static final int DB_CONNECTION_TRY_COUNT = 10;
 	public static final String DDI_FILE_REGEX = "ddi[\\w,\\s-]+\\.xml";
 	public static final String LUNATIC_FILE_REGEX = "lunatic[\\w,\\s-]+\\.json";
+	public static final String SCRIPT_UNIMODAL_REGEX= "script_unimodal[\\w-]*\\.vtl$";
+	public static final String SCRIPT_FINAL_REGEX= "script_final[\\w-]*\\.vtl$";
 
 
 	// ----- Explicit Variables Names
@@ -96,6 +101,7 @@ public final class Constants {
 
 	// ----- Reporting Variables Names
 	public static final String REPORTING_DATA_PREFIX_NAME = "Report_";
+	public static final String IDENTIFICATION_CONFIGURATION = "TYPE_SPOTTING";
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String COMMENT_PREFIX_NAME = "COMMENT";
 	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
@@ -123,10 +129,20 @@ public final class Constants {
 	public static final String SITUATION_NAME = "situation";
 	public static final String CATEGORY_NAME = "category";
 	public static final String OCCUPANT_NAME = "occupant";
-
+	public static final String INDIVIDUAL_STATUS = "individualStatus";
+	public static final String INTERVIEWER_CAN_PROCESS = "interviewerCanProcess";
 	public static final String OUTCOME_SPOTTING = "outcome_spotting";
 	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + SURVEY_VALIDATION_DATE_NAME;
-	
+
+	public static final String NOGRAP = "NoGrap";
+	public static final String NOLOG = "NoLog";
+	public static final String NOLE = "Nole";
+	public static final String AUTRE = "Autre";
+
+	public static final String CLOSING_CAUSE = "ClosingCause";
+
+	public static final String CLOSING_CAUSE_DATE = "ClosingCause_Date";
+
 	// ------ Pairwise variables
 	
 	public static final int MAX_LINKS_ALLOWED = 21;
@@ -136,6 +152,13 @@ public final class Constants {
 	public static final String PAIRWISE_GROUP_NAME = "LIENS";
 	public static final String SAME_AXIS_VALUE = "0";
 	public static final String NO_PAIRWISE_VALUE = "99";
+
+	// ------ Vault variables
+	public static final String TRUST_VAULT_PATH = "trust_key";
+	public static final String TRUST_AES_KEY_VAULT_PATH = "aes_key";
+	public static final String STRING_FORMAT_VAULT_PATH = "chiffrement/%s/%s";
+
+	public static final String VAULT_APPROLE_ENDPOINT = "approle_produit";
 	
 	// ---------- Functions
 	// ---------- Get a file

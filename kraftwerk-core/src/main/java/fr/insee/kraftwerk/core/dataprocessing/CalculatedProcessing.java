@@ -1,8 +1,9 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.bpm.metadata.model.CalculatedVariables;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -30,7 +31,7 @@ public class CalculatedProcessing extends DataProcessing {
     }
     
     
-    public String applyCalculatedVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext){
+    public String applyCalculatedVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
         // First step
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         // Second step

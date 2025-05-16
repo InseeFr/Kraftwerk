@@ -2,9 +2,10 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -25,7 +26,7 @@ class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	private KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext();
+	private KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 
 	InMemoryDataset capiDataset = new InMemoryDataset(
 			List.of(
@@ -74,12 +75,12 @@ class ReconciliationTest {
 	@BeforeEach
 	void initVtlBindings() {
 		vtlBindings = new VtlBindings();
-		kraftwerkExecutionContext = new KraftwerkExecutionContext();
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = {"CAPI", "CAWI", "PAPI"})
-	void applyReconciliation_singleMode(String dsName) {
+	void applyReconciliation_singleMode(String dsName) throws KraftwerkException {
 		//
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
@@ -90,7 +91,7 @@ class ReconciliationTest {
 		assertNotNull(multimodeDataset);
 	}
 
-	private Dataset applyReconciliation_twoModes(String mode1, String mode2) {
+	private Dataset applyReconciliation_twoModes(String mode1, String mode2) throws KraftwerkException {
 		//
 		vtlBindings.put(mode1, testDatasets.get(mode1));
 		vtlBindings.put(mode2, testDatasets.get(mode2));
@@ -102,7 +103,7 @@ class ReconciliationTest {
 	}
 
 	@Test
-	void reconciliation_capiCawi() {
+	void reconciliation_capiCawi() throws KraftwerkException {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAPI", "CAWI");
 		//
 		assertNotNull(multimodeDataset);
@@ -114,7 +115,7 @@ class ReconciliationTest {
 	}
 
 	@Test
-	void reconciliation_capiPapi() {
+	void reconciliation_capiPapi() throws KraftwerkException {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAPI", "PAPI");
 		//
 		assertNotNull(multimodeDataset);
@@ -124,7 +125,7 @@ class ReconciliationTest {
 	}
 
 	@Test
-	void reconciliation_cawiPapi() {
+	void reconciliation_cawiPapi() throws KraftwerkException {
 		Dataset multimodeDataset = applyReconciliation_twoModes("CAWI", "PAPI");
 		//
 		assertNotNull(multimodeDataset);
@@ -134,7 +135,7 @@ class ReconciliationTest {
 	}
 
 	@Test
-	void applyReconciliation_threeModes() {
+	void applyReconciliation_threeModes() throws KraftwerkException {
 		vtlBindings.put("CAPI", cawiDataset);
 		vtlBindings.put("CAWI", capiDataset);
 		vtlBindings.put("PAPI", papiDataset);

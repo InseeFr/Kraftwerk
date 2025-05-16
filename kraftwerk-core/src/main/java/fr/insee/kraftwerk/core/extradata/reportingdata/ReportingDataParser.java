@@ -54,6 +54,9 @@ public abstract class ReportingDataParser {
 		Variable variableOrganization = new Variable(Constants.ORGANIZATION_UNIT_ID_NAME, reportingDataGroup,
 				VariableType.STRING, "50");
 		surveyRawData.putVariable(variableOrganization);
+		Variable variableIdentificationConfig = new Variable(Constants.IDENTIFICATION_CONFIGURATION, reportingDataGroup,
+				VariableType.STRING, "20");
+		surveyRawData.putVariable(variableIdentificationConfig);
 		surveyRawData
 				.putVariable(new Variable(Constants.ADRESS_RGES_NAME, reportingDataGroup, VariableType.STRING, "2"));
 		surveyRawData
@@ -67,6 +70,16 @@ public abstract class ReportingDataParser {
 				.putVariable(new Variable(Constants.ADRESS_NOI_NAME, reportingDataGroup, VariableType.STRING, "2"));
 		surveyRawData.putVariable(
 				new Variable(Constants.ADRESS_ID_STAT_INSEE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOGRAP, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOLOG, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.NOLE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.AUTRE, reportingDataGroup, VariableType.STRING, "15"));
+
+		surveyRawData.putVariable(new Variable(Constants.CLOSING_CAUSE, reportingDataGroup, VariableType.STRING, "15"));
+		surveyRawData.putVariable(new Variable(Constants.CLOSING_CAUSE_DATE, reportingDataGroup, VariableType.STRING,
+				"15"));
+
+
 		for (int k = 1; k <= this.maxStates; k++) {
 			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataGroup,
 					VariableType.STRING, "50");
@@ -106,6 +119,12 @@ public abstract class ReportingDataParser {
 		Variable variableOccupant = new Variable(Constants.OCCUPANT_NAME, reportingDataGroup, VariableType.STRING,
 				"50");
 		surveyRawData.putVariable(variableOccupant);
+		Variable variableIndividualStatus = new Variable(Constants.INDIVIDUAL_STATUS, reportingDataGroup, VariableType.STRING,
+				"50");
+		surveyRawData.putVariable(variableIndividualStatus);
+		Variable variableInterviewerCanProcess = new Variable(Constants.INTERVIEWER_CAN_PROCESS, reportingDataGroup, VariableType.STRING,
+				"50");
+		surveyRawData.putVariable(variableInterviewerCanProcess);
 		Variable variableOutcomeSpotting = new Variable(Constants.OUTCOME_SPOTTING, reportingDataGroup, VariableType.STRING,
 				"50");
 		surveyRawData.putVariable(variableOutcomeSpotting);
@@ -155,6 +174,11 @@ public abstract class ReportingDataParser {
 			missingQuestionnaireIds.add(reportingDataUE.getIdentifier());
 		}
 		// TODO Find another way than Constants.REPORTING_DATA_PREFIX_NAME +
+		if (reportingDataUE.getIdentificationConfiguration() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.IDENTIFICATION_CONFIGURATION, reportingDataUE.getIdentificationConfiguration());
+		}
 		// reportingDataUE.getIdentifier() to fill the identifier field
 		if (reportingDataUE.getInterviewerId() != null)
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
@@ -190,6 +214,26 @@ public abstract class ReportingDataParser {
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.ADRESS_ID_STAT_INSEE,
 							reportingDataUE.getInseeSampleIdentifier().getIdStatInsee());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOGRAP,
+							reportingDataUE.getInseeSampleIdentifier().getNograp());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOGRAP,
+							reportingDataUE.getInseeSampleIdentifier().getNograp());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOLOG,
+							reportingDataUE.getInseeSampleIdentifier().getNolog());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.NOLE,
+							reportingDataUE.getInseeSampleIdentifier().getNole());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.AUTRE,
+							reportingDataUE.getInseeSampleIdentifier().getAutre());
 		}
 		if (!reportingDataUE.getStates().isEmpty()) {
 			addStates(reportingDataUE, questionnaire);
@@ -218,6 +262,12 @@ public abstract class ReportingDataParser {
 					.putValue(Constants.OCCUPANT_NAME, reportingDataUE.getIdentification().getOccupant());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.INDIVIDUAL_STATUS, reportingDataUE.getIdentification().getIndividualStatus());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.INTERVIEWER_CAN_PROCESS, reportingDataUE.getIdentification().getInterviewerCanProcess());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.OUTCOME_SPOTTING, reportingDataUE.getIdentification().getOutcomeSpotting());
 		}
 		if (!reportingDataUE.getComments().isEmpty()) {
@@ -226,6 +276,17 @@ public abstract class ReportingDataParser {
 		if(reportingDataUE.getSurveyValidationDateTimeStamp() != null){
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME).getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier()).putValue(Constants.REPORTING_DATA_SURVEY_VALIDATION_NAME,
 					reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getSurveyValidationDateTimeStamp()),ZoneId.of("CET"))));
+		}
+		if(reportingDataUE.getReportingDataClosingCause() != null){
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.CLOSING_CAUSE,
+							reportingDataUE.getReportingDataClosingCause().getClosingCauseValue().toString());
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.CLOSING_CAUSE_DATE,
+							reportingDataUE.getReportingDataClosingCause().getClosingCauseDate()
+									.format(DateTimeFormatter.ofPattern(Constants.REPORTING_DATA_OUTPUT_DATE_FORMAT)));
 		}
 	}
 
@@ -267,8 +328,7 @@ public abstract class ReportingDataParser {
 		for (int k = 1; k <= reportingDataUE.size(); k++) {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k,
-							StateType.getStateType((reportingDataUE.getStates().get(k - 1)).getStateType()));
+					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataUE.getStates().get(k - 1).getStateType());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
@@ -276,8 +336,7 @@ public abstract class ReportingDataParser {
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 				.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-				.putValue(Constants.LAST_STATE_NAME, StateType.getStateType(
-						(reportingDataUE.getStates().getLast()).getStateType()));
+				.putValue(Constants.LAST_STATE_NAME, reportingDataUE.getStates().getLast().getStateType());
 	}
 
 	private void addComments(ReportingDataUE reportingDataUE, QuestionnaireData questionnaire) {

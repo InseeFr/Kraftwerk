@@ -9,12 +9,13 @@ import fr.insee.bpm.metadata.model.VariablesMap;
 import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.dataprocessing.*;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.metadata.*;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
-import fr.insee.kraftwerk.core.utils.log.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class UnimodalSequence {
 
 	public void applyUnimodalSequence(UserInputs userInputs, String dataMode, VtlBindings vtlBindings,
-									  KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
+									  KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		ModeInputs modeInputs = userInputs.getModeInputs(dataMode);
 		String vtlGenerate;
 
