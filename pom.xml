@@ -33,7 +33,7 @@
 			**/kraftwerk-functional-tests/**
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.19.2</pitest.version>
+		<pitest.version>1.19.3</pitest.version>
 		<pitest.junit.version>1.2.2</pitest.junit.version>
 	
 	</properties>
