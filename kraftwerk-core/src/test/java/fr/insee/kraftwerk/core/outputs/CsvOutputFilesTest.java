@@ -143,7 +143,10 @@ class CsvOutputFilesTest {
 
 		outputFiles.writeOutputTablesV2();
 
-		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.outputFileName("RACINE"));
+		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(),
+				outputFiles.outputFileName("RACINE",
+						outputFiles.getKraftwerkExecutionContext())
+		);
 		racinePath = racinePath.resolveSibling(racinePath.getFileName());
 		File f = racinePath.toFile();
 		assertTrue(f.exists());
