@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>12.6</version>
+			<version>12.7</version>
 		</dependency>
 		<!-- XML oriented test dependency -->
 		<!-- https://www.xmlunit.org/ -->
