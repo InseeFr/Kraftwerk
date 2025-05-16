@@ -115,10 +115,11 @@ public class MainService extends KraftwerkService {
 	public ResponseEntity<String> mainGenesisV2(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
 			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
 			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId) {
 		boolean withDDI = true;
-		return runWithGenesisV2(campaignId, withDDI, batchSize, workersNumbers, workerId);
+		return runWithGenesisV2(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
 	}
 	//========= OPTIMISATIONS PERFS (END) ==========
 
@@ -173,10 +174,10 @@ public class MainService extends KraftwerkService {
 	 * @author Adrien Marchal
 	 */
 	@NotNull
-	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, int batchSize, int workersNumbers, int workerId) {
+	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, boolean withEncryption, int batchSize, int workersNumbers, int workerId) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, fileUtilsInterface);
+		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 
 		try {
 			mpGenesis.runMainV2(campaignId, batchSize, workersNumbers, workerId);

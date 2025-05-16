@@ -425,7 +425,7 @@ class MainServiceTest {
         doNothing().when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -447,7 +447,7 @@ class MainServiceTest {
         doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -468,7 +468,7 @@ class MainServiceTest {
         doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, 1, 1);
+        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
