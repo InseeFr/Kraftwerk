@@ -135,7 +135,7 @@ public class CsvOutputFiles extends OutputFiles {
 			try {
 				//Temporary file
 				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName), null);
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName, kraftwerkExecutionContext), null);
 
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
@@ -239,7 +239,7 @@ public class CsvOutputFiles extends OutputFiles {
 
 				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
 
-				String outputFile = getOutputFolder().resolve(outputFileName(datasetName)).toString();
+				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
 				//Move to output folder
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
 				log.info("File: {} successfully written", outputFile);
