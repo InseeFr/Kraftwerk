@@ -99,8 +99,8 @@ public final class Constants {
 
 
 
-	// ----- Reporting Variables Names
-	public static final String REPORTING_DATA_PREFIX_NAME = "Report_";
+	// ----- Reporting Variables Names in output file
+	public static final String REPORTING_DATA_PREFIX_NAME = "REPORT_";
 	public static final String IDENTIFICATION_CONFIGURATION = "TYPE_SPOTTING";
 	public static final String STATE_SUFFIX_NAME = "STATE";
 	public static final String COMMENT_PREFIX_NAME = "COMMENT";
@@ -124,24 +124,25 @@ public final class Constants {
 	public static final String ADRESS_ID_STAT_INSEE = "IDSTATINSEE";
 	public static final String LAST_ATTEMPT_DATE = "LAST_ATTEMPT_DATE";
 	public static final String OUTCOME_DATE = "OUTCOME_DATE";
-	public static final String IDENTIFICATION_NAME = "identification";
-	public static final String ACCESS_NAME = "access";
-	public static final String SITUATION_NAME = "situation";
-	public static final String CATEGORY_NAME = "category";
-	public static final String OCCUPANT_NAME = "occupant";
-	public static final String INDIVIDUAL_STATUS = "individualStatus";
-	public static final String INTERVIEWER_CAN_PROCESS = "interviewerCanProcess";
-	public static final String OUTCOME_SPOTTING = "outcome_spotting";
+
+	public static final String IDENTIFICATION_NAME = "IDENTIFICATION";
+	public static final String ACCESS_NAME = "ACCESS";
+	public static final String SITUATION_NAME = "SITUATION";
+	public static final String CATEGORY_NAME = "CATEGORY";
+	public static final String OCCUPANT_NAME = "OCCUPANT";
+	public static final String INDIVIDUAL_STATUS = "INDIVIDUALSTATUS";
+	public static final String INTERVIEWER_CAN_PROCESS = "INTERVIEWERCANPROCESS";
+	public static final String OUTCOME_SPOTTING = "OUTCOME_SPOTTING";
 	public static final String REPORTING_DATA_SURVEY_VALIDATION_NAME = REPORTING_DATA_PREFIX_NAME + SURVEY_VALIDATION_DATE_NAME;
 
-	public static final String NOGRAP = "NoGrap";
-	public static final String NOLOG = "NoLog";
-	public static final String NOLE = "Nole";
-	public static final String AUTRE = "Autre";
+	public static final String NOGRAP = "NOGRAP";
+	public static final String NOLOG = "NOLOG";
+	public static final String NOLE = "NOLE";
+	public static final String AUTRE = "AUTRE";
 
-	public static final String CLOSING_CAUSE = "ClosingCause";
+	public static final String CLOSING_CAUSE = "CLOSINGCAUSE";
 
-	public static final String CLOSING_CAUSE_DATE = "ClosingCause_Date";
+	public static final String CLOSING_CAUSE_DATE = CLOSING_CAUSE + "_DATE";
 
 	// ------ Pairwise variables
 	
