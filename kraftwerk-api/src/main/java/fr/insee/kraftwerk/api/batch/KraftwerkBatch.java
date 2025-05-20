@@ -69,21 +69,11 @@ public class KraftwerkBatch implements CommandLineRunner {
                 //3. Campaign name
                 //4. Authentication token for Genesis
                 //5. Encrypt at end (false or true)
-                //(only for "runMainV2") 6. workers Number (NOTE : "1" by default if NOT PROVIDED)
-                //(only for "runMainV2") 7. worker id (NOTE : "1" by default if NOT PROVIDED)
                 KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
                 boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
                 boolean withAllReportingData = Boolean.parseBoolean(args[2]);
                 String inDirectory = args[3];
                 boolean withEncryption = Boolean.parseBoolean(args[5]);
-                //========= OPTIMISATIONS PERFS (START) ==========
-                int workersNumber = 1; //initialisation to 1 by default
-                int workerId = 1;  //initialisation to 1 by default
-                if(args.length == 6) {
-                    workersNumber = Integer.parseInt(args[6]); //note : checks have been previously made inside "checkArgs(args)"
-                    workerId = Integer.parseInt(args[7]); //note : checks have been previously made inside "checkArgs(args)"
-                }
-                //========= OPTIMISATIONS PERFS (END) ==========
 
                 //Kraftwerk service type related parameters
                 boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
@@ -94,11 +84,6 @@ public class KraftwerkBatch implements CommandLineRunner {
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     archiveAtEnd = false;
                 }
-                //========= OPTIMISATIONS PERFS (START) ==========
-                if (kraftwerkServiceType == KraftwerkServiceType.GENESISV2) {
-                    archiveAtEnd = false;
-                }
-                //========= OPTIMISATIONS PERFS (END) ==========
 
 
                 //Run kraftwerk
@@ -118,19 +103,7 @@ public class KraftwerkBatch implements CommandLineRunner {
                         kraftwerkExecutionContext
                     );
                     mainProcessingGenesis.runMain(inDirectory,1000);
-                }
-                //========= OPTIMISATIONS PERFS (START) ==========
-                else if (kraftwerkServiceType == KraftwerkServiceType.GENESISV2) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
-                            configProperties,
-                            new GenesisClient(new RestTemplateBuilder(), configProperties),
-                            fileSystem,
-                            kraftwerkExecutionContext
-                    );
-                    mainProcessingGenesis.runMainV2(inDirectory,1000, workersNumber, workerId);
-                }
-                //========= OPTIMISATIONS PERFS (END) ==========
-                else {
+                } else {
                     MainProcessing mainProcessing = new MainProcessing(
                             kraftwerkExecutionContext,
                             defaultDirectory,
@@ -162,12 +135,9 @@ public class KraftwerkBatch implements CommandLineRunner {
      * @throws IllegalArgumentException if invalid argument
      */
     private static void checkArgs(String[] args) throws IllegalArgumentException{
-        //========= OPTIMISATIONS PERFS (START) ==========
-        //We provide retro-compatibility, and authorize old (runMain) & new (runMainV2) process
-        if(args.length != 6 && args.length != 8) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 6 or 8 !".formatted(args.length));
+        if(args.length != 6) {
+            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 6 !".formatted(args.length));
         }
-        //========= OPTIMISATIONS PERFS (END) ==========
         if(isNotBoolean(args[1])){
             throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
         }
@@ -177,24 +147,6 @@ public class KraftwerkBatch implements CommandLineRunner {
         if(isNotBoolean(args[5])){
             throw new IllegalArgumentException("Invalid withEncryption boolean argument ! %s".formatted(args[5]));
         }
-        //========= OPTIMISATIONS PERFS (START) ==========
-        if(args.length == 8) {
-            int workersNb = 0;
-            int workerIndex = 0;
-            try {
-                workersNb = Integer.parseInt(args[6]);
-                workerIndex = Integer.parseInt(args[7]);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(String.format("workersNb (%s) and/or workerIndex (%s) cannot be parsed as an integer !", args[6], args[7]));
-            }
-            if(workersNb < 1 || workersNb > 10){
-                throw new IllegalArgumentException("Maximum number of workers is 10 ! (got %s)".formatted(args[6]));
-            }
-            if(workerIndex < 1 || workerIndex > workersNb){
-                throw new IllegalArgumentException("workerId cannot be > workers number, which is inconsistant ! (got %s)".formatted(args[7]));
-            }
-        }
-        //========= OPTIMISATIONS PERFS (END) ==========
     }
 
     private static boolean isNotBoolean(String argToCheck){
