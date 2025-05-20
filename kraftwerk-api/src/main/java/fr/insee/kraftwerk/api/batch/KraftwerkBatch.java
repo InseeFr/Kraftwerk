@@ -54,6 +54,8 @@ public class KraftwerkBatch implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        log.info("Disabling KraftwerkBatch...");
+        /*
         try {
             //If .jar launched with cli args
             if (args.length > 0) {
@@ -83,6 +85,7 @@ public class KraftwerkBatch implements CommandLineRunner {
                 }
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
                     archiveAtEnd = false;
+
                 }
 
 
@@ -126,6 +129,7 @@ public class KraftwerkBatch implements CommandLineRunner {
             System.exit(1);
         }
         log.info("Launching Kraftwerk in API mode...");
+        */
     }
 
     /**
