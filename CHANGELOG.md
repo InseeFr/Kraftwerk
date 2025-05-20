@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.3.5 [2025-05-19]
+
+### Added
+- symmetrical encryption of output files
+- reporting data : add variables NoLog, NoGrep, Nole, Autre, ClosingCause, ClosingDate, TYPE_SPOTTING, individualStatus, interviewerCanProcess
+- reporting data : no more renaming of OUTCOME et STATE modalities
+- reporting data : add specific endpoint to extract them and remove them from "classic" data extraction
+
+### Updated
+- bpm 1.0.7
+- saxon-he 12.7
+- opencsv 5.11
+- springdoc 2.8.8
+- cucumber 7.22.2
+- pitest 1.19.3
+
 ## 3.3.4 [2025-04-29}
 ### Fixed
 - Resolve problem concerning the reading of vtl files on MinIo
