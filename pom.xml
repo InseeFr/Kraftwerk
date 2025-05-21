@@ -34,7 +34,7 @@
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
 		<pitest.version>1.19.3</pitest.version>
-		<pitest.junit.version>1.2.2</pitest.junit.version>
+		<pitest.junit.version>1.2.3</pitest.junit.version>
 	
 	</properties>
 	<modules>
