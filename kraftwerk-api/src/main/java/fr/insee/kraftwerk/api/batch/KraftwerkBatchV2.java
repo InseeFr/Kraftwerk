@@ -108,22 +108,24 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
                         limitSize
                 );
 
-                if (argsChecker.getServiceName() == KraftwerkServiceType.GENESIS) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
-                                                                                            new GenesisClient(new RestTemplateBuilder(), configProperties),
-                                                                                            fileSystem, kraftwerkExecutionContext);
-                    mainProcessingGenesis.runMain(argsChecker.getCampaignId(),1000);
-                }
-                else if (argsChecker.getServiceName() == KraftwerkServiceType.GENESISV2) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
-                                                                                            new GenesisClient(new RestTemplateBuilder(), configProperties),
-                                                                                            fileSystem, kraftwerkExecutionContext);
-                    mainProcessingGenesis.runMainV2(argsChecker.getCampaignId(),1000,
-                                                    argsChecker.getWorkersNb(), argsChecker.getWorkerIndex());
-                }
-                else {
-                    MainProcessing mainProcessing = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileSystem);
-                    mainProcessing.runMain();
+                switch (argsChecker.getServiceName()) {
+                    case KraftwerkServiceType.GENESIS: {
+                        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
+                                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                                fileSystem, kraftwerkExecutionContext);
+                        mainProcessingGenesis.runMain(argsChecker.getCampaignId(),1000);
+                    } break;
+                    case KraftwerkServiceType.GENESISV2: {
+                        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
+                                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                                fileSystem, kraftwerkExecutionContext);
+                        mainProcessingGenesis.runMainV2(argsChecker.getCampaignId(),1000,
+                                argsChecker.getWorkersNb(), argsChecker.getWorkerIndex());
+                    } break;
+                    default: {
+                        MainProcessing mainProcessing = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileSystem);
+                        mainProcessing.runMain();
+                    }
                 }
 
                 //Archive

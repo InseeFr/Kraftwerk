@@ -157,85 +157,7 @@ public class CsvOutputFiles extends OutputFiles {
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 
-				//!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
-				String[] regExPatternsTab = regExPatterns(columnNames, boolColumnNames, boolColumnIndexes);
-				log.info("sbRegExPatternToFind : {}", regExPatternsTab[0]);
-				log.info("sbRegExPatternReplacement : {}", regExPatternsTab[1]);
-
-
-				//In order to be aware of the process progress, we count how much lines the file contains & how many blocks must be processed
-				int totalLinesNumber = 0;
-				int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
-					while (bufferedReader.readLine() != null) {
-						totalLinesNumber++;
-					}
-                }
-				int totalBlocksNumber = totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK == 0 ? 1 : totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK;
-				log.info("{} lines ({} blocks)", totalLinesNumber, totalBlocksNumber);
-
-				// => READING DATA FROM ".tmpdata" file BY BLOCK OF 50 LINES AND WRITING FORMATTED DATA INTO ".tmp" file
-				int currentBlockNumber = 1;
-				StringBuilder sbInput = new StringBuilder();
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
-					String line = bufferedReader.readLine();
-					int nbReadLinesInBlock = 1;
-					int currentReadLine = 1;
-					while(line != null || currentReadLine <= (totalLinesNumber + 1) ){
-
-						//fill in "sbInput" before processing it
-						if( (nbReadLinesInBlock - 1) < INPUT_FILE_LINE_NUMBER_BLOCK) {
-							// => READ CASE FROM INPUT FILE (".tmpdata" file)
-							sbInput.append(line);
-							sbInput.append("\n");
-							//read new line for next loop
-							line = bufferedReader.readLine();
-							nbReadLinesInBlock++;
-							currentReadLine++;
-						}
-						//process "sbInput" when block is full
-						else {
-							// => WRITE CASE INTO OUTPUT FILE (".tmp" file)
-							log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
-							String result;
-
-							Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
-							Matcher m0 = p0.matcher(sbInput.toString());
-							result = m0.replaceAll(regExPatternsTab[1]);
-
-							//free RAM as soon as possible -> empty "sbInput"
-							sbInput.delete(0, sbInput.length());
-
-							//If there are boolColumns, subsequent regEx patterns must be applied :
-							//NOTE : change "true" or "false" by "1" or "0"
-							if(!boolColumnNames.isEmpty()) {
-								//REMINDER : in previous process (outside current loop), we surrounded all bool columns
-								//			 by "\"###" and "###\"".
-								//1) Process empty entries in boolean columns
-								Pattern p1 = Pattern.compile("\"######\"", Pattern.CASE_INSENSITIVE);
-								Matcher m1 = p1.matcher(result);
-								result = m1.replaceAll("\"\"");
-
-								//2) process "true" values
-								Pattern p2 = Pattern.compile("\"###true###\"", Pattern.CASE_INSENSITIVE);
-								Matcher m2 = p2.matcher(result);
-								result = m2.replaceAll("1");
-
-								//3) process "false" values
-								Pattern p3 = Pattern.compile("\"###false###\"", Pattern.CASE_INSENSITIVE);
-								Matcher m3 = p3.matcher(result);
-								result = m3.replaceAll("0");
-							}
-
-							Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
-
-							//reset index AT THE END
-							nbReadLinesInBlock = 1;
-							//increment block number for next loop
-							currentBlockNumber++;
-						}
-					}
-				}
+				writeIntoTmpFile(tmpOutputFile, columnNames, boolColumnNames, boolColumnIndexes);
 
 				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
 
@@ -258,7 +180,101 @@ public class CsvOutputFiles extends OutputFiles {
 	}
 
 
-	private String[] regExPatterns(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+	private void writeIntoTmpFile(Path tmpOutputFile, List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) throws KraftwerkException {
+		try {
+			//!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
+			String[] regExPatternsTab = regExPatterns(columnNames, boolColumnNames, boolColumnIndexes);
+			log.info("sbRegExPatternToFind : {}", regExPatternsTab[0]);
+			log.info("sbRegExPatternReplacement : {}", regExPatternsTab[1]);
+
+
+			//In order to be aware of the process progress, we count how much lines the file contains & how many blocks must be processed
+			int totalLinesNumber = 0;
+			int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
+			try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
+				while (bufferedReader.readLine() != null) {
+					totalLinesNumber++;
+				}
+			}
+			int totalBlocksNumber = totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK == 0 ? 1 : totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK;
+			log.info("{} lines ({} blocks)", totalLinesNumber, totalBlocksNumber);
+
+			// => READING DATA FROM ".tmpdata" file BY BLOCK OF 50 LINES AND WRITING FORMATTED DATA INTO ".tmp" file
+			int currentBlockNumber = 1;
+			StringBuilder sbInput = new StringBuilder();
+			try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
+				String line = bufferedReader.readLine();
+				int nbReadLinesInBlock = 1;
+				int currentReadLine = 1;
+				while(line != null || currentReadLine <= (totalLinesNumber + 1) ){
+
+					//fill in "sbInput" before processing it
+					if( (nbReadLinesInBlock - 1) < INPUT_FILE_LINE_NUMBER_BLOCK) {
+						// => READ CASE FROM INPUT FILE (".tmpdata" file)
+						sbInput.append(line);
+						sbInput.append("\n");
+						//read new line for next loop
+						line = bufferedReader.readLine();
+						nbReadLinesInBlock++;
+						currentReadLine++;
+					}
+					//process "sbInput" when block is full
+					else {
+						// => WRITE CASE INTO OUTPUT FILE (".tmp" file)
+						log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
+						String result = applyRegExOnBlockFile(sbInput, regExPatternsTab, boolColumnNames);
+
+						Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
+
+						//reset index AT THE END
+						nbReadLinesInBlock = 1;
+						//increment block number for next loop
+						currentBlockNumber++;
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new KraftwerkException(500, e.toString());
+		}
+	}
+
+
+	private static String applyRegExOnBlockFile(StringBuilder sbInput, String[] regExPatternsTab, List<String> boolColumnNames) {
+		String result;
+
+		Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
+		Matcher m0 = p0.matcher(sbInput.toString());
+		result = m0.replaceAll(regExPatternsTab[1]);
+
+		//free RAM as soon as possible -> empty "sbInput"
+		sbInput.delete(0, sbInput.length());
+
+		//If there are boolColumns, subsequent regEx patterns must be applied :
+		//NOTE : change "true" or "false" by "1" or "0"
+		if(!boolColumnNames.isEmpty()) {
+			//REMINDER : in previous process (outside current loop), we surrounded all bool columns
+			//			 by "\"###" and "###\"".
+			//1) Process empty entries in boolean columns
+			Pattern p1 = Pattern.compile("\"######\"", Pattern.CASE_INSENSITIVE);
+			Matcher m1 = p1.matcher(result);
+			result = m1.replaceAll("\"\"");
+
+			//2) process "true" values
+			Pattern p2 = Pattern.compile("\"###true###\"", Pattern.CASE_INSENSITIVE);
+			Matcher m2 = p2.matcher(result);
+			result = m2.replaceAll("1");
+
+			//3) process "false" values
+			Pattern p3 = Pattern.compile("\"###false###\"", Pattern.CASE_INSENSITIVE);
+			Matcher m3 = p3.matcher(result);
+			result = m3.replaceAll("0");
+		}
+
+		return result;
+	}
+
+
+	private static String[] regExPatterns(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
 		String[] result = new String[2];
 
 		//MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
