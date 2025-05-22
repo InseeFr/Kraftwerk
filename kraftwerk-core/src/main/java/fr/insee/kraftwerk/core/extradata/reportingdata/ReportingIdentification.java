@@ -27,12 +27,18 @@ public class ReportingIdentification {
     private static final String NOORDINARY = "NOORDINARY";
 
     public String getOutcomeSpotting(String identificationConfiguration) {
-        if (CONFIG_IASCO.contains(identificationConfiguration)) {
+        // Outcome spotting for reporting data from Moog (WEB) is not applicable
+        if (identificationConfiguration == null && identification == null){
+            return null;
+        }
+        // Case of old format of reporting data. No identificationConfiguration, but identification is not null.
+        // We apply outcomeForHouseF2F algorithm
+        if (identificationConfiguration == null || CONFIG_IASCO.contains(identificationConfiguration)) {
             return outcomeForHouseF2F();
         } else if (CONFIG_PHONE.contains(identificationConfiguration)) {
             return outcomeForPhone();
         } else if (CONFIG_F2F.contains(identificationConfiguration)) {
-            return outcomeForFaceToFace();
+            return outcomeForIndF2F();
         }
         return null;
     }
@@ -85,6 +91,7 @@ public class ReportingIdentification {
     }
 
     private String outcomeForPhone() {
+        if (individualStatus == null) return null;
         return switch (individualStatus) {
             case "DCD" -> "INDDCD";
             case "NOIDENT" -> "INDNOIDENT";
@@ -100,7 +107,8 @@ public class ReportingIdentification {
         };
     }
 
-    private String outcomeForFaceToFace() {
+    private String outcomeForIndF2F() {
+        if (individualStatus == null) return null;
         return switch (individualStatus) {
             case "DCD" -> "INDDCD";
             case "NOIDENT" -> "INDNOIDENT";

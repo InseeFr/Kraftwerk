@@ -266,11 +266,10 @@ public abstract class ReportingDataParser {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
 					.putValue(Constants.INTERVIEWER_CAN_PROCESS, reportingDataUE.getIdentification().getInterviewerCanProcess());
-			if (reportingDataUE.getIdentificationConfiguration()!=null) {
-				questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
-						.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-						.putValue(Constants.OUTCOME_SPOTTING, reportingDataUE.getIdentification().getOutcomeSpotting(reportingDataUE.getIdentificationConfiguration()));
-			}
+			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
+					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
+					.putValue(Constants.OUTCOME_SPOTTING, reportingDataUE.getIdentification().getOutcomeSpotting(reportingDataUE.getIdentificationConfiguration()));
+
 		}
 		if (!reportingDataUE.getComments().isEmpty()) {
 			addComments(reportingDataUE, questionnaire);
