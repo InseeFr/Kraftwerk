@@ -210,7 +210,6 @@ public class CsvOutputFiles extends OutputFiles {
 					//fill in "sbInput" before processing it
 					// => READ CASE FROM INPUT FILE (".tmpdata" file)
 					sbInput.append(line);
-					sbInput.append("\n");
 
 					//process "sbInput" when block is full of end of file is reached
 					if (nbReadLinesInBlock >= INPUT_FILE_LINE_NUMBER_BLOCK || currentReadLine >= totalLinesNumber) {
@@ -234,6 +233,10 @@ public class CsvOutputFiles extends OutputFiles {
 					line = bufferedReader.readLine();
 					nbReadLinesInBlock++;
 					currentReadLine++;
+					//We insert a carriage return ONLY IF END OF FILE IS NOT REACHED!
+					if(line != null) {
+						sbInput.append("\n");
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -262,12 +265,12 @@ public class CsvOutputFiles extends OutputFiles {
 			//2) process "true" values
 			Pattern p2 = Pattern.compile("\"###true###\"", Pattern.CASE_INSENSITIVE);
 			Matcher m2 = p2.matcher(result);
-			result = m2.replaceAll("1");
+			result = m2.replaceAll("\"1\"");
 
 			//3) process "false" values
 			Pattern p3 = Pattern.compile("\"###false###\"", Pattern.CASE_INSENSITIVE);
 			Matcher m3 = p3.matcher(result);
-			result = m3.replaceAll("0");
+			result = m3.replaceAll("\"0\"");
 		}
 
 		return result;
@@ -287,7 +290,7 @@ public class CsvOutputFiles extends OutputFiles {
 		//If no boolean column at all, we simply add double quotes to all fields
 		if(boolColumnNames.isEmpty()) {
 			for(String colName : columnNames) {
-				sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+				sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê\\.àçù]*)\"?");
 				sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
 				if( (colIndex + 1) < columnNames.size()) {
 					sbRegExPatternToFind.append(";");
@@ -301,13 +304,13 @@ public class CsvOutputFiles extends OutputFiles {
 			//for each column, we check if it is a boolean column or not
 			for(String colName : columnNames) {
 				if(boolColumnIndexes.contains(colIndex)) {
-					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê\\.àçù]*)\"?");
 					//=> we FIRST surround boolean columns by "\"###" and "###\"" to be sure
 					// not to further update "true" or "false" strings in fields which would NOT BE TAGGED as booleans.
 					//NOTE : a subsequent process will be needed if there are boolColumns
 					sbRegExPatternReplacement.append("\"###$").append(colIndex + 1).append("###\"");
 				} else {
-					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê]*)\"?");
+					sbRegExPatternToFind.append("\"?([\\w\\-\\s\\/éèê\\.àçù]*)\"?");
 					//we add double quotes in case of boolean column
 					sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
 				}
