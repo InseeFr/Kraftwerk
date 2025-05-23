@@ -204,33 +204,36 @@ public class CsvOutputFiles extends OutputFiles {
 			StringBuilder sbInput = new StringBuilder();
 			try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
 				String line = bufferedReader.readLine();
-				int nbReadLinesInBlock = 1;
-				int currentReadLine = 1;
-				while(line != null || currentReadLine <= (totalLinesNumber + 1) ){
-
+				int nbReadLinesInBlock = 1; //Nb of lines read in the current block
+				int currentReadLine = 1; //Nb of lines read in the whole file
+				while(line != null){
 					//fill in "sbInput" before processing it
-					if( (nbReadLinesInBlock - 1) < INPUT_FILE_LINE_NUMBER_BLOCK) {
-						// => READ CASE FROM INPUT FILE (".tmpdata" file)
-						sbInput.append(line);
-						sbInput.append("\n");
-						//read new line for next loop
-						line = bufferedReader.readLine();
-						nbReadLinesInBlock++;
-						currentReadLine++;
-					}
-					//process "sbInput" when block is full
-					else {
+					// => READ CASE FROM INPUT FILE (".tmpdata" file)
+					sbInput.append(line);
+					sbInput.append("\n");
+
+					//process "sbInput" when block is full of end of file is reached
+					if (nbReadLinesInBlock >= INPUT_FILE_LINE_NUMBER_BLOCK || currentReadLine >= totalLinesNumber) {
 						// => WRITE CASE INTO OUTPUT FILE (".tmp" file)
-						log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
+						if(currentReadLine % 1000 == 0) {
+							log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
+						}
 						String result = applyRegExOnBlockFile(sbInput, regExPatternsTab, boolColumnNames);
 
 						Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
 
+						//free RAM as soon as possible -> empty "sbInput"
+						sbInput.delete(0, sbInput.length());
 						//reset index AT THE END
-						nbReadLinesInBlock = 1;
+						nbReadLinesInBlock = 0;
 						//increment block number for next loop
 						currentBlockNumber++;
 					}
+
+					//read new line for next loop
+					line = bufferedReader.readLine();
+					nbReadLinesInBlock++;
+					currentReadLine++;
 				}
 			}
 		} catch (IOException e) {
@@ -245,9 +248,6 @@ public class CsvOutputFiles extends OutputFiles {
 		Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
 		Matcher m0 = p0.matcher(sbInput.toString());
 		result = m0.replaceAll(regExPatternsTab[1]);
-
-		//free RAM as soon as possible -> empty "sbInput"
-		sbInput.delete(0, sbInput.length());
 
 		//If there are boolColumns, subsequent regEx patterns must be applied :
 		//NOTE : change "true" or "false" by "1" or "0"
