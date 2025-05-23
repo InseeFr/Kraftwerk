@@ -3,6 +3,9 @@ package stubs;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.libjavachiffrement.vault.VaultCaller;
 import lombok.Getter;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -11,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
+@Component
+@Primary
+@Profile("test-cucumber")
 public class VaultCallerStub extends VaultCaller {
     private final Map<String, byte[]> vaultStub;
 
