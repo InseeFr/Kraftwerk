@@ -104,4 +104,42 @@ public class GenesisClientStub extends GenesisClient {
 
         return set.stream().toList();
     }
+
+
+    //========= OPTIMISATIONS PERFS (START) ==========
+    @Override
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, int workersNumbers, int workerId,
+                                                              long blockSize, long page) {
+        //For first version of this stub, we Use same stub as "getInterrogationIds()"
+        return getInterrogationIds(questionnaireId);
+    }
+
+    @Override
+    public Long countInterrogationIds(String questionnaireId) {
+        return 1L;
+    }
+
+    @Override
+    public List<String> getDistinctModesByQuestionnaire(String questionnaireId) {
+        Set<String> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
+                .filter(
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
+                ).toList();
+
+        for(SurveyUnitUpdateLatest doc : mongoFiltered){
+            set.add(doc.getQuestionnaireId());
+        }
+
+        return set.stream().toList();
+    }
+
+    @Override
+    public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
+        //For first version of this stub, we Use same stub as "getUEsLatestState()"
+        return getUEsLatestState(questionnaireId, interrogationIds);
+    }
+    //========= OPTIMISATIONS PERFS (END) ==========
+
 }

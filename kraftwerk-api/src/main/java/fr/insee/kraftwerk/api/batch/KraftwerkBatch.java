@@ -22,9 +22,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-@Component
+//DISABLING "KraftwerkBatch" class
+//@Component
 @Slf4j
-public class KraftwerkBatch implements CommandLineRunner {
+//public class KraftwerkBatch implements CommandLineRunner {
+public class KraftwerkBatch {
 
     ConfigProperties configProperties;
     MinioConfig minioConfig;
@@ -52,8 +54,10 @@ public class KraftwerkBatch implements CommandLineRunner {
         this.vaultConfig = vaultConfig;
     }
 
-    @Override
+    //@Override
     public void run(String... args) {
+        log.info("Disabling KraftwerkBatch...");
+        /*
         try {
             //If .jar launched with cli args
             if (args.length > 0) {
@@ -127,6 +131,7 @@ public class KraftwerkBatch implements CommandLineRunner {
             System.exit(1);
         }
         log.info("Launching Kraftwerk in API mode...");
+        */
     }
 
     /**
