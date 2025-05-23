@@ -49,7 +49,7 @@ Feature: Do we save correctly all reporting data ?
 
       |ReportingDataFile                  |Directory                        |OutputFileName                                     |ExpectedDateFormat  |FieldName             |
       |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv      |yyyy-MM-dd-hh-mm-ss |STATE_1_DATE          |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |Report_DATE_COLLECTE  |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv |yyyy-MM-dd-hh-mm-ss |REPORT_DATE_COLLECTE  |
 
 
   Scenario Outline: The file has all the contact attempts of a certain type
@@ -90,11 +90,11 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "IDENTIFICATION" field
     And In a file named "<OutputFileName>" in directory "<Directory>" we should only have "<ExpectedTypeSpotting>" in the "TYPE_SPOTTING" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "individualStatus" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "interviewerCanProcess" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "occupant" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "INDIVIDUALSTATUS" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "INTERVIEWERCANPROCESS" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "OCCUPANT" field
 
 
     Examples:
@@ -119,7 +119,7 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "OUTCOME_SPOTTING" field
 
     Examples:
     # Parameters :
@@ -138,10 +138,10 @@ Feature: Do we save correctly all reporting data ?
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
-    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "identification"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
-    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "outcome_spotting"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "IDENTIFICATION" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "IDENTIFICATION"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "OUTCOME_SPOTTING" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "OUTCOME_SPOTTING"
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
@@ -151,12 +151,12 @@ Feature: Do we save correctly all reporting data ?
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoGrap>" in the "NoGrap" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoLog>" in the "NoLog" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNole>" in the "Nole" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "Autre" field
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "ClosingCause" field
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "ClosingCause_Date" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoGrap>" in the "NOGRAP" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNoLog>" in the "NOLOG" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNole>" in the "NOLE" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedAutre>" in the "AUTRE" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCause>" in the "CLOSINGCAUSE" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedClosingCauseDate>" in the "CLOSINGCAUSE_DATE" field
     Examples:
       |ReportingDataFile |Directory                        |OutputFileName                                    |InterrogationId   | ExpectedNoGrap   | ExpectedNoLog  | ExpectedNole | ExpectedAutre | ExpectedClosingCause | ExpectedClosingCauseDate |
       |reporting_us.xml  |SAMPLETEST-REPORTINGDATA-V3      |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       | 1                | 7              | 8            | 9             |                      |                          |
@@ -168,10 +168,10 @@ Feature: Do we save correctly all reporting data ?
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service with genesis input path with mode "TEL"
     Then For SurveyUnit "<InterrogationId>" we should have <ExpectedSpecificStatusCount> contact states with status "<ExpectedStatus>" in a file named "<OutputFileName>" in directory "<Directory>"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "identification" field
-    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "identification"
-    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "outcome_spotting" field
-    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "outcome_spotting"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIdentification>" in the "IDENTIFICATION" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedIdentification>" for field "IDENTIFICATION"
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "OUTCOME_SPOTTING" field
+    And In parquet reporting data file in directory "<Directory>" for interrogationId "<InterrogationId>" we should have value "<ExpectedOutcomeSpottingStatus>" for field "OUTCOME_SPOTTING"
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
