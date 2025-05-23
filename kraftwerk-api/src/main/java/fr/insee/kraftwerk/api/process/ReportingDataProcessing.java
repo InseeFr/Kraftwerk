@@ -88,7 +88,6 @@ public class ReportingDataProcessing {
                 InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
                 insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
                 WriterSequence writerSequence = new WriterSequence();
-                /*
                 writerSequence.writeOutputFiles(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
@@ -97,7 +96,8 @@ public class ReportingDataProcessing {
                         writeDatabase,
                         fileUtilsInterface
                 );
-                */
+                /*
+                //TODO : ACTIVATE "V2" for performance purposes
                 writerSequence.writeOutputFilesV2(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
@@ -106,6 +106,7 @@ public class ReportingDataProcessing {
                         writeDatabase,
                         fileUtilsInterface
                 );
+                */
             }
         }catch (SQLException e){
             log.error(e.toString());
