@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+  <Id>TEST-TABLEAUX</Id>
+  <Label />
+  <SurveyUnits>
+    <SurveyUnit>
+      <Id>AUTO11000</Id>
+      <QuestionnaireModelId>TEST-TABLEAUX</QuestionnaireModelId>
+      <Data>
+        <COLLECTED>
+          <TABLEAUTIC21>
+            <COLLECTED type="number">5</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAUTIC21>
+          <TABLEAUTIC41>
+            <COLLECTED type="number">12</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAUTIC41>
+          <TABLEAU1AH1M21>
+            <COLLECTED type="number">14</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1AH1M21>
+          <TABESA2>
+            <COLLECTED>
+              <COLLECTED type="number">11</COLLECTED>
+              <COLLECTED type="number">22</COLLECTED>
+              <COLLECTED type="number">33</COLLECTED>
+              <COLLECTED type="number">44</COLLECTED>
+              <COLLECTED type="number">55</COLLECTED>
+              <COLLECTED type="number">66</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABESA2>
+          <TABESTANP2>
+            <COLLECTED>
+              <COLLECTED type="number">12</COLLECTED>
+              <COLLECTED type="number">25</COLLECTED>
+              <COLLECTED type="number">55</COLLECTED>
+              <COLLECTED type="number">12</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABESTANP2>
+          <COMMENT_QE>
+            <COLLECTED type="string">pas de commentaire</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </COMMENT_QE>
+          <MIN_REMPL>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </MIN_REMPL>
+          <TABLEAU2A25>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A25>
+          <TABLEAU1A3M13>
+            <COLLECTED type="string">34</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A3M13>
+          <TABLEAU1A1M31>
+            <COLLECTED type="number">33</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A1M31>
+          <TABLEAU1AH1M41>
+            <COLLECTED type="number">25</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1AH1M41>
+          <TABLEAU1A3M11>
+            <COLLECTED type="number">12</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A3M11>
+          <TABLEAU1A1M11>
+            <COLLECTED type="number">12</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A1M11>
+          <TABLEAU1A3M12>
+            <COLLECTED type="string">1</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A3M12>
+          <TABLEAU2A21>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A21>
+          <TABLEAU2A22>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A22>
+          <TABLEAU2A23>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A23>
+          <TABLEAU2A24>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A24>
+          <TABLEAU2A31>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A31>
+          <TABLEAUTIC11>
+            <COLLECTED type="number">6</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAUTIC11>
+          <TABLEAU1AH1M11>
+            <COLLECTED type="number">12</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1AH1M11>
+          <TABLEAUTIC31>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAUTIC31>
+          <TABLEAU1AH1M31>
+            <COLLECTED type="number">13</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1AH1M31>
+          <HEURE_REMPL>
+            <COLLECTED type="number">1</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </HEURE_REMPL>
+          <TABESTANP1>
+            <COLLECTED>
+              <COLLECTED type="string">38312300H0</COLLECTED>
+              <COLLECTED type="string">39001100H0</COLLECTED>
+              <COLLECTED type="string">3832300030</COLLECTED>
+            </COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABESTANP1>
+          <TABLEAU2A14>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A14>
+          <TABLEAU1A1M21>
+            <COLLECTED type="number">12</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A1M21>
+          <TABLEAU1AH1M51>
+            <COLLECTED type="number">22</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1AH1M51>
+          <TABLEAU2A15>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A15>
+          <TABLEAU1A3M23>
+            <COLLECTED type="string">78</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A3M23>
+          <TABLEAU2A32>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A32>
+          <TABLEAU2A11>
+            <COLLECTED type="number">1</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A11>
+          <TABLEAU2A33>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A33>
+          <TABLEAU1A3M21>
+            <COLLECTED type="number">56</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A3M21>
+          <TABLEAU2A12>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A12>
+          <TABLEAU2A34>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A34>
+          <TABLEAU1A1M41>
+            <COLLECTED type="number">3</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU1A1M41>
+          <TABLEAU2A13>
+            <COLLECTED type="number">2</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A13>
+          <TABLEAU2A35>
+            <COLLECTED type="number">4</COLLECTED>
+            <EDITED type="null" />
+            <FORCED type="null" />
+            <INPUTTED type="null" />
+            <PREVIOUS type="null" />
+          </TABLEAU2A35>
+        </COLLECTED>
+        <EXTERNAL>
+        <CODESA>
+          <CODESA type="string">AAA</CODESA>
+          <CODESA type="string">BBB</CODESA>
+          <CODESA type="string">CCC</CODESA>
+          <CODESA type="string">DDD</CODESA>
+          </CODESA>
+        </EXTERNAL>
+      </Data>
+    </SurveyUnit>
+  </SurveyUnits>
+</Campaign>

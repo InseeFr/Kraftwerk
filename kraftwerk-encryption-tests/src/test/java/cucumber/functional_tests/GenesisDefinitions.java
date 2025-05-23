@@ -18,11 +18,14 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import stubs.ConfigStub;
 import stubs.GenesisClientStub;
 
@@ -50,6 +53,9 @@ public class GenesisDefinitions {
 
     private boolean isUsingEncryption;
     KraftwerkExecutionContext kraftwerkExecutionContext;
+
+    @Autowired
+    private ApplicationContext context;
 
     @Before
     public void clean() throws SQLException {
@@ -266,7 +272,8 @@ public class GenesisDefinitions {
     @Then("We should be able to decrypt the file \\(Genesis)")
     public void check_genesis_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
         Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(kraftwerkExecutionContext);
+        SymmetricEncryptionEndpoint symmetricEncryptionEndpoint =
+                TestConstants.getSymmetricEncryptionEndpointForTest(context.getBean(VaultCaller.class));
 
 
         //Check CSV
