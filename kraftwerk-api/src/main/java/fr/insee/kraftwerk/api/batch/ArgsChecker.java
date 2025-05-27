@@ -63,6 +63,7 @@ public class ArgsChecker {
         if(this.argServiceName == null || this.argCampaignId == null ) {
             throw new IllegalArgumentException("Invalid number of arguments");
         }
+        this.campaignId = this.argCampaignId;
     }
 
     void checkServiceName() {
