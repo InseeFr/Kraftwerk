@@ -143,7 +143,7 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
             log.error(e.toString());
             System.exit(1);
         }
-        log.info("Launching Kraftwerk in API mode...");
+        log.info("Launching Kraftwerk in API mode (V2)...");
 
 
     }

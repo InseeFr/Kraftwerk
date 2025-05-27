@@ -139,18 +139,10 @@ public class GenesisClient {
 	 */
 	public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) throws KraftwerkException {
 		//Convert Array into String
-		StringBuilder sbModes = new StringBuilder();
-		int index = 0;
-		for(String mode : modes) {
-			sbModes.append(mode);
-			if(modes.size() > index + 1 ) {
-				sbModes.append(",");
-			}
-			index++;
-		}
+		String modesQueryParam = String.join(",", modes);
 
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latestV2?questionnaireId=%s&modes=%s",
-				configProperties.getGenesisUrl(), questionnaireId, sbModes.toString());
+				configProperties.getGenesisUrl(), questionnaireId, modesQueryParam);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}

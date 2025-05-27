@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 //public class KraftwerkBatch implements CommandLineRunner {
 public class KraftwerkBatch {
-
+/*
     ConfigProperties configProperties;
     MinioConfig minioConfig;
     FileUtilsInterface fileSystem;
@@ -57,7 +57,7 @@ public class KraftwerkBatch {
     //@Override
     public void run(String... args) {
         log.info("Disabling KraftwerkBatch...");
-        /*
+
         try {
             //If .jar launched with cli args
             if (args.length > 0) {
@@ -131,15 +131,15 @@ public class KraftwerkBatch {
             System.exit(1);
         }
         log.info("Launching Kraftwerk in API mode...");
-        */
+
     }
 
-    /**
+    / **
      * Throws a IllegalArgumentException if the arguments are not valid (ex: unparseable boolean)
      * KraftwerkServiceType is already checked by valueOf
      * @param args list of CLI arguments
      * @throws IllegalArgumentException if invalid argument
-     */
+     * /
     private static void checkArgs(String[] args) throws IllegalArgumentException{
         if(args.length != 6) {
             throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 6 !".formatted(args.length));
@@ -158,4 +158,5 @@ public class KraftwerkBatch {
     private static boolean isNotBoolean(String argToCheck){
         return !argToCheck.equals("true") && !argToCheck.equals("false");
     }
+    */
 }
