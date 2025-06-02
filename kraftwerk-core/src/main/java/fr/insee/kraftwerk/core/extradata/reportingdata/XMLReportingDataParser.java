@@ -2,7 +2,6 @@ package fr.insee.kraftwerk.core.extradata.reportingdata;
 
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xml.XmlFileReader;
@@ -187,31 +186,31 @@ public class XMLReportingDataParser extends ReportingDataParser {
             return;
         }
 
-        if (identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME) != null) {
-            reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement(Constants.IDENTIFICATION_NAME).getValue());
+        if (identificationElement.getFirstChildElement("identification") != null) {
+            reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement("identification").getValue());
         }
-        if (identificationElement.getFirstChildElement(Constants.ACCESS_NAME) != null) {
-            reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement(Constants.ACCESS_NAME).getValue());
-        }
-
-        if (identificationElement.getFirstChildElement(Constants.SITUATION_NAME) != null) {
-            reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement(Constants.SITUATION_NAME).getValue());
+        if (identificationElement.getFirstChildElement("access") != null) {
+            reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement("access").getValue());
         }
 
-        if (identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME) != null) {
-            reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement(Constants.OCCUPANT_NAME).getValue());
+        if (identificationElement.getFirstChildElement("situation") != null) {
+            reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement("situation").getValue());
         }
 
-        if (identificationElement.getFirstChildElement(Constants.CATEGORY_NAME) != null) {
-            reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement(Constants.CATEGORY_NAME).getValue());
+        if (identificationElement.getFirstChildElement("occupant") != null) {
+            reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement("occupant").getValue());
         }
 
-        if (identificationElement.getFirstChildElement(Constants.INDIVIDUAL_STATUS) != null) {
-            reportingDataUE.getIdentification().setIndividualStatus(identificationElement.getFirstChildElement(Constants.INDIVIDUAL_STATUS).getValue());
+        if (identificationElement.getFirstChildElement("category") != null) {
+            reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement("category").getValue());
         }
 
-        if (identificationElement.getFirstChildElement(Constants.INTERVIEWER_CAN_PROCESS) != null) {
-            reportingDataUE.getIdentification().setInterviewerCanProcess(identificationElement.getFirstChildElement(Constants.INTERVIEWER_CAN_PROCESS).getValue());
+        if (identificationElement.getFirstChildElement("individualStatus") != null) {
+            reportingDataUE.getIdentification().setIndividualStatus(identificationElement.getFirstChildElement("individualStatus").getValue());
+        }
+
+        if (identificationElement.getFirstChildElement("interviewerCanProcess") != null) {
+            reportingDataUE.getIdentification().setInterviewerCanProcess(identificationElement.getFirstChildElement("interviewerCanProcess").getValue());
         }
     }
 
