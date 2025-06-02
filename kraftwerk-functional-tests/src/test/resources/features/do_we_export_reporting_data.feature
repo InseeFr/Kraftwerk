@@ -13,9 +13,9 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedReportingDataFieldCount : Expected field quantity excluding interrogationId
       |ReportingDataFile                  |Directory                        |OutputFileName                                         |ExpectedReportingDataFieldCount   |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |84                                |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |84                                |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |40                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v1      |SAMPLETEST-REPORTINGDATA-v1_REPORTINGDATA.csv          |85                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv          |85                                |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-MOOG-v1 |SAMPLETEST-REPORTINGDATA-MOOG-v1_REPORTINGDATA.csv     |41                                |
 
 
 
@@ -95,6 +95,7 @@ Feature: Do we save correctly all reporting data ?
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedIndividualStatus>" in the "INDIVIDUALSTATUS" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedInterviewerCanProcess>" in the "INTERVIEWERCANPROCESS" field
     And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOccupant>" in the "OCCUPANT" field
+    And For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "OUTCOME_SPOTTING" field
 
 
     Examples:
@@ -104,22 +105,23 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |ReportingDataFile                  |Directory                         |OutputFileName                                    |InterrogationId   |ExpectedIdentification | ExpectedTypeSpotting   | ExpectedIndividualStatus | ExpectedInterviewerCanProcess | ExpectedOccupant |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2       |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |DESTROY                |                        |                          |                               |                  |
-      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3       |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv     |99P10352919       |IDENTIFIED             |                        |                          |                               | IDENTIFIED       |
-      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL987_tech    |                       | INDTEL                 | OTHER_ADDRESS            |                               |                  |
-      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4       |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv     |INDTEL811_tech1   |                       | INDTEL                 | SAME_ADDRESS             |                               |                  |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F02_tech     |                       | INDF2F                 | SAME_ADDRESS             |                               |                  |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F05_tech     |                       | INDF2F                 | OTHER_ADDRESS            | YES                           |                  |
-      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5       |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv     |INDF2F15_tech     |                       | INDF2F                 | OTHER_ADDRESS            | NO                            |                  |
+      |ReportingDataFile                  |Directory                             |OutputFileName                                     |InterrogationId       |ExpectedIdentification | ExpectedTypeSpotting   | ExpectedIndividualStatus | ExpectedInterviewerCanProcess | ExpectedOccupant | ExpectedOutcomeSpottingStatus |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2           |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000001               |DESTROY                |                        |                          |                               |                  | DESTROY                       |
+      |reporting_us.xml                   |SAMPLETEST-REPORTINGDATA-V3           |SAMPLETEST-REPORTINGDATA-V3_REPORTINGDATA.csv      |99P10352919           |IDENTIFIED             |                        |                          |                               | IDENTIFIED       | ACCPRIDENT                    |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4           |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv      |INDTEL987_tech        |                       | INDTEL                 | OTHER_ADDRESS            |                               |                  |                               |
+      |campaign.extract_indtel_us9894.xml |SAMPLETEST-REPORTINGDATA-V4           |SAMPLETEST-REPORTINGDATA-V4_REPORTINGDATA.csv      |INDTEL811_tech1       |                       | INDTEL                 | SAME_ADDRESS             |                               |                  |                               |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5           |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv      |INDF2F02_tech         |                       | INDF2F                 | SAME_ADDRESS             |                               |                  |                               |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5           |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv      |INDF2F05_tech         |                       | INDF2F                 | OTHER_ADDRESS            | YES                           |                  |                               |
+      |campaign.extract_indf2f_us9894.xml |SAMPLETEST-REPORTINGDATA-V5           |SAMPLETEST-REPORTINGDATA-V5_REPORTINGDATA.csv      |INDF2F15_tech         |                       | INDF2F                 | OTHER_ADDRESS            | NO                            |                  |                               |
+      |reporting_outcome_nouveauIndTel.xml|SAMPLETEST-REPORTINGDATA-V6_newINDTEL |SAMPLETEST-REPORTINGDATA-V6_newINDTEL_REPORTINGDATA.csv|INDORDOADR        |                       | INDTEL                 | OTHERADRESS              |                               |                  | INDORDOADR                    |
+      |reporting_outcome_nouveauIndF2F.xml|SAMPLETEST-REPORTINGDATA-V6_newINDF2F |SAMPLETEST-REPORTINGDATA-V6_newINDF2F_REPORTINGDATA.csv|INDNORDOADR       |                       | INDF2F                 | OTHERADRESS              | YES                           |                  | INDNORDOADR                   |
 
 
-
-  Scenario Outline: Does the OUTCOME_SPOTTING is computed correctly using a standard VTL file
+  Scenario Outline: Does the reporting standard VTL file is read correctly
     Given Step 0 : We have some survey in directory "<Directory>"
     And We have reporting data file in "<ReportingDataFile>"
     When We launch reporting data service
-    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedOutcomeSpottingStatus>" in the "OUTCOME_SPOTTING" field
+    Then For SurveyUnit "<InterrogationId>" in a file named "<OutputFileName>" in directory "<Directory>" we should have "<ExpectedNewVarStatus>" in the "new_var" field
 
     Examples:
     # Parameters :
@@ -128,10 +130,9 @@ Feature: Do we save correctly all reporting data ?
     # - OutputFileName : Name of reporting data file (with .csv extension)
     # - ExpectedOutcomeSpottingStatus : Expected outcome spotting status in outputfile
 
-      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedOutcomeSpottingStatus   |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                            |
+      |ReportingDataFile                  |Directory                        |OutputFileName                                    |InterrogationId   |ExpectedNewVarStatus   |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  |SAMPLETEST-REPORTINGDATA-v2      |SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv     |0000001           |TEST                   |
 
-    #TODO Adapt this test when we have the correct TEL .vtl script
 
   Scenario Outline: Reporting data only export (main paths)
     Given Step 0 : We have some survey in directory "<Directory>"
@@ -145,7 +146,7 @@ Feature: Do we save correctly all reporting data ?
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                     |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           | TEST                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv      |0000002           |IDENTIFIED             |WFT             | 5                           | NACCNO                        |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
 
   Scenario Outline: Reporting data new variables export
     Given Step 0 : We have some survey in directory "<Directory>"
@@ -175,4 +176,4 @@ Feature: Do we save correctly all reporting data ?
     And The output file "<RootOutputFileName>" should not exist
     Examples:
       |ReportingDataFile                  | Directory                    | OutputFileName                                |InterrogationId   |ExpectedIdentification |ExpectedStatus  | ExpectedSpecificStatusCount | ExpectedOutcomeSpottingStatus |RootOutputFileName                     |
-      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv |0000002           |IDENTIFIED             |WFT             | 5                           | TEST                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
+      |suivi/SAMPLEREPORTINGDATA_TEL.xml  | SAMPLETEST-REPORTINGDATA-v2  | SAMPLETEST-REPORTINGDATA-v2_REPORTINGDATA.csv |0000002           |IDENTIFIED             |WFT             | 5                           | NACCNO                          |SAMPLETEST-REPORTINGDATA-v2_RACINE.csv |
