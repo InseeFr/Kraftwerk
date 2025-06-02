@@ -57,16 +57,12 @@ public class EncryptionUtilsImpl implements EncryptionUtils {
     ) throws KraftwerkException {
         SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = getSymmetricEncryptionEndpoint();
 
-        try(FileInputStream fileInputStream = new FileInputStream(pathOfFileToEncrypt.toFile());
-            InputStream outInputStream = symmetricEncryptionEndpoint.getEncryptedInputStream(fileInputStream,
-                    ENCRYPTION_BUFFER_SIZE)
-        ){
-                return  outInputStream;
+        try(FileInputStream fileInputStream = new FileInputStream(pathOfFileToEncrypt.toFile())){
+            return symmetricEncryptionEndpoint.getEncryptedInputStream(fileInputStream, ENCRYPTION_BUFFER_SIZE);
         }catch (IOException e){
             throw new KraftwerkException(500,
-                    "IO Exception during encryption : %s !".formatted(e.toString()));
+                    "IO Exception during encryption : %s caused by %s !".formatted(e.toString(), e.getCause().toString()));
         }
-
     }
 
     @NotNull
