@@ -7,6 +7,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
+import cucumber.functional_tests.config.CucumberSpringConfiguration;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -29,6 +30,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
+import fr.insee.libjavachiffrement.vault.VaultCaller;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
@@ -37,6 +39,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -64,6 +71,9 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Main example
+@ContextConfiguration(classes = CucumberSpringConfiguration.class)
+@ActiveProfiles("test-cucumber")
+@SpringBootTest
 public class MainDefinitions {
 
 	Path inDirectory = Paths.get(TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY);
@@ -81,12 +91,17 @@ public class MainDefinitions {
 	KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	boolean isUsingEncryption;
+	static SymmetricEncryptionEndpoint symmetricEncryptionEndpoint;
+
+	@Autowired
+	private ApplicationContext context;
 
 	@BeforeAll
 	public static void clean() throws SQLException {
 		FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 		try {
 			fileUtilsInterface.deleteDirectory(outDirectory);
+			fileUtilsInterface.deleteDirectory(Paths.get(TestConstants.TEST_RESOURCES_DIRECTORY).resolve("temp"));
 		} catch (Exception ignored){
 			//Ignored exception
 		}
@@ -729,10 +744,10 @@ public class MainDefinitions {
 	}
 
 	@Then("We should be able to decrypt the file")
-	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
+	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException, InterruptedException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-		SymmetricEncryptionEndpoint symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(kraftwerkExecutionContext);
+		VaultCaller vaultCaller = context.getBean(VaultCaller.class);
+		symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(vaultCaller);
 
 		//Check CSV
 		Path encryptedFilePath =
