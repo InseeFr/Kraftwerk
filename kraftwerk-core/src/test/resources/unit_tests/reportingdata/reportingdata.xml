@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Campaign>
    <Id>LOG2023M02</Id>
+   <IdentificationConfiguration>IASCO</IdentificationConfiguration>
    <OrganizationalUnits>
       <OrganizationalUnit>
          <CollectionStartDate>1686292973000</CollectionStartDate>
