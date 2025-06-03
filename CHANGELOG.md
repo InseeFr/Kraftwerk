@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.3.6 [2025-06-03]
+
+### Added
+- reporting data : new calculation for OUTCOME_SPOTTING
+- reporting data : all variables are in capital
+
+### Fixed
+- symmetrical encryption
+
+### Updated
+- pitest 1.2.3
+- pitest-maven 1.19.4
+- springboot 3.5.0
+- trevas 1.9.0
+- duckdb 1.3.0.0
+- opencsv 5.11.1
+
 ## 3.3.5 [2025-05-19]
 
 ### Added
