@@ -172,7 +172,7 @@ public class MainProcessingGenesis {
 				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
 
 				for (int indexPartition = 0; indexPartition < blockNb; indexPartition++) {
-					log.info("=============== (V2) PROCESS BLOCK N°{} ==============", indexPartition);
+					log.info("=============== (V2) PROCESS BLOCK N°{} ==============", indexPartition + 1);
 
 					//USING PAGINATION INSTEAD
 					List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, workersNumbers, workerId,
@@ -182,7 +182,7 @@ public class MainProcessingGenesis {
 					//Free RAM with unused List in the rest of the loop.
 					ids = null;
 
-					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, blockNb);
+					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, blockNb);
 					vtlBindings = new VtlBindings();
 
 					unimodalProcess(suLatest);
