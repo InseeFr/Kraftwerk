@@ -108,8 +108,7 @@ public class GenesisClientStub extends GenesisClient {
 
     //========= OPTIMISATIONS PERFS (START) ==========
     @Override
-    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, int workersNumbers, int workerId,
-                                                              long blockSize, long page) {
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
         //For first version of this stub, we Use same stub as "getInterrogationIds()"
         return getInterrogationIds(questionnaireId);
     }

@@ -89,10 +89,9 @@ public class GenesisClient {
 	/**
 	 * @author Adrien Marchal
 	 */
-	public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, int workersNumbers, int workerId,
-															  long blockSize, long page) throws KraftwerkException {
-		String url = String.format("%s/interrogations/by-questionnaire/%s/paginated?totalSize=%s&workersNumbers=%s&workerId=%s&blockSize=%s&page=%s",
-				configProperties.getGenesisUrl(), questionnaireId, totalSize, workersNumbers, workerId, blockSize, page);
+	public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire/%s/paginated?totalSize=%s&blockSize=%s&page=%s",
+				configProperties.getGenesisUrl(), questionnaireId, totalSize, blockSize, page);
 		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}

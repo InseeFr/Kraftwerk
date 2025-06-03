@@ -166,23 +166,25 @@ public class MainProcessingGenesis {
 				//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
 				long totalSize = client.countInterrogationIds(questionnaireId);
 				//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
-				long blockNb = totalSize < batchSize ? 1 : totalSize / batchSize;
-				log.info("====> (V2) BLOCKS NUMBER TO PROCESS for questionnaireId {} : {}", questionnaireId, blockNb);
+				long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
+				log.info("====> (V2) Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
+				long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + 1;
+						log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
 
 				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
 
-				for (int indexPartition = 0; indexPartition < blockNb; indexPartition++) {
-					log.info("=============== (V2) PROCESS BLOCK N°{} ==============", indexPartition + 1);
+				for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
+					long absoluteBlockIndex = (workerId - 1) * workerBlocksNb + indexPartition;
+					log.info("=============== (V2) PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
 
 					//USING PAGINATION INSTEAD
-					List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, workersNumbers, workerId,
-																					batchSize, indexPartition);
+					List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
 
 					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
 					//Free RAM with unused List in the rest of the loop.
 					ids = null;
 
-					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, blockNb);
+					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
 					vtlBindings = new VtlBindings();
 
 					unimodalProcess(suLatest);

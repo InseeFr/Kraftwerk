@@ -81,8 +81,7 @@ class MainProcessingGenesisTest {
 
             //========= OPTIMISATIONS PERFS (START) ==========
             @Override
-            public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, int workersNumbers, int workerId,
-                                                                      long blockSize, long page) {
+            public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
                 return Collections.singletonList(new InterrogationId());
             }
 
