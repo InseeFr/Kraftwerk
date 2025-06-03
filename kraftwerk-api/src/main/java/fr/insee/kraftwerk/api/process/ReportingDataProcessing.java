@@ -116,16 +116,22 @@ public class ReportingDataProcessing {
 
     public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
         Path reportingDataFile = modeInputs.getReportingDataFile();
-        if (reportingDataFile != null) {
-            ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
-            if (reportingDataFile.toString().contains(".xml")) {
-                XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
-                xMLReportingDataParser.parseReportingData(reportingData, data, true);
-
-            } else if (reportingDataFile.toString().contains(".csv")) {
-                CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
-                cSVReportingDataParser.parseReportingData(reportingData, data, true);
-            }
+        if(!reportingDataFile.toFile().exists()){
+            throw new KraftwerkException(404,
+                    "Reporting data file %s not found !".formatted(reportingDataFile.toString()));
         }
+        ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
+        if (reportingDataFile.toString().endsWith(".xml")) {
+            XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
+            xMLReportingDataParser.parseReportingData(reportingData, data, true);
+            return;
+        }
+        if (reportingDataFile.toString().endsWith(".csv")) {
+            CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
+            cSVReportingDataParser.parseReportingData(reportingData, data, true);
+            return;
+        }
+        throw new KraftwerkException(400,
+                "Reporting data file path must be a xml or csv file ! Got %s".formatted(reportingDataFile.toString()));
     }
 }

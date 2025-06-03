@@ -108,12 +108,7 @@ class MainProcessingGenesisTest {
         };
 
 
-        FileUtilsInterface fileUtils = new FileSystemImpl("defaultDir") {
-            @Override
-            public String findFile(String directory, String fileName) {
-                return "src/test/resources/ddi-SAMPLETEST-DATAONLY-v1.xml";
-            }
-        };
+        FileUtilsInterface fileUtils = new FileSystemImpl("defaultDir");
 
         KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                 null,
