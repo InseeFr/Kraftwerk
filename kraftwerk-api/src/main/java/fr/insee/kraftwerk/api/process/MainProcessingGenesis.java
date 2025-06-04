@@ -168,7 +168,8 @@ public class MainProcessingGenesis {
 				//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
 				long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
 				log.info("====> (V2) Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
-				long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + 1;
+				long optionalSupplementBlock = blockNb % workersNumbers == 0 ? 0 : 1;
+				long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
 						log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
 
 				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
