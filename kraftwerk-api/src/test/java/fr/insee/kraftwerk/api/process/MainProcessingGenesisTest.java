@@ -78,6 +78,32 @@ class MainProcessingGenesisTest {
                 surveyUnitUpdateLatest.setMode(Mode.WEB);
                 return Collections.singletonList(surveyUnitUpdateLatest);
             }
+
+            //========= OPTIMISATIONS PERFS (START) ==========
+            @Override
+            public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
+                return Collections.singletonList(new InterrogationId());
+            }
+
+            @Override
+            public Long countInterrogationIds(String questionnaireId) {
+                return 1L;
+            }
+
+            @Override
+            public List<String> getDistinctModesByQuestionnaire(String questionnaireId) {
+                return Collections.singletonList(Mode.WEB.toString());
+            }
+
+            @Override
+            public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
+                SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
+                surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
+                surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
+                surveyUnitUpdateLatest.setMode(Mode.WEB);
+                return Collections.singletonList(surveyUnitUpdateLatest);
+            }
+            //========= OPTIMISATIONS PERFS (END) ==========
         };
 
 
@@ -109,6 +135,17 @@ class MainProcessingGenesisTest {
         String idCampaign = "campaign1";
         assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
     }
+
+    //========= OPTIMISATIONS PERFS (START) ==========
+    /**
+     * @author Adrien Marchal
+     */
+    @Test
+    void testRunMainV2Ok() {
+        String idCampaign = "campaign1";
+        assertDoesNotThrow(() -> mainProcessing.runMainV2(idCampaign, 100, 1, 1));
+    }
+    //========= OPTIMISATIONS PERFS (END) ==========
 
 
 }
