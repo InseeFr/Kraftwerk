@@ -163,35 +163,7 @@ public class MainProcessingGenesis {
 			}
 
 			for (String questionnaireId : questionnaireModelIds) {
-				//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
-				long totalSize = client.countInterrogationIds(questionnaireId);
-				//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
-				long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
-				log.info("====> (V2) Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
-				long optionalSupplementBlock = blockNb % workersNumbers == 0 ? 0 : 1;
-				long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
-						log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
-
-				List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
-
-				for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
-					long absoluteBlockIndex = (workerId - 1) * workerBlocksNb + indexPartition;
-					log.info("=============== (V2) PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
-
-					//USING PAGINATION INSTEAD
-					List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
-
-					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
-					//Free RAM with unused List in the rest of the loop.
-					ids = null;
-
-					log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
-					vtlBindings = new VtlBindings();
-
-					unimodalProcess(suLatest);
-					multimodalProcess();
-					insertDatabase();
-				}
+				runMainV2OnQuestionnaire(batchSize, workersNumbers, workerId, questionnaireId);
 			}
 			outputFileWriterV2();
 			writeErrors();
@@ -201,6 +173,47 @@ public class MainProcessingGenesis {
 			throw new KraftwerkException(500,"SQL error");
 		}
 		SqlUtils.deleteDatabaseFile(databasePath);
+	}
+
+	private void runMainV2OnQuestionnaire(
+			int batchSize, int workersNumbers, int workerId, String questionnaireId
+	) throws KraftwerkException {
+		//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
+		long totalSize = client.countInterrogationIds(questionnaireId);
+		//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
+		long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
+		log.info("====> (V2) Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
+		long optionalSupplementBlock = blockNb % workersNumbers == 0 ? 0 : 1;
+		long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
+		log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
+
+		List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
+
+		for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
+			runMainV2OnPartition(batchSize, workerId, questionnaireId, workerBlocksNb, indexPartition, totalSize, modes);
+		}
+	}
+
+	private void runMainV2OnPartition(
+			int batchSize, int workerId, String questionnaireId, long workerBlocksNb, int indexPartition,
+			long totalSize, List<String> modes
+	) throws KraftwerkException {
+		long absoluteBlockIndex = (workerId - 1) * workerBlocksNb + indexPartition;
+		log.info("=============== (V2) PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
+
+		//USING PAGINATION INSTEAD
+		List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
+
+		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
+		//Free RAM with unused List in the rest of the loop.
+		ids = null;
+
+		log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
+		vtlBindings = new VtlBindings();
+
+		unimodalProcess(suLatest);
+		multimodalProcess();
+		insertDatabase();
 	}
 	//========= OPTIMISATIONS PERFS (END) ==========
 
