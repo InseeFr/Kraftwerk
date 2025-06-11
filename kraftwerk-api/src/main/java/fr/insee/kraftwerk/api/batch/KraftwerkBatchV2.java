@@ -72,28 +72,29 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
                 for(String option : args.getOptionNames()) {
                     switch(option) {
                         case ARG_SERVICE:
-                            argsCheckerBuilder.argServiceName(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argServiceName(getValue(option, args));
                             break;
                         case ARG_ARCHIVE:
-                            argsCheckerBuilder.argIsArchive(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argIsArchive(getValue(option, args));
                             break;
                         case ARG_REPORTING_DATA:
-                            argsCheckerBuilder.argIsReportingData(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argIsReportingData(getValue(option, args));
                             break;
                         case ARG_CAMPAIGNID:
-                            argsCheckerBuilder.argCampaignId(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argCampaignId(getValue(option, args));
                             break;
                         case ARG_WORKERS_NB:
-                            argsCheckerBuilder.argWorkersNb(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argWorkersNb(getValue(option, args));
                             break;
                         case ARG_WORKER_INDEX:
-                            argsCheckerBuilder.argWorkerIndex(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argWorkerIndex(getValue(option, args));
                             break;
                         case ARG_WITH_ENCRYPTION:
-                            argsCheckerBuilder.argWithEncryption(!args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null);
+                            argsCheckerBuilder.argWithEncryption(getValue(option, args));
                             break;
-                        //default:
-                        // code block
+                        default:
+                            log.warn("unknown option : {}", option);
+                            break;
                     }
                 }
                 ArgsChecker argsChecker = argsCheckerBuilder.build();
@@ -146,6 +147,11 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
         log.info("Launching Kraftwerk in API mode (V2)...");
 
 
+    }
+
+
+    private static String getValue(String option, ApplicationArguments args) {
+        return !args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null;
     }
 
 
