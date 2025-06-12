@@ -158,7 +158,7 @@ public class MinioImpl implements FileUtilsInterface {
 
     @Override
     public void writeFile(String path, InputStream inputStream, boolean replace) {
-        writeFileOnMinio(path.replace("\\","/"), inputStream, replace);
+        writeFileOnMinio(path.replace("\\","/"), inputStream, -1, replace);
     }
 
     @Override
@@ -244,37 +244,17 @@ public class MinioImpl implements FileUtilsInterface {
     private void writeFileOnMinio(String minioPath, InputStream inputStream, long fileSize, boolean replace) {
         try{
             if(replace || !isFileExists(minioPath)){
-                minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, fileSize, -1).object(minioPath.replace("\\","/")).build());
+                minioClient.putObject(
+                        PutObjectArgs.builder().bucket(bucketName).stream(
+                                inputStream,
+                                fileSize,
+                                fileSize == -1 ? 10485760 : -1
+                        ).object(minioPath.replace("\\","/")).build());
                 return;
             }
         }catch (Exception e) {
             log.error(e.toString());
         }
-        try (InputStream alreadyExistingInputStream = readFile(minioPath)){
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            alreadyExistingInputStream.transferTo(baos);
-            inputStream.transferTo(baos);
-            inputStream.close();
-            InputStream appendedInputStream = new ByteArrayInputStream(baos.toByteArray());
-            int size = baos.size();
-            baos.close();
-            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(appendedInputStream, size, -1).object(minioPath.replace("\\","/")).build());
-            appendedInputStream.close();
-        } catch (Exception e) {
-            log.error(e.toString());
-        }
-    }
-
-    private void writeFileOnMinio(String minioPath, InputStream inputStream, boolean replace) {
-        try {
-            if (replace || !isFileExists(minioPath)) {
-                minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).stream(inputStream, -1, 10485760).object(minioPath.replace("\\", "/")).build());
-                return;
-            }
-        }catch (Exception e) {
-            log.error(e.toString());
-        }
-
         try (InputStream alreadyExistingInputStream = readFile(minioPath)){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             alreadyExistingInputStream.transferTo(baos);
