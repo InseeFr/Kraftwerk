@@ -219,7 +219,7 @@ public class CsvOutputFiles extends OutputFiles {
 						}
 						String result = applyRegExOnBlockFile(sbInput, regExPatternsTab, boolColumnNames);
 
-						Files.write(tmpOutputFile,(result + "\n").getBytes(),StandardOpenOption.APPEND);
+						Files.write(tmpOutputFile,(result).getBytes(),StandardOpenOption.APPEND);
 
 						//free RAM as soon as possible -> empty "sbInput"
 						sbInput.delete(0, sbInput.length());
