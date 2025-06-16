@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.process;
 
 import fr.insee.bpm.exceptions.MetadataParserException;
+import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
@@ -28,8 +29,12 @@ import org.apache.commons.collections4.ListUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -135,6 +140,55 @@ public class MainProcessingGenesis {
 		SqlUtils.deleteDatabaseFile(databasePath);
 	}
 
+	public Map<String, Object> runMainJson(String campaignId, String interrogationId) throws KraftwerkException, IOException {
+		Map<String, Object> results = new LinkedHashMap<>();
+		results.put("interrogationId", interrogationId);
+		log.info("Export json for campaign {} and interrogationId {}", campaignId, interrogationId);
+		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
+				campaignId));
+		//We delete database at start (in case there is already one)
+		SqlUtils.deleteDatabaseFile(databasePath);
+		init(campaignId);
+		//Try with resources to close database when done
+		try (Connection tryDatabase = config.isDuckDbInMemory() ?
+				SqlUtils.openConnection()
+				: SqlUtils.openConnection(Path.of(databasePath))) {
+			if(tryDatabase == null){
+				throw new KraftwerkException(500,"Error during internal database creation");
+			}
+			this.database = tryDatabase.createStatement();
+			String questionnaireModelId = client.getQuestionnaireModelIdByInterrogationId(interrogationId);
+			if (questionnaireModelId.isEmpty()) {
+				throw new KraftwerkException(204, null);
+			}
+			results.put("questionnaireModelId", questionnaireModelId);
+
+			//We need to add metadata to the output
+			results.put("partitionId","TO BE IMPLEMENTED");
+			results.put("surveyUnitId","TO BE IMPLEMENTED");
+			results.put("contextualId","TO BE IMPLEMENTED");
+			results.put("mode","TO BE IMPLEMENTED");
+			results.put("isCapturedIndirectly","TO BE IMPLEMENTED");
+			results.put("validationDate","TO BE IMPLEMENTED");
+
+			InterrogationId id = new InterrogationId();
+			id.setId(interrogationId);
+			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, List.of(id));
+			log.info("InterrogationId {} retrieved from Genesis",id.getId());
+			vtlBindings = new VtlBindings();
+			unimodalProcess(suLatest);
+			multimodalProcess();
+			insertDatabase();
+			results.put("data",transformDataToJson());
+			if (!database.isClosed()){database.close();}
+		}catch (SQLException e){
+			log.error(e.toString());
+			throw new KraftwerkException(500,"SQL error");
+		}
+		SqlUtils.deleteDatabaseFile(databasePath);
+		return results;
+	}
+
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
 		for (String dataMode : userInputs.getModeInputsMap().keySet()) {
@@ -166,6 +220,35 @@ public class MainProcessingGenesis {
 	/* Step 6 : Write errors */
 	private void writeErrors() {
 		TextFileWriter.writeErrorsFile(specsDirectory, kraftwerkExecutionContext, fileUtilsInterface);
+	}
+
+	private Map<String,Object> transformDataToJson() throws KraftwerkException {
+		Map<String, Object> resultByScope = new LinkedHashMap<>();
+		try {
+			MetadataModel firstMetadataModel = metadataModels.entrySet().iterator().next().getValue();
+			Map<String, Group> groups = firstMetadataModel.getGroups();
+			for (String group : groups.keySet()){
+				List<Object> listIteration = new ArrayList<>();
+				ResultSet rs = database.executeQuery("SELECT * FROM "+group);
+
+				ResultSetMetaData meta = rs.getMetaData();
+				int cols = meta.getColumnCount();
+
+				while (rs.next()) {
+					Map<String, Object> row = new LinkedHashMap<>();
+					for (int i = 1; i <= cols; i++) {
+						if (meta.getColumnLabel(i).equals("interrogationId")) continue;
+						row.put(meta.getColumnLabel(i), rs.getObject(i));
+					}
+					listIteration.add(row);
+				}
+				resultByScope.put(group,listIteration);
+			}
+		} catch (Exception e){
+			log.error(e.getMessage());
+			throw new KraftwerkException(500,"SQL error : extraction step");
+		}
+		return resultByScope;
 	}
 
 }
