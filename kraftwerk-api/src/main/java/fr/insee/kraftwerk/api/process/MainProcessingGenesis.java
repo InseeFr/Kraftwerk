@@ -141,13 +141,37 @@ public class MainProcessingGenesis {
 	/**
 	 * @author Adrien Marchal
 	 */
+	public void initV2(String campaignId) throws KraftwerkException {
+		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
+				? "with DDI": "without DDI");
+		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
+		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
+		//First we check the modes present in database for the given questionnaire
+		//We build userInputs for the given questionnaire
+		userInputs = new UserInputsGenesis(specsDirectory,
+				client.getModesV2(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
+		if (!userInputs.getModes().isEmpty()) {
+			try {
+				metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+			} catch (MetadataParserException e) {
+				throw new KraftwerkException(500, e.getMessage());
+			}
+		} else {
+			log.error("No source found for campaign {}", campaignId);
+		}
+	}
+
+
+	/**
+	 * @author Adrien Marchal
+	 */
 	public void runMainV2(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
 		log.info("(V2) Batch size of interrogations retrieved from Genesis: {}", batchSize);
 		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
 				campaignId));
 		//We delete database at start (in case there is already one)
 		SqlUtils.deleteDatabaseFile(databasePath);
-		init(campaignId);
+		initV2(campaignId);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = config.isDuckDbInMemory() ?
 				SqlUtils.openConnection()
@@ -187,7 +211,7 @@ public class MainProcessingGenesis {
 		long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
 		log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
 
-		List<String> modes = client.getDistinctModesByQuestionnaire(questionnaireId);
+		List<String> modes = client.getDistinctModesByQuestionnaireIdV2(questionnaireId);
 
 		for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
 			runMainV2OnPartition(batchSize, workerId, questionnaireId, workerBlocksNb, indexPartition, totalSize, modes);
