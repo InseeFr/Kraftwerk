@@ -81,6 +81,11 @@ class MainProcessingGenesisTest {
 
             //========= OPTIMISATIONS PERFS (START) ==========
             @Override
+            public List<Mode> getModesV2(String idCampaign) {
+                return Collections.singletonList(Mode.WEB);
+            }
+
+            @Override
             public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
                 return Collections.singletonList(new InterrogationId());
             }
@@ -91,7 +96,7 @@ class MainProcessingGenesisTest {
             }
 
             @Override
-            public List<String> getDistinctModesByQuestionnaire(String questionnaireId) {
+            public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
                 return Collections.singletonList(Mode.WEB.toString());
             }
 
@@ -137,6 +142,19 @@ class MainProcessingGenesisTest {
     }
 
     //========= OPTIMISATIONS PERFS (START) ==========
+    /**
+     * @author Adrien Marchal
+     */
+    @Test
+    void testInitV2LoadsMetadata() throws Exception {
+        String idCampaign = "campaign1";
+
+        mainProcessing.initV2(idCampaign);
+
+        assertNotNull(mainProcessing.getMetadataModels());
+        assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
+    }
+
     /**
      * @author Adrien Marchal
      */
