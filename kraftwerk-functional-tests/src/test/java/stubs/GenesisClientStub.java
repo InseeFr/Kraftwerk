@@ -119,7 +119,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<String> getDistinctModesByQuestionnaire(String questionnaireId) {
+    public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
         Set<String> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
