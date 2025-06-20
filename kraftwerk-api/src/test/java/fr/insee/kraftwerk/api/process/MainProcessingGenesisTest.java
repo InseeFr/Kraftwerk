@@ -108,6 +108,11 @@ class MainProcessingGenesisTest {
                 surveyUnitUpdateLatest.setMode(Mode.WEB);
                 return Collections.singletonList(surveyUnitUpdateLatest);
             }
+
+            @Override
+            public List<String> getQuestionnaireModelIdsV2(String campaignId) {
+                return getQuestionnaireModelIds(campaignId);
+            }
             //========= OPTIMISATIONS PERFS (END) ==========
         };
 

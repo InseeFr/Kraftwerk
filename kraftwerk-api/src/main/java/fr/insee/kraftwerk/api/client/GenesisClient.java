@@ -166,4 +166,16 @@ public class GenesisClient {
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
 	}
 
+	//========= OPTIMISATIONS PERFS (START) ==========
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<String> getQuestionnaireModelIdsV2(String campaignId) throws JsonProcessingException, KraftwerkException {
+		String url = String.format("%s/questionnaires/by-campaignV2?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
+		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
+	}
+	//========= OPTIMISATIONS PERFS (END) ==========
+
 }

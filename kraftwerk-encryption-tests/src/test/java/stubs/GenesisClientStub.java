@@ -139,6 +139,12 @@ public class GenesisClientStub extends GenesisClient {
         //For first version of this stub, we Use same stub as "getUEsLatestState()"
         return getUEsLatestState(questionnaireId, interrogationIds);
     }
+
+    @Override
+    public List<String> getQuestionnaireModelIdsV2(String campaignId) {
+        //For first version of this stub, we Use same stub as "getQuestionnaireModelIds()"
+        return getQuestionnaireModelIds(campaignId);
+    }
     //========= OPTIMISATIONS PERFS (END) ==========
 
 }

@@ -181,7 +181,7 @@ public class MainProcessingGenesis {
 			}
 			this.database = tryDatabase.createStatement();
 
-			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
+			List<String> questionnaireModelIds = client.getQuestionnaireModelIdsV2(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
 			}

@@ -1,10 +1,12 @@
 package stubs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -135,9 +137,21 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
+    public List<Mode> getModesV2(String campaignId) throws KraftwerkException {
+        //For first version of this stub, we Use same stub as "getModes()"
+        return getModes(campaignId);
+    }
+
+    @Override
     public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
         //For first version of this stub, we Use same stub as "getUEsLatestState()"
         return getUEsLatestState(questionnaireId, interrogationIds);
+    }
+
+    @Override
+    public List<String> getQuestionnaireModelIdsV2(String campaignId) throws JsonProcessingException, KraftwerkException {
+        //For first version of this stub, we Use same stub as "getQuestionnaireModelIds()"
+        return getQuestionnaireModelIds(campaignId);
     }
     //========= OPTIMISATIONS PERFS (END) ==========
 
