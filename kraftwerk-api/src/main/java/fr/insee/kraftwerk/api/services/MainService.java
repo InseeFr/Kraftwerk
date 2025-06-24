@@ -133,7 +133,6 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		boolean withDDI = true;
 		boolean withEncryption = false;
-		int batchSize =1000;
 
 		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 		Map<String,Object> results;

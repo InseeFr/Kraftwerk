@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.core.data.model.DataState;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Log4j2
 public class MainProcessingGenesis {
@@ -163,17 +165,15 @@ public class MainProcessingGenesis {
 			}
 			results.put("questionnaireModelId", questionnaireModelId);
 
-			//We need to add metadata to the output
-			results.put("partitionId","TO BE IMPLEMENTED");
-			results.put("surveyUnitId","TO BE IMPLEMENTED");
-			results.put("contextualId","TO BE IMPLEMENTED");
-			results.put("mode","TO BE IMPLEMENTED");
-			results.put("isCapturedIndirectly","TO BE IMPLEMENTED");
-			results.put("validationDate","TO BE IMPLEMENTED");
-
 			InterrogationId id = new InterrogationId();
 			id.setId(interrogationId);
 			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, List.of(id));
+			results.put("partitionId",suLatest.getFirst().getCampaignId());
+			results.put("surveyUnitId",suLatest.getFirst().getSurveyUnitId());
+			results.put("contextualId",suLatest.getFirst().getContextualId());
+			results.put("mode",suLatest.getFirst().getMode());
+			results.put("isCapturedIndirectly",suLatest.getFirst().getIsCapturedIndirectly());
+			results.put("validationDate",suLatest.getFirst().getValidationDate());
 			log.info("InterrogationId {} retrieved from Genesis",id.getId());
 			vtlBindings = new VtlBindings();
 			unimodalProcess(suLatest);
