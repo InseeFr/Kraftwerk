@@ -65,7 +65,6 @@ class MainServiceTest {
     private static final String URI_MAIN = "/main";
     private static final String URI_MAIN_LUNATIC = "/main/lunatic-only";
     private static final String URI_MAIN_GENESIS = "/main/genesis";
-    private static final String URI_MAIN_GENESISV2 = "/main/genesisV2";
     private static final String URI_MAIN_GENESIS_LUNATIC = "/main/genesis/lunatic-only";
     private static final String URI_MAIN_FILE_BY_FILE = "/main/file-by-file";
 
@@ -107,7 +106,6 @@ class MainServiceTest {
     private static Stream<Arguments> endpointsMainGenesis(){
         return Stream.of(
                 Arguments.of(URI_MAIN_GENESIS),
-                Arguments.of(URI_MAIN_GENESISV2),
                 Arguments.of(URI_MAIN_GENESIS_LUNATIC )
         );
     }
@@ -404,78 +402,6 @@ class MainServiceTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("IO error", response.getBody());
     }
-
-
-    //========= OPTIMISATIONS PERFS (START) ==========
-    /**
-     * @author Adrien Marchal
-     */
-    /*** Main Genesis ***/
-
-    @Test
-    void testMainGenesisV2_Success() throws Exception {
-        String idCampaign = "test-campaign-id";
-
-        // Mock the dependencies
-        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
-        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doNothing().when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
-
-        // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
-
-        // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(idCampaign, response.getBody());
-    }
-
-    @Test
-    void testMainGenesisV2_KraftwerkException() throws Exception {
-        String idCampaign = "test-campaign-id";
-        KraftwerkException exception = new KraftwerkException( HttpStatus.BAD_REQUEST.value(), "Kraftwerk error");
-
-
-        // Mock the dependencies
-        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
-        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
-
-        // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
-
-        // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
-    }
-
-    @Test
-    void testMainGenesisV2_IOException() throws Exception {
-        String idCampaign = "test-campaign-id";
-        IOException exception = new IOException("IO error");
-
-        // Mock the dependencies
-        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
-        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMainV2(idCampaign,100, 1, 1);
-
-        // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisV2(idCampaign,100, false, 1, 1);
-
-        // THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("IO error", response.getBody());
-    }
-    //========= OPTIMISATIONS PERFS (END) ==========
-
 
     /*** Main Genesis Lunatic Only***/
 

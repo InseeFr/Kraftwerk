@@ -45,17 +45,3 @@ Feature: Output Data Encryption
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value |
       | TEST-TABLEAUX  |  AUTO11000       | TABLEAU2A11  | 4     |
-
-  Scenario Outline: Do we encrypt data if asked in genesisV2 service
-    Given Step 0 : We have some survey in directory "<CampaignId>"
-    And We have a collected variable "<VariableName>" in a document with CampaignId "<CampaignId>", InterrogationId "<InterrogationId>" with value "<Value>"
-    And We have a external variable "<VariableName>" in a document with CampaignId "<CampaignId>", InterrogationId "<InterrogationId>" with value "<Value>"
-    And We want to encrypt output data at the end of genesis process
-    When We use the GenesisV2 service with campaignId "<CampaignId>"
-    Then We should not be able to read the csv output file
-    And We should not be able to read the parquet output file
-    And We should be able to decrypt the file (Genesis)
-
-    Examples:
-      | CampaignId     |  InterrogationId | VariableName | Value |
-      | TEST-TABLEAUX  |  AUTO11000       | TABLEAU2A11  | 4     |

@@ -106,24 +106,6 @@ public class MainService extends KraftwerkService {
 	}
 
 
-	//========= OPTIMISATIONS PERFS (START) ==========
-	/**
-	 * @author Adrien Marchal
-	 */
-	@PutMapping(value = "/main/genesisV2")
-	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
-	public ResponseEntity<String> mainGenesisV2(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
-			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
-			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId) {
-		boolean withDDI = true;
-		return runWithGenesisV2(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
-	}
-	//========= OPTIMISATIONS PERFS (END) ==========
-
-
 	@PutMapping(value = "/main/genesis/lunatic-only")
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
@@ -167,28 +149,6 @@ public class MainService extends KraftwerkService {
 		}
 		return ResponseEntity.ok(campaignId);
 	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
-	/**
-	 * @author Adrien Marchal
-	 */
-	@NotNull
-	private ResponseEntity<String> runWithGenesisV2(String campaignId, boolean withDDI, boolean withEncryption, int batchSize, int workersNumbers, int workerId) {
-		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
-
-		try {
-			mpGenesis.runMainV2(campaignId, batchSize, workersNumbers, workerId);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		return ResponseEntity.ok(campaignId);
-	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 
