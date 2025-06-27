@@ -96,6 +96,17 @@ public class ReportingDataProcessing {
                         writeDatabase,
                         fileUtilsInterface
                 );
+                /*
+                //TODO : ACTIVATE "V2" for performance purposes
+                writerSequence.writeOutputFilesV2(inOrSpecDirectory,
+                        "_REPORTING_DATA_ONLY",
+                        vtlBindings,
+                        modeInputs,
+                        context,
+                        writeDatabase,
+                        fileUtilsInterface
+                );
+                */
             }
         }catch (SQLException e){
             log.error(e.toString());

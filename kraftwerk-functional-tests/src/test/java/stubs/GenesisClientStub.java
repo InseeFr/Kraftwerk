@@ -1,10 +1,12 @@
 package stubs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -104,4 +106,53 @@ public class GenesisClientStub extends GenesisClient {
 
         return set.stream().toList();
     }
+
+
+    //========= OPTIMISATIONS PERFS (START) ==========
+    @Override
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
+        //For first version of this stub, we Use same stub as "getInterrogationIds()"
+        return getInterrogationIds(questionnaireId);
+    }
+
+    @Override
+    public Long countInterrogationIds(String questionnaireId) {
+        return 1L;
+    }
+
+    @Override
+    public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
+        Set<String> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
+                .filter(
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
+                ).toList();
+
+        for(SurveyUnitUpdateLatest doc : mongoFiltered){
+            set.add(doc.getQuestionnaireId());
+        }
+
+        return set.stream().toList();
+    }
+
+    @Override
+    public List<Mode> getModesV2(String campaignId) throws KraftwerkException {
+        //For first version of this stub, we Use same stub as "getModes()"
+        return getModes(campaignId);
+    }
+
+    @Override
+    public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
+        //For first version of this stub, we Use same stub as "getUEsLatestState()"
+        return getUEsLatestState(questionnaireId, interrogationIds);
+    }
+
+    @Override
+    public List<String> getQuestionnaireModelIdsV2(String campaignId) throws JsonProcessingException, KraftwerkException {
+        //For first version of this stub, we Use same stub as "getQuestionnaireModelIds()"
+        return getQuestionnaireModelIds(campaignId);
+    }
+    //========= OPTIMISATIONS PERFS (END) ==========
+
 }
