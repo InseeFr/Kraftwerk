@@ -256,19 +256,19 @@ public class CsvOutputFiles extends OutputFiles {
 		//NOTE : change "true" or "false" by "1" or "0"
 		if(!boolColumnNames.isEmpty()) {
 			//REMINDER : in previous process (outside current loop), we surrounded all bool columns
-			//			 by "\"###" and "###\"".
+			//			 by "\"¤¤¤" and "¤¤¤\"".
 			//1) Process empty entries in boolean columns
-			Pattern p1 = Pattern.compile("\"######\"", Pattern.CASE_INSENSITIVE);
+			Pattern p1 = Pattern.compile("\"¤¤¤¤¤¤\"", Pattern.CASE_INSENSITIVE);
 			Matcher m1 = p1.matcher(result);
 			result = m1.replaceAll("\"\"");
 
 			//2) process "true" values
-			Pattern p2 = Pattern.compile("\"###true###\"", Pattern.CASE_INSENSITIVE);
+			Pattern p2 = Pattern.compile("\"¤¤¤true¤¤¤\"", Pattern.CASE_INSENSITIVE);
 			Matcher m2 = p2.matcher(result);
 			result = m2.replaceAll("\"1\"");
 
 			//3) process "false" values
-			Pattern p3 = Pattern.compile("\"###false###\"", Pattern.CASE_INSENSITIVE);
+			Pattern p3 = Pattern.compile("\"¤¤¤false¤¤¤\"", Pattern.CASE_INSENSITIVE);
 			Matcher m3 = p3.matcher(result);
 			result = m3.replaceAll("\"0\"");
 		}
@@ -305,10 +305,10 @@ public class CsvOutputFiles extends OutputFiles {
 			for(String colName : columnNames) {
 				if(boolColumnIndexes.contains(colIndex)) {
 					sbRegExPatternToFind.append("\"?([\\w\\- \\/éèê\\.àçù]*)\"?");
-					//=> we FIRST surround boolean columns by "\"###" and "###\"" to be sure
+					//=> we FIRST surround boolean columns by "\"¤¤¤" and "¤¤¤\"" to be sure
 					// not to further update "true" or "false" strings in fields which would NOT BE TAGGED as booleans.
 					//NOTE : a subsequent process will be needed if there are boolColumns
-					sbRegExPatternReplacement.append("\"###$").append(colIndex + 1).append("###\"");
+					sbRegExPatternReplacement.append("\"¤¤¤$").append(colIndex + 1).append("¤¤¤\"");
 				} else {
 					sbRegExPatternToFind.append("\"?([\\w\\- \\/éèê\\.àçù]*)\"?");
 					//we add double quotes in case of boolean column
