@@ -8,7 +8,6 @@ import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
-import fr.insee.kraftwerk.core.extradata.reportingdata.StateType;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import io.cucumber.java.en.Then;
 import org.assertj.core.api.Assertions;

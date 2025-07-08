@@ -744,7 +744,7 @@ public class MainDefinitions {
 	}
 
 	@Then("We should be able to decrypt the file")
-	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException, InterruptedException {
+	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		VaultCaller vaultCaller = context.getBean(VaultCaller.class);
 		symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(vaultCaller);

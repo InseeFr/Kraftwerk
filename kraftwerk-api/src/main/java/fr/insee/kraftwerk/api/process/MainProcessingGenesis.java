@@ -230,7 +230,7 @@ public class MainProcessingGenesis {
 
 		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
 		//Free RAM with unused List in the rest of the loop.
-		ids = null;
+		ids.clear();
 
 		log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
 		vtlBindings = new VtlBindings();

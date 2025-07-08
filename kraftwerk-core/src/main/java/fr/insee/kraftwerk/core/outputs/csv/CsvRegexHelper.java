@@ -19,13 +19,17 @@ import java.util.regex.Pattern;
 @Slf4j
 public class CsvRegexHelper {
 
+    private static final String REGULAR_EXPRESSION = "\"?([\\w\\- \\/éèê\\.àçù]*)\"?";
+    private static final String BOOLEAN_FIELD_IDENTIFIER_START = "¤¤¤";
+    private static final String BOOLEAN_FIELD_IDENTIFIER_END = "¤¤¤";
+
     /**
      *
      * @param tmpOutputFile file in which we write dada transformed by Regex
      * @param columnNames CSV colum names
      * @param boolColumnNames CSV colum names typed as boolean
      * @param boolColumnIndexes indexes of CSV boolean columns
-     * @throws KraftwerkException
+     * @throws KraftwerkException runtime exception
      */
     static void writeIntoTmpFile(Path tmpOutputFile, List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) throws KraftwerkException {
         try {
@@ -39,8 +43,10 @@ public class CsvRegexHelper {
             int totalLinesNumber = 0;
             int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
             try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
-                while (bufferedReader.readLine() != null) {
+                String line = bufferedReader.readLine();
+                while (line != null) {
                     totalLinesNumber++;
+                    line = bufferedReader.readLine();
                 }
             }
             int totalBlocksNumber = totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK == 0 ? 1 : totalLinesNumber / INPUT_FILE_LINE_NUMBER_BLOCK;
@@ -104,17 +110,17 @@ public class CsvRegexHelper {
             //REMINDER : in previous process (outside current loop), we surrounded all bool columns
             //			 by "\"¤¤¤" and "¤¤¤\"".
             //1) Process empty entries in boolean columns
-            Pattern p1 = Pattern.compile("\"¤¤¤¤¤¤\"", Pattern.CASE_INSENSITIVE);
+            Pattern p1 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
             Matcher m1 = p1.matcher(result);
             result = m1.replaceAll("\"\"");
 
             //2) process "true" values
-            Pattern p2 = Pattern.compile("\"¤¤¤true¤¤¤\"", Pattern.CASE_INSENSITIVE);
+            Pattern p2 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "true" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
             Matcher m2 = p2.matcher(result);
             result = m2.replaceAll("\"1\"");
 
             //3) process "false" values
-            Pattern p3 = Pattern.compile("\"¤¤¤false¤¤¤\"", Pattern.CASE_INSENSITIVE);
+            Pattern p3 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "false" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
             Matcher m3 = p3.matcher(result);
             result = m3.replaceAll("\"0\"");
         }
@@ -136,7 +142,7 @@ public class CsvRegexHelper {
         //If no boolean column at all, we simply add double quotes to all fields
         if(boolColumnNames.isEmpty()) {
             for(String colName : columnNames) {
-                sbRegExPatternToFind.append("\"?([\\w\\- \\/éèê\\.àçù]*)\"?");
+                sbRegExPatternToFind.append(REGULAR_EXPRESSION);
                 sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
                 if( (colIndex + 1) < columnNames.size()) {
                     sbRegExPatternToFind.append(";");
@@ -150,13 +156,13 @@ public class CsvRegexHelper {
             //for each column, we check if it is a boolean column or not
             for(String colName : columnNames) {
                 if(boolColumnIndexes.contains(colIndex)) {
-                    sbRegExPatternToFind.append("\"?([\\w\\- \\/éèê\\.àçù]*)\"?");
+                    sbRegExPatternToFind.append(REGULAR_EXPRESSION);
                     //=> we FIRST surround boolean columns by "\"¤¤¤" and "¤¤¤\"" to be sure
                     // not to further update "true" or "false" strings in fields which would NOT BE TAGGED as booleans.
                     //NOTE : a subsequent process will be needed if there are boolColumns
-                    sbRegExPatternReplacement.append("\"¤¤¤$").append(colIndex + 1).append("¤¤¤\"");
+                    sbRegExPatternReplacement.append("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "$").append(colIndex + 1).append(BOOLEAN_FIELD_IDENTIFIER_END + "\"");
                 } else {
-                    sbRegExPatternToFind.append("\"?([\\w\\- \\/éèê\\.àçù]*)\"?");
+                    sbRegExPatternToFind.append(REGULAR_EXPRESSION);
                     //we add double quotes in case of boolean column
                     sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
                 }
