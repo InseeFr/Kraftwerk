@@ -46,4 +46,5 @@ public class MultimodalSequence {
 				userInputs.getVtlInformationLevelsFile(), kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 	}
+
 }

@@ -34,7 +34,7 @@ public class LogRequestFilter extends OncePerRequestFilter {
 			+ "Status :  {} - "
 		//	+ "Content-Type : {} \n "
 		//	+ "Headers : {} \n "
-			+ "Body : {} \n";
+			+ "Beginning of Body : {} \n";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -59,7 +59,7 @@ public class LogRequestFilter extends OncePerRequestFilter {
         log.info(RESPONSE_MESSAGE_FORMAT, 
         		req.getMethod(), req.getRequestURI(), 
         		resp.getStatus(),
-                getResponseBody(req, resp)); //Body
+                firstNChars(getResponseBody(req, resp),100)); //Body
         
         // Finally remember to respond to the client with the cached data.
         resp.copyBodyToResponse();
@@ -68,6 +68,16 @@ public class LogRequestFilter extends OncePerRequestFilter {
 	private String getResponseBody(ContentCachingRequestWrapper req, ContentCachingResponseWrapper resp) {
 		if (req.getRequestURI().contains("swagger-ui") ||req.getRequestURI().contains("api-docs")) return "Hidden Swagger response";
 		return new String(resp.getContentAsByteArray(), StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * Extract up to the first n characters of a String
+	 */
+	private String firstNChars(String str, int n) {
+		if (str == null) {
+			return null;
+		}
+		return str.length() < n ? str : str.substring(0, n);
 	}
     
 }

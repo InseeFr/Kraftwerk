@@ -23,12 +23,17 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -115,6 +120,31 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+	}
+
+	//WIP : poc one interrogation
+	//Objective : give the json with all the data
+	@GetMapping(value ="/json")
+	@Operation(operationId = "jsonExtraction", summary = "", description ="")
+	public ResponseEntity<Object> jsonExtraction(
+			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String campaignId,
+			@Parameter(description = "${param.interrogationId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String interrogationId
+	){
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		boolean withDDI = true;
+		boolean withEncryption = false;
+
+		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		Map<String,Object> results;
+		try {
+			results = mpGenesis.runMainJson(campaignId, interrogationId);
+			log.info("Data extracted");
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(results);
 	}
 
 	@NotNull
