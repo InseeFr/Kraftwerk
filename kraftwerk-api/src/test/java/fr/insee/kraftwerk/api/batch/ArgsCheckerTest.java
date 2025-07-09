@@ -1,8 +1,13 @@
 package fr.insee.kraftwerk.api.batch;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
@@ -321,29 +326,22 @@ class ArgsCheckerTest {
     }
 
 
-    @Test
-    void testIsReportingData_MAIN() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("MAIN"); // This will set "IsReportingData" to arg content because == "MAIN"!
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argIsReportingData("true");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        doNothing().when(argsChecker).checkArgNumber();
-        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgIsArchive();
-        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgWithEncryption();
-
-        argsChecker.checkArgs();
-
-        assertEquals(Boolean.TRUE, argsChecker.isReportingData());
+    private static Stream<Arguments> isReportingDataParameterizedTests() {
+        return Stream.of(
+                Arguments.of(Boolean.TRUE, "MAIN"),
+                Arguments.of(Boolean.FALSE, "LUNATIC_ONLY"),
+                Arguments.of(Boolean.FALSE, "GENESIS"),
+                Arguments.of(Boolean.FALSE, "GENESISV2"),
+                Arguments.of(Boolean.FALSE, "FILE_BY_FILE")
+        );
     }
 
 
-    @Test
-    void testIsReportingData_LUNATIC_ONLY() {
+    @ParameterizedTest
+    @MethodSource("isReportingDataParameterizedTests")
+    void testIsReportingData_ParameterizedTests(boolean expectedResult, String param) {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("LUNATIC_ONLY"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
+        argsCheckerBuilder.argServiceName(param); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
@@ -355,64 +353,7 @@ class ArgsCheckerTest {
 
         argsChecker.checkArgs();
 
-        assertEquals(Boolean.FALSE, argsChecker.isReportingData());
-    }
-
-
-    @Test
-    void testIsReportingData_GENESIS() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("GENESIS"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argIsReportingData("true");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        doNothing().when(argsChecker).checkArgNumber();
-        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgIsArchive();
-        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgWithEncryption();
-
-        argsChecker.checkArgs();
-
-        assertEquals(Boolean.FALSE, argsChecker.isReportingData());
-    }
-
-
-    @Test
-    void testIsReportingData_GENESISV2() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("GENESISV2"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argIsReportingData("true");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        doNothing().when(argsChecker).checkArgNumber();
-        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgIsArchive();
-        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgWithEncryption();
-
-        argsChecker.checkArgs();
-
-        assertEquals(Boolean.FALSE, argsChecker.isReportingData());
-    }
-
-
-    @Test
-    void testIsReportingData_FILE_BY_FILE() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("FILE_BY_FILE"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argIsReportingData("true");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        doNothing().when(argsChecker).checkArgNumber();
-        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgIsArchive();
-        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgWithEncryption();
-
-        argsChecker.checkArgs();
-
-        assertEquals(Boolean.FALSE, argsChecker.isReportingData());
+        assertEquals(expectedResult, argsChecker.isReportingData());
     }
 
 

@@ -1,24 +1,18 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
-import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.outputs.ImportScript;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
-import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RImportScriptTest {
+class RImportScriptTest {
 
     @Test
-    void generateScriptTest() throws KraftwerkException {
+    void generateScriptTest() {
         List<TableScriptInfo> tableScriptInfoList = new ArrayList<TableScriptInfo>();
 
         String tableName1 = "myTableName1";

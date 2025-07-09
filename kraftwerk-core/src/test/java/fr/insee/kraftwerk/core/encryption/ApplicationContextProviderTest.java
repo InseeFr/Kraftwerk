@@ -6,7 +6,7 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApplicationContextProviderTest {
+class ApplicationContextProviderTest {
 
     @Test
     void applicationContextProvider_getterSetter_test() {

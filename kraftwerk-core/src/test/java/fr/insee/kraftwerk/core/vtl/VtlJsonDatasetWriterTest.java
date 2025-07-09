@@ -16,10 +16,14 @@ import fr.insee.vtl.model.Dataset;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -226,32 +230,30 @@ class VtlJsonDatasetWriterTest {
 
 	@Test
 	void convertBooleanValueNullTest() {
-		assertNull(VtlJsonDatasetWriter.convertBooleanValue_UnitTest(null));
+		assertNull(VtlJsonDatasetWriter.convertBooleanValueUnitTest(null));
 	}
 
-	@Test
-	void convertToVtlType_true1_Test() {
-		assertEquals("true", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("true"));
+
+	private static Stream<Arguments> convertBooleanValueParameterizedTests() {
+		return Stream.of(
+				Arguments.of("true", "true"),
+				Arguments.of("true", "1"),
+				Arguments.of("false", "false"),
+				Arguments.of("false", "0")
+		);
 	}
 
-	@Test
-	void convertToVtlType_true2_Test() {
-		assertEquals("true", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("1"));
+
+	@ParameterizedTest
+	@MethodSource("convertBooleanValueParameterizedTests")
+	void convertToVtlType_parameterizedTests(String expectedResult, String param) {
+		assertEquals(expectedResult, VtlJsonDatasetWriter.convertBooleanValueUnitTest(param));
 	}
 
-	@Test
-	void convertToVtlType_false1_Test() {
-		assertEquals("false", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("false"));
-	}
-
-	@Test
-	void convertToVtlType_false2_Test() {
-		assertEquals("false", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("0"));
-	}
 
 	@Test
 	void convertToVtlType_unknownValue_Test() {
-		assertNull(VtlJsonDatasetWriter.convertBooleanValue_UnitTest("aaa"));
+		assertNull(VtlJsonDatasetWriter.convertBooleanValueUnitTest("aaa"));
 	}
 
 }

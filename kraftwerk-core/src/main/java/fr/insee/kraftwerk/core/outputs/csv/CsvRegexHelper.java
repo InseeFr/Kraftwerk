@@ -41,7 +41,7 @@ public class CsvRegexHelper {
         try {
             //!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
             String regExPatternToFind = buildRegExPatternToFind(columnNames);
-            String regExPatternReplacement = buildRegExPatternReplacement(columnNames, boolColumnNames, boolColumnIndexes);
+            String regExPatternReplacement = buildRegExPatternReplacement(columnNames, boolColumnIndexes);
             log.info("regExPatternToFind : {}", regExPatternToFind);
             log.info("regExPatternReplacement : {}", regExPatternReplacement);
 
@@ -142,7 +142,7 @@ public class CsvRegexHelper {
     /**
      * Package protected scope for unit tests
      */
-    static String applyRegExOnBlockFile_unitTests(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
+    static String applyRegExOnBlockFileUnitTests(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
         return applyRegExOnBlockFile(sbInput, regExPatternToFind, regExPatternReplacement, boolColumnNames);
     }
 
@@ -166,12 +166,12 @@ public class CsvRegexHelper {
     /**
      * Package protected scope for unit tests
      */
-    static String buildRegExPatternToFind_unitTests(List<String> columnNames) {
+    static String buildRegExPatternToFindUnitTests(List<String> columnNames) {
         return buildRegExPatternToFind(columnNames);
     }
 
 
-    private static String buildRegExPatternReplacement(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+    private static String buildRegExPatternReplacement(List<String> columnNames, List<Integer> boolColumnIndexes) {
         //MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
         StringBuilder sbRegExPatternReplacement = new StringBuilder();
         int nbColumns = columnNames.size();
@@ -213,8 +213,8 @@ public class CsvRegexHelper {
     /**
      * Package protected scope for unit tests
      */
-    static String buildRegExPatternReplacement_unitTests(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
-        return buildRegExPatternReplacement(columnNames, boolColumnNames, boolColumnIndexes);
+    static String buildRegExPatternReplacementUnitTests(List<String> columnNames, List<Integer> boolColumnIndexes) {
+        return buildRegExPatternReplacement(columnNames, boolColumnIndexes);
     }
 
 }

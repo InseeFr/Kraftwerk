@@ -184,7 +184,7 @@ public class PaperDataParser extends DataParser {
 	/**
 	 * For unit tests coverage (package scoped)
 	 */
-	static String getUcqValue_UnitTest(String variableName) {
+	static String getUcqValueUnitTest(String variableName) {
 		return getUcqValue(variableName);
 	}
 
@@ -204,7 +204,7 @@ public class PaperDataParser extends DataParser {
 	/**
 	 * For unit tests coverage (package scoped)
 	 */
-	static String createGroupId_UnitTest(String groupName, String subGroupId) {
+	static String createGroupIdUnitTest(String groupName, String subGroupId) {
 		return createGroupId(groupName, subGroupId);
 	}
 

@@ -102,7 +102,7 @@ class PaperDataParserTest {
     @Test
     void getUcqValueTest() {
         String value = "aaa_bbb_ccc";
-        assertEquals("ccc", PaperDataParser.getUcqValue_UnitTest(value));
+        assertEquals("ccc", PaperDataParser.getUcqValueUnitTest(value));
     }
 
 
@@ -110,6 +110,6 @@ class PaperDataParserTest {
     void createGroupIdTest() {
         String groupName = "aaa";
         String subGroupId = "bbb";
-        assertEquals("aaa-bbb", PaperDataParser.createGroupId_UnitTest(groupName, subGroupId));
+        assertEquals("aaa-bbb", PaperDataParser.createGroupIdUnitTest(groupName, subGroupId));
     }
 }

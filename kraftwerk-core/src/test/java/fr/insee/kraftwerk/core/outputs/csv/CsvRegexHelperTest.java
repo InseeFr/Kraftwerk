@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,10 +10,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CsvRegexHelperTest {
+class CsvRegexHelperTest {
 
     private static final String REGEX_1_COLUMN = CsvRegexHelper.REGULAR_EXPRESSION;  //!!!WARNING!!! potential bug when there is ONLY ONE NOT-EMPTY COLUMN!
-    private static final String REGEX_2_COLUMNS = CsvRegexHelper.REGULAR_EXPRESSION + ";" + CsvRegexHelper.REGULAR_EXPRESSION;;
+    private static final String REGEX_2_COLUMNS = CsvRegexHelper.REGULAR_EXPRESSION + ";" + CsvRegexHelper.REGULAR_EXPRESSION;
     private static final String REGEX_REPLACEMENT_2_COLUMNS = "\"$1\";\"$2\"";
     private static final String REGEX_3_COLUMNS = CsvRegexHelper.REGULAR_EXPRESSION + ";" +
                                               CsvRegexHelper.REGULAR_EXPRESSION + ";" +
@@ -53,7 +52,7 @@ public class CsvRegexHelperTest {
         if(boolColumns) {
             boolColumnNames.add("col_B");
         }
-        String result = CsvRegexHelper.applyRegExOnBlockFile_unitTests(sbInput, regExToFind, regExReplacement, boolColumnNames);
+        String result = CsvRegexHelper.applyRegExOnBlockFileUnitTests(sbInput, regExToFind, regExReplacement, boolColumnNames);
         assertEquals(expectedResult, result);
     }
 
@@ -73,17 +72,13 @@ public class CsvRegexHelperTest {
         for (int i = 0; i < nbColumns; i++) {
             columnNames.add("col_" + i);
         }
-        List<String> boolColumnNames = new ArrayList<>();
-        for (int i = 0; i < nbBoolColumns; i++) {
-            boolColumnNames.add("col_" + i);
-        }
         List<Integer> boolColumnIndexes = new ArrayList<>();
         if(nbBoolColumns > 0) {
             boolColumnIndexes.add(1);
         }
 
-        String regExPatternToFind = CsvRegexHelper.buildRegExPatternToFind_unitTests(columnNames);
-        String regExPatternReplacement = CsvRegexHelper.buildRegExPatternReplacement_unitTests(columnNames, boolColumnNames, boolColumnIndexes);
+        String regExPatternToFind = CsvRegexHelper.buildRegExPatternToFindUnitTests(columnNames);
+        String regExPatternReplacement = CsvRegexHelper.buildRegExPatternReplacementUnitTests(columnNames, boolColumnIndexes);
         assertEquals(regExToFind, regExPatternToFind);
         assertEquals(regExReplacement, regExPatternReplacement);
     }

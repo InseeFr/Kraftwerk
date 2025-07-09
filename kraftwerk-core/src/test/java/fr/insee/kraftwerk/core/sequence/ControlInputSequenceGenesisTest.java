@@ -6,7 +6,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ControlInputSequenceGenesisTest {
+class ControlInputSequenceGenesisTest {
 
     //OS DEPENDENT!
     private static final String FILE_SEPARATOR = File.separator;

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class VtlScriptTest {
+class VtlScriptTest {
 
     @Test
     void constructeur1_test() {
