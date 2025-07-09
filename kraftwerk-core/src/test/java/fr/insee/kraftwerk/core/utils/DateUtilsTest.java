@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DateUtilsTest {
 
@@ -17,6 +20,11 @@ class DateUtilsTest {
 		assertEquals(1111111111000L, DateUtils.convertToTimestamp("18/03/2005 02:58:31", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")));
 		assertEquals(1000L, DateUtils.convertToTimestamp("01/01/1970 01:00:01", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")));
 		
+	}
+
+	@Test
+	void convertDate_throwException_Test() {
+		assertEquals(0L, DateUtils.convertToTimestamp("aaaaaaa", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")));
 	}
 
 }

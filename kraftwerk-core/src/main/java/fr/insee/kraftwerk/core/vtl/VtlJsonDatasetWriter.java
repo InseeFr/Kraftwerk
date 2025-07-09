@@ -224,4 +224,11 @@ public class VtlJsonDatasetWriter {
 		}
 	}
 
+	/**
+	 * For unit tests coverage (package scoped)
+	 */
+	static String convertBooleanValue_UnitTest(String value) {
+		return convertBooleanValue(value);
+	}
+
 }

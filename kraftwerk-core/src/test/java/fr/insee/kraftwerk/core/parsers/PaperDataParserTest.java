@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PaperDataParserTest {
@@ -96,5 +97,19 @@ class PaperDataParserTest {
             Integer fooInt = Integer.parseInt(fooValue3);
             Assertions.assertThat(fooInt).isNotNull();
         }
+    }
+
+    @Test
+    void getUcqValueTest() {
+        String value = "aaa_bbb_ccc";
+        assertEquals("ccc", PaperDataParser.getUcqValue_UnitTest(value));
+    }
+
+
+    @Test
+    void createGroupIdTest() {
+        String groupName = "aaa";
+        String subGroupId = "bbb";
+        assertEquals("aaa-bbb", PaperDataParser.createGroupId_UnitTest(groupName, subGroupId));
     }
 }

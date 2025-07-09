@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -211,6 +212,46 @@ class VtlJsonDatasetWriterTest {
 
 		//
 		assertEquals(4, dataset.getDataPoints().size());
+	}
+
+	@Test
+	void convertToVtlTypeNullTest() {
+		assertEquals("STRING", VtlJsonDatasetWriter.convertToVtlType(null));
+	}
+
+	@Test
+	void convertToVtlTypeTest() {
+		assertEquals("BOOLEAN", VtlJsonDatasetWriter.convertToVtlType(VariableType.BOOLEAN));
+	}
+
+	@Test
+	void convertBooleanValueNullTest() {
+		assertNull(VtlJsonDatasetWriter.convertBooleanValue_UnitTest(null));
+	}
+
+	@Test
+	void convertToVtlType_true1_Test() {
+		assertEquals("true", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("true"));
+	}
+
+	@Test
+	void convertToVtlType_true2_Test() {
+		assertEquals("true", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("1"));
+	}
+
+	@Test
+	void convertToVtlType_false1_Test() {
+		assertEquals("false", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("false"));
+	}
+
+	@Test
+	void convertToVtlType_false2_Test() {
+		assertEquals("false", VtlJsonDatasetWriter.convertBooleanValue_UnitTest("0"));
+	}
+
+	@Test
+	void convertToVtlType_unknownValue_Test() {
+		assertNull(VtlJsonDatasetWriter.convertBooleanValue_UnitTest("aaa"));
 	}
 
 }

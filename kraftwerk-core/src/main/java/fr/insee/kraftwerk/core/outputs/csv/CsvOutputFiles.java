@@ -35,6 +35,8 @@ import java.util.Map;
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
 
+	private static final String TMPDIR_SYSTEM_PROPERTY = "java.io.tmpdir";
+
 	/**
 	 * When an instance is created, the output folder is created.
 	 * 
@@ -53,8 +55,8 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
-				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
+				Files.createDirectories(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)));
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)),
 						outputFileName(datasetName, kraftwerkExecutionContext), null);
 
 				//Get column names
@@ -132,8 +134,8 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
-				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),outputFileName(datasetName, kraftwerkExecutionContext), null);
+				Files.createDirectories(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)));
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)),outputFileName(datasetName, kraftwerkExecutionContext), null);
 
 				//Get column names
 				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);

@@ -19,9 +19,15 @@ import java.util.regex.Pattern;
 @Slf4j
 public class CsvRegexHelper {
 
-    private static final String REGULAR_EXPRESSION = "\"?([\\w\\- \\/éèê\\.àçù]*)\"?";
-    private static final String BOOLEAN_FIELD_IDENTIFIER_START = "¤¤¤";
-    private static final String BOOLEAN_FIELD_IDENTIFIER_END = "¤¤¤";
+    private CsvRegexHelper(){
+        throw new IllegalStateException("Utility class");
+    }
+
+    //package protected scope in order to use these contants in unit tests as well
+    static final String REGULAR_EXPRESSION = "\"?([\\w\\- \\/éèê\\.àçù]*)\"?";
+    static final String BOOLEAN_FIELD_IDENTIFIER_START = "¤¤¤";
+    static final String BOOLEAN_FIELD_IDENTIFIER_END = "¤¤¤";
+    private static final int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
 
     /**
      *
@@ -34,14 +40,14 @@ public class CsvRegexHelper {
     static void writeIntoTmpFile(Path tmpOutputFile, List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) throws KraftwerkException {
         try {
             //!!!WARNING!!! : !!!REGEX!!! TRANSFORMATION FOR PERFORMANCES OPTIMISATIONS
-            String[] regExPatternsTab = regExPatterns(columnNames, boolColumnNames, boolColumnIndexes);
-            log.info("sbRegExPatternToFind : {}", regExPatternsTab[0]);
-            log.info("sbRegExPatternReplacement : {}", regExPatternsTab[1]);
+            String regExPatternToFind = buildRegExPatternToFind(columnNames);
+            String regExPatternReplacement = buildRegExPatternReplacement(columnNames, boolColumnNames, boolColumnIndexes);
+            log.info("regExPatternToFind : {}", regExPatternToFind);
+            log.info("regExPatternReplacement : {}", regExPatternReplacement);
 
 
             //In order to be aware of the process progress, we count how much lines the file contains & how many blocks must be processed
             int totalLinesNumber = 0;
-            int INPUT_FILE_LINE_NUMBER_BLOCK = 50;
             try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
                 String line = bufferedReader.readLine();
                 while (line != null) {
@@ -70,7 +76,7 @@ public class CsvRegexHelper {
                         if(currentReadLine % 1000 == 0) {
                             log.info("Processing {} / {} (line {} read)", currentBlockNumber, totalBlocksNumber, currentReadLine);
                         }
-                        String result = applyRegExOnBlockFile(sbInput, regExPatternsTab, boolColumnNames);
+                        String result = applyRegExOnBlockFile(sbInput, regExPatternToFind, regExPatternReplacement, boolColumnNames);
 
                         Files.write(tmpOutputFile,(result).getBytes(), StandardOpenOption.APPEND);
 
@@ -89,6 +95,9 @@ public class CsvRegexHelper {
                     //We insert a carriage return ONLY IF END OF FILE IS NOT REACHED!
                     if(line != null) {
                         sbInput.append("\n");
+                    } else {
+                        //write carriage return after last line
+                        Files.write(tmpOutputFile,"\n".getBytes(), StandardOpenOption.APPEND);
                     }
                 }
             }
@@ -97,88 +106,115 @@ public class CsvRegexHelper {
         }
     }
 
-    private static String applyRegExOnBlockFile(StringBuilder sbInput, String[] regExPatternsTab, List<String> boolColumnNames) {
+    private static String applyRegExOnBlockFile(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
         String result;
 
-        Pattern p0 = Pattern.compile(regExPatternsTab[0], Pattern.CASE_INSENSITIVE);
+        Pattern p0 = Pattern.compile(regExPatternToFind, Pattern.CASE_INSENSITIVE);
         Matcher m0 = p0.matcher(sbInput.toString());
-        result = m0.replaceAll(regExPatternsTab[1]);
+        result = m0.replaceAll(regExPatternReplacement);
+
+        if(boolColumnNames.isEmpty()) {
+            return result;
+        }
 
         //If there are boolColumns, subsequent regEx patterns must be applied :
         //NOTE : change "true" or "false" by "1" or "0"
-        if(!boolColumnNames.isEmpty()) {
-            //REMINDER : in previous process (outside current loop), we surrounded all bool columns
-            //			 by "\"¤¤¤" and "¤¤¤\"".
-            //1) Process empty entries in boolean columns
-            Pattern p1 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
-            Matcher m1 = p1.matcher(result);
-            result = m1.replaceAll("\"\"");
+        //REMINDER : in previous process (outside current loop), we surrounded all bool columns
+        //			 by "\"¤¤¤" and "¤¤¤\"".
+        //1) Process empty entries in boolean columns
+        Pattern p1 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
+        Matcher m1 = p1.matcher(result);
+        result = m1.replaceAll("\"\"");
 
-            //2) process "true" values
-            Pattern p2 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "true" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
-            Matcher m2 = p2.matcher(result);
-            result = m2.replaceAll("\"1\"");
+        //2) process "true" values
+        Pattern p2 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "true" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
+        Matcher m2 = p2.matcher(result);
+        result = m2.replaceAll("\"1\"");
 
-            //3) process "false" values
-            Pattern p3 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "false" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
-            Matcher m3 = p3.matcher(result);
-            result = m3.replaceAll("\"0\"");
-        }
+        //3) process "false" values
+        Pattern p3 = Pattern.compile("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "false" + BOOLEAN_FIELD_IDENTIFIER_END + "\"", Pattern.CASE_INSENSITIVE);
+        Matcher m3 = p3.matcher(result);
+        result = m3.replaceAll("\"0\"");
 
         return result;
     }
 
+    /**
+     * Package protected scope for unit tests
+     */
+    static String applyRegExOnBlockFile_unitTests(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
+        return applyRegExOnBlockFile(sbInput, regExPatternToFind, regExPatternReplacement, boolColumnNames);
+    }
 
-    private static String[] regExPatterns(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
-        String[] result = new String[2];
 
-        //MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
+    private static String buildRegExPatternToFind(List<String> columnNames) {
         //1) dynamically set regEx Pattern
         StringBuilder sbRegExPatternToFind = new StringBuilder();
         //sbRegExPatternToFind.append("^"); //DO NOT ADD THIS AS IT WILL ONLY PROCESS THE 1ST LINE!
+
+        int nbColumns = columnNames.size();
+        for (int i = 0; i < nbColumns; i++) {
+            sbRegExPatternToFind.append(REGULAR_EXPRESSION);
+            sbRegExPatternToFind.append(";");
+        }
+        //remove last ";" character
+        sbRegExPatternToFind.deleteCharAt(sbRegExPatternToFind.length() - 1);
+
+        return sbRegExPatternToFind.toString();
+    }
+
+    /**
+     * Package protected scope for unit tests
+     */
+    static String buildRegExPatternToFind_unitTests(List<String> columnNames) {
+        return buildRegExPatternToFind(columnNames);
+    }
+
+
+    private static String buildRegExPatternReplacement(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+        //MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
         StringBuilder sbRegExPatternReplacement = new StringBuilder();
-        int colIndex = 0;
+        int nbColumns = columnNames.size();
 
         //If no boolean column at all, we simply add double quotes to all fields
-        if(boolColumnNames.isEmpty()) {
-            for(String colName : columnNames) {
-                sbRegExPatternToFind.append(REGULAR_EXPRESSION);
+        if(boolColumnIndexes.isEmpty()) {
+            for (int colIndex = 0; colIndex < nbColumns; colIndex++) {
                 sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
-                if( (colIndex + 1) < columnNames.size()) {
-                    sbRegExPatternToFind.append(";");
-                    sbRegExPatternReplacement.append(";");
-                }
-                colIndex++;
+                sbRegExPatternReplacement.append(";");
             }
-        } else {
-            //if there are boolColumns
-            log.warn("boolColumns NOT EMPTY !");
-            //for each column, we check if it is a boolean column or not
-            for(String colName : columnNames) {
-                if(boolColumnIndexes.contains(colIndex)) {
-                    sbRegExPatternToFind.append(REGULAR_EXPRESSION);
-                    //=> we FIRST surround boolean columns by "\"¤¤¤" and "¤¤¤\"" to be sure
-                    // not to further update "true" or "false" strings in fields which would NOT BE TAGGED as booleans.
-                    //NOTE : a subsequent process will be needed if there are boolColumns
-                    sbRegExPatternReplacement.append("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "$").append(colIndex + 1).append(BOOLEAN_FIELD_IDENTIFIER_END + "\"");
-                } else {
-                    sbRegExPatternToFind.append(REGULAR_EXPRESSION);
-                    //we add double quotes in case of boolean column
-                    sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
-                }
-                if( (colIndex + 1) < columnNames.size()) {
-                    sbRegExPatternToFind.append(";");
-                    sbRegExPatternReplacement.append(";");
-                }
-                colIndex++;
-            }
+            //remove last ";" character
+            sbRegExPatternReplacement.deleteCharAt(sbRegExPatternReplacement.length() - 1);
+            //early return to reduce cognitive complexity
+            return sbRegExPatternReplacement.toString();
         }
 
-        //fill-in result object
-        result[0] = sbRegExPatternToFind.toString();
-        result[1] = sbRegExPatternReplacement.toString();
+        //ELSE : if there are boolColumns
+        log.warn("boolColumns NOT EMPTY !");
+        //for each column, we check if it is a boolean column or not
+        for (int colIndex = 0; colIndex < nbColumns; colIndex++) {
+            if(boolColumnIndexes.contains(colIndex)) {
+                //=> we FIRST surround boolean columns by "\"¤¤¤" and "¤¤¤\"" to be sure
+                // not to further update "true" or "false" strings in fields which would NOT BE TAGGED as booleans.
+                //NOTE : a subsequent process will be needed if there are boolColumns
+                sbRegExPatternReplacement.append("\"" + BOOLEAN_FIELD_IDENTIFIER_START + "$").append(colIndex + 1).append(BOOLEAN_FIELD_IDENTIFIER_END + "\"");
+            } else {
+                //we add double quotes in case of boolean column
+                sbRegExPatternReplacement.append("\"$").append(colIndex + 1).append("\"");
+            }
+            sbRegExPatternReplacement.append(";");
+        }
+        //remove last ";" character
+        sbRegExPatternReplacement.deleteCharAt(sbRegExPatternReplacement.length() - 1);
 
-        return result;
+        return sbRegExPatternReplacement.toString();
+    }
+
+
+    /**
+     * Package protected scope for unit tests
+     */
+    static String buildRegExPatternReplacement_unitTests(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+        return buildRegExPatternReplacement(columnNames, boolColumnNames, boolColumnIndexes);
     }
 
 }

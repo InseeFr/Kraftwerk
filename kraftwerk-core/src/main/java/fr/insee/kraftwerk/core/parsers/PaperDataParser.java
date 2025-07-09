@@ -176,9 +176,16 @@ public class PaperDataParser extends DataParser {
 		}
 	}
 
-	private String getUcqValue(String variableName) {
+	private static String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
 		return decomposition[decomposition.length - 1];
+	}
+
+	/**
+	 * For unit tests coverage (package scoped)
+	 */
+	static String getUcqValue_UnitTest(String variableName) {
+		return getUcqValue(variableName);
 	}
 
 	/**
@@ -190,8 +197,15 @@ public class PaperDataParser extends DataParser {
 	 *
 	 * @return A concatenation of these which is a group instance identifier.
 	 */
-	private String createGroupId(String groupName, String subGroupId) {
+	private static String createGroupId(String groupName, String subGroupId) {
 		return groupName + "-" + subGroupId;
+	}
+
+	/**
+	 * For unit tests coverage (package scoped)
+	 */
+	static String createGroupId_UnitTest(String groupName, String subGroupId) {
+		return createGroupId(groupName, subGroupId);
 	}
 
 }

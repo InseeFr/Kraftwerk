@@ -75,33 +75,27 @@ public abstract class OutputFiles {
 		}
 	}
 
-	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
-		//Should be override
-	}
+	public abstract void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext);
 
 	/**
 	 * Return the name of the file to be written from the dataset name.
+	 * => implemented in subclasses
 	 */
-	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
-		// implemented in subclasses
-		return datasetName;
-	}
+	public abstract String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext);
 
 	/**
 	 * Method to write output tables from datasets that are in the bindings.
+	 * => implemented in subclasses
      */
-	public void writeOutputTables() throws KraftwerkException {
-		// implemented in subclasses
-	}
+	public abstract void writeOutputTables() throws KraftwerkException;
 
 	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 * Method to write output tables from datasets that are in the bindings.
+	 * => implemented in subclasses
 	 */
-	public void writeOutputTablesV2() throws KraftwerkException {
-		// implemented in subclasses
-	}
+	public abstract void writeOutputTablesV2() throws KraftwerkException;
 	//========= OPTIMISATIONS PERFS (END) ==========
 
 }

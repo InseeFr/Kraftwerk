@@ -5,8 +5,6 @@ import org.mockito.Mockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 
 
@@ -16,10 +14,10 @@ class ArgsCheckerTest {
     private ArgsChecker argsChecker;
 
     @Test
-    void testBadNbOfArgs_1() throws Exception {
+    void testBadNbOfArgs_1() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
         doNothing().when(argsChecker).checkServiceName();
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
@@ -30,11 +28,11 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void testBadNbOfArgs_2() throws Exception {
+    void testBadNbOfArgs_2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("SERVICE_NAME");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
         doNothing().when(argsChecker).checkServiceName();
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
@@ -45,13 +43,13 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void testBadServiceName() throws Exception {
+    void testBadServiceName() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("SERVICE_NAME");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -61,13 +59,13 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void testGoodServiceName_MAIN() throws Exception {
+    void testGoodServiceName_MAIN() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -79,13 +77,13 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void testGoodServiceName_LUNATIC_ONLY() throws Exception {
+    void testGoodServiceName_LUNATIC_ONLY() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("LUNATIC_ONLY");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -98,13 +96,13 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testGoodServiceName_GENESIS() throws Exception {
+    void testGoodServiceName_GENESIS() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESIS");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -117,13 +115,13 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testGoodServiceName_GENESISV2() throws Exception {
+    void testGoodServiceName_GENESISV2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESISV2");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -136,13 +134,13 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testGoodServiceName_FILE_BY_FILE() throws Exception {
+    void testGoodServiceName_FILE_BY_FILE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("FILE_BY_FILE");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
@@ -156,14 +154,14 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_NULL() throws Exception {
+    void testIsArchive_NULL() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -174,15 +172,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_FALSE() throws Exception {
+    void testIsArchive_FALSE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("false");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -193,15 +191,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_TRUE() throws Exception {
+    void testIsArchive_TRUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -212,15 +210,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_FORCE_1() throws Exception {
+    void testIsArchive_FORCE_1() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESIS");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -231,15 +229,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_FORCE_2() throws Exception {
+    void testIsArchive_FORCE_2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESISV2");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -250,15 +248,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsArchive_BAD_VALUE() throws Exception {
+    void testIsArchive_BAD_VALUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("bad_boolean");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsReportingData();
         doNothing().when(argsChecker).checkArgWithEncryption();
 
@@ -268,15 +266,15 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_NULL() throws Exception {
+    void testIsReportingData_NULL() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -286,16 +284,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_FALSE() throws Exception {
+    void testIsReportingData_FALSE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("false");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -305,16 +303,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_TRUE() throws Exception {
+    void testIsReportingData_TRUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -324,16 +322,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_MAIN() throws Exception {
+    void testIsReportingData_MAIN() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN"); // This will set "IsReportingData" to arg content because == "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -343,16 +341,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_LUNATIC_ONLY() throws Exception {
+    void testIsReportingData_LUNATIC_ONLY() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("LUNATIC_ONLY"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -362,16 +360,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_GENESIS() throws Exception {
+    void testIsReportingData_GENESIS() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESIS"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -381,16 +379,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_GENESISV2() throws Exception {
+    void testIsReportingData_GENESISV2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("GENESISV2"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -400,16 +398,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_FILE_BY_FILE() throws Exception {
+    void testIsReportingData_FILE_BY_FILE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("FILE_BY_FILE"); // This will force "IsReportingData" to "FALSE" because != "MAIN"!
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
         doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         argsChecker.checkArgs();
@@ -419,16 +417,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testIsReportingData_BAD_VALUE() throws Exception {
+    void testIsReportingData_BAD_VALUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsReportingData("bad_boolean");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
         doNothing().when(argsChecker).checkArgWithEncryption();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
@@ -437,16 +435,16 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWithEncryption_NULL() throws Exception {
+    void testWithEncryption_NULL() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
-        //doNothing().when(argsChecker).checkArgWithEncryption();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgWithEncryption()" is not ignored on this unit test
 
         argsChecker.checkArgs();
 
@@ -455,17 +453,17 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWithEncryption_FALSE() throws Exception {
+    void testWithEncryption_FALSE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argWithEncryption("false");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
-        //doNothing().when(argsChecker).checkArgWithEncryption();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgWithEncryption()" is not ignored on this unit test
 
         argsChecker.checkArgs();
 
@@ -474,17 +472,17 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWithEncryption_TRUE() throws Exception {
+    void testWithEncryption_TRUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argWithEncryption("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
-        //doNothing().when(argsChecker).checkArgWithEncryption();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgWithEncryption()" is not ignored on this unit test
 
         argsChecker.checkArgs();
 
@@ -493,17 +491,17 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWithEncryption_BAD_VALUE() throws Exception {
+    void testWithEncryption_BAD_VALUE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argWithEncryption("bad_boolean");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //doNothing().when(argsChecker).checkArgNumber();
-        //doNothing().when(argsChecker).checkServiceName();
-        //doNothing().when(argsChecker).checkArgIsArchive();
-        //doNothing().when(argsChecker).checkArgIsReportingData();
-        //doNothing().when(argsChecker).checkArgWithEncryption();
+        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsArchive()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgIsReportingData()" is not ignored on this unit test
+        //NOTE : "argsChecker.checkArgWithEncryption()" is not ignored on this unit test
 
         Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
         assertEquals("Invalid argWithEncryption boolean argument ! : bad_boolean", exception.getMessage());
@@ -511,7 +509,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerNb_NOT_INTEGER() throws Exception {
+    void testWorkerNb_NOT_INTEGER() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -524,7 +522,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerIndex_NOT_INTEGER() throws Exception {
+    void testWorkerIndex_NOT_INTEGER() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -537,7 +535,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerNb_DEFAULT() throws Exception {
+    void testWorkerNb_DEFAULT() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -550,7 +548,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerIndex_DEFAULT() throws Exception {
+    void testWorkerIndex_DEFAULT() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -562,7 +560,7 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void testWorkerNb_OK() throws Exception {
+    void testWorkerNb_OK() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -576,7 +574,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerIndex_OK() throws Exception {
+    void testWorkerIndex_OK() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -590,7 +588,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerNb_BAD_INTEGER_1() throws Exception {
+    void testWorkerNb_BAD_INTEGER_1() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -603,7 +601,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerNb_BAD_INTEGER_2() throws Exception {
+    void testWorkerNb_BAD_INTEGER_2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -616,7 +614,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerIndex_BAD_INTEGER_1() throws Exception {
+    void testWorkerIndex_BAD_INTEGER_1() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
@@ -629,7 +627,7 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testWorkerIndex_BAD_INTEGER_2() throws Exception {
+    void testWorkerIndex_BAD_INTEGER_2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");

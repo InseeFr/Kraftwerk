@@ -29,9 +29,6 @@ public class ReportingDataService extends KraftwerkService{
     ConfigProperties configProperties;
     FileUtilsInterface fileUtilsInterface;
 
-    @Value("${fr.insee.postcollecte.files}")
-    private String defaultDirectory;
-
     public ReportingDataService(ConfigProperties configProperties, MinioConfig minioConfig) {
         super(configProperties, minioConfig);
         this.configProperties = configProperties;
