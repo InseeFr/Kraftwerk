@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PaperDataParserTest {
@@ -98,6 +99,21 @@ class PaperDataParserTest {
             Assertions.assertThat(fooInt).isNotNull();
         }
     }
+
+
+    @Test
+    void getVariableStem_null() {
+        assertNull(PaperDataParser.getVariableStemUnitTest(null));
+    }
+
+
+    @Test
+    void getVariableStemTest() {
+        assertEquals("", PaperDataParser.getVariableStemUnitTest(""));
+        assertEquals("", PaperDataParser.getVariableStemUnitTest("aaa"));
+        assertEquals("aaa_bbb", PaperDataParser.getVariableStemUnitTest("aaa_bbb_ccc"));
+    }
+
 
     @Test
     void getUcqValueTest() {

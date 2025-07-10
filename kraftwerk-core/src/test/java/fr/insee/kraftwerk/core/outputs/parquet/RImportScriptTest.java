@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.outputs.parquet;
 
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.outputs.TableScriptInfo;
 import org.junit.jupiter.api.Test;
 

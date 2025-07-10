@@ -38,7 +38,7 @@ public class ReportingDataProcessing {
                                String reportingDataFilePathParam
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", inDirectoryParam);
-        runProcess(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam);
+        runProcessPackageScopeProtected(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam);
     }
 
     public void runProcessGenesis(FileUtilsInterface fileUtilsInterface,
@@ -49,7 +49,7 @@ public class ReportingDataProcessing {
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", mode.getFolder(), inDirectoryParam);
         Path specDirectory = Path.of(defaultDirectory, "specs", inDirectoryParam);
-        runProcess(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam);
+        runProcessPackageScopeProtected(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam);
     }
 
 
@@ -114,6 +114,16 @@ public class ReportingDataProcessing {
         }
     }
 
+    /**
+     * package-scoped method for unit tests coverage
+     */
+    void runProcessPackageScopeProtected(FileUtilsInterface fileUtilsInterface, Path inDirectory, Path inOrSpecDirectory,
+                    String reportingDataFilePathParam) throws KraftwerkException {
+        runProcess(fileUtilsInterface, inDirectory, inOrSpecDirectory, reportingDataFilePathParam);
+    }
+
+
+
     public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
         Path reportingDataFile = modeInputs.getReportingDataFile();
         if(!reportingDataFile.toFile().exists()){
@@ -122,16 +132,33 @@ public class ReportingDataProcessing {
         }
         ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
         if (reportingDataFile.toString().endsWith(".xml")) {
-            XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
+            XMLReportingDataParser xMLReportingDataParser = newInstanceOfXMLReportingDataParser(fileUtilsInterface);
             xMLReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
         if (reportingDataFile.toString().endsWith(".csv")) {
-            CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
+            CSVReportingDataParser cSVReportingDataParser = newInstanceOfCSVReportingDataParser(fileUtilsInterface);
             cSVReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
         throw new KraftwerkException(400,
                 "Reporting data file path must be a xml or csv file ! Got %s".formatted(reportingDataFile.toString()));
     }
+
+    /**
+     * package-protected method for unit tests spying purpose
+     * (as we can't test/spy new instance creation with "new" keyword.)
+     */
+    XMLReportingDataParser newInstanceOfXMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+        return new XMLReportingDataParser(fileUtilsInterface);
+    }
+
+    /**
+     * package-protected method for unit tests spying purpose
+     * (as we can't test/spy new instance creation with "new" keyword.)
+     */
+    CSVReportingDataParser newInstanceOfCSVReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+        return new CSVReportingDataParser(fileUtilsInterface);
+    }
+
 }

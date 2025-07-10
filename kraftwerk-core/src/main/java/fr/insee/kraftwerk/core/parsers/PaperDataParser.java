@@ -54,7 +54,7 @@ public class PaperDataParser extends DataParser {
 	private void readCsvFileStream(InputStream inputStream) {
 		// Create an object of file reader
 		// class with CSV file as a parameter.
-        /** Input stream reader */
+        /* Input stream reader */
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		// create csvReader object passing
 		// file reader as a parameter
@@ -167,7 +167,8 @@ public class PaperDataParser extends DataParser {
 
 	// TODO: do something more robust here (-> needs of standardisation for paper
 	// data files)
-	private String getVariableStem(String variableName) {
+	private static String getVariableStem(String variableName) {
+		if(variableName == null) {return null;}
 		String[] decomposition = variableName.split("_");
 		if (decomposition.length == 2) { // no "_" in the variable name
 			return decomposition[0];
@@ -175,6 +176,15 @@ public class PaperDataParser extends DataParser {
 			return String.join("_", Arrays.copyOf(decomposition, decomposition.length - 1));
 		}
 	}
+
+
+	/**
+	 * For unit tests coverage (package scoped)
+	 */
+	static String getVariableStemUnitTest(String variableName) {
+		return getVariableStem(variableName);
+	}
+
 
 	private static String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
