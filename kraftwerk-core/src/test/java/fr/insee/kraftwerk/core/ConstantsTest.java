@@ -41,6 +41,8 @@ class ConstantsTest {
     void getCsvOutputQuoteChar_changed_Test() {
         Constants.setCsvOutputQuoteChar('¤');
         assertEquals('¤', Constants.getCsvOutputQuoteChar());
+        Constants.setCsvOutputQuoteChar('"'); //Set original '"' char separator for the next tests
+        assertEquals('"', Constants.getCsvOutputQuoteChar());
     }
 
     @Test
