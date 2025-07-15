@@ -23,9 +23,9 @@ class ErrorVariableLengthTest {
     @Test
     void errorVariableLength_toString1_Test() {
         String varName = "myVarName";
-        Variable var = new Variable(varName, null, null); //instantiation with minimum of parameters
+        Variable newVariable = new Variable(varName, null, null); //instantiation with minimum of parameters
         String dataMode = "dataMode1234";
-        ErrorVariableLength errorVariableLength = new ErrorVariableLength(var, dataMode);
+        ErrorVariableLength errorVariableLength = new ErrorVariableLength(newVariable, dataMode);
         String expectedResult = String.format("Warning : The maximum length read for variable %s (DataMode: %s) exceed expected length", varName, dataMode) + "\n" +
                 String.format("Expected: %s but received: %d", 1, 0) + "\n";
         assertEquals(expectedResult, errorVariableLength.toString());
@@ -34,10 +34,10 @@ class ErrorVariableLengthTest {
     @Test
     void errorVariableLength_toString2_Test() {
         String varName = "myVarName";
-        Variable var = new Variable(varName, null, null, "567");
-        var.setMaxLengthData(234);
+        Variable newVariable = new Variable(varName, null, null, "567");
+        newVariable.setMaxLengthData(234);
         String dataMode = "dataMode1234";
-        ErrorVariableLength errorVariableLength = new ErrorVariableLength(var, dataMode);
+        ErrorVariableLength errorVariableLength = new ErrorVariableLength(newVariable, dataMode);
         String expectedResult = String.format("Warning : The maximum length read for variable %s (DataMode: %s) exceed expected length", varName, dataMode) + "\n" +
                 String.format("Expected: %s but received: %d", 567, 234) + "\n";
         assertEquals(expectedResult, errorVariableLength.toString());

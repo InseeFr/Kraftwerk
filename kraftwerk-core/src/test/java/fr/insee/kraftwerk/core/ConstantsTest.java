@@ -23,7 +23,6 @@ class ConstantsTest {
 
     @Test
     void getInputPath_2params_null_Test() {
-        String userPath = null;
         assertNull(Constants.getInputPath(null, null));
     }
 
