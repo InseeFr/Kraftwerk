@@ -2,6 +2,9 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.exceptions.NullException;
+import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.UcqVariable;
@@ -13,16 +16,23 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.nio.file.Path;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class BuildBindingsSequenceTest {
 	
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+
+	@MockitoBean
+	private BuildBindingsSequence spyBuildBindingsSequence;
 
 	@Test
 	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
@@ -59,4 +69,39 @@ class BuildBindingsSequenceTest {
 		//WHEN + THEN
 		assertDoesNotThrow(() -> bbs.buildVtlBindings(userInputsFile, dataMode, vtlBindings, capiMetadata, withDdi, null));
 	}
+
+
+	@Test
+	void parseParadata_ModeInputsNotSet_Test() throws NullException {
+		// 1. Mock the dependencies
+		ModeInputs mockModeInputs = mock(ModeInputs.class); //"getParadataFolder()" not set here to test null value
+		ParadataParser mockParadataParser = mock(ParadataParser.class);
+		spyBuildBindingsSequence = Mockito.spy(new BuildBindingsSequence(fileUtilsInterface));
+		doReturn(mockParadataParser).when(spyBuildBindingsSequence).newInstanceOfParadataParser(any());
+		doNothing().when(mockParadataParser).parseParadata(any(), any());
+
+		// 2. Launch test
+		spyBuildBindingsSequence.parseParadataUnitTest(mockModeInputs, null);
+
+		// 3. checks
+		verify(mockParadataParser, times(0)).parseParadata(any(), any());
+	}
+
+	@Test
+	void parseParadata_Test() throws NullException {
+		// 1. Mock the dependencies
+		ModeInputs mockModeInputs = mock(ModeInputs.class);
+		doReturn(Path.of("a")).when(mockModeInputs).getParadataFolder();
+		ParadataParser mockParadataParser = mock(ParadataParser.class);
+		spyBuildBindingsSequence = Mockito.spy(new BuildBindingsSequence(fileUtilsInterface));
+		doReturn(mockParadataParser).when(spyBuildBindingsSequence).newInstanceOfParadataParser(any());
+		doNothing().when(mockParadataParser).parseParadata(any(), any());
+
+		// 2. Launch test
+		spyBuildBindingsSequence.parseParadataUnitTest(mockModeInputs, null);
+
+		// 3. checks
+		verify(mockParadataParser, times(1)).parseParadata(any(), any());
+	}
+
 }
