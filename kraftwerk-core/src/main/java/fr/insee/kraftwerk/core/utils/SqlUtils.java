@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.slf4j.Slf4j;
+import org.duckdb.DuckDBAppender;
 import org.duckdb.DuckDBConnection;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -190,12 +192,28 @@ public class SqlUtils {
                 appender.beginRow();
                 for (String columnName : sqlSchema.keySet()) {
                     String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
-                    appender.append(data);
+                    appendValueWithType(appender, data, sqlSchema.get(columnName));
                 }
                 appender.endRow();
             }
         }
         database.execute("CHECKPOINT;"); //Force to write data on disk
+    }
+
+    private static void appendValueWithType(DuckDBAppender appender,
+                                            String data,
+                                            VariableType variableType) throws SQLException {
+        if (data == null){
+            appender.appendNull();
+            return;
+        }
+        switch (variableType) {
+            case NUMBER -> appender.append(Double.parseDouble(data));
+            case BOOLEAN -> appender.append(Boolean.parseBoolean(data));
+            case INTEGER -> appender.append(Long.parseLong(data));
+            case STRING -> appender.append(data);
+            case DATE -> appender.append(LocalDateTime.parse(data));
+        }
     }
 
     /**
