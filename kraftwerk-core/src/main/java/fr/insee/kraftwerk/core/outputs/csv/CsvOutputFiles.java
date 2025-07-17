@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -26,6 +25,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Class to manage the writing of CSV output tables.
@@ -55,24 +55,19 @@ public class CsvOutputFiles extends OutputFiles {
 				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
 						outputFileName(datasetName, kraftwerkExecutionContext), null);
 
-				//Get column names
-				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
+				//Get columns
+				Map<String,String> columns = SqlUtils.getColumnTypes(getDatabase(), datasetName);
 
-				if(columnNames.isEmpty()){
+				if(columns.isEmpty()){
 					log.warn("dataset {} is empty !", datasetName);
 					return;
 				}
 
-				//Get boolean columns names
-				List<String> boolColumnNames = SqlUtils.getColumnNames(getDatabase(), datasetName, VariableType.BOOLEAN);
-				//Get indexes of boolean columns
-				List<Integer> boolColumnIndexes = new ArrayList<>();
-
 				//Create file with double quotes header
-				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+				Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames, boolColumnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columns);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
@@ -101,27 +96,31 @@ public class CsvOutputFiles extends OutputFiles {
         }
 	}
 
-	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames, List<String> boolColumnNames) {
+	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, Map<String, String> columnTypes) {
 		StringBuilder query = new StringBuilder("COPY (SELECT ");
-
-			for (int i = 0; i < columnNames.size(); i++) {
-				String col = columnNames.get(i);
+			int nbColOk = 0;
+			for (Entry<String,String> column : columnTypes.entrySet()) {
+				String col = column.getKey();
+				String type = column.getValue().toUpperCase(); // e.g. 'INTEGER', 'VARCHAR', etc.
 
 				String expression;
 				// replaces false/true by 0/1
-				if (boolColumnNames.contains(col)) {
+				if (type.equals("BOOLEAN")) {
 					expression = String.format(
-							"COALESCE(CASE WHEN \"%1$s\" IS NULL THEN NULL ELSE CASE WHEN \"%1$s\" THEN 1 ELSE 0 END END, '') AS \"%1$s\"",
+							"CASE WHEN \"%1$s\" IS NULL THEN NULL ELSE CASE WHEN \"%1$s\" THEN 1 ELSE 0 END END AS \"%1$s\"",
 							col
 					);
-				} else {
+				} else if (type.contains("CHAR") || type.equals("TEXT")) {
 					expression = String.format("COALESCE(\"%1$s\", '') AS \"%1$s\"", col);
+				} else {
+					expression = String.format("\"%1$s\"", col); // keep null
 				}
 
 				query.append(expression);
-				if (i < columnNames.size() - 1) {
+				if (nbColOk < columnTypes.keySet().size() - 1) {
 					query.append(", ");
 				}
+				nbColOk++;
 			}
 
 			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER true, DELIMITER '%s'",
@@ -129,10 +128,10 @@ public class CsvOutputFiles extends OutputFiles {
 					outputFile.getAbsolutePath() + "data",
 					Constants.CSV_OUTPUTS_SEPARATOR));
 
-			if (!columnNames.isEmpty()) {
+			if (!columnTypes.isEmpty()) {
 				//Double quote values parameter
 				query.append(", FORCE_QUOTE(");
-				for (String col : columnNames) {
+				for (String col : columnTypes.keySet()) {
 					query.append("\"").append(col).append("\",");
 				}
 				query.deleteCharAt(query.length() - 1); // remove trailing comma
@@ -143,20 +142,17 @@ public class CsvOutputFiles extends OutputFiles {
 			return query;
 	}
 
-	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+	private static String buildHeader(List<String> columnNames) {
 		StringBuilder headerBuilder = new StringBuilder();
 		for (String columnName : columnNames) {
 			headerBuilder.append(String.format("\"%s\"", columnName)).append(Constants.CSV_OUTPUTS_SEPARATOR);
-			if(boolColumnNames.contains(columnName)){
-				boolColumnIndexes.add(columnNames.indexOf(columnName));
-			}
 		}
 		headerBuilder.deleteCharAt(headerBuilder.length()-1);
 		headerBuilder.append("\n");
 		return headerBuilder.toString();
 	}
 
-	
+
 	@Override
 	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		// Assemble required info to write scripts
