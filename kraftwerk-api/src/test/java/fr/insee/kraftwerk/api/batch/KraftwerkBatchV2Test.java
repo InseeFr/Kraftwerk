@@ -37,7 +37,7 @@ class KraftwerkBatchV2Test {
     KraftwerkBatchV2 kraftwerkBatchV2;
 
     @Test
-    public void noArgs_Test() throws Exception {
+    void noArgs_Test() throws Exception {
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(new String[]{});
         kraftwerkBatchV2.run(myArgs);
         verify(kraftwerkBatchV2, times(0)).cliModeLaunched(any());
@@ -45,7 +45,7 @@ class KraftwerkBatchV2Test {
 
 
     @Test
-    public void throwException_Test() throws Exception {
+    void throwException_Test() throws Exception {
         //Use Case
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(new String[]{"--aaa=bbb"});
         //Mocks : unnecessary here as an exception will be thrown before all useful calls : invalid arguments
@@ -57,17 +57,13 @@ class KraftwerkBatchV2Test {
 
 
     @Test
-    public void run_allArgs_Test() throws Exception {
+    void run_allArgs_Test() throws Exception {
         //Use Case
         String args = "--service=MAIN;--campaignId=TEST-GLOB;--archive=true;--reporting-data=false;--with-encryption=false;--workers-nb=1;--worker-index=1";
         String[] argsArray = args.split(";");
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(argsArray);
 
-        //Mocks
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMain(any(),anyInt());
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMainV2(any(), anyInt(), anyInt(), anyInt());
+        //Mocks : N/A here
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
@@ -90,8 +86,6 @@ class KraftwerkBatchV2Test {
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
         verify(mockMainProcessing, times(1)).runMain();
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessingGenesis, times(0)).runMain(any(), anyInt());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessingGenesis, times(0)).runMainV2(any(), anyInt(), anyInt(), anyInt());
         verify(mockKraftwerkService, times(1)).archive(any(), any());
     }
 
@@ -106,25 +100,17 @@ class KraftwerkBatchV2Test {
 
     @ParameterizedTest
     @MethodSource("mainProcessingParameterizedTests")
-    public void run_mainProcessing_Test(String serviceName) throws Exception {
+    void run_mainProcessing_Test(String serviceName) throws Exception {
         //Use Case
         String args = "--service=" + serviceName + ";--campaignId=TEST-GLOB";
         String[] argsArray = args.split(";");
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(argsArray);
 
-        //Mocks
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMain(any(),anyInt());
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMainV2(any(), anyInt(), anyInt(), anyInt());
+        //Mocks : N/A here
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
         doNothing().when(mockMainProcessing).runMain();
-
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : KraftwerkService mockKraftwerkService = mock(KraftwerkService.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockKraftwerkService).when(kraftwerkBatchV2).getKraftwerkService();
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(null).when(mockKraftwerkService).archive(any(), any());
 
         //execute
         kraftwerkBatchV2.run(myArgs);
@@ -132,14 +118,11 @@ class KraftwerkBatchV2Test {
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
         verify(mockMainProcessing, times(1)).runMain();
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessingGenesis, times(0)).runMain(any(), anyInt());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessingGenesis, times(0)).runMainV2(any(), anyInt(), anyInt(), anyInt());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockKraftwerkService, times(0)).archive(any(), any());
     }
 
 
     @Test
-    public void run_GENESIS_Test() throws Exception {
+    void run_GENESIS_Test() throws Exception {
         //Use Case
         String args = "--service=GENESIS;--campaignId=TEST-GLOB";
         String[] argsArray = args.split(";");
@@ -149,30 +132,19 @@ class KraftwerkBatchV2Test {
         MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
         doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
         doNothing().when(mockMainProcessingGenesis).runMain(any(),anyInt());
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMainV2(any(), anyInt(), anyInt(), anyInt());
-
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessing).runMain();
-
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : KraftwerkService mockKraftwerkService = mock(KraftwerkService.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockKraftwerkService).when(kraftwerkBatchV2).getKraftwerkService();
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(null).when(mockKraftwerkService).archive(any(), any());
 
         //execute
         kraftwerkBatchV2.run(myArgs);
 
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessing, times(0)).runMain();
         verify(mockMainProcessingGenesis, times(1)).runMain(any(), anyInt());
         verify(mockMainProcessingGenesis, times(0)).runMainV2(any(), anyInt(), anyInt(), anyInt());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockKraftwerkService, times(0)).archive(any(), any());
     }
 
 
     @Test
-    public void run_GENESISV2_Test() throws Exception {
+    void run_GENESISV2_Test() throws Exception {
         //Use Case
         String args = "--service=GENESISV2;--campaignId=TEST-GLOB";
         String[] argsArray = args.split(";");
@@ -181,26 +153,15 @@ class KraftwerkBatchV2Test {
         //Mocks
         MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
         doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessingGenesis).runMain(any(),anyInt());
         doNothing().when(mockMainProcessingGenesis).runMainV2(any(), anyInt(), anyInt(), anyInt());
-
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockMainProcessing).runMain();
-
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : KraftwerkService mockKraftwerkService = mock(KraftwerkService.class);
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockKraftwerkService).when(kraftwerkBatchV2).getKraftwerkService();
-        //NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(null).when(mockKraftwerkService).archive(any(), any());
 
         //execute
         kraftwerkBatchV2.run(myArgs);
 
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockMainProcessing, times(0)).runMain();
         verify(mockMainProcessingGenesis, times(0)).runMain(any(), anyInt());
         verify(mockMainProcessingGenesis, times(1)).runMainV2(any(), anyInt(), anyInt(), anyInt());
-        //NOT NEEDED VERIFICATION FOR THAT TEST-CASE : verify(mockKraftwerkService, times(0)).archive(any(), any());
     }
 
 }

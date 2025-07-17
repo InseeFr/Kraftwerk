@@ -43,15 +43,6 @@ class ErrorVariableLengthTest {
         assertEquals(expectedResult, errorVariableLength.toString());
     }
 
-    /*
-    //NOTE : This test is commented because equality test on self object generates sonar issue!
-    @Test
-    void errorVariableLength_self_Tests() {
-        ErrorVariableLength errorVariableLength = new ErrorVariableLength(null, null);
-        assertEquals(errorVariableLength, errorVariableLength);
-    }
-    */
-
 
     private static Stream<Arguments> errorVariableLengthEqualsParameterizedTests() {
         return Stream.of(

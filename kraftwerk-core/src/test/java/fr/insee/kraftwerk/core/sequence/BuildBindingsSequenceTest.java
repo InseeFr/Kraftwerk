@@ -80,8 +80,6 @@ class BuildBindingsSequenceTest {
 		// 1. Mock the dependencies
 		ModeInputs mockModeInputs = mock(ModeInputs.class); //"getParadataFolder()" not set here to test null value
 		ParadataParser mockParadataParser = mock(ParadataParser.class);
-		//NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockParadataParser).when(spyBuildBindingsSequence).getParadataParser(any());
-		//NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockParadataParser).parseParadata(any(), any());
 
 		// 2. Launch test
 		spyBuildBindingsSequence.parseParadata(mockModeInputs, null);

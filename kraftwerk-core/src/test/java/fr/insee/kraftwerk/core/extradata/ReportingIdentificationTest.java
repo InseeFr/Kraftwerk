@@ -58,23 +58,7 @@ class ReportingIdentificationTest {
 				Arguments.of("IDENTIFIED","NACC","ORDINARY","SECONDARY","","","",           "HOUSEF2F", "NACCSEC"),
 				Arguments.of("IDENTIFIED","NACC","ORDINARY","DK","UNIDENTIFIED","","",      "HOUSEF2F", "NACCDKUNIDENT"),
 				Arguments.of("IDENTIFIED","NACC","ORDINARY","PRIMARY","IDENTIFIED","","",   "HOUSEF2F", "NACCPRIDENT"),
-				Arguments.of("IDENTIFIED","ACC","ORDINARY","OCCASIONAL","IDENTIFIED","","", "HOUSEF2F", "ACCOCCIDENT")
-		);
-	}
-
-
-	@ParameterizedTest
-	@MethodSource("oldFilesAndIASCOParameterizedTests")
-	void getOutcomeSpotting_ParameterizedTest_old_files_and_IASCO(String identification, String access, String situation,
-										  String category, String occupant, String individualStatus, String interviewerCanProcess,
-										  String param, String expectedResult) {
-		ReportingIdentification reportingIdentification = new ReportingIdentification(identification, access, situation, category, occupant, individualStatus, interviewerCanProcess);
-		Assertions.assertEquals(expectedResult, reportingIdentification.getOutcomeSpotting(param));
-	}
-
-
-	private static Stream<Arguments> INDETELParameterizedTests() {
-		return Stream.of(
+				Arguments.of("IDENTIFIED","ACC","ORDINARY","OCCASIONAL","IDENTIFIED","","", "HOUSEF2F", "ACCOCCIDENT"),
 				//INDTEL
 				Arguments.of("","","","","","DCD","",                   "INDTEL", "INDDCD"),
 				Arguments.of("","","","","","NOIDENT","",               "INDTEL", "INDNOIDENT"),
@@ -94,23 +78,7 @@ class ReportingIdentificationTest {
 				Arguments.of("","","ORDINARY","","","OTHERADRESS","",   "INTELNOR", "INDORDOADR"),
 				Arguments.of("","","NOORDINARY","","","OTHERADRESS","", "INTELNOR", "INDNORDOADR"),
 				Arguments.of("","","NOORDINARY","","",null,"",          "INDTEL", null),
-				Arguments.of("","","NOORDINARY","","","aaaaaaa","",     "INDTEL", null)
-		);
-	}
-
-
-	@ParameterizedTest
-	@MethodSource("INDETELParameterizedTests")
-	void getOutcomeSpotting_ParameterizedTest_INDETEL(String identification, String access, String situation,
-													String category, String occupant, String individualStatus, String interviewerCanProcess,
-													String param, String expectedResult) {
-		ReportingIdentification reportingIdentification = new ReportingIdentification(identification, access, situation, category, occupant, individualStatus, interviewerCanProcess);
-		Assertions.assertEquals(expectedResult, reportingIdentification.getOutcomeSpotting(param));
-	}
-
-
-	private static Stream<Arguments> INDF2FParameterizedTests() {
-		return Stream.of(
+				Arguments.of("","","NOORDINARY","","","aaaaaaa","",     "INDTEL", null),
 				//INDF2F
 				Arguments.of("","","","","","DCD","",                      "INDF2F", "INDDCD"),
 				Arguments.of("","","","","","NOIDENT","",                  "INDF2F", "INDNOIDENT"),
@@ -138,13 +106,12 @@ class ReportingIdentificationTest {
 
 
 	@ParameterizedTest
-	@MethodSource("INDF2FParameterizedTests")
-	void getOutcomeSpotting_ParameterizedTest_INDF2F(String identification, String access, String situation,
-													  String category, String occupant, String individualStatus, String interviewerCanProcess,
-													  String param, String expectedResult) {
+	@MethodSource("oldFilesAndIASCOParameterizedTests")
+	void getOutcomeSpotting_ParameterizedTest(String identification, String access, String situation,
+										  String category, String occupant, String individualStatus, String interviewerCanProcess,
+										  String param, String expectedResult) {
 		ReportingIdentification reportingIdentification = new ReportingIdentification(identification, access, situation, category, occupant, individualStatus, interviewerCanProcess);
 		Assertions.assertEquals(expectedResult, reportingIdentification.getOutcomeSpotting(param));
 	}
-
 
 }

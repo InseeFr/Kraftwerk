@@ -449,29 +449,48 @@ class ArgsCheckerTest {
     }
 
 
-    @Test
-    void testWorkerNb_NOT_INTEGER() {
+    private static Stream<Arguments> badWorkerNbParameterizedTests() {
+        return Stream.of(
+                Arguments.of("bad_integer", "arg (argWorkersNb) cannot be parsed as an integer !"),
+                Arguments.of("0", "workers must be between 1 and 10 ! (got 0)"),
+                Arguments.of("11", "workers must be between 1 and 10 ! (got 11)")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("badWorkerNbParameterizedTests")
+    void badWorkerNb_ParameterizedTests(String workerNb, String expectedMsg) {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkersNb("bad_integer");
+        argsCheckerBuilder.argWorkersNb(workerNb);
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
 
         Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("arg (argWorkersNb) cannot be parsed as an integer !", exception.getMessage());
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
 
-    @Test
-    void testWorkerIndex_NOT_INTEGER() {
+    private static Stream<Arguments> badWorkerIndexParameterizedTests() {
+        return Stream.of(
+                Arguments.of("1", "bad_integer", "arg (argWorkerIndex) cannot be parsed as an integer !"),
+                Arguments.of("1", "0", "workerId cannot be > workers number, which is inconsistant ! (got 0 for 1 workers)"),
+                Arguments.of("3", "4", "workerId cannot be > workers number, which is inconsistant ! (got 4 for 3 workers)")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("badWorkerIndexParameterizedTests")
+    void badWorkerIndex_ParameterizedTests(String workersNb, String workerIndex, String expectedMsg) {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("MAIN");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkerIndex("bad_integer");
+        argsCheckerBuilder.argWorkersNb(workersNb);
+        argsCheckerBuilder.argWorkerIndex(workerIndex);
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
 
         Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("arg (argWorkerIndex) cannot be parsed as an integer !", exception.getMessage());
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
 
@@ -526,60 +545,5 @@ class ArgsCheckerTest {
 
         assertEquals(1, argsChecker.getWorkerIndex());
     }
-
-
-    @Test
-    void testWorkerNb_BAD_INTEGER_1() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("MAIN");
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkersNb("0");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("workers must be between 1 and 10 ! (got 0)", exception.getMessage());
-    }
-
-
-    @Test
-    void testWorkerNb_BAD_INTEGER_2() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("MAIN");
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkersNb("11");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("workers must be between 1 and 10 ! (got 11)", exception.getMessage());
-    }
-
-
-    @Test
-    void testWorkerIndex_BAD_INTEGER_1() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("MAIN");
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkerIndex("0");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("workerId cannot be > workers number, which is inconsistant ! (got 0 for 1 workers)", exception.getMessage());
-    }
-
-
-    @Test
-    void testWorkerIndex_BAD_INTEGER_2() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("MAIN");
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsCheckerBuilder.argWorkersNb("3");
-        argsCheckerBuilder.argWorkerIndex("4");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, argsChecker::checkArgs);
-        assertEquals("workerId cannot be > workers number, which is inconsistant ! (got 4 for 3 workers)", exception.getMessage());
-    }
-
-
 
 }
