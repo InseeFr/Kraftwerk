@@ -14,10 +14,12 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
 
@@ -26,13 +28,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class BuildBindingsSequenceTest {
 	
 	private static final Path inputSamplesDirectory = Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs");
 	private static final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
-	@MockitoBean
-	private BuildBindingsSequence spyBuildBindingsSequence;
+	@Spy
+	@InjectMocks
+	private BuildBindingsSequence spyBuildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 
 	@Test
 	void buildVtlBindings_errorWithoutMetadata() throws KraftwerkException {
@@ -76,12 +80,11 @@ class BuildBindingsSequenceTest {
 		// 1. Mock the dependencies
 		ModeInputs mockModeInputs = mock(ModeInputs.class); //"getParadataFolder()" not set here to test null value
 		ParadataParser mockParadataParser = mock(ParadataParser.class);
-		spyBuildBindingsSequence = Mockito.spy(new BuildBindingsSequence(fileUtilsInterface));
-		doReturn(mockParadataParser).when(spyBuildBindingsSequence).newInstanceOfParadataParser(any());
-		doNothing().when(mockParadataParser).parseParadata(any(), any());
+		//NOT NEEDED MOCK FOR THAT TEST-CASE : doReturn(mockParadataParser).when(spyBuildBindingsSequence).getParadataParser(any());
+		//NOT NEEDED MOCK FOR THAT TEST-CASE : doNothing().when(mockParadataParser).parseParadata(any(), any());
 
 		// 2. Launch test
-		spyBuildBindingsSequence.parseParadataUnitTest(mockModeInputs, null);
+		spyBuildBindingsSequence.parseParadata(mockModeInputs, null);
 
 		// 3. checks
 		verify(mockParadataParser, times(0)).parseParadata(any(), any());
@@ -93,12 +96,11 @@ class BuildBindingsSequenceTest {
 		ModeInputs mockModeInputs = mock(ModeInputs.class);
 		doReturn(Path.of("a")).when(mockModeInputs).getParadataFolder();
 		ParadataParser mockParadataParser = mock(ParadataParser.class);
-		spyBuildBindingsSequence = Mockito.spy(new BuildBindingsSequence(fileUtilsInterface));
-		doReturn(mockParadataParser).when(spyBuildBindingsSequence).newInstanceOfParadataParser(any());
+		doReturn(mockParadataParser).when(spyBuildBindingsSequence).getParadataParser(any());
 		doNothing().when(mockParadataParser).parseParadata(any(), any());
 
 		// 2. Launch test
-		spyBuildBindingsSequence.parseParadataUnitTest(mockModeInputs, null);
+		spyBuildBindingsSequence.parseParadata(mockModeInputs, null);
 
 		// 3. checks
 		verify(mockParadataParser, times(1)).parseParadata(any(), any());

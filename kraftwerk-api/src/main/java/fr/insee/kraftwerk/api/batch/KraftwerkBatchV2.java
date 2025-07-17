@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -63,7 +64,7 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
         log.info("KraftwerkBatchV2 executed with options:");
         try {
             if (!args.getOptionNames().isEmpty()) {
-                log.info("Launching Kraftwerk in CLI mode (V2)...");
+                cliModeLaunched("Launching Kraftwerk in CLI mode (V2)...");
 
                 args.getOptionNames().forEach(option ->
                         log.info("{} = {}", option, args.getOptionValues(option))
@@ -111,47 +112,69 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
 
                 switch (argsChecker.getServiceName()) {
                     case KraftwerkServiceType.GENESIS: {
-                        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
-                                new GenesisClient(new RestTemplateBuilder(), configProperties),
-                                fileSystem, kraftwerkExecutionContext);
+                        MainProcessingGenesis mainProcessingGenesis = getMainProcessingGenesis(kraftwerkExecutionContext);
                         mainProcessingGenesis.runMain(argsChecker.getCampaignId(),1000);
                     } break;
                     case KraftwerkServiceType.GENESISV2: {
-                        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(configProperties,
-                                new GenesisClient(new RestTemplateBuilder(), configProperties),
-                                fileSystem, kraftwerkExecutionContext);
+                        MainProcessingGenesis mainProcessingGenesis = getMainProcessingGenesis(kraftwerkExecutionContext);
                         mainProcessingGenesis.runMainV2(argsChecker.getCampaignId(),1000,
                                 argsChecker.getWorkersNb(), argsChecker.getWorkerIndex());
                     } break;
                     default: {
-                        MainProcessing mainProcessing = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileSystem);
+                        MainProcessing mainProcessing = getMainProcessing(kraftwerkExecutionContext);
                         mainProcessing.runMain();
                     }
                 }
 
                 //Archive
                 if (argsChecker.isArchive()) {
-                    KraftwerkService kraftwerkService = new KraftwerkService(configProperties, minioConfig);
+                    KraftwerkService kraftwerkService = getKraftwerkService();
                     kraftwerkService.archive(argsChecker.getCampaignId(), fileSystem);
                 }
 
-                System.exit(0);
+                //NOTE : "System.exit(0);" prevents doing clean Unit Tests..
+                return;
+
             }
         } catch (KraftwerkException ke) {
             log.error("Kraftwerk exception caught : Code {}, {}", ke.getStatus(), ke.getMessage());
-            System.exit(1);
+            //NOTE : "System.exit(1);" prevents doing clean Unit Tests..
+            return;
         }catch(Exception e){
             log.error(e.toString());
-            System.exit(1);
+            //NOTE : "System.exit(1);" prevents doing clean Unit Tests..
+            return;
         }
         log.info("Launching Kraftwerk in API mode (V2)...");
-
-
     }
 
 
     private static String getValue(String option, ApplicationArguments args) {
         return !args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null;
+    }
+
+
+    /**
+     * Used for some checks on Unit Tests
+     */
+    void cliModeLaunched(String logString) {
+        log.info(logString);
+    }
+
+    @NotNull MainProcessingGenesis getMainProcessingGenesis(KraftwerkExecutionContext kraftwerkExecutionContext) {
+        return new MainProcessingGenesis(configProperties,
+                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                fileSystem, kraftwerkExecutionContext);
+    }
+
+
+    @NotNull MainProcessing getMainProcessing(KraftwerkExecutionContext kraftwerkExecutionContext) {
+        return new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileSystem);
+    }
+
+
+    @NotNull KraftwerkService getKraftwerkService() {
+        return new KraftwerkService(configProperties, minioConfig);
     }
 
 

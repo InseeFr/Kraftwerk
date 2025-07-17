@@ -22,7 +22,7 @@ import java.nio.file.Path;
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
-	private final FileUtilsInterface fileUtilsInterface;
+	private FileUtilsInterface fileUtilsInterface; //NOTE : "@InjectMocks" does not work with "final" keyword in Unit Tests!
 
 	public BuildBindingsSequence(FileUtilsInterface fileUtilsInterface) {
 		vtlExecute = new VtlExecute(fileUtilsInterface);
@@ -54,27 +54,20 @@ public class BuildBindingsSequence {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
+	/**
+	 * package-protected method for unit tests purpose
+	 */
+	void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
 		Path paraDataFolder = modeInputs.getParadataFolder();
 		if (paraDataFolder != null) {
-			ParadataParser paraDataParser = newInstanceOfParadataParser(fileUtilsInterface);
+			ParadataParser paraDataParser = getParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataFolder);
 			paraDataParser.parseParadata(paraData, data);
 		}
 	}
 
-	/**
-	 * package-protected method for unit tests purpose
-	 */
-	void parseParadataUnitTest(ModeInputs modeInputs, SurveyRawData data) throws NullException {
-		parseParadata(modeInputs, data);
-	}
 
-	/**
-	 * package-protected method for unit tests spying purpose
-	 * (as we can't test new instance creation with "new" keyword.)
-	 */
-	ParadataParser newInstanceOfParadataParser(FileUtilsInterface fileUtilsInterface) {
+	ParadataParser getParadataParser(FileUtilsInterface fileUtilsInterface) {
 		return new ParadataParser(fileUtilsInterface);
 	}
 

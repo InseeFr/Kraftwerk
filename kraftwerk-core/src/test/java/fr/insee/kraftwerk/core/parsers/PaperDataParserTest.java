@@ -103,22 +103,22 @@ class PaperDataParserTest {
 
     @Test
     void getVariableStem_null() {
-        assertNull(PaperDataParser.getVariableStemUnitTest(null));
+        assertNull(PaperDataParser.getVariableStem(null));
     }
 
 
     @Test
     void getVariableStemTest() {
-        assertEquals("", PaperDataParser.getVariableStemUnitTest(""));
-        assertEquals("", PaperDataParser.getVariableStemUnitTest("aaa"));
-        assertEquals("aaa_bbb", PaperDataParser.getVariableStemUnitTest("aaa_bbb_ccc"));
+        assertEquals("", PaperDataParser.getVariableStem(""));
+        assertEquals("", PaperDataParser.getVariableStem("aaa"));
+        assertEquals("aaa_bbb", PaperDataParser.getVariableStem("aaa_bbb_ccc"));
     }
 
 
     @Test
     void getUcqValueTest() {
         String value = "aaa_bbb_ccc";
-        assertEquals("ccc", PaperDataParser.getUcqValueUnitTest(value));
+        assertEquals("ccc", PaperDataParser.getUcqValue(value));
     }
 
 
@@ -126,6 +126,6 @@ class PaperDataParserTest {
     void createGroupIdTest() {
         String groupName = "aaa";
         String subGroupId = "bbb";
-        assertEquals("aaa-bbb", PaperDataParser.createGroupIdUnitTest(groupName, subGroupId));
+        assertEquals("aaa-bbb", PaperDataParser.createGroupId(groupName, subGroupId));
     }
 }

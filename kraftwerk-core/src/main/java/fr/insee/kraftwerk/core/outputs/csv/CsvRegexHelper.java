@@ -31,7 +31,7 @@ public class CsvRegexHelper {
 
     /**
      *
-     * @param tmpOutputFile file in which we write dada transformed by Regex
+     * @param tmpOutputFile file in which we write data transformed by Regex
      * @param columnNames CSV colum names
      * @param boolColumnNames CSV colum names typed as boolean
      * @param boolColumnIndexes indexes of CSV boolean columns
@@ -106,7 +106,10 @@ public class CsvRegexHelper {
         }
     }
 
-    private static String applyRegExOnBlockFile(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
+    /**
+     * Package protected scope for unit tests
+     */
+    static String applyRegExOnBlockFile(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
         String result;
 
         Pattern p0 = Pattern.compile(regExPatternToFind, Pattern.CASE_INSENSITIVE);
@@ -139,15 +142,11 @@ public class CsvRegexHelper {
         return result;
     }
 
+
     /**
      * Package protected scope for unit tests
      */
-    static String applyRegExOnBlockFileUnitTests(StringBuilder sbInput, String regExPatternToFind, String regExPatternReplacement, List<String> boolColumnNames) {
-        return applyRegExOnBlockFile(sbInput, regExPatternToFind, regExPatternReplacement, boolColumnNames);
-    }
-
-
-    private static String buildRegExPatternToFind(List<String> columnNames) {
+    static String buildRegExPatternToFind(List<String> columnNames) {
         //1) dynamically set regEx Pattern
         StringBuilder sbRegExPatternToFind = new StringBuilder();
         //sbRegExPatternToFind.append("^"); //DO NOT ADD THIS AS IT WILL ONLY PROCESS THE 1ST LINE!
@@ -163,15 +162,12 @@ public class CsvRegexHelper {
         return sbRegExPatternToFind.toString();
     }
 
+
+
     /**
      * Package protected scope for unit tests
      */
-    static String buildRegExPatternToFindUnitTests(List<String> columnNames) {
-        return buildRegExPatternToFind(columnNames);
-    }
-
-
-    private static String buildRegExPatternReplacement(List<String> columnNames, List<Integer> boolColumnIndexes) {
+    static String buildRegExPatternReplacement(List<String> columnNames, List<Integer> boolColumnIndexes) {
         //MAIN PATTERN : ALL NON-BOOLEAN FIELDS ARE SURROUNDED BY QUOTES
         StringBuilder sbRegExPatternReplacement = new StringBuilder();
         int nbColumns = columnNames.size();
@@ -207,14 +203,6 @@ public class CsvRegexHelper {
         sbRegExPatternReplacement.deleteCharAt(sbRegExPatternReplacement.length() - 1);
 
         return sbRegExPatternReplacement.toString();
-    }
-
-
-    /**
-     * Package protected scope for unit tests
-     */
-    static String buildRegExPatternReplacementUnitTests(List<String> columnNames, List<Integer> boolColumnIndexes) {
-        return buildRegExPatternReplacement(columnNames, boolColumnIndexes);
     }
 
 }

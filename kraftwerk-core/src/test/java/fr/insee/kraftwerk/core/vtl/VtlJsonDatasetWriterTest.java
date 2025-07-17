@@ -230,7 +230,7 @@ class VtlJsonDatasetWriterTest {
 
 	@Test
 	void convertBooleanValueNullTest() {
-		assertNull(VtlJsonDatasetWriter.convertBooleanValueUnitTest(null));
+		assertNull(VtlJsonDatasetWriter.convertBooleanValue(null));
 	}
 
 
@@ -247,13 +247,13 @@ class VtlJsonDatasetWriterTest {
 	@ParameterizedTest
 	@MethodSource("convertBooleanValueParameterizedTests")
 	void convertToVtlType_parameterizedTests(String expectedResult, String param) {
-		assertEquals(expectedResult, VtlJsonDatasetWriter.convertBooleanValueUnitTest(param));
+		assertEquals(expectedResult, VtlJsonDatasetWriter.convertBooleanValue(param));
 	}
 
 
 	@Test
 	void convertToVtlType_unknownValue_Test() {
-		assertNull(VtlJsonDatasetWriter.convertBooleanValueUnitTest("aaa"));
+		assertNull(VtlJsonDatasetWriter.convertBooleanValue("aaa"));
 	}
 
 }

@@ -213,8 +213,11 @@ public class VtlJsonDatasetWriter {
 	/** Compatible boolean values for "false" */
 	private static final Set<String> falseValues = Set.of("false", "0");
 
-	/** Method to convert compatible boolean values to "true" or "false". */
-	private static String convertBooleanValue(String value) {
+	/**
+	 * Method to convert compatible boolean values to "true" or "false".
+	 * NOTE : package-scoped method for unit tests coverage
+	 */
+	static String convertBooleanValue(String value) {
 		if (value != null) {
 			if (trueValues.contains(value)) return "true";
 			else if (falseValues.contains(value)) return "false";
@@ -222,13 +225,6 @@ public class VtlJsonDatasetWriter {
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * For unit tests coverage (package scoped)
-	 */
-	static String convertBooleanValueUnitTest(String value) {
-		return convertBooleanValue(value);
 	}
 
 }
