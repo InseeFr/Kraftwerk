@@ -15,13 +15,11 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -74,26 +72,8 @@ public class CsvOutputFiles extends OutputFiles {
 				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames, boolColumnNames);
 				this.getDatabase().execute(exportCsvQuery.toString());
-
-				//Apply csv format transformations
-
-				//Merge data file with header file
-				//Read line by line to avoid memory waste
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
-					String line = bufferedReader.readLine();
-					while(line != null){
-						//Apply transformations to elements
-						line = applyNullTransformation(line);
-						line = applyBooleanTransformations(line, boolColumnIndexes);
-
-						Files.write(tmpOutputFile,(line + "\n").getBytes(),StandardOpenOption.APPEND);
-						line = bufferedReader.readLine();
-					}
-				}
-				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
-
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
 				if (kraftwerkExecutionContext != null) {
@@ -121,17 +101,46 @@ public class CsvOutputFiles extends OutputFiles {
         }
 	}
 
-	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames) {
-		StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
-		//Double quote values parameter
-		exportCsvQuery.append(", FORCE_QUOTE(");
-		for (String stringColumnName : columnNames) {
-			exportCsvQuery.append(String.format("'%s',", stringColumnName));
-		}
-		//Remove last ","
-		exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
-		exportCsvQuery.append("))");
-		return exportCsvQuery;
+	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames, List<String> boolColumnNames) {
+		StringBuilder query = new StringBuilder("COPY (SELECT ");
+
+			for (int i = 0; i < columnNames.size(); i++) {
+				String col = columnNames.get(i);
+
+				String expression;
+				// replaces false/true by 0/1
+				if (boolColumnNames.contains(col)) {
+					expression = String.format(
+							"COALESCE(CASE WHEN \"%1$s\" IS NULL THEN NULL ELSE CASE WHEN \"%1$s\" THEN 1 ELSE 0 END END, '') AS \"%1$s\"",
+							col
+					);
+				} else {
+					expression = String.format("COALESCE(\"%1$s\", '') AS \"%1$s\"", col);
+				}
+
+				query.append(expression);
+				if (i < columnNames.size() - 1) {
+					query.append(", ");
+				}
+			}
+
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER true, DELIMITER '%s'",
+					datasetName,
+					outputFile.getAbsolutePath() + "data",
+					Constants.CSV_OUTPUTS_SEPARATOR));
+
+			if (!columnNames.isEmpty()) {
+				//Double quote values parameter
+				query.append(", FORCE_QUOTE(");
+				for (String col : columnNames) {
+					query.append("\"").append(col).append("\",");
+				}
+				query.deleteCharAt(query.length() - 1); // remove trailing comma
+				query.append(")");
+			}
+
+			query.append(")");
+			return query;
 	}
 
 	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
@@ -147,37 +156,7 @@ public class CsvOutputFiles extends OutputFiles {
 		return headerBuilder.toString();
 	}
 
-	/**
-	 * replaces false/true by 0/1 in a line
-	 * @param csvLine line to transform
-	 * @param boolColumnIndexes indexes of booleans values to change
-	 * @return the transformed line
-	 */
-	private String applyBooleanTransformations(String csvLine, List<Integer> boolColumnIndexes) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
-		//change "true" or "false" by "1" or "0"
-		for (int elementIndex : boolColumnIndexes) {
-			lineElements[elementIndex] = lineElements[elementIndex].replace("false", "0").replace("true", "1");
-		}
-		//Rebuild csv line
-		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
-	}
-
-	/**
-	 * Changes null values to "" in a line
-	 * @param csvLine line to transform
-	 * @return the transformed line
-	 */
-	private String applyNullTransformation(String csvLine) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
-		for (int i = 0; i < lineElements.length; i++) {
-			if (lineElements[i].isEmpty()) {
-				lineElements[i] = "\"\"";
-			}
-		}
-		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
-	}
-
+	
 	@Override
 	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		// Assemble required info to write scripts
