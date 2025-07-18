@@ -139,6 +139,7 @@ public class CsvOutputFiles extends OutputFiles {
 			}
 
 			query.append(")");
+			log.debug("csv query : \n {}",query);
 			return query;
 	}
 
