@@ -125,7 +125,7 @@ public class CsvOutputFiles extends OutputFiles {
 
 			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s'",
 					datasetName,
-					outputFile.getAbsolutePath() ,//+ "data",
+					outputFile.getAbsolutePath() + "data",
 					Constants.CSV_OUTPUTS_SEPARATOR));
 
 			if (!columnTypes.isEmpty()) {
