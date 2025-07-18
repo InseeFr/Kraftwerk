@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -33,6 +34,8 @@ import java.util.Map.Entry;
  */
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
+
+	public static final String NULL = ";¤__NULL__¤;";
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -76,6 +79,10 @@ public class CsvOutputFiles extends OutputFiles {
 					 var input = Files.newInputStream(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
 					input.transferTo(output);
 				}
+				String content = Files.readString(tmpOutputFile);
+				content = content.replace(NULL, ";\"\";");
+				Files.write(tmpOutputFile, content.getBytes(StandardCharsets.UTF_8));
+
 				Files.deleteIfExists(Path.of(tmpOutputFile.toAbsolutePath() + "data"));
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
@@ -131,10 +138,11 @@ public class CsvOutputFiles extends OutputFiles {
 				nbColOk++;
 			}
 
-			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s'",
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR %s",
 					datasetName,
 					outputFile.getAbsolutePath() + "data",
-					Constants.CSV_OUTPUTS_SEPARATOR));
+					Constants.CSV_OUTPUTS_SEPARATOR,
+					NULL));
 
 			if (!columnTypes.isEmpty()) {
 				//Double quote values parameter
