@@ -64,7 +64,7 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 
 				//Create file with double quotes header
-				Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
+		//		Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
 
 				//Data export into temp file
 				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columns);
@@ -123,9 +123,9 @@ public class CsvOutputFiles extends OutputFiles {
 				nbColOk++;
 			}
 
-			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s'",
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER true, DELIMITER '%s'",
 					datasetName,
-					outputFile.getAbsolutePath() + "data",
+					outputFile.getAbsolutePath(),
 					Constants.CSV_OUTPUTS_SEPARATOR));
 
 			if (!columnTypes.isEmpty()) {
