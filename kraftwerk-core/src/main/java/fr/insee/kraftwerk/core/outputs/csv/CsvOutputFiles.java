@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -81,7 +80,7 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 				String content = Files.readString(tmpOutputFile);
 				content = content.replace(NULL, ";\"\";");
-				Files.write(tmpOutputFile, content.getBytes(StandardCharsets.UTF_8));
+				Files.writeString(tmpOutputFile, content);
 
 				Files.deleteIfExists(Path.of(tmpOutputFile.toAbsolutePath() + "data"));
 
@@ -132,17 +131,16 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 
 				query.append(expression);
-				if (nbColOk < columnTypes.keySet().size() - 1) {
+				if (nbColOk < columnTypes.size() - 1) {
 					query.append(", ");
 				}
 				nbColOk++;
 			}
 
-			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR %s",
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR ¤__NULL__¤",
 					datasetName,
 					outputFile.getAbsolutePath() + "data",
-					Constants.CSV_OUTPUTS_SEPARATOR,
-					NULL));
+					Constants.CSV_OUTPUTS_SEPARATOR));
 
 			if (!columnTypes.isEmpty()) {
 				//Double quote values parameter
