@@ -2,10 +2,16 @@ package fr.insee.kraftwerk.api.services;
 
 import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.TestUtils;
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileSystemType;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.xml.XmlSplitter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,13 +23,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,6 +58,9 @@ class SplitterServiceTest {
     private SplitterService splitterService;
     @Autowired
     private TestUtils testUtils;
+
+    ConfigProperties configProperties = new ConfigProperties();
+    MinioConfig minioConfig;
 
 
     /**
@@ -110,6 +120,35 @@ class SplitterServiceTest {
                             .param("nbResponsesByFile", "2")
                             .param("fileSystemType", "OS_FILESYSTEM"))
                     .andExpect(status().isForbidden());
+        }
+    }
+
+
+    @Test
+    void saveResponsesFromXmlFile_Test() throws Exception{
+        try(MockedStatic<XmlSplitter> mockedStatic = mockStatic(XmlSplitter.class)) {
+            //Static Mocks
+            mockedStatic.when(() -> XmlSplitter.split(anyString(),anyString(),anyString(),anyString(),anyInt(), any())).thenAnswer(invocation -> null);
+            //Mocks
+            FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
+            splitterService = Mockito.spy(new SplitterService(configProperties, minioConfig));
+            doReturn(mockFileUtilsInterface).when(splitterService).getFileUtilsInterface(any());
+
+            //execute
+            splitterService.saveResponsesFromXmlFile("a","b","c",2, FileSystemType.OS_FILESYSTEM);
+
+            //Checks
+            mockedStatic.verify(() -> {
+                try {
+                    XmlSplitter.split(anyString(),anyString(),anyString(),anyString(),anyInt(), any());
+                } catch (XMLStreamException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (KraftwerkException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
     }
 

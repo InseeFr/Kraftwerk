@@ -32,7 +32,10 @@ public class ControlInputSequence {
 		return inDirectory;
 	}
 
-	private boolean verifyInDirectory(Path inDirectory) {
+	/**
+	 * packaged-protected scope for unit tests
+	 */
+	boolean verifyInDirectory(Path inDirectory) {
 		Path userInputFile = inDirectory.resolve(Constants.USER_INPUT_FILE);
         return fileUtilsInterface.isFileExists(userInputFile.toString());
     }

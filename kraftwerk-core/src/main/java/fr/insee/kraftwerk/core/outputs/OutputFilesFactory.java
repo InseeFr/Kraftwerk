@@ -25,28 +25,28 @@ public class OutputFilesFactory {
 
     public CsvOutputFiles createCsv(Path outDir, VtlBindings bindings, List<String> modes,
                                     Statement db, FileUtilsInterface fs, KraftwerkExecutionContext ctx) {
-        return newInstanceOfCsvOutputFiles(outDir, bindings, modes, db, fs, ctx, encryptionUtils);
+        return getCsvOutputFiles(outDir, bindings, modes, db, fs, ctx, encryptionUtils);
     }
 
     /**
      * package-protected method for unit tests spying purpose
      * (as we can't test new instance creation with "new" keyword.)
      */
-    CsvOutputFiles newInstanceOfCsvOutputFiles(Path outDir, VtlBindings bindings, List<String> modes, Statement db,
+    CsvOutputFiles getCsvOutputFiles(Path outDir, VtlBindings bindings, List<String> modes, Statement db,
                                                FileUtilsInterface fs, KraftwerkExecutionContext ctx, EncryptionUtils encUtils) {
         return new CsvOutputFiles(outDir, bindings, modes, db, fs, ctx, encUtils);
     }
 
     public ParquetOutputFiles createParquet(Path outDir, VtlBindings bindings, List<String> modes,
                                             Statement db, FileUtilsInterface fs, KraftwerkExecutionContext ctx) {
-        return newInstanceOfParquetOutputFiles(outDir, bindings, modes, db, fs, ctx, encryptionUtils);
+        return getParquetOutputFiles(outDir, bindings, modes, db, fs, ctx, encryptionUtils);
     }
 
     /**
      * package-protected method for unit tests spying purpose
      * (as we can't test new instance creation with "new" keyword.)
      */
-    ParquetOutputFiles newInstanceOfParquetOutputFiles(Path outDir, VtlBindings bindings, List<String> modes, Statement db,
+    ParquetOutputFiles getParquetOutputFiles(Path outDir, VtlBindings bindings, List<String> modes, Statement db,
                                                FileUtilsInterface fs, KraftwerkExecutionContext ctx, EncryptionUtils encUtils) {
         return new ParquetOutputFiles(outDir, bindings, modes, db, fs, ctx, encUtils);
     }
