@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -64,11 +65,18 @@ public class CsvOutputFiles extends OutputFiles {
 				}
 
 				//Create file with double quotes header
-		//		Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
+				Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
 
 				//Data export into temp file
 				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columns);
 				this.getDatabase().execute(exportCsvQuery.toString());
+
+				//Merge header and data
+				try (var output = Files.newOutputStream(tmpOutputFile, StandardOpenOption.APPEND);
+					 var input = Files.newInputStream(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
+					input.transferTo(output);
+				}
+				Files.deleteIfExists(Path.of(tmpOutputFile.toAbsolutePath() + "data"));
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
 				if (kraftwerkExecutionContext != null) {
@@ -123,9 +131,9 @@ public class CsvOutputFiles extends OutputFiles {
 				nbColOk++;
 			}
 
-			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER true, DELIMITER '%s'",
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s'",
 					datasetName,
-					outputFile.getAbsolutePath(),
+					outputFile.getAbsolutePath() + "data",
 					Constants.CSV_OUTPUTS_SEPARATOR));
 
 			if (!columnTypes.isEmpty()) {
