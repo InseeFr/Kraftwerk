@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
 
-	public static final String NULL = ";¤__NULL__¤;";
+	public static final String NULL_MARKER  = "¤__NULL__¤";
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -79,7 +79,7 @@ public class CsvOutputFiles extends OutputFiles {
 					input.transferTo(output);
 				}
 				String content = Files.readString(tmpOutputFile);
-				content = content.replace(NULL, ";\"\";");
+				content = content.replace(NULL_MARKER, "\"\"");
 				Files.writeString(tmpOutputFile, content);
 
 				Files.deleteIfExists(Path.of(tmpOutputFile.toAbsolutePath() + "data"));
@@ -137,10 +137,11 @@ public class CsvOutputFiles extends OutputFiles {
 				nbColOk++;
 			}
 
-			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR ¤__NULL__¤",
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR '%s'",
 					datasetName,
 					outputFile.getAbsolutePath() + "data",
-					Constants.CSV_OUTPUTS_SEPARATOR));
+					Constants.CSV_OUTPUTS_SEPARATOR,
+					NULL_MARKER));
 
 			if (!columnTypes.isEmpty()) {
 				//Double quote values parameter
