@@ -180,26 +180,6 @@ public class GenesisDefinitions {
         this.isUsingEncryption = true;
     }
 
-    @When("We use the Genesis service with campaignId {string}")
-    public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
-        configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
-
-        kraftwerkExecutionContext =
-                TestConstants.getKraftwerkExecutionContext(null, isUsingEncryption);
-
-
-        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
-                configStub,
-                genesisClientStub,
-                new FileSystemImpl(configStub.getDefaultDirectory()),
-                kraftwerkExecutionContext
-        );
-        mainProcessingGenesis.runMain(campaignId,1000);
-        System.out.println();
-    }
-
-
-    //========= OPTIMISATIONS PERFS (START) ==========
     @When("We use the GenesisV2 service with campaignId {string}")
     public void launch_genesisV2(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
@@ -217,7 +197,6 @@ public class GenesisDefinitions {
         mainProcessingGenesis.runMainV2(campaignId,1000, 1, 1);
         System.out.println();
     }
-    //========= OPTIMISATIONS PERFS (END) ==========
 
 
     @Then("In root csv output file we should have {string} for survey unit {string}, column {string}")

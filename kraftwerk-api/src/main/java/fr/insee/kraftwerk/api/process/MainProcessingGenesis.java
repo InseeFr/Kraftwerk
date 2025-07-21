@@ -71,73 +71,6 @@ public class MainProcessingGenesis {
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
-	public void init(String campaignId) throws KraftwerkException {
-		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
-				? "with DDI": "without DDI");
-		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
-		specsDirectory = controlInputSequenceGenesis.getSpecsDirectory(campaignId);
-		//First we check the modes present in database for the given questionnaire
-		//We build userInputs for the given questionnaire
-		userInputs = new UserInputsGenesis(specsDirectory,
-				client.getModes(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
-		if (!userInputs.getModes().isEmpty()) {
-            try {
-                metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
-			} catch (MetadataParserException e) {
-                throw new KraftwerkException(500, e.getMessage());
-            }
-        } else {
-            log.error("No source found for campaign {}", campaignId);
-		}
-	}
-
-	public void runMain(String campaignId, int batchSize) throws KraftwerkException, IOException {
-		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
-		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
-				campaignId));
-		//We delete database at start (in case there is already one)
-		SqlUtils.deleteDatabaseFile(databasePath);
-		init(campaignId);
-		//Try with resources to close database when done
-		try (Connection tryDatabase = config.isDuckDbInMemory() ?
-				SqlUtils.openConnection()
-				: SqlUtils.openConnection(Path.of(databasePath))) {
-			if(tryDatabase == null){
-				throw new KraftwerkException(500,"Error during internal database creation");
-			}
-			this.database = tryDatabase.createStatement();
-			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
-			if (questionnaireModelIds.isEmpty()) {
-				throw new KraftwerkException(204, null);
-			}
-			for (String questionnaireId : questionnaireModelIds) {
-				List<InterrogationId> ids = client.getInterrogationIds(questionnaireId);
-				List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
-				int nbPartitions = listIds.size();
-				int indexPartition = 1;
-				for (List<InterrogationId> listId : listIds) {
-					log.info("=============== PROCESS BLOCK N°{} ==============", indexPartition);
-					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
-					log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
-					vtlBindings = new VtlBindings();
-					unimodalProcess(suLatest);
-					multimodalProcess();
-					insertDatabase();
-					indexPartition++;
-				}
-			}
-			outputFileWriter();
-			writeErrors();
-			if (!database.isClosed()){database.close();}
-		}catch (SQLException e){
-			log.error(e.toString());
-			throw new KraftwerkException(500,"SQL error");
-		}
-		SqlUtils.deleteDatabaseFile(databasePath);
-	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 */
@@ -239,7 +172,6 @@ public class MainProcessingGenesis {
 		multimodalProcess();
 		insertDatabase();
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
@@ -264,13 +196,6 @@ public class MainProcessingGenesis {
 		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
 	}
 
-	/* Step 5 : Write output files */
-	private void outputFileWriter() throws KraftwerkException {
-		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
-	}
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 */
@@ -279,7 +204,6 @@ public class MainProcessingGenesis {
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFilesV2(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 	/* Step 6 : Write errors */
 	private void writeErrors() {

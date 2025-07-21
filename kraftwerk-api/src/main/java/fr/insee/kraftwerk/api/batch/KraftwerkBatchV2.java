@@ -111,10 +111,6 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
                 );
 
                 switch (argsChecker.getServiceName()) {
-                    case KraftwerkServiceType.GENESIS: {
-                        MainProcessingGenesis mainProcessingGenesis = getMainProcessingGenesis(kraftwerkExecutionContext);
-                        mainProcessingGenesis.runMain(argsChecker.getCampaignId(),1000);
-                    } break;
                     case KraftwerkServiceType.GENESISV2: {
                         MainProcessingGenesis mainProcessingGenesis = getMainProcessingGenesis(kraftwerkExecutionContext);
                         mainProcessingGenesis.runMainV2(argsChecker.getCampaignId(),1000,
@@ -122,7 +118,7 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
                     } break;
                     default: {
                         MainProcessing mainProcessing = getMainProcessing(kraftwerkExecutionContext);
-                        mainProcessing.runMain();
+                        mainProcessing.runMainV2();
                     }
                 }
 

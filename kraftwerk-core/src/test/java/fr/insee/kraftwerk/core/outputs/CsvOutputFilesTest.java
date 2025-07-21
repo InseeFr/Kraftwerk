@@ -97,38 +97,11 @@ class CsvOutputFilesTest {
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
 	}
 
-	@Test
-	@Order(3)
-	void testWriteCsv() throws KraftwerkException, IOException {
-		Files.createDirectories(outputFiles.getOutputFolder());
-
-		Map<String, MetadataModel> metaModels = new HashMap<>();
-		MetadataModel metMod = new MetadataModel();
-		Group group = new Group("test","RACINE");
-		metMod.getVariables().putVariable(new Variable("ID",group, VariableType.STRING));
-		metMod.getVariables().putVariable(new Variable("ID2",group, VariableType.STRING));
-		metMod.getVariables().putVariable(new Variable("FOO_STR",group, VariableType.STRING));
-		metMod.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
-		metaModels.put("test",metMod);
-
-		outputFiles.writeOutputTables();
-
-		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(),
-				outputFiles.outputFileName("RACINE",
-				outputFiles.getKraftwerkExecutionContext())
-		);
-		racinePath = racinePath.resolveSibling(racinePath.getFileName());
-		File f = racinePath.toFile();
-		assertTrue(f.exists());
-		Assertions.assertNotEquals(0, f.length());
-	}
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 */
 	@Test
-	@Order(4)
+	@Order(3)
 	void testWriteCsvV2() throws KraftwerkException, IOException {
 		Files.createDirectories(outputFiles.getOutputFolder());
 
@@ -152,7 +125,6 @@ class CsvOutputFilesTest {
 		assertTrue(f.exists());
 		Assertions.assertNotEquals(0, f.length());
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 	@AfterAll
     static void closeConnection() throws SQLException {

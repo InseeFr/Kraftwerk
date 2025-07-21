@@ -55,32 +55,6 @@ class MainProcessingGenesisTest {
 
         GenesisClient genesisClient = new GenesisClient(restTemplate, configProperties) {
             @Override
-            public List<Mode> getModes(String idCampaign) {
-                return Collections.singletonList(Mode.WEB);
-            }
-
-            @Override
-            public List<String> getQuestionnaireModelIds(String campaignId) {
-                return Collections.singletonList("id");
-            }
-
-            @Override
-            public List<InterrogationId> getInterrogationIds(String questionnaireId) {
-                return Collections.singletonList(new InterrogationId());
-
-            }
-
-            @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
-                SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
-                surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
-                surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
-                surveyUnitUpdateLatest.setMode(Mode.WEB);
-                return Collections.singletonList(surveyUnitUpdateLatest);
-            }
-
-            //========= OPTIMISATIONS PERFS (START) ==========
-            @Override
             public List<Mode> getModesV2(String idCampaign) {
                 return Collections.singletonList(Mode.WEB);
             }
@@ -111,9 +85,8 @@ class MainProcessingGenesisTest {
 
             @Override
             public List<String> getQuestionnaireModelIdsV2(String campaignId) {
-                return getQuestionnaireModelIds(campaignId);
+                return Collections.singletonList("id");
             }
-            //========= OPTIMISATIONS PERFS (END) ==========
         };
 
 
@@ -130,23 +103,6 @@ class MainProcessingGenesisTest {
         mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
-    @Test
-    void testInitLoadsMetadata() throws Exception {
-        String idCampaign = "campaign1";
-
-        mainProcessing.init(idCampaign);
-
-        assertNotNull(mainProcessing.getMetadataModels());
-        assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
-    }
-
-   @Test
-    void testRunMainOk() {
-        String idCampaign = "campaign1";
-        assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
-    }
-
-    //========= OPTIMISATIONS PERFS (START) ==========
     /**
      * @author Adrien Marchal
      */
@@ -168,7 +124,6 @@ class MainProcessingGenesisTest {
         String idCampaign = "campaign1";
         assertDoesNotThrow(() -> mainProcessing.runMainV2(idCampaign, 100, 1, 1));
     }
-    //========= OPTIMISATIONS PERFS (END) ==========
 
 
 }

@@ -68,10 +68,10 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return runWithoutGenesisV2(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
-	@PutMapping(value = "/main/file-by-file")
+	@PutMapping(value = "/main/file-by-fileV2")
 	@Operation(operationId = "main", summary = "${summary.fileByFile}", description = "${description.fileByFile}")
 	public ResponseEntity<String> mainFileByFile(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
@@ -80,10 +80,10 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean fileByFile = true;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return runWithoutGenesisV2(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
-	@PutMapping(value = "/main/lunatic-only")
+	@PutMapping(value = "/main/lunatic-onlyV2")
 	@Operation(operationId = "mainLunaticOnly", summary = "${summary.mainLunaticOnly}", description = "${description.mainLunaticOnly}")
 	public ResponseEntity<String> mainLunaticOnly(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
@@ -92,21 +92,9 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		boolean fileByFile = false;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return runWithoutGenesisV2(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
-	@PutMapping(value = "/main/genesis")
-	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
-	public ResponseEntity<String> mainGenesis(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
-			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
-		boolean withDDI = true;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
-	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 */
@@ -121,27 +109,29 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = true;
 		return runWithGenesisV2(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
-	@PutMapping(value = "/main/genesis/lunatic-only")
+	@PutMapping(value = "/main/genesis/lunatic-onlyV2")
 	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
-	public ResponseEntity<String> mainGenesisLunaticOnly(
+	public ResponseEntity<String> mainGenesisLunaticOnlyV2(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
+			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId
 	) {
 		boolean withDDI = false;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+		return runWithGenesisV2(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
 	}
 
+
 	@NotNull
-	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
+	private ResponseEntity<String> runWithoutGenesisV2(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
 		try {
-			mp.runMain();
+			mp.runMainV2();
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
@@ -151,25 +141,6 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
-
-	@NotNull
-	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
-		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
-
-		try {
-			mpGenesis.runMain(campaignId, batchSize);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		return ResponseEntity.ok(campaignId);
-	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 */
@@ -188,7 +159,6 @@ public class MainService extends KraftwerkService {
 		}
 		return ResponseEntity.ok(campaignId);
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 

@@ -29,7 +29,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<InterrogationId> getInterrogationIds(String questionnaireId) {
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
         List<InterrogationId> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
@@ -46,7 +46,28 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<Mode> getModes(String campaignId) {
+    public Long countInterrogationIds(String questionnaireId) {
+        return 1L;
+    }
+
+    @Override
+    public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
+        Set<String> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
+                .filter(
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
+                ).toList();
+
+        for(SurveyUnitUpdateLatest doc : mongoFiltered){
+            set.add(doc.getQuestionnaireId());
+        }
+
+        return set.stream().toList();
+    }
+
+    @Override
+    public List<Mode> getModesV2(String campaignId) {
         Set<Mode> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
@@ -60,7 +81,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+    public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered1 = mongoStub.stream()
@@ -90,7 +111,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<String> getQuestionnaireModelIds(String campaignId) {
+    public List<String> getQuestionnaireModelIdsV2(String campaignId) {
         Set<String> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
@@ -104,47 +125,5 @@ public class GenesisClientStub extends GenesisClient {
 
         return set.stream().toList();
     }
-
-
-    //========= OPTIMISATIONS PERFS (START) ==========
-    @Override
-    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
-        //For first version of this stub, we Use same stub as "getInterrogationIds()"
-        return getInterrogationIds(questionnaireId);
-    }
-
-    @Override
-    public Long countInterrogationIds(String questionnaireId) {
-        return 1L;
-    }
-
-    @Override
-    public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
-        Set<String> set = new HashSet<>();
-
-        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
-                .filter(
-                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
-                ).toList();
-
-        for(SurveyUnitUpdateLatest doc : mongoFiltered){
-            set.add(doc.getQuestionnaireId());
-        }
-
-        return set.stream().toList();
-    }
-
-    @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
-        //For first version of this stub, we Use same stub as "getUEsLatestState()"
-        return getUEsLatestState(questionnaireId, interrogationIds);
-    }
-
-    @Override
-    public List<String> getQuestionnaireModelIdsV2(String campaignId) {
-        //For first version of this stub, we Use same stub as "getQuestionnaireModelIds()"
-        return getQuestionnaireModelIds(campaignId);
-    }
-    //========= OPTIMISATIONS PERFS (END) ==========
 
 }

@@ -67,7 +67,7 @@ class KraftwerkBatchV2Test {
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessing).runMain();
+        doNothing().when(mockMainProcessing).runMainV2();
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
@@ -85,7 +85,7 @@ class KraftwerkBatchV2Test {
 
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessing, times(1)).runMain();
+        verify(mockMainProcessing, times(1)).runMainV2();
         verify(mockKraftwerkService, times(1)).archive(any(), any());
     }
 
@@ -110,37 +110,17 @@ class KraftwerkBatchV2Test {
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessing).runMain();
+        doNothing().when(mockMainProcessing).runMainV2();
 
         //execute
         kraftwerkBatchV2.run(myArgs);
 
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessing, times(1)).runMain();
+        verify(mockMainProcessing, times(1)).runMainV2();
     }
 
 
-    @Test
-    void run_GENESIS_Test() throws Exception {
-        //Use Case
-        String args = "--service=GENESIS;--campaignId=TEST-GLOB";
-        String[] argsArray = args.split(";");
-        DefaultApplicationArguments myArgs = new DefaultApplicationArguments(argsArray);
-
-        //Mocks
-        MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
-        doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessingGenesis).runMain(any(),anyInt());
-
-        //execute
-        kraftwerkBatchV2.run(myArgs);
-
-        //Checks
-        verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessingGenesis, times(1)).runMain(any(), anyInt());
-        verify(mockMainProcessingGenesis, times(0)).runMainV2(any(), anyInt(), anyInt(), anyInt());
-    }
 
 
     @Test
@@ -160,7 +140,6 @@ class KraftwerkBatchV2Test {
 
         //Checks
         verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessingGenesis, times(0)).runMain(any(), anyInt());
         verify(mockMainProcessingGenesis, times(1)).runMainV2(any(), anyInt(), anyInt(), anyInt());
     }
 

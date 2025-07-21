@@ -84,18 +84,10 @@ public abstract class OutputFiles {
 	public abstract String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext);
 
 	/**
-	 * Method to write output tables from datasets that are in the bindings.
-	 * => implemented in subclasses
-     */
-	public abstract void writeOutputTables() throws KraftwerkException;
-
-	//========= OPTIMISATIONS PERFS (START) ==========
-	/**
 	 * @author Adrien Marchal
 	 * Method to write output tables from datasets that are in the bindings.
 	 * => implemented in subclasses
 	 */
 	public abstract void writeOutputTablesV2() throws KraftwerkException;
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 }

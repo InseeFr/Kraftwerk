@@ -46,12 +46,13 @@ public class ParquetOutputFiles extends OutputFiles {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext, encryptionUtils);
 	}
 
-	
+
 	/**
+	 * @author Adrien Marchal
 	 * Method to write output tables from datasets that are in the bindings.
 	 */
 	@Override
-	public void writeOutputTables() throws KraftwerkException {
+	public void writeOutputTablesV2() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
@@ -81,19 +82,6 @@ public class ParquetOutputFiles extends OutputFiles {
 			}
 		}
 	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
-	/**
-	 * @author Adrien Marchal
-	 * Method to write output tables from datasets that are in the bindings.
-	 */
-	@Override
-	public void writeOutputTablesV2() throws KraftwerkException {
-		//No changes between V1 & V2 for parquet files
-		writeOutputTables();
-	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 	@Override

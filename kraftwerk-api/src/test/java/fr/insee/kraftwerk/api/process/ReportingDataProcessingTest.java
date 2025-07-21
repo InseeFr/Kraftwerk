@@ -26,7 +26,7 @@ class ReportingDataProcessingTest {
     void runProcessMain_Test() throws KraftwerkException {
         // 1. Mock the dependencies
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
-        doNothing().when(spyReportingDataProcessing).runProcessPackageScopeProtected(any(), any(), any(), any());
+        doNothing().when(spyReportingDataProcessing).runProcess(any(), any(), any(), any());
 
         String defaultDir = "/a/b/c/defaultDir";
         String inDirectory = "inDir";
@@ -36,7 +36,7 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing.runProcessMain(null, defaultDir, inDirectory, null);
 
         // 3. checks
-        verify(spyReportingDataProcessing, times(1)).runProcessPackageScopeProtected(any(), eq(inDirParam), eq(inDirParam), any());
+        verify(spyReportingDataProcessing, times(1)).runProcess(any(), eq(inDirParam), eq(inDirParam), any());
     }
 
 
@@ -44,7 +44,7 @@ class ReportingDataProcessingTest {
     void runProcessGenesis_Test() throws KraftwerkException {
         // 1. Mock the dependencies
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
-        doNothing().when(spyReportingDataProcessing).runProcessPackageScopeProtected(any(), any(), any(), any());
+        doNothing().when(spyReportingDataProcessing).runProcess(any(), any(), any(), any());
 
         Mode mode = Mode.WEB;
         String defaultDir = "/a/b/c/defaultDir";
@@ -56,7 +56,7 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing.runProcessGenesis(null, mode, defaultDir, inDirectory, null);
 
         // 3. checks
-        verify(spyReportingDataProcessing, times(1)).runProcessPackageScopeProtected(any(), eq(inDirParam), eq(specDirectory), any());
+        verify(spyReportingDataProcessing, times(1)).runProcess(any(), eq(inDirParam), eq(specDirectory), any());
     }
 
     @Test
@@ -68,8 +68,8 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
         Path path = Path.of("aaa.xyz");
         doReturn(path).when(mockModeInputs).getReportingDataFile();
-        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).newInstanceOfXMLReportingDataParser(any());
-        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).newInstanceOfCSVReportingDataParser(any());
+        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).getXMLReportingDataParser(any());
+        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 3. checks
         Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null));
@@ -86,8 +86,8 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
         Path absolutePath = Path.of(new File("src/test/resources/" + "unit_tests/reportingdata/reportingdata_unittest.xyz").getAbsolutePath());
         doReturn(absolutePath).when(mockModeInputs).getReportingDataFile();
-        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).newInstanceOfXMLReportingDataParser(any());
-        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).newInstanceOfCSVReportingDataParser(any());
+        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).getXMLReportingDataParser(any());
+        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 3. checks
         Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null));
@@ -104,8 +104,8 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
         Path absolutePath = Path.of(new File("src/test/resources/" + "unit_tests/reportingdata/reportingdata_unittest.xml").getAbsolutePath());
         doReturn(absolutePath).when(mockModeInputs).getReportingDataFile();
-        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).newInstanceOfXMLReportingDataParser(any());
-        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).newInstanceOfCSVReportingDataParser(any());
+        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).getXMLReportingDataParser(any());
+        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 2. Launch test
         spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null);
@@ -125,8 +125,8 @@ class ReportingDataProcessingTest {
         spyReportingDataProcessing = Mockito.spy(new ReportingDataProcessing());
         Path absolutePath = Path.of(new File("src/test/resources/" + "unit_tests/reportingdata/reportingdata_unittest.csv").getAbsolutePath());
         doReturn(absolutePath).when(mockModeInputs).getReportingDataFile();
-        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).newInstanceOfXMLReportingDataParser(any());
-        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).newInstanceOfCSVReportingDataParser(any());
+        doReturn(mockXMLReportingDataParser).when(spyReportingDataProcessing).getXMLReportingDataParser(any());
+        doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 2. Launch test
         spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null);

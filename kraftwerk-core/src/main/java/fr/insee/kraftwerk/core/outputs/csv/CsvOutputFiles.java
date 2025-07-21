@@ -15,13 +15,10 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -47,84 +44,6 @@ public class CsvOutputFiles extends OutputFiles {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext, encryptionUtils);
 	}
 
-	/**
-	 * Method to write CSV output tables from datasets that are in the bindings.
-	 */
-	@Override
-	public void writeOutputTables() throws KraftwerkException {
-		for (String datasetName : getDatasetToCreate()) {
-			try {
-				//Temporary file
-				Files.createDirectories(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)),
-						outputFileName(datasetName, kraftwerkExecutionContext), null);
-
-				//Get column names
-				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
-
-				if(columnNames.isEmpty()){
-					log.warn("dataset {} is empty !", datasetName);
-					return;
-				}
-
-				//Get boolean columns names
-				List<String> boolColumnNames = SqlUtils.getColumnNames(getDatabase(), datasetName, VariableType.BOOLEAN);
-				//Get indexes of boolean columns
-				List<Integer> boolColumnIndexes = new ArrayList<>();
-
-				//Create file with double quotes header
-				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
-
-				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
-				this.getDatabase().execute(exportCsvQuery.toString());
-
-				//Apply csv format transformations
-
-				//Merge data file with header file
-				//Read line by line to avoid memory waste
-				try(BufferedReader bufferedReader = Files.newBufferedReader(Path.of(tmpOutputFile.toAbsolutePath() + "data"))){
-					String line = bufferedReader.readLine();
-					while(line != null){
-						//Apply transformations to elements
-						line = applyNullTransformation(line);
-						line = applyBooleanTransformations(line, boolColumnIndexes);
-
-						Files.write(tmpOutputFile,(line + "\n").getBytes(),StandardOpenOption.APPEND);
-						line = bufferedReader.readLine();
-					}
-				}
-				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
-
-
-				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
-				if (kraftwerkExecutionContext != null) {
-					//Count rows for functional log
-					try(ResultSet countResult =
-								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
-						countResult.next();
-                        kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
-					}
-
-					//Encrypt file if requested
-					if(kraftwerkExecutionContext.isWithEncryption()) {
-						InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-						getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
-						log.info("File: {} successfully written and encrypted", outputFile);
-						continue; //Go to next dataset to write
-					}
-				}
-				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
-				log.info("File: {} successfully written", outputFile);
-			} catch (SQLException | IOException e) {
-				throw new KraftwerkException(500, e.toString());
-			}
-        }
-	}
-
-
-	//========= OPTIMISATIONS PERFS (START) ==========
 	/**
 	 * @author Adrien Marchal
 	 * Method to write CSV output tables from datasets that are in the bindings.
@@ -178,7 +97,6 @@ public class CsvOutputFiles extends OutputFiles {
 			}
 		}
 	}
-	//========= OPTIMISATIONS PERFS (END) ==========
 
 
 
@@ -208,36 +126,6 @@ public class CsvOutputFiles extends OutputFiles {
 		return headerBuilder.toString();
 	}
 
-	/**
-	 * replaces false/true by 0/1 in a line
-	 * @param csvLine line to transform
-	 * @param boolColumnIndexes indexes of booleans values to change
-	 * @return the transformed line
-	 */
-	private String applyBooleanTransformations(String csvLine, List<Integer> boolColumnIndexes) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
-		//change "true" or "false" by "1" or "0"
-		for (int elementIndex : boolColumnIndexes) {
-			lineElements[elementIndex] = lineElements[elementIndex].replace("false", "0").replace("true", "1");
-		}
-		//Rebuild csv line
-		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
-	}
-
-	/**
-	 * Changes null values to "" in a line
-	 * @param csvLine line to transform
-	 * @return the transformed line
-	 */
-	private String applyNullTransformation(String csvLine) {
-		String[] lineElements = csvLine.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR), -1);
-		for (int i = 0; i < lineElements.length; i++) {
-			if (lineElements[i].isEmpty()) {
-				lineElements[i] = "\"\"";
-			}
-		}
-		return String.join(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR),lineElements);
-	}
 
 	@Override
 	public void writeImportScripts(Map<String, MetadataModel> metadataModels, KraftwerkExecutionContext kraftwerkExecutionContext) {

@@ -38,7 +38,7 @@ public class ReportingDataProcessing {
                                String reportingDataFilePathParam
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", inDirectoryParam);
-        runProcessPackageScopeProtected(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam);
+        runProcess(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam);
     }
 
     public void runProcessGenesis(FileUtilsInterface fileUtilsInterface,
@@ -49,11 +49,14 @@ public class ReportingDataProcessing {
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", mode.getFolder(), inDirectoryParam);
         Path specDirectory = Path.of(defaultDirectory, "specs", inDirectoryParam);
-        runProcessPackageScopeProtected(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam);
+        runProcess(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam);
     }
 
 
-    private void runProcess(FileUtilsInterface fileUtilsInterface,
+    /**
+     * package-scoped method for unit tests coverage
+     */
+    void runProcess(FileUtilsInterface fileUtilsInterface,
                            Path inDirectory,
                            Path inOrSpecDirectory,
                            String reportingDataFilePathParam
@@ -88,16 +91,6 @@ public class ReportingDataProcessing {
                 InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
                 insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
                 WriterSequence writerSequence = new WriterSequence();
-                writerSequence.writeOutputFiles(inOrSpecDirectory,
-                        "_REPORTING_DATA_ONLY",
-                        vtlBindings,
-                        modeInputs,
-                        context,
-                        writeDatabase,
-                        fileUtilsInterface
-                );
-                /*
-                //TODO : ACTIVATE "V2" for performance purposes
                 writerSequence.writeOutputFilesV2(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",
                         vtlBindings,
@@ -106,22 +99,12 @@ public class ReportingDataProcessing {
                         writeDatabase,
                         fileUtilsInterface
                 );
-                */
             }
         }catch (SQLException e){
             log.error(e.toString());
             throw new KraftwerkException(500, "SQL Error");
         }
     }
-
-    /**
-     * package-scoped method for unit tests coverage
-     */
-    void runProcessPackageScopeProtected(FileUtilsInterface fileUtilsInterface, Path inDirectory, Path inOrSpecDirectory,
-                    String reportingDataFilePathParam) throws KraftwerkException {
-        runProcess(fileUtilsInterface, inDirectory, inOrSpecDirectory, reportingDataFilePathParam);
-    }
-
 
 
     public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
@@ -132,12 +115,12 @@ public class ReportingDataProcessing {
         }
         ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
         if (reportingDataFile.toString().endsWith(".xml")) {
-            XMLReportingDataParser xMLReportingDataParser = newInstanceOfXMLReportingDataParser(fileUtilsInterface);
+            XMLReportingDataParser xMLReportingDataParser = getXMLReportingDataParser(fileUtilsInterface);
             xMLReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
         if (reportingDataFile.toString().endsWith(".csv")) {
-            CSVReportingDataParser cSVReportingDataParser = newInstanceOfCSVReportingDataParser(fileUtilsInterface);
+            CSVReportingDataParser cSVReportingDataParser = getCSVReportingDataParser(fileUtilsInterface);
             cSVReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
@@ -149,7 +132,7 @@ public class ReportingDataProcessing {
      * package-protected method for unit tests spying purpose
      * (as we can't test/spy new instance creation with "new" keyword.)
      */
-    XMLReportingDataParser newInstanceOfXMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+    XMLReportingDataParser getXMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
         return new XMLReportingDataParser(fileUtilsInterface);
     }
 
@@ -157,7 +140,7 @@ public class ReportingDataProcessing {
      * package-protected method for unit tests spying purpose
      * (as we can't test/spy new instance creation with "new" keyword.)
      */
-    CSVReportingDataParser newInstanceOfCSVReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+    CSVReportingDataParser getCSVReportingDataParser(FileUtilsInterface fileUtilsInterface) {
         return new CSVReportingDataParser(fileUtilsInterface);
     }
 

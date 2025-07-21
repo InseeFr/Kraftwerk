@@ -183,7 +183,7 @@ public class MainDefinitions {
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 	}
 
 	@When("Step 1 : We launch main service with an export of reporting data only for survey respondents")
@@ -195,7 +195,7 @@ public class MainDefinitions {
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 	}
 
 	@When("We launch main service 2 times")
@@ -207,11 +207,11 @@ public class MainDefinitions {
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 		await().atMost(2, TimeUnit.SECONDS);
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 		mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory", new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 	}
 
 	@When("Step 1 : We launch main service file by file")
@@ -223,7 +223,7 @@ public class MainDefinitions {
 		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(inDirectory.toString(), isUsingEncryption);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, Paths.get(FUNCTIONAL_TESTS_INPUT_DIRECTORY).resolve(campaignName).toString(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 	}
 
 	@When("Step 2 : We get each unimodal dataset")
@@ -254,7 +254,7 @@ public class MainDefinitions {
 		try (Statement statement = database.createStatement()) {
 			WriterSequence writerSequence = new WriterSequence();
 			LocalDateTime localDateTime = LocalDateTime.now();
-			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			writerSequence.writeOutputFilesV2(inDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, statement, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 			writeErrorsFile(inDirectory, localDateTime, errors);
 			outputFiles = new CsvOutputFiles(
 					outDirectory,
@@ -280,7 +280,7 @@ public class MainDefinitions {
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, "defaultDirectory",
 				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-		mp.runMain();
+		mp.runMainV2();
 	}
 
 	@When("We launch reporting data service")
