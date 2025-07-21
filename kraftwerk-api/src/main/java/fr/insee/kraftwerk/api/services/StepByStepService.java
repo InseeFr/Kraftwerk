@@ -261,9 +261,9 @@ public class StepByStepService extends KraftwerkService {
 	}
 
 
-	@PutMapping(value = "/writeOutputFilesV2")
+	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")
-	public ResponseEntity<String> writeOutputFilesV2(
+	public ResponseEntity<String> writeOutputFiles(
 			@Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody  String inDirectoryParam
 			) throws KraftwerkException, SQLException {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
@@ -302,7 +302,7 @@ public class StepByStepService extends KraftwerkService {
 		}
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
 		try (Statement database = SqlUtils.openConnection().createStatement()) {
-			writerSequence.writeOutputFilesV2(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, database, fileUtilsInterface);
+			writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModelMap, kraftwerkExecutionContext, database, fileUtilsInterface);
 		}
 		return ResponseEntity.ok(inDirectoryParam);
 

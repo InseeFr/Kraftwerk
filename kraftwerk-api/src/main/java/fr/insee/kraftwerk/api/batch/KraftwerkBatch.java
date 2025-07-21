@@ -23,15 +23,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class KraftwerkBatchV2 implements ApplicationRunner {
+public class KraftwerkBatch implements ApplicationRunner {
 
     ConfigProperties configProperties;
     MinioConfig minioConfig;
     FileUtilsInterface fileSystem;
     MinioClient minioClient;
 
-    //old JVM arguments list : "GENESISV2 false false TESTCAMPAIGN300000 3 2"
-    //new JVM arguments list : "--service=GENESISV2 --campaignId=TESTCAMPAIGN300000 --archive=false --reporting-data=false --with-encryption=false --workers-nb=3 --worker-index=2"
+    //old JVM arguments list : "GENESIS false false TESTCAMPAIGN300000 3 2"
+    //new JVM arguments list : "--service=GENESIS --campaignId=TESTCAMPAIGN300000 --archive=false --reporting-data=false --with-encryption=false --workers-nb=3 --worker-index=2"
     private static final String ARG_SERVICE = "service";
     private static final String ARG_ARCHIVE = "archive";
     private static final String ARG_REPORTING_DATA = "reporting-data";
@@ -48,7 +48,7 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatchV2(ConfigProperties configProperties, MinioConfig minioConfig) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -61,10 +61,10 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("KraftwerkBatchV2 executed with options:");
+        log.info("KraftwerkBatch executed with options:");
         try {
             if (!args.getOptionNames().isEmpty()) {
-                cliModeLaunched("Launching Kraftwerk in CLI mode (V2)...");
+                cliModeLaunched("Launching Kraftwerk in CLI mode...");
 
                 args.getOptionNames().forEach(option ->
                         log.info("{} = {}", option, args.getOptionValues(option))
@@ -111,14 +111,14 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
                 );
 
                 switch (argsChecker.getServiceName()) {
-                    case KraftwerkServiceType.GENESISV2: {
+                    case KraftwerkServiceType.GENESIS: {
                         MainProcessingGenesis mainProcessingGenesis = getMainProcessingGenesis(kraftwerkExecutionContext);
-                        mainProcessingGenesis.runMainV2(argsChecker.getCampaignId(),1000,
+                        mainProcessingGenesis.runMain(argsChecker.getCampaignId(),1000,
                                 argsChecker.getWorkersNb(), argsChecker.getWorkerIndex());
                     } break;
                     default: {
                         MainProcessing mainProcessing = getMainProcessing(kraftwerkExecutionContext);
-                        mainProcessing.runMainV2();
+                        mainProcessing.runMain();
                     }
                 }
 
@@ -141,7 +141,7 @@ public class KraftwerkBatchV2 implements ApplicationRunner {
             //NOTE : "System.exit(1);" prevents doing clean Unit Tests..
             return;
         }
-        log.info("Launching Kraftwerk in API mode (V2)...");
+        log.info("Launching Kraftwerk in API mode...");
     }
 
 

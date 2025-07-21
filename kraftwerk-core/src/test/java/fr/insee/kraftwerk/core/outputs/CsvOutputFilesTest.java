@@ -102,7 +102,7 @@ class CsvOutputFilesTest {
 	 */
 	@Test
 	@Order(3)
-	void testWriteCsvV2() throws KraftwerkException, IOException {
+	void testWriteCsv() throws KraftwerkException, IOException {
 		Files.createDirectories(outputFiles.getOutputFolder());
 
 		Map<String, MetadataModel> metaModels = new HashMap<>();
@@ -114,7 +114,7 @@ class CsvOutputFilesTest {
 		metMod.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
 		metaModels.put("test",metMod);
 
-		outputFiles.writeOutputTablesV2();
+		outputFiles.writeOutputTables();
 
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(),
 				outputFiles.outputFileName("RACINE",

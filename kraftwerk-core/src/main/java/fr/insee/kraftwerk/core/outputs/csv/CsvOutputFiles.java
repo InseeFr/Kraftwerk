@@ -49,7 +49,7 @@ public class CsvOutputFiles extends OutputFiles {
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
 	@Override
-	public void writeOutputTablesV2() throws KraftwerkException {
+	public void writeOutputTables() throws KraftwerkException {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file

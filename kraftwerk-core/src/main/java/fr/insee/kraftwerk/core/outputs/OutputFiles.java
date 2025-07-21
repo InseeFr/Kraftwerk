@@ -88,6 +88,6 @@ public abstract class OutputFiles {
 	 * Method to write output tables from datasets that are in the bindings.
 	 * => implemented in subclasses
 	 */
-	public abstract void writeOutputTablesV2() throws KraftwerkException;
+	public abstract void writeOutputTables() throws KraftwerkException;
 
 }

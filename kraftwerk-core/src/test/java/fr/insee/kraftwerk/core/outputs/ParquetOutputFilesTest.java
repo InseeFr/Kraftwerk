@@ -120,7 +120,7 @@ class ParquetOutputFilesTest {
 		metMod.getVariables().putVariable(new Variable("FOO_NUM",group, VariableType.NUMBER));
 		metaModels.put("test",metMod);
 
-		outputFiles.writeOutputTablesV2();
+		outputFiles.writeOutputTables();
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(), outputFiles.getAllOutputFileNames("RACINE").getFirst());
 		racinePath = racinePath.resolveSibling(racinePath.getFileName()+".parquet");
 		File f = racinePath.toFile();

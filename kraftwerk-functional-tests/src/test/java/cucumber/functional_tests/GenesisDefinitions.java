@@ -171,8 +171,8 @@ public class GenesisDefinitions {
         this.isUsingEncryption = true;
     }
 
-    @When("We use the GenesisV2 service with campaignId {string}")
-    public void launch_genesisV2(String campaignId) throws IOException, KraftwerkException {
+    @When("We use the Genesis service with campaignId {string}")
+    public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
 
         kraftwerkExecutionContext =
@@ -185,7 +185,7 @@ public class GenesisDefinitions {
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 kraftwerkExecutionContext
         );
-        mainProcessingGenesis.runMainV2(campaignId,1000, 1, 1);
+        mainProcessingGenesis.runMain(campaignId,1000, 1, 1);
         System.out.println();
     }
 

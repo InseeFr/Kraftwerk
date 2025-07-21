@@ -101,14 +101,14 @@ public class GenesisClient {
 	/**
 	 * @author Adrien Marchal
 	 */
-	public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) throws KraftwerkException {
+	public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-questionnaireV2?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
 		ResponseEntity<String[]> response = makeApiCall(url,HttpMethod.GET,null, String[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 
-	public List<Mode> getModesV2(String campaignId) throws KraftwerkException {
+	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaignV2?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
@@ -120,7 +120,7 @@ public class GenesisClient {
 	/**
 	 * @author Adrien Marchal
 	 */
-	public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) throws KraftwerkException {
+	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) throws KraftwerkException {
 		//Convert Array into String
 		String modesQueryParam = String.join(",", modes);
 
@@ -133,7 +133,7 @@ public class GenesisClient {
 	/**
 	 * @author Adrien Marchal
 	 */
-	public List<String> getQuestionnaireModelIdsV2(String campaignId) throws JsonProcessingException, KraftwerkException {
+	public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
 		String url = String.format("%s/questionnaires/by-campaignV2?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
 		ObjectMapper objectMapper = new ObjectMapper();

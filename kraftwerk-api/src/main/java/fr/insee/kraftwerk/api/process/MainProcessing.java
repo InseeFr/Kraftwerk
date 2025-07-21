@@ -64,7 +64,7 @@ public class MainProcessing {
 	}
 
 
-	public void runMainV2() throws KraftwerkException {
+	public void runMain() throws KraftwerkException {
 		init();
 		//iterate on file(s)
 		try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
@@ -79,7 +79,7 @@ public class MainProcessing {
 			}
 			//Export from database
 			try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
-				outputFileWriterV2(writeDatabase);
+				outputFileWriter(writeDatabase);
 			}
 			writeErrors();
 			kraftwerkExecutionContext.setEndTimeStamp(System.currentTimeMillis());
@@ -150,11 +150,11 @@ public class MainProcessing {
 	}
 
 	/* Step 5 : Write output files */
-	private void outputFileWriterV2(Statement database) throws KraftwerkException {
+	private void outputFileWriter(Statement database) throws KraftwerkException {
 		//AMAR - CODE-REVIEW : Question : pourquoi faire un "new" dans le cas présent? pourquoi une méthode statique ne suffirait-elle pas?
 		// => cela implique de stocker un objet en mémoire, donc d'utiliser de la RAM
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFilesV2(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 5 : Write errors */

@@ -55,7 +55,7 @@ class MainProcessingGenesisTest {
 
         GenesisClient genesisClient = new GenesisClient(restTemplate, configProperties) {
             @Override
-            public List<Mode> getModesV2(String idCampaign) {
+            public List<Mode> getModes(String idCampaign) {
                 return Collections.singletonList(Mode.WEB);
             }
 
@@ -70,12 +70,12 @@ class MainProcessingGenesisTest {
             }
 
             @Override
-            public List<String> getDistinctModesByQuestionnaireIdV2(String questionnaireId) {
+            public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) {
                 return Collections.singletonList(Mode.WEB.toString());
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestStateV2(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
+            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
@@ -84,7 +84,7 @@ class MainProcessingGenesisTest {
             }
 
             @Override
-            public List<String> getQuestionnaireModelIdsV2(String campaignId) {
+            public List<String> getQuestionnaireModelIds(String campaignId) {
                 return Collections.singletonList("id");
             }
         };
@@ -107,10 +107,10 @@ class MainProcessingGenesisTest {
      * @author Adrien Marchal
      */
     @Test
-    void testInitV2LoadsMetadata() throws Exception {
+    void testInitLoadsMetadata() throws Exception {
         String idCampaign = "campaign1";
 
-        mainProcessing.initV2(idCampaign);
+        mainProcessing.init(idCampaign);
 
         assertNotNull(mainProcessing.getMetadataModels());
         assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
@@ -120,9 +120,9 @@ class MainProcessingGenesisTest {
      * @author Adrien Marchal
      */
     @Test
-    void testRunMainV2Ok() {
+    void testRunMainOk() {
         String idCampaign = "campaign1";
-        assertDoesNotThrow(() -> mainProcessing.runMainV2(idCampaign, 100, 1, 1));
+        assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100, 1, 1));
     }
 
 

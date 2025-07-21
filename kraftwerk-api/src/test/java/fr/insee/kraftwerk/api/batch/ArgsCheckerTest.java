@@ -120,25 +120,6 @@ class ArgsCheckerTest {
 
 
     @Test
-    void testGoodServiceName_GENESISV2() {
-        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("GENESISV2");
-        argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
-        argsChecker  = Mockito.spy(argsCheckerBuilder.build());
-        //NOTE : "argsChecker.checkArgNumber()" is not ignored on this unit test
-        //NOTE : "argsChecker.checkServiceName()" is not ignored on this unit test
-        doNothing().when(argsChecker).checkArgIsArchive();
-        doNothing().when(argsChecker).checkArgIsReportingData();
-        doNothing().when(argsChecker).checkArgWithEncryption();
-
-        argsChecker.checkArgs();
-
-        assertEquals(KraftwerkServiceType.GENESISV2, argsChecker.getServiceName());
-        assertEquals(Boolean.TRUE, argsChecker.isWithDDI());
-    }
-
-
-    @Test
     void testGoodServiceName_FILE_BY_FILE() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
         argsCheckerBuilder.argServiceName("FILE_BY_FILE");
@@ -236,7 +217,7 @@ class ArgsCheckerTest {
     @Test
     void testIsArchive_FORCE_2() {
         ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
-        argsCheckerBuilder.argServiceName("GENESISV2");
+        argsCheckerBuilder.argServiceName("GENESIS");
         argsCheckerBuilder.argCampaignId("CAMPAIGN_ID");
         argsCheckerBuilder.argIsArchive("true");
         argsChecker  = Mockito.spy(argsCheckerBuilder.build());
@@ -331,7 +312,6 @@ class ArgsCheckerTest {
                 Arguments.of(Boolean.TRUE, "MAIN"),
                 Arguments.of(Boolean.FALSE, "LUNATIC_ONLY"),
                 Arguments.of(Boolean.FALSE, "GENESIS"),
-                Arguments.of(Boolean.FALSE, "GENESISV2"),
                 Arguments.of(Boolean.FALSE, "FILE_BY_FILE")
         );
     }

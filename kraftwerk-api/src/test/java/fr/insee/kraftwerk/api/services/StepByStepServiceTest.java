@@ -45,7 +45,7 @@ class StepByStepServiceTest {
 
     // API endpoints under test
     private static final String URI_STEPS = "/steps";
-    private static final String URI_STEPS_WRITE_OUTPUT = URI_STEPS + "/writeOutputFilesV2";
+    private static final String URI_STEPS_WRITE_OUTPUT = URI_STEPS + "/writeOutputFiles";
     private static final String URI_STEPS_UNIMODAL = URI_STEPS + "/unimodalProcessing?dataMode=WEB";
     private static final String URI_STEPS_MULTIMODAL = URI_STEPS + "/multimodalProcessing";
     private static final String URI_STEPS_BUILD_VTL_BINDINGS = URI_STEPS + "/buildVtlBindings";
@@ -85,7 +85,7 @@ class StepByStepServiceTest {
     @MethodSource("endpointsSteps")
     @DisplayName("Kraftwerk users should not access steps services")
     void kraftwerk_users_should_not_access_steps_services(String endpointURI) throws Exception{
-        doNothing().when(mainProcessing).runMainV2();
+        doNothing().when(mainProcessing).runMain();
         Jwt jwt = testUtils.generateJwt(List.of("USER"), USER_KRAFTWERK);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -98,7 +98,7 @@ class StepByStepServiceTest {
     @MethodSource("endpointsSteps")
     @DisplayName("Admins should access steps services")
     void admins_should_access_steps_services(String endpointURI) throws Exception{
-        doNothing().when(mainProcessing).runMainV2();
+        doNothing().when(mainProcessing).runMain();
         Jwt jwt = testUtils.generateJwt(List.of("ADMIN"), ADMIN);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -111,7 +111,7 @@ class StepByStepServiceTest {
     @MethodSource("endpointsSteps")
     @DisplayName("Incorrect roles should not access steps services")
     void incorrect_roles_should_not_access_steps_services(String endpointURI) throws Exception{
-        doNothing().when(mainProcessing).runMainV2();
+        doNothing().when(mainProcessing).runMain();
         Jwt jwt = testUtils.generateJwt(List.of(""), "Test no roles");
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")

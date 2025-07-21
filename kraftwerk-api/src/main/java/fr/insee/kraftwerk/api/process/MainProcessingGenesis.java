@@ -72,9 +72,10 @@ public class MainProcessingGenesis {
 	}
 
 	/**
+	 * NOTE : package-protected method for unit-tests
 	 * @author Adrien Marchal
 	 */
-	public void initV2(String campaignId) throws KraftwerkException {
+	void init(String campaignId) throws KraftwerkException {
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
 				? "with DDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
@@ -82,7 +83,7 @@ public class MainProcessingGenesis {
 		//First we check the modes present in database for the given questionnaire
 		//We build userInputs for the given questionnaire
 		userInputs = new UserInputsGenesis(specsDirectory,
-				client.getModesV2(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
+				client.getModes(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
 		if (!userInputs.getModes().isEmpty()) {
 			try {
 				metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
@@ -98,13 +99,13 @@ public class MainProcessingGenesis {
 	/**
 	 * @author Adrien Marchal
 	 */
-	public void runMainV2(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
-		log.info("(V2) Batch size of interrogations retrieved from Genesis: {}", batchSize);
+	public void runMain(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
+		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
 		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
 				campaignId));
 		//We delete database at start (in case there is already one)
 		SqlUtils.deleteDatabaseFile(databasePath);
-		initV2(campaignId);
+		init(campaignId);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = config.isDuckDbInMemory() ?
 				SqlUtils.openConnection()
@@ -114,15 +115,15 @@ public class MainProcessingGenesis {
 			}
 			this.database = tryDatabase.createStatement();
 
-			List<String> questionnaireModelIds = client.getQuestionnaireModelIdsV2(campaignId);
+			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
 			}
 
 			for (String questionnaireId : questionnaireModelIds) {
-				runMainV2OnQuestionnaire(batchSize, workersNumbers, workerId, questionnaireId);
+				runMainOnQuestionnaire(batchSize, workersNumbers, workerId, questionnaireId);
 			}
-			outputFileWriterV2();
+			outputFileWriter();
 			writeErrors();
 			if (!database.isClosed()){database.close();}
 		}catch (SQLException e){
@@ -132,40 +133,40 @@ public class MainProcessingGenesis {
 		SqlUtils.deleteDatabaseFile(databasePath);
 	}
 
-	private void runMainV2OnQuestionnaire(
+	private void runMainOnQuestionnaire(
 			int batchSize, int workersNumbers, int workerId, String questionnaireId
 	) throws KraftwerkException {
 		//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
 		long totalSize = client.countInterrogationIds(questionnaireId);
 		//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
 		long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
-		log.info("====> (V2) Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
+		log.info("====> Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
 		long optionalSupplementBlock = blockNb % workersNumbers == 0 ? 0 : 1;
 		long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
-		log.info("====> (V2) NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
+		log.info("====> NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
 
-		List<String> modes = client.getDistinctModesByQuestionnaireIdV2(questionnaireId);
+		List<String> modes = client.getDistinctModesByQuestionnaireId(questionnaireId);
 
 		for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
-			runMainV2OnPartition(batchSize, workerId, questionnaireId, workerBlocksNb, indexPartition, totalSize, modes);
+			runMainOnPartition(batchSize, workerId, questionnaireId, workerBlocksNb, indexPartition, totalSize, modes);
 		}
 	}
 
-	private void runMainV2OnPartition(
+	private void runMainOnPartition(
 			int batchSize, int workerId, String questionnaireId, long workerBlocksNb, int indexPartition,
 			long totalSize, List<String> modes
 	) throws KraftwerkException {
 		long absoluteBlockIndex = (workerId - 1) * workerBlocksNb + indexPartition;
-		log.info("=============== (V2) PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
+		log.info("=============== PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
 
 		//USING PAGINATION INSTEAD
 		List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
 
-		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestStateV2(questionnaireId, ids, modes);
+		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, ids, modes);
 		//Free RAM with unused List in the rest of the loop.
 		ids = null;
 
-		log.info("(V2) Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
+		log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
 		vtlBindings = new VtlBindings();
 
 		unimodalProcess(suLatest);
@@ -200,9 +201,9 @@ public class MainProcessingGenesis {
 	 * @author Adrien Marchal
 	 */
 	/* Step 5 : Write output files */
-	private void outputFileWriterV2() throws KraftwerkException {
+	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
-		writerSequence.writeOutputFilesV2(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+		writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
 	/* Step 6 : Write errors */

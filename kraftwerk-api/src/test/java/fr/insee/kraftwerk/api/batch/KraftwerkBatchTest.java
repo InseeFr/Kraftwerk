@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class KraftwerkBatchV2Test {
+class KraftwerkBatchTest {
 
     @Mock
     ConfigProperties configProperties;
@@ -34,13 +34,13 @@ class KraftwerkBatchV2Test {
 
     @Spy
     @InjectMocks
-    KraftwerkBatchV2 kraftwerkBatchV2;
+    KraftwerkBatch kraftwerkBatch;
 
     @Test
     void noArgs_Test() throws Exception {
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(new String[]{});
-        kraftwerkBatchV2.run(myArgs);
-        verify(kraftwerkBatchV2, times(0)).cliModeLaunched(any());
+        kraftwerkBatch.run(myArgs);
+        verify(kraftwerkBatch, times(0)).cliModeLaunched(any());
     }
 
 
@@ -50,9 +50,9 @@ class KraftwerkBatchV2Test {
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(new String[]{"--aaa=bbb"});
         //Mocks : unnecessary here as an exception will be thrown before all useful calls : invalid arguments
         //execute
-        kraftwerkBatchV2.run(myArgs);
+        kraftwerkBatch.run(myArgs);
         //Checks
-        verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
+        verify(kraftwerkBatch, times(1)).cliModeLaunched(any());
     }
 
 
@@ -66,8 +66,8 @@ class KraftwerkBatchV2Test {
         //Mocks : N/A here
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessing).runMainV2();
+        doReturn(mockMainProcessing).when(kraftwerkBatch).getMainProcessing(any(KraftwerkExecutionContext.class));
+        doNothing().when(mockMainProcessing).runMain();
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
@@ -77,15 +77,15 @@ class KraftwerkBatchV2Test {
                 HttpStatus.OK
         );
         KraftwerkService mockKraftwerkService = mock(KraftwerkService.class);
-        doReturn(mockKraftwerkService).when(kraftwerkBatchV2).getKraftwerkService();
+        doReturn(mockKraftwerkService).when(kraftwerkBatch).getKraftwerkService();
         doReturn(responseEntity).when(mockKraftwerkService).archive(any(), any());
 
         //execute
-        kraftwerkBatchV2.run(myArgs);
+        kraftwerkBatch.run(myArgs);
 
         //Checks
-        verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessing, times(1)).runMainV2();
+        verify(kraftwerkBatch, times(1)).cliModeLaunched(any());
+        verify(mockMainProcessing, times(1)).runMain();
         verify(mockKraftwerkService, times(1)).archive(any(), any());
     }
 
@@ -109,38 +109,38 @@ class KraftwerkBatchV2Test {
         //Mocks : N/A here
 
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        doReturn(mockMainProcessing).when(kraftwerkBatchV2).getMainProcessing(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessing).runMainV2();
+        doReturn(mockMainProcessing).when(kraftwerkBatch).getMainProcessing(any(KraftwerkExecutionContext.class));
+        doNothing().when(mockMainProcessing).runMain();
 
         //execute
-        kraftwerkBatchV2.run(myArgs);
+        kraftwerkBatch.run(myArgs);
 
         //Checks
-        verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessing, times(1)).runMainV2();
+        verify(kraftwerkBatch, times(1)).cliModeLaunched(any());
+        verify(mockMainProcessing, times(1)).runMain();
     }
 
 
 
 
     @Test
-    void run_GENESISV2_Test() throws Exception {
+    void run_GENESIS_Test() throws Exception {
         //Use Case
-        String args = "--service=GENESISV2;--campaignId=TEST-GLOB";
+        String args = "--service=GENESIS;--campaignId=TEST-GLOB";
         String[] argsArray = args.split(";");
         DefaultApplicationArguments myArgs = new DefaultApplicationArguments(argsArray);
 
         //Mocks
         MainProcessingGenesis mockMainProcessingGenesis = mock(MainProcessingGenesis.class);
-        doReturn(mockMainProcessingGenesis).when(kraftwerkBatchV2).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
-        doNothing().when(mockMainProcessingGenesis).runMainV2(any(), anyInt(), anyInt(), anyInt());
+        doReturn(mockMainProcessingGenesis).when(kraftwerkBatch).getMainProcessingGenesis(any(KraftwerkExecutionContext.class));
+        doNothing().when(mockMainProcessingGenesis).runMain(any(), anyInt(), anyInt(), anyInt());
 
         //execute
-        kraftwerkBatchV2.run(myArgs);
+        kraftwerkBatch.run(myArgs);
 
         //Checks
-        verify(kraftwerkBatchV2, times(1)).cliModeLaunched(any());
-        verify(mockMainProcessingGenesis, times(1)).runMainV2(any(), anyInt(), anyInt(), anyInt());
+        verify(kraftwerkBatch, times(1)).cliModeLaunched(any());
+        verify(mockMainProcessingGenesis, times(1)).runMain(any(), anyInt(), anyInt(), anyInt());
     }
 
 }

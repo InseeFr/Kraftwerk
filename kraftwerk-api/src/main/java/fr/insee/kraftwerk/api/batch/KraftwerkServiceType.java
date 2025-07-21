@@ -7,6 +7,5 @@ public enum KraftwerkServiceType {
     MAIN,
     LUNATIC_ONLY,
     GENESIS,
-    GENESISV2,
     FILE_BY_FILE
 }

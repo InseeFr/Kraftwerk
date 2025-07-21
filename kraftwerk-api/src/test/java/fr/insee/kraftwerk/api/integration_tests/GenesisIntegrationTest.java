@@ -65,7 +65,7 @@ class GenesisIntegrationTest {
     @Test
     void getModes_test() throws KraftwerkException {
         //When
-        List<Mode> response = genesisClient.getModesV2(CAMPAIGN_ID);
+        List<Mode> response = genesisClient.getModes(CAMPAIGN_ID);
         log.debug("Get modes returned :\n{}", response);
 
         //Then
@@ -86,7 +86,7 @@ class GenesisIntegrationTest {
         modes.add("WEB");
 
         //When
-        List<SurveyUnitUpdateLatest> response = genesisClient.getUEsLatestStateV2(QUESTIONNAIRE_ID, interrogationIds, modes);
+        List<SurveyUnitUpdateLatest> response = genesisClient.getUEsLatestState(QUESTIONNAIRE_ID, interrogationIds, modes);
         log.debug("Get UEs latest states returned :\n{}", response);
 
         //Then
@@ -96,7 +96,7 @@ class GenesisIntegrationTest {
     @Test
     void getQuestionnaireModelIds_test() throws KraftwerkException, JsonProcessingException {
         //When
-        List<String> response = genesisClient.getQuestionnaireModelIdsV2(CAMPAIGN_ID);
+        List<String> response = genesisClient.getQuestionnaireModelIds(CAMPAIGN_ID);
         Assertions.assertThat(response).containsExactly(QUESTIONNAIRE_ID);
     }
 }

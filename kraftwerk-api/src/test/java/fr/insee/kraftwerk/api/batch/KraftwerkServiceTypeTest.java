@@ -15,8 +15,7 @@ class KraftwerkServiceTypeTest {
                 Arguments.of(0, KraftwerkServiceType.MAIN),
                 Arguments.of(1, KraftwerkServiceType.LUNATIC_ONLY),
                 Arguments.of(2, KraftwerkServiceType.GENESIS),
-                Arguments.of(3, KraftwerkServiceType.GENESISV2),
-                Arguments.of(4, KraftwerkServiceType.FILE_BY_FILE)
+                Arguments.of(3, KraftwerkServiceType.FILE_BY_FILE)
         );
     }
 

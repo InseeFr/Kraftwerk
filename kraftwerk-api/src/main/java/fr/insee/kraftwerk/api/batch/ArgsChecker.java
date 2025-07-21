@@ -51,15 +51,11 @@ public class ArgsChecker {
         if (this.serviceName == KraftwerkServiceType.GENESIS) {
             this.isArchive = false;
         }
-        if (this.serviceName == KraftwerkServiceType.GENESISV2) {
-            this.isArchive = false;
-        }
     }
 
 
     void checkArgNumber() {
-        //We provide retro-compatibility, and authorize old (runMain) & new (runMainV2) process
-        //Thus, we consider that if "argWorkersNb" or "argWorkerIndex" are not filled, their values are set to "1"
+        //Note : We consider that if "argWorkersNb" or "argWorkerIndex" are not filled, their values are set to "1"
         if(this.argServiceName == null || this.argCampaignId == null ) {
             throw new IllegalArgumentException("Invalid number of arguments");
         }
