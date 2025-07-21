@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.outputs.csv;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.encryption.EncryptionUtils;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -17,14 +16,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Class to manage the writing of CSV output tables.
@@ -32,7 +34,7 @@ import java.util.Map;
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
 
-	private static final String TMPDIR_SYSTEM_PROPERTY = "java.io.tmpdir";
+	public static final String NULL_MARKER  = "�__NULL__�";
 
 	/**
 	 * When an instance is created, the output folder is created.
@@ -45,7 +47,7 @@ public class CsvOutputFiles extends OutputFiles {
 	}
 
 	/**
-	 * @author Adrien Marchal
+	 * @author Alice lambois
 	 * Method to write CSV output tables from datasets that are in the bindings.
 	 */
 	@Override
@@ -53,73 +55,116 @@ public class CsvOutputFiles extends OutputFiles {
 		for (String datasetName : getDatasetToCreate()) {
 			try {
 				//Temporary file
-				Files.createDirectories(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)));
-				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty(TMPDIR_SYSTEM_PROPERTY)),outputFileName(datasetName, kraftwerkExecutionContext), null);
+				Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
+				Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
+						outputFileName(datasetName, kraftwerkExecutionContext), null);
 
-				//Get column names
-				List<String> columnNames = SqlUtils.getColumnNames(getDatabase(), datasetName);
-				if(columnNames.isEmpty()){
+				//Get columns
+				Map<String,String> columns = SqlUtils.getColumnTypes(getDatabase(), datasetName);
+
+				if(columns.isEmpty()){
 					log.warn("dataset {} is empty !", datasetName);
 					return;
 				}
 
-				//Get boolean columns names
-				List<String> boolColumnNames = SqlUtils.getColumnNames(getDatabase(), datasetName, VariableType.BOOLEAN);
-				//Get indexes of boolean columns
-				List<Integer> boolColumnIndexes = new ArrayList<>();
-
 				//Create file with double quotes header
-				Files.write(tmpOutputFile, buildHeader(columnNames, boolColumnNames, boolColumnIndexes).getBytes());
+				Files.write(tmpOutputFile, buildHeader(columns.keySet().stream().toList()).getBytes());
 
 				//Data export into temp file
-				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columnNames);
+				StringBuilder exportCsvQuery = getExportCsvQuery(datasetName, tmpOutputFile.toFile(), columns);
 				this.getDatabase().execute(exportCsvQuery.toString());
 
+				//Merge header and data
+				try (var output = Files.newOutputStream(tmpOutputFile, StandardOpenOption.APPEND);
+					 var input = Files.newInputStream(Path.of(tmpOutputFile.toAbsolutePath() + "data"))) {
+					input.transferTo(output);
+				}
+				String content = Files.readString(tmpOutputFile);
+				content = content.replace(NULL_MARKER, "\"\"");
 
-				CsvRegexHelper.writeIntoTmpFile(tmpOutputFile, columnNames, boolColumnNames, boolColumnIndexes);
+				//Solution with RegEx DISABLED : CsvRegexHelper.writeIntoTmpFile(tmpOutputFile, columnNames, boolColumnNames, boolColumnIndexes);
+				Files.writeString(tmpOutputFile, content);
 
-				Files.deleteIfExists(Path.of(tmpOutputFile + "data"));
+				Files.deleteIfExists(Path.of(tmpOutputFile.toAbsolutePath() + "data"));
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
-				//Move to output folder
-				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
-				log.info("File: {} successfully written", outputFile);
-				//Count rows for functional log
 				if (kraftwerkExecutionContext != null) {
+					//Count rows for functional log
 					try(ResultSet countResult =
 								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
 						countResult.next();
-						kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
+                        kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
+					}
+
+					//Encrypt file if requested
+					if(kraftwerkExecutionContext.isWithEncryption()) {
+						InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
+						getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
+						log.info("File: {} successfully written and encrypted", outputFile);
+						continue; //Go to next dataset to write
 					}
 				}
+				//Move to output folder
+				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
+				log.info("File: {} successfully written", outputFile);
 			} catch (SQLException | IOException e) {
 				throw new KraftwerkException(500, e.toString());
 			}
 		}
 	}
 
+	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, Map<String, String> columnTypes) {
+		StringBuilder query = new StringBuilder("COPY (SELECT ");
+			int nbColOk = 0;
+			for (Entry<String,String> column : columnTypes.entrySet()) {
+				String col = column.getKey();
+				String type = column.getValue().toUpperCase(); // e.g. 'INTEGER', 'VARCHAR', etc.
 
+				String expression;
+				// replaces false/true by 0/1
+				if (type.equals("BOOLEAN")) {
+					expression = String.format(
+							"CASE WHEN \"%1$s\" IS NULL THEN NULL ELSE CASE WHEN \"%1$s\" THEN 1 ELSE 0 END END AS \"%1$s\"",
+							col
+					);
+				} else if (type.contains("CHAR") || type.equals("TEXT")) {
+					expression = String.format("COALESCE(\"%1$s\", '') AS \"%1$s\"", col);
+				} else {
+					expression = String.format("\"%1$s\"", col); // keep null
+				}
 
-	private static @NotNull StringBuilder getExportCsvQuery(String datasetName, File outputFile, List<String> columnNames) {
-		StringBuilder exportCsvQuery = new StringBuilder(String.format("COPY %s TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', OVERWRITE_OR_IGNORE true", datasetName, outputFile.getAbsolutePath() +"data", Constants.CSV_OUTPUTS_SEPARATOR));
-		//Double quote values parameter
-		exportCsvQuery.append(", FORCE_QUOTE(");
-		for (String stringColumnName : columnNames) {
-			exportCsvQuery.append(String.format("'%s',", stringColumnName));
-		}
-		//Remove last ","
-		exportCsvQuery.deleteCharAt(exportCsvQuery.length() - 1);
-		exportCsvQuery.append("))");
-		return exportCsvQuery;
+				query.append(expression);
+				if (nbColOk < columnTypes.size() - 1) {
+					query.append(", ");
+				}
+				nbColOk++;
+			}
+
+			query.append(String.format(" FROM \"%s\") TO '%s' (FORMAT CSV, HEADER false, DELIMITER '%s', NULLSTR '%s'",
+					datasetName,
+					outputFile.getAbsolutePath() + "data",
+					Constants.CSV_OUTPUTS_SEPARATOR,
+					NULL_MARKER));
+
+			if (!columnTypes.isEmpty()) {
+				//Double quote values parameter
+				query.append(", FORCE_QUOTE(");
+				for (String col : columnTypes.keySet()) {
+					query.append("\"").append(col).append("\",");
+				}
+				query.deleteCharAt(query.length() - 1); // remove trailing comma
+				query.append(")");
+			}
+
+			query.append(")");
+			log.debug("csv query : \n {}",query);
+			return query;
 	}
 
-	private static String buildHeader(List<String> columnNames, List<String> boolColumnNames, List<Integer> boolColumnIndexes) {
+	private static String buildHeader(List<String> columnNames) {
 		StringBuilder headerBuilder = new StringBuilder();
 		for (String columnName : columnNames) {
 			headerBuilder.append(String.format("\"%s\"", columnName)).append(Constants.CSV_OUTPUTS_SEPARATOR);
-			if(boolColumnNames.contains(columnName)){
-				boolColumnIndexes.add(columnNames.indexOf(columnName));
-			}
 		}
 		headerBuilder.deleteCharAt(headerBuilder.length()-1);
 		headerBuilder.append("\n");
