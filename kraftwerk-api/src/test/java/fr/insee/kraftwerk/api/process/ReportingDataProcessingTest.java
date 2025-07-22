@@ -60,7 +60,7 @@ class ReportingDataProcessingTest {
     }
 
     @Test
-    void parseReportingData_exceotion1_Test() {
+    void parseReportingData_exception1_Test() {
         // 1. Mock the dependencies
         ModeInputs mockModeInputs = mock(ModeInputs.class);
         XMLReportingDataParser mockXMLReportingDataParser = mock(XMLReportingDataParser.class);
@@ -78,7 +78,7 @@ class ReportingDataProcessingTest {
 
 
     @Test
-    void parseReportingData_exceotion2_Test() {
+    void parseReportingData_exception2_Test() {
         // 1. Mock the dependencies
         ModeInputs mockModeInputs = mock(ModeInputs.class);
         XMLReportingDataParser mockXMLReportingDataParser = mock(XMLReportingDataParser.class);

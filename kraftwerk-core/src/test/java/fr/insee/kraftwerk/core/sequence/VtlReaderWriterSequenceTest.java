@@ -14,22 +14,18 @@ import java.nio.file.Path;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-//"@ExtendWith(MockitoExtension.class)" NEEDED TO MOCK CLASS ATTRIBUTES!
 @ExtendWith(MockitoExtension.class) //JUnit v5
 class VtlReaderWriterSequenceTest {
 
-    //"@Mock" NEEDED TO MOCK CLASS ATTRIBUTES when executing "@InjectMocks" dependency injection!
     @Mock
     VtlExecute vtlExecute;
 
-    //"@InjectMocks" NEEDED TO MOCK CLASS ATTRIBUTES!
     @InjectMocks
     private VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(null);
 
     @Test
     void readDataset4params_Test() {
         // 1. Mock the dependencies
-        // => 1) when calling a method !!!belonging!!! to the class of a spy, we can mock its return with a mock object
         VtlReaderWriterSequence spyVtlReaderWriterSequence = Mockito.spy(vtlReaderWriterSequence);
         doNothing().when(spyVtlReaderWriterSequence).readDataset(any(), any(), any());
         // 2. Launch test

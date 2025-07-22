@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class VtlScriptTest {
 
     @Test
-    void constructeur1_test() {
+    void constructor1_test() {
         VtlScript array = new VtlScript("first_instruction");
         assertEquals("first_instruction", array.getFirst());
     }
 
     @Test
-    void constructeur2_test() {
+    void constructor2_test() {
         VtlScript array = new VtlScript("first_instruction", "2_instruction", "3_instruction", "4_instruction");
         assertEquals(4, array.size());
         assertEquals("first_instruction", array.get(0));

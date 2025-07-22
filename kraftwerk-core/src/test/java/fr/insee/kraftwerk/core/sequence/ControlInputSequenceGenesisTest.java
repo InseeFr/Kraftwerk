@@ -12,7 +12,7 @@ class ControlInputSequenceGenesisTest {
     private static final String FILE_SEPARATOR = File.separator;
 
     @Test
-    void constructeur_test() {
+    void constructor_test() {
         ControlInputSequenceGenesis cisg = new ControlInputSequenceGenesis("/a/b/c/default_dir");
         assertEquals("/a/b/c/default_dir", cisg.defaultDirectory);
     }

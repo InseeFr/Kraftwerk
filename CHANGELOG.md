@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.4.0 [2025-07-08]
+### Added
+- First version of JSON export
+
+### Changed
+- Speed optimizations (Block processing, useless calls...)
+- Possibility to launch on batch mode with workers
+
 ## 3.3.6 [2025-06-03]
 
 ### Added

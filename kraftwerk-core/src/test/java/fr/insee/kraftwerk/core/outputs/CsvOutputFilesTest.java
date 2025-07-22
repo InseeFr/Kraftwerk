@@ -118,7 +118,7 @@ class CsvOutputFilesTest {
 
 		Path racinePath = Path.of(outputFiles.getOutputFolder().toString(),
 				outputFiles.outputFileName("RACINE",
-						outputFiles.getKraftwerkExecutionContext())
+				outputFiles.getKraftwerkExecutionContext())
 		);
 		racinePath = racinePath.resolveSibling(racinePath.getFileName());
 		File f = racinePath.toFile();

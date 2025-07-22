@@ -143,16 +143,12 @@ public class MainProcessing {
 
 	/* Step 4 : Insert into SQL database */
 	private void insertDatabase(Statement database) {
-		//AMAR - CODE-REVIEW : Question : pourquoi faire un "new" dans le cas présent? pourquoi une méthode statique ne suffirait-elle pas?
-		// => cela implique de stocker un objet en mémoire, donc d'utiliser de la RAM
 		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
 		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
 	}
 
 	/* Step 5 : Write output files */
 	private void outputFileWriter(Statement database) throws KraftwerkException {
-		//AMAR - CODE-REVIEW : Question : pourquoi faire un "new" dans le cas présent? pourquoi une méthode statique ne suffirait-elle pas?
-		// => cela implique de stocker un objet en mémoire, donc d'utiliser de la RAM
 		WriterSequence writerSequence = new WriterSequence();
 		writerSequence.writeOutputFiles(inDirectory, vtlBindings, userInputsFile.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}

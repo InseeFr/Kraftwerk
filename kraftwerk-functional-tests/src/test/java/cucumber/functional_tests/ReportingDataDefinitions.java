@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ContactAttemptType;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import io.cucumber.java.en.Then;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 
 import java.io.File;
@@ -37,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 
+@Slf4j
 // These definitions are used in do_we_export_contact_attempts feature
 public class ReportingDataDefinitions {
 
@@ -254,6 +256,7 @@ public class ReportingDataDefinitions {
                     try {
                         sdf.parse(element);
                     } catch (ParseException e) {
+                        log.error(e.toString());
                         fail("Wrong date format on field " + fieldName + "\n" +
                                 "Expected " + expectedDateFormat + "\n"
                                 + "to be parsed on actual date : " + element

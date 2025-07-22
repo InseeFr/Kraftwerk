@@ -46,17 +46,13 @@ public class WriterSequence {
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
-
-	/**
-	 * @author Adrien Marchal
-	 */
 	public void writeOutputFiles(Path inDirectory,
-								   String outDirectorySuffix,
-								   VtlBindings vtlBindings,
-								   ModeInputs modeInputs,
-								   KraftwerkExecutionContext kraftwerkExecutionContext,
-								   Statement database,
-								   FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+								 String outDirectorySuffix,
+								 VtlBindings vtlBindings,
+								 ModeInputs modeInputs,
+								 KraftwerkExecutionContext kraftwerkExecutionContext,
+								 Statement database,
+								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
 		Map<String, ModeInputs> modeInputsMap = new HashMap<>();
 		modeInputsMap.put(modeInputs.getDataMode(), modeInputs);
@@ -66,16 +62,14 @@ public class WriterSequence {
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, new HashMap<>(), kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
 
-	/**
-	 * @author Adrien Marchal
-	 */
-	public void writeCsvFiles(Path outDirectory,
-								VtlBindings vtlBindings,
-								Map<String, ModeInputs> modeInputsMap,
-								Map<String, MetadataModel> metadataModels,
-								KraftwerkExecutionContext kraftwerkExecutionContext,
-								Statement database,
-								FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+	private void writeCsvFiles(Path outDirectory,
+								 VtlBindings vtlBindings,
+								 Map<String, ModeInputs> modeInputsMap,
+								 Map<String, MetadataModel> metadataModels,
+								 KraftwerkExecutionContext kraftwerkExecutionContext,
+								 Statement database,
+								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
+		//Write CSV
 		/* Step 5.1 : write csv output tables */
 		OutputFiles csvOutputFiles = outputFilesFactory.createCsv(outDirectory, vtlBindings,
 				new ArrayList<>(modeInputsMap.keySet()), database, fileUtilsInterface, kraftwerkExecutionContext);
@@ -85,10 +79,7 @@ public class WriterSequence {
 	}
 
 
-	/**
-	 * @author Adrien Marchal
-	 * Write Parquet
-	 */
+	//Write Parquet
 	private void writeParquetFiles(Path outDirectory,
 									 VtlBindings vtlBindings,
 									 Map<String, ModeInputs> modeInputsMap,

@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
@@ -30,6 +31,8 @@ public class KraftwerkBatch implements ApplicationRunner {
     FileUtilsInterface fileSystem;
     MinioClient minioClient;
 
+    VaultConfig vaultConfig;
+
     //old JVM arguments list : "GENESIS false false TESTCAMPAIGN300000 3 2"
     //new JVM arguments list : "--service=GENESIS --campaignId=TESTCAMPAIGN300000 --archive=false --reporting-data=false --with-encryption=false --workers-nb=3 --worker-index=2"
     private static final String ARG_SERVICE = "service";
@@ -48,7 +51,7 @@ public class KraftwerkBatch implements ApplicationRunner {
     protected long limitSize;
 
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig) {
+    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig) {
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -57,6 +60,7 @@ public class KraftwerkBatch implements ApplicationRunner {
         }else{
             fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
+        this.vaultConfig = vaultConfig;
     }
 
     @Override
