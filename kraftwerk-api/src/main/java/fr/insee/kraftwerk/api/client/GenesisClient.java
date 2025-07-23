@@ -102,14 +102,14 @@ public class GenesisClient {
 	 * @author Adrien Marchal
 	 */
 	public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) throws KraftwerkException {
-		String url = String.format("%s/modes/by-questionnaireV2?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
 		ResponseEntity<String[]> response = makeApiCall(url,HttpMethod.GET,null, String[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
-		String url = String.format("%s/modes/by-campaignV2?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
+		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
@@ -124,7 +124,7 @@ public class GenesisClient {
 		//Convert Array into String
 		String modesQueryParam = String.join(",", modes);
 
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latestV2?questionnaireId=%s&modes=%s",
+		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire-and-modes/latest?questionnaireId=%s&modes=%s",
 				configProperties.getGenesisUrl(), questionnaireId, modesQueryParam);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
@@ -134,7 +134,7 @@ public class GenesisClient {
 	 * @author Adrien Marchal
 	 */
 	public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
-		String url = String.format("%s/questionnaires/by-campaignV2?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
+		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
