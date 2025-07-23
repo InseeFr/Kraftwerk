@@ -30,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -100,14 +97,25 @@ public class MainService extends KraftwerkService {
 		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
+	@Deprecated (since = "3.4.1", forRemoval = true)
 	@PutMapping(value = "/main/genesis")
-	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis.deprecated}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
 		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+	}
+
+	@PutMapping(value = "/main/genesis/by-questionnaire")
+	@Operation(operationId = "mainGenesisByQuestionnaireId", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesisByQuestionnaireId(
+			@Parameter(description = "${param.campaignId}") @RequestParam String questionnaireId,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
+		boolean withDDI = true;
+		return runWithGenesis(questionnaireId, withDDI, withEncryption, batchSize);
 	}
 
 
