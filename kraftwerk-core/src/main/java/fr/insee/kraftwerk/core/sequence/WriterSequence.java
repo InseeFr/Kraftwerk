@@ -32,6 +32,7 @@ public class WriterSequence {
 		}
 	}
 
+
 	public void writeOutputFiles(Path inDirectory,
 								 VtlBindings vtlBindings,
 								 Map<String, ModeInputs> modeInputsMap,
@@ -80,7 +81,7 @@ public class WriterSequence {
 
 	//Write Parquet
 	private void writeParquetFiles(Path outDirectory,
-									 VtlBindings vtlBindings, 
+									 VtlBindings vtlBindings,
 									 Map<String, ModeInputs> modeInputsMap,
 									 Map<String, MetadataModel> metadataModels,
 									 KraftwerkExecutionContext kraftwerkExecutionContext,
@@ -92,4 +93,5 @@ public class WriterSequence {
 		parquetOutputFiles.writeOutputTables();
 		parquetOutputFiles.writeImportScripts(metadataModels, kraftwerkExecutionContext);
 	}
+
 }

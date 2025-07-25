@@ -29,7 +29,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<InterrogationId> getInterrogationIds(String questionnaireId) {
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
         List<InterrogationId> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
@@ -43,6 +43,27 @@ public class GenesisClientStub extends GenesisClient {
             list.add(interrogationId);
         }
         return list;
+    }
+
+    @Override
+    public Long countInterrogationIds(String questionnaireId) {
+        return 1L;
+    }
+
+    @Override
+    public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) {
+        Set<String> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
+                .filter(
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
+                ).toList();
+
+        for(SurveyUnitUpdateLatest doc : mongoFiltered){
+            set.add(doc.getQuestionnaireId());
+        }
+
+        return set.stream().toList();
     }
 
     @Override
@@ -60,7 +81,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered1 = mongoStub.stream()
@@ -104,4 +125,5 @@ public class GenesisClientStub extends GenesisClient {
 
         return set.stream().toList();
     }
+
 }

@@ -60,23 +60,32 @@ class MainProcessingGenesisTest {
             }
 
             @Override
-            public List<String> getQuestionnaireModelIds(String campaignId) {
-                return Collections.singletonList("id");
-            }
-
-            @Override
-            public List<InterrogationId> getInterrogationIds(String questionnaireId) {
+            public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
                 return Collections.singletonList(new InterrogationId());
-
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+            public Long countInterrogationIds(String questionnaireId) {
+                return 1L;
+            }
+
+            @Override
+            public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) {
+                return Collections.singletonList(Mode.WEB.toString());
+            }
+
+            @Override
+            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setMode(Mode.WEB);
                 return Collections.singletonList(surveyUnitUpdateLatest);
+            }
+
+            @Override
+            public List<String> getQuestionnaireModelIds(String campaignId) {
+                return Collections.singletonList("id");
             }
         };
 
@@ -94,6 +103,9 @@ class MainProcessingGenesisTest {
         mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
+    /**
+     * @author Adrien Marchal
+     */
     @Test
     void testInitLoadsMetadata() throws Exception {
         String idCampaign = "campaign1";
@@ -104,10 +116,13 @@ class MainProcessingGenesisTest {
         assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
     }
 
-   @Test
+    /**
+     * @author Adrien Marchal
+     */
+    @Test
     void testRunMainOk() {
         String idCampaign = "campaign1";
-        assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
+        assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100, 1, 1));
     }
 
 

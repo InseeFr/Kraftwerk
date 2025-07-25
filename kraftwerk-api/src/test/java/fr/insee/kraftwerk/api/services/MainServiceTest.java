@@ -133,7 +133,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Kraftwerk users should access main services with Genesis")
     void kraftwerk_users_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(), anyInt());
+        doNothing().when(mainProcessingGenesis).runMain(anyString(), anyInt(), anyInt(), anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("USER"), USER_KRAFTWERK);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -165,7 +165,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Admins should access main services with genesis")
     void admins_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt(), anyInt(), anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("ADMIN"), ADMIN);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -197,7 +197,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Incorrect roles should not access main services with Genesis")
     void no_correct_roles_should_not_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt(), anyInt(), anyInt());
         Jwt jwt = testUtils.generateJwt(List.of(""), "Not_a_good_role");
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -337,7 +337,9 @@ class MainServiceTest {
         assertEquals("Kraftwerk error", response.getBody());
     }
 
-
+    /**
+     * @author Adrien Marchal
+     */
     /*** Main Genesis ***/
 
     @Test
@@ -349,11 +351,11 @@ class MainServiceTest {
         MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
-        doNothing().when(mockMainProcessing).runMain(idCampaign,100);
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doNothing().when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -372,10 +374,10 @@ class MainServiceTest {
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
+        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -393,15 +395,16 @@ class MainServiceTest {
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
+        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("IO error", response.getBody());
     }
+
 
     /*** Main Genesis Lunatic Only***/
 
@@ -415,10 +418,10 @@ class MainServiceTest {
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doNothing().when(mockMainProcessing).runMain(idCampaign,100);
+        doNothing().when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(200, response.getStatusCode().value());
@@ -437,10 +440,10 @@ class MainServiceTest {
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
+        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -458,10 +461,10 @@ class MainServiceTest {
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
-        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
+        doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100, 1, 1);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false, 1, 1);
 
         // THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

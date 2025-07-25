@@ -53,7 +53,10 @@ public class ReportingDataProcessing {
     }
 
 
-    private void runProcess(FileUtilsInterface fileUtilsInterface,
+    /**
+     * package-scoped method for unit tests coverage
+     */
+    void runProcess(FileUtilsInterface fileUtilsInterface,
                            Path inDirectory,
                            Path inOrSpecDirectory,
                            String reportingDataFilePathParam
@@ -103,6 +106,7 @@ public class ReportingDataProcessing {
         }
     }
 
+
     public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
         Path reportingDataFile = modeInputs.getReportingDataFile();
         if(!fileUtilsInterface.isFileExists(reportingDataFile.toString())){
@@ -111,16 +115,33 @@ public class ReportingDataProcessing {
         }
         ReportingData reportingData = new ReportingData(reportingDataFile, new ArrayList<>());
         if (reportingDataFile.toString().endsWith(".xml")) {
-            XMLReportingDataParser xMLReportingDataParser = new XMLReportingDataParser(fileUtilsInterface);
+            XMLReportingDataParser xMLReportingDataParser = getXMLReportingDataParser(fileUtilsInterface);
             xMLReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
         if (reportingDataFile.toString().endsWith(".csv")) {
-            CSVReportingDataParser cSVReportingDataParser = new CSVReportingDataParser(fileUtilsInterface);
+            CSVReportingDataParser cSVReportingDataParser = getCSVReportingDataParser(fileUtilsInterface);
             cSVReportingDataParser.parseReportingData(reportingData, data, true);
             return;
         }
         throw new KraftwerkException(400,
                 "Reporting data file path must be a xml or csv file ! Got %s".formatted(reportingDataFile.toString()));
     }
+
+    /**
+     * package-protected method for unit tests spying purpose
+     * (as we can't test/spy new instance creation with "new" keyword.)
+     */
+    XMLReportingDataParser getXMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+        return new XMLReportingDataParser(fileUtilsInterface);
+    }
+
+    /**
+     * package-protected method for unit tests spying purpose
+     * (as we can't test/spy new instance creation with "new" keyword.)
+     */
+    CSVReportingDataParser getCSVReportingDataParser(FileUtilsInterface fileUtilsInterface) {
+        return new CSVReportingDataParser(fileUtilsInterface);
+    }
+
 }

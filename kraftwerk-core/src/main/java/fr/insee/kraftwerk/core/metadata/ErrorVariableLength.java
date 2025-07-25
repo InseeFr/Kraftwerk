@@ -20,8 +20,8 @@ public class ErrorVariableLength extends KraftwerkError {
 
     @Override
     public String toString() {
-        return  String.format("Warning : The maximum length read for variable %s (DataMode: %s) exceed expected length",variable.getName(),dataMode) + "\n" +
-                String.format("Expected: %s but received: %d",variable.getExpectedLength(),variable.getMaxLengthData()) + "\n";
+        return  String.format("Warning : The maximum length read for variable %s (DataMode: %s) exceed expected length", (variable != null ? variable.getName() : "null"),dataMode) + "\n" +
+                String.format("Expected: %s but received: %d", (variable != null ? variable.getExpectedLength() : "null"), (variable != null ? variable.getMaxLengthData() : -1)) + "\n";
     }
 
     @Override

@@ -259,7 +259,7 @@ public class StepByStepService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 
 	}
-	
+
 
 	@PutMapping(value = "/writeOutputFiles")
 	@Operation(operationId = "writeOutputFiles", summary = "${summary.writeOutputFiles}", description = "${description.writeOutputFiles}")

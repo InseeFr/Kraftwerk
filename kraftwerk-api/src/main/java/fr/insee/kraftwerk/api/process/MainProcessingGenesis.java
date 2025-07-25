@@ -5,7 +5,6 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.DataState;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -25,7 +24,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.ListUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,7 +36,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Log4j2
 public class MainProcessingGenesis {
@@ -78,7 +75,11 @@ public class MainProcessingGenesis {
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
-	public void init(String campaignId) throws KraftwerkException {
+	/**
+	 * NOTE : package-protected method for unit-tests
+	 * @author Adrien Marchal
+	 */
+	void init(String campaignId) throws KraftwerkException {
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
 				? "with DDI": "without DDI");
 		this.controlInputSequenceGenesis = new ControlInputSequenceGenesis(client.getConfigProperties().getDefaultDirectory());
@@ -88,17 +89,21 @@ public class MainProcessingGenesis {
 		userInputs = new UserInputsGenesis(specsDirectory,
 				client.getModes(campaignId), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
 		if (!userInputs.getModes().isEmpty()) {
-            try {
-                metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+			try {
+				metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
 			} catch (MetadataParserException e) {
-                throw new KraftwerkException(500, e.getMessage());
-            }
-        } else {
-            log.error("No source found for campaign {}", campaignId);
+				throw new KraftwerkException(500, e.getMessage());
+			}
+		} else {
+			log.error("No source found for campaign {}", campaignId);
 		}
 	}
 
-	public void runMain(String campaignId, int batchSize) throws KraftwerkException, IOException {
+
+	/**
+	 * @author Adrien Marchal
+	 */
+	public void runMain(String campaignId, int batchSize, int workersNumbers, int workerId) throws KraftwerkException, IOException {
 		log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
 		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
 				campaignId));
@@ -113,24 +118,14 @@ public class MainProcessingGenesis {
 				throw new KraftwerkException(500,"Error during internal database creation");
 			}
 			this.database = tryDatabase.createStatement();
+
 			List<String> questionnaireModelIds = client.getQuestionnaireModelIds(campaignId);
 			if (questionnaireModelIds.isEmpty()) {
 				throw new KraftwerkException(204, null);
 			}
+
 			for (String questionnaireId : questionnaireModelIds) {
-				List<InterrogationId> ids = client.getInterrogationIds(questionnaireId);
-				List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
-				int nbPartitions = listIds.size();
-				int indexPartition = 1;
-				for (List<InterrogationId> listId : listIds) {
-					List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, listId);
-					log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
-					vtlBindings = new VtlBindings();
-					unimodalProcess(suLatest);
-					multimodalProcess();
-					insertDatabase();
-					indexPartition++;
-				}
+				runMainOnQuestionnaire(batchSize, workersNumbers, workerId, questionnaireId);
 			}
 			outputFileWriter();
 			writeErrors();
@@ -142,52 +137,96 @@ public class MainProcessingGenesis {
 		SqlUtils.deleteDatabaseFile(databasePath);
 	}
 
-	public Map<String, Object> runMainJson(String campaignId, String interrogationId) throws KraftwerkException, IOException {
-		Map<String, Object> results = new LinkedHashMap<>();
-		results.put("interrogationId", interrogationId);
-		log.info("Export json for campaign {} and interrogationId {}", campaignId, interrogationId);
-		String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
-				campaignId));
-		//We delete database at start (in case there is already one)
-		SqlUtils.deleteDatabaseFile(databasePath);
-		init(campaignId);
-		//Try with resources to close database when done
-		try (Connection tryDatabase = config.isDuckDbInMemory() ?
-				SqlUtils.openConnection()
-				: SqlUtils.openConnection(Path.of(databasePath))) {
-			if(tryDatabase == null){
-				throw new KraftwerkException(500,"Error during internal database creation");
-			}
-			this.database = tryDatabase.createStatement();
-			String questionnaireModelId = client.getQuestionnaireModelIdByInterrogationId(interrogationId);
-			if (questionnaireModelId.isEmpty()) {
-				throw new KraftwerkException(204, null);
-			}
-			results.put("questionnaireModelId", questionnaireModelId);
+	private void runMainOnQuestionnaire(
+			int batchSize, int workersNumbers, int workerId, String questionnaireId
+	) throws KraftwerkException {
+		//FIRST GET NUMBER OF ELEMENTS OF THE QUESTIONNAIRE
+		long totalSize = client.countInterrogationIds(questionnaireId);
+		//blockNb must always be at least equal to 1, even if "totalSize" < "batchSize"
+		long blockNb = totalSize % batchSize == 0 ? totalSize / batchSize : totalSize / batchSize + 1;
+		log.info("====> Number of questionnaireIds to process : {} ({} blocks)", totalSize, blockNb);
+		long optionalSupplementBlock = blockNb % workersNumbers == 0 ? 0 : 1;
+		long workerBlocksNb = workerId == workersNumbers ? blockNb / workersNumbers : blockNb / workersNumbers + optionalSupplementBlock;
+		log.info("====> NUMBER OF BLOCKS TO PROCESS for questionnaireId {} on workerId {} : {}", questionnaireId, workerId, workerBlocksNb);
 
-			InterrogationId id = new InterrogationId();
-			id.setId(interrogationId);
-			List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, List.of(id));
-			results.put("partitionId",suLatest.getFirst().getCampaignId());
-			results.put("surveyUnitId",suLatest.getFirst().getSurveyUnitId());
-			results.put("contextualId",suLatest.getFirst().getContextualId());
-			results.put("mode",suLatest.getFirst().getMode());
-			results.put("isCapturedIndirectly",suLatest.getFirst().getIsCapturedIndirectly());
-			results.put("validationDate",suLatest.getFirst().getValidationDate());
-			log.info("InterrogationId {} retrieved from Genesis",id.getId());
-			vtlBindings = new VtlBindings();
-			unimodalProcess(suLatest);
-			multimodalProcess();
-			insertDatabase();
-			results.put("data",transformDataToJson());
-			if (!database.isClosed()){database.close();}
-		}catch (SQLException e){
-			log.error(e.toString());
-			throw new KraftwerkException(500,"SQL error");
+		List<String> modes = client.getDistinctModesByQuestionnaireId(questionnaireId);
+
+		for (int indexPartition = 0; indexPartition < workerBlocksNb; indexPartition++) {
+			runMainOnPartition(batchSize, workerId, questionnaireId, workerBlocksNb, indexPartition, totalSize, modes);
 		}
-		SqlUtils.deleteDatabaseFile(databasePath);
-		return results;
 	}
+
+	private void runMainOnPartition(
+			int batchSize, int workerId, String questionnaireId, long workerBlocksNb, int indexPartition,
+			long totalSize, List<String> modes
+	) throws KraftwerkException {
+		long absoluteBlockIndex = (workerId - 1) * workerBlocksNb + indexPartition;
+		log.info("=============== PROCESS BLOCK N°{} (on workerId {}) ==============", absoluteBlockIndex + 1, workerId);
+
+		//USING PAGINATION INSTEAD
+		List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
+
+		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, ids, modes);
+		//Free RAM with unused List in the rest of the loop.
+		ids = null;
+
+		log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
+		vtlBindings = new VtlBindings();
+
+		unimodalProcess(suLatest);
+		multimodalProcess();
+		insertDatabase();
+	}
+
+
+    public Map<String, Object> runMainJson(String campaignId, String interrogationId) throws KraftwerkException, IOException {
+        Map<String, Object> results = new LinkedHashMap<>();
+        results.put("interrogationId", interrogationId);
+        log.info("Export json for campaign {} and interrogationId {}", campaignId, interrogationId);
+        String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
+                campaignId));
+        //We delete database at start (in case there is already one)
+        SqlUtils.deleteDatabaseFile(databasePath);
+        init(campaignId);
+        //Try with resources to close database when done
+        try (Connection tryDatabase = config.isDuckDbInMemory() ?
+                SqlUtils.openConnection()
+                : SqlUtils.openConnection(Path.of(databasePath))) {
+            if(tryDatabase == null){
+                throw new KraftwerkException(500,"Error during internal database creation");
+            }
+            this.database = tryDatabase.createStatement();
+            String questionnaireModelId = client.getQuestionnaireModelIdByInterrogationId(interrogationId);
+            if (questionnaireModelId.isEmpty()) {
+                throw new KraftwerkException(204, null);
+            }
+            results.put("questionnaireModelId", questionnaireModelId);
+
+            InterrogationId id = new InterrogationId();
+            id.setId(interrogationId);
+			List<String> modes = client.getDistinctModesByQuestionnaireId(questionnaireModelId);
+            List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, List.of(id), modes);
+            results.put("partitionId",suLatest.getFirst().getCampaignId());
+            results.put("surveyUnitId",suLatest.getFirst().getSurveyUnitId());
+            results.put("contextualId",suLatest.getFirst().getContextualId());
+            results.put("mode",suLatest.getFirst().getMode());
+            results.put("isCapturedIndirectly",suLatest.getFirst().getIsCapturedIndirectly());
+            results.put("validationDate",suLatest.getFirst().getValidationDate());
+            log.info("InterrogationId {} retrieved from Genesis",id.getId());
+            vtlBindings = new VtlBindings();
+            unimodalProcess(suLatest);
+            multimodalProcess();
+            insertDatabase();
+            results.put("data",transformDataToJson());
+            if (!database.isClosed()){database.close();}
+        }catch (SQLException e){
+            log.error(e.toString());
+            throw new KraftwerkException(500,"SQL error");
+        }
+        SqlUtils.deleteDatabaseFile(databasePath);
+        return results;
+    }
+
 
 	private void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
 		BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
@@ -211,6 +250,9 @@ public class MainProcessingGenesis {
 		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
 	}
 
+	/**
+	 * @author Adrien Marchal
+	 */
 	/* Step 5 : Write output files */
 	private void outputFileWriter() throws KraftwerkException {
 		WriterSequence writerSequence = new WriterSequence();
