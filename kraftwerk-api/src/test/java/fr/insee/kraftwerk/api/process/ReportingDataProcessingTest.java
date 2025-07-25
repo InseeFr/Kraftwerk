@@ -5,6 +5,8 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
 import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -12,6 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.io.File;
 import java.nio.file.Path;
 
+import static fr.insee.kraftwerk.api.TestConstants.TEST_RESOURCES_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +24,8 @@ class ReportingDataProcessingTest {
 
     @MockitoBean
     private ReportingDataProcessing spyReportingDataProcessing;
+
+    FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TEST_RESOURCES_DIRECTORY);
 
     @Test
     void runProcessMain_Test() throws KraftwerkException {
@@ -33,7 +38,7 @@ class ReportingDataProcessingTest {
         Path inDirParam = Path.of(defaultDir, "in", inDirectory);
 
         // 2. Launch test
-        spyReportingDataProcessing.runProcessMain(null, defaultDir, inDirectory, null);
+        spyReportingDataProcessing.runProcessMain(fileUtilsInterface, defaultDir, inDirectory, null);
 
         // 3. checks
         verify(spyReportingDataProcessing, times(1)).runProcess(any(), eq(inDirParam), eq(inDirParam), any());
@@ -53,7 +58,7 @@ class ReportingDataProcessingTest {
         Path specDirectory = Path.of(defaultDir, "specs", inDirectory);
 
         // 2. Launch test
-        spyReportingDataProcessing.runProcessGenesis(null, mode, defaultDir, inDirectory, null);
+        spyReportingDataProcessing.runProcessGenesis(fileUtilsInterface, mode, defaultDir, inDirectory, null);
 
         // 3. checks
         verify(spyReportingDataProcessing, times(1)).runProcess(any(), eq(inDirParam), eq(specDirectory), any());
@@ -72,7 +77,7 @@ class ReportingDataProcessingTest {
         doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 3. checks
-        Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null));
+        Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, fileUtilsInterface));
         assertEquals("Reporting data file aaa.xyz not found !", exception.getMessage());
     }
 
@@ -90,7 +95,7 @@ class ReportingDataProcessingTest {
         doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 3. checks
-        Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null));
+        Throwable exception = assertThrows(KraftwerkException.class, () -> spyReportingDataProcessing.parseReportingData(mockModeInputs, null, fileUtilsInterface));
         assertEquals("Reporting data file path must be a xml or csv file ! Got " + absolutePath, exception.getMessage());
     }
 
@@ -108,7 +113,7 @@ class ReportingDataProcessingTest {
         doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 2. Launch test
-        spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null);
+        spyReportingDataProcessing.parseReportingData(mockModeInputs, null, fileUtilsInterface);
 
         // 3. checks
         verify(mockXMLReportingDataParser, times(1)).parseReportingData(any(), any(), eq(true));
@@ -129,7 +134,7 @@ class ReportingDataProcessingTest {
         doReturn(mockCSVReportingDataParser).when(spyReportingDataProcessing).getCSVReportingDataParser(any());
 
         // 2. Launch test
-        spyReportingDataProcessing.parseReportingData(mockModeInputs, null, null);
+        spyReportingDataProcessing.parseReportingData(mockModeInputs, null, fileUtilsInterface);
 
         // 3. checks
         verify(mockXMLReportingDataParser, times(0)).parseReportingData(any(), any(), eq(true));
