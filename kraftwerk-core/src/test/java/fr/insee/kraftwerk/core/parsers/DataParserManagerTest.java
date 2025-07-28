@@ -23,7 +23,7 @@ class DataParserManagerTest {
 
     @ParameterizedTest
     @MethodSource("getParserParameterizedTests")
-    void kraftwerkServiceType_ParameterizedTests(DataFormat dataFormatParam, Class<?> cls) {
+    void getParser_ParameterizedTests(DataFormat dataFormatParam, Class<?> cls) {
         SurveyRawData data = new SurveyRawData();
         DataParser dataParser = DataParserManager.getParser(dataFormatParam, data, null);
         assertInstanceOf(cls, dataParser);
