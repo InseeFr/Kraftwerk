@@ -109,7 +109,7 @@ public class ReportingDataProcessing {
 
     public void parseReportingData(ModeInputs modeInputs, SurveyRawData data, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
         Path reportingDataFile = modeInputs.getReportingDataFile();
-        if(!reportingDataFile.toFile().exists()){
+        if(!fileUtilsInterface.isFileExists(reportingDataFile.toString())){
             throw new KraftwerkException(404,
                     "Reporting data file %s not found !".formatted(reportingDataFile.toString()));
         }
