@@ -25,7 +25,7 @@ jobs:
       - name: Extract version from PR title
         id: extract_version
         run: |
-          TITLE_VERSION=$(echo '${{ github.event.pull_request.title }}' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          TITLE_VERSION=$(echo '${{ github.event.pull_request.title }}' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
           if [ -z "$TITLE_VERSION" ]; then
             echo "No version in PR title. Will increment patch from current pom version."
           else
@@ -46,36 +46,10 @@ jobs:
           if [ -n "${{ steps.extract_version.outputs.title_version }}" ]; then
             BASE_VERSION="${{ steps.extract_version.outputs.title_version }}"
           else
-            # Increment patch version from current version
             CUR="${{ steps.current_version.outputs.current_version }}"
             IFS='.' read -r MAJOR MINOR PATCH <<< "$CUR"
             PATCH=$((PATCH + 1))
             BASE_VERSION="$MAJOR.$MINOR.$PATCH"
             echo "Auto-incremented patch version: $BASE_VERSION"
           fi
-          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Determine final version
-        id: final_version
-        run: |
-          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'Version Update - Staging') }}" == "true" ]]; then
-            FINAL_VERSION="${{ steps.base_version.outputs.base_version }}-${{ steps.sha.outputs.sha_short }}"
-          else
-            FINAL_VERSION="${{ steps.base_version.outputs.base_version }}"
-          fi
-          echo "Final version to set: $FINAL_VERSION"
-          echo "final_version=$FINAL_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Update Maven Version
-        run: |
-          mvn versions:set -DnewVersion="${{ steps.final_version.outputs.final_version }}" -DprocessAllModules
-          mvn versions:commit
-
-      - name: Commit and Push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name 'github-actions'
-          git config user.email 'github-actions@github.com'
-          git commit -am "chore: update version to ${{ steps.final_version.outputs.final_version }}" || echo "No changes to commit"
-          git push
+          echo "base_version=$BASE_VE
