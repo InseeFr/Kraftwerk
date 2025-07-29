@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Campaign>
+    <Id>TEST01</Id>
+    <Label>Fake campaign to test XForms XML contents</Label>
+    <Questionnaires>
+        <Questionnaire>
+            <InformationsGenerales>
+                <UniteEnquetee>
+                    <Identifiant>Q1</Identifiant>
+                </UniteEnquetee>
+            </InformationsGenerales>
+            <InformationsPersonnalisees>
+                <Variable idVariable="Q1-IDV1">
+                    <Valeur type="ancienne">Q1-IDV1-oldVal</Valeur>
+                    <Valeur type="nouvelle">Q1-IDV1-newVal</Valeur>
+                </Variable>
+                <Variable idVariable="Q1-IDV2"/>
+                <Groupe>
+                    <Groupe idGroupe="Q1-IDG1" typeGroupe="Q1-TG1">
+                        <Variable idVariable="Q1-IDG1-IDV1">
+                            <Valeur type="ancienne">Q1-IDG1-IDV1-oldVal</Valeur>
+                            <Valeur type="nouvelle">Q1-IDG1-IDV1-newVal</Valeur>
+                        </Variable>
+                    </Groupe>
+                </Groupe>
+            </InformationsPersonnalisees>
+        </Questionnaire>
+    </Questionnaires>
+</Campaign>
