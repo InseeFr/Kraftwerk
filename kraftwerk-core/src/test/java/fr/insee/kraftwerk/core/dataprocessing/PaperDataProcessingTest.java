@@ -113,9 +113,9 @@ class PaperDataProcessingTest {
 		Assertions.assertEquals("aaa := union(aaa,aaa);", vtlScript.get(0));
 
 		StringBuilder sbModalityInstruction = new StringBuilder();
-		sbModalityInstruction.append("aaa := aaa [calc UCQ_VAR_1 := if UCQ_VAR_1_1 = \"1\" then \"val1\" else (\r\n");
-		sbModalityInstruction.append("if UCQ_VAR_1_2 = \"1\" then \"val2\" else (\r\n");
-		sbModalityInstruction.append("if UCQ_VAR_1_3 = \"1\" then \"val3\" else (\r\n");
+		sbModalityInstruction.append("aaa := aaa [calc UCQ_VAR_1 := if UCQ_VAR_1_1 = \"1\" then \"val1\" else (" + System.lineSeparator());
+		sbModalityInstruction.append("if UCQ_VAR_1_2 = \"1\" then \"val2\" else (" + System.lineSeparator());
+		sbModalityInstruction.append("if UCQ_VAR_1_3 = \"1\" then \"val3\" else (" + System.lineSeparator());
 		sbModalityInstruction.append("if UCQ_VAR_1_4 = \"1\" then \"val4\" else \"\" )))];");
 		Assertions.assertEquals(sbModalityInstruction.toString(), vtlScript.get(1));
 	}

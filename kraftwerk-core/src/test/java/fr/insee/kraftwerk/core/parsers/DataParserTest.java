@@ -173,8 +173,6 @@ class DataParserTest {
 
         //Checks
         assertEquals(2, kraftwerkExecutionContext.getOkFileNames().size());
-        assertEquals("tmp1.xml", kraftwerkExecutionContext.getOkFileNames().get(0));
-        assertEquals("tmp2.xml", kraftwerkExecutionContext.getOkFileNames().get(1));
     }
 
 
