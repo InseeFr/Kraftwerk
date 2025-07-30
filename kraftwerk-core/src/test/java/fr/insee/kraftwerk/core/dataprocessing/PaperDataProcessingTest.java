@@ -1,15 +1,12 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.bpm.metadata.model.Group;
-import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.Variable;
-import fr.insee.bpm.metadata.model.VariableType;
-import fr.insee.bpm.metadata.model.VariablesMap;
+import fr.insee.bpm.metadata.model.*;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import fr.insee.kraftwerk.core.vtl.VtlScript;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -60,6 +57,24 @@ class PaperDataProcessingTest {
 		}
 	}
 
+
+	private void addPaperUcqWithModalities(VariablesMap variablesMap, Group group, String variableName, int modalitiesNumber) {
+		UcqVariable ucq = new UcqVariable(variableName, group, VariableType.STRING);
+		variablesMap.putVariable(ucq);
+		for (int k=1; k < modalitiesNumber+1; k++) {
+			//1) Add modality to Ucq variable
+			UcqModality ucqModality = new UcqModality();
+			ucqModality.setValue("val" + k);
+			ucqModality.setText("text" + k);
+			ucqModality.setVariableName(String.format("%s_%s", variableName, k));
+			ucq.addModality(ucqModality);
+			//2) add modality as an associated simple variable to variablesMap
+			Variable ucqModalityVariable = new Variable(String.format("%s_%s", variableName, k), group, VariableType.STRING);
+			variablesMap.putVariable(ucqModalityVariable);
+		}
+	}
+
+
 	@Test
 	void testPaperDataProcessing() {
 		//
@@ -82,4 +97,27 @@ class PaperDataProcessingTest {
 		Assertions.assertNotNull(paperDsModified);
 		
 	}
+
+
+	@Test
+	void generateVtlInstructions() {
+
+		MetadataModel metadataModel = new MetadataModel();
+		addPaperUcqWithModalities(metadataModel.getVariables(), metadataModel.getRootGroup(), "UCQ_VAR_1", 4);
+		//
+		//NOTE : "vtlBindings" param has no incidence on "generateVtlInstructions()" function
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(null, metadataModel, fileUtilsInterface);
+		VtlScript vtlScript = paperDataProcessing.generateVtlInstructions("aaa");
+		//
+		Assertions.assertEquals(2, vtlScript.size());
+		Assertions.assertEquals("aaa := union(aaa,aaa);", vtlScript.get(0));
+
+		StringBuilder sbModalityInstruction = new StringBuilder();
+		sbModalityInstruction.append("aaa := aaa [calc UCQ_VAR_1 := if UCQ_VAR_1_1 = \"1\" then \"val1\" else (\r\n");
+		sbModalityInstruction.append("if UCQ_VAR_1_2 = \"1\" then \"val2\" else (\r\n");
+		sbModalityInstruction.append("if UCQ_VAR_1_3 = \"1\" then \"val3\" else (\r\n");
+		sbModalityInstruction.append("if UCQ_VAR_1_4 = \"1\" then \"val4\" else \"\" )))];");
+		Assertions.assertEquals(sbModalityInstruction.toString(), vtlScript.get(1));
+	}
+
 }
