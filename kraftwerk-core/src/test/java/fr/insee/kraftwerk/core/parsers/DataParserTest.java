@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.parsers;
 
-
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.NullException;
@@ -8,20 +7,14 @@ import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import nu.xom.Builder;
-import nu.xom.ValidityException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class DataParserTest {
 

@@ -120,10 +120,10 @@ class TextFileWriterTest {
         //Add errors
         //NOTE : "ErrorVtlTransformation" will generate 3 lines in the "errors.txt" file.
         kraftwerkExecutionContext.getErrors().add(new ErrorVtlTransformation("testVtlTransformation","testVtlTransformation-error-msg"));
-        Variable var = new Variable("TESTVAR1234",new Group("TESTGROUP"), VariableType.STRING, "2887.expected_length");
-        var.setMaxLengthData(3578);
+        Variable var1 = new Variable("TESTVAR1234",new Group("TESTGROUP"), VariableType.STRING, "2887.expected_length");
+        var1.setMaxLengthData(3578);
         //NOTE : "ErrorVariableLength" will generate 2 lines in the "errors.txt" file.
-        kraftwerkExecutionContext.getErrors().add(new ErrorVariableLength(var,"WEB-ABCD"));
+        kraftwerkExecutionContext.getErrors().add(new ErrorVariableLength(var1,"WEB-ABCD"));
         FileUtilsInterface fileUtils = new FileSystemImpl(tempDir.toString());
 
         TextFileWriter.writeErrorsFile(fullPath, kraftwerkExecutionContext, fileUtils);
@@ -141,7 +141,6 @@ class TextFileWriterTest {
         assertNotEquals(0, errorFilePath.toFile().length());
         //4) check log file content
         List<String> content = Files.readAllLines(errorFilePath);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
         List<String> expectedContent = new LinkedList<>();
         expectedContent.add("VTL Transformation error detected on :");
         expectedContent.add("Script='testVtlTransformation'");

@@ -37,7 +37,7 @@ class XformsDataParserTest {
 
 
     @Test
-    void parseDataFile_EmptyMetadataModel_Test() throws NullException {
+    void parseDataFile_EmptyMetadataModel_Test() {
         //
         SurveyRawData data = new SurveyRawData("TEST");
         //PREDICATE : "data..getMetadataModel()" MUST NOT BE NULL! -> function "parseDataFile()" must evolve to manage that case!
@@ -54,7 +54,7 @@ class XformsDataParserTest {
 
 
     @Test
-    void parseDataFile_NotEmptyMetadataModel_Test() throws NullException {
+    void parseDataFile_NotEmptyMetadataModel_Test() {
         //
         SurveyRawData data = new SurveyRawData("TEST");
         //PREDICATE : "data..getMetadataModel()" MUST NOT BE NULL! -> function "parseDataFile()" must evolve to manage that case!
