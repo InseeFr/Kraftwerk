@@ -6,7 +6,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -72,7 +72,7 @@ class MainServiceTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
     @MockitoBean
-    private MainProcessingGenesis mainProcessingGenesis;
+    private MainProcessingGenesisLegacy mainProcessingGenesisLegacy;
     @MockitoBean
     private MainProcessing mainProcessing;
     @MockitoBean
@@ -133,7 +133,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Kraftwerk users should access main services with Genesis")
     void kraftwerk_users_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(), anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(), anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("USER"), USER_KRAFTWERK);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -165,7 +165,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Admins should access main services with genesis")
     void admins_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(),anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("ADMIN"), ADMIN);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -197,7 +197,7 @@ class MainServiceTest {
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Incorrect roles should not access main services with Genesis")
     void no_correct_roles_should_not_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(),anyInt());
         Jwt jwt = testUtils.generateJwt(List.of(""), "Not_a_good_role");
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
@@ -346,7 +346,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
@@ -368,7 +368,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -389,7 +389,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -411,7 +411,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -433,7 +433,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -454,7 +454,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));

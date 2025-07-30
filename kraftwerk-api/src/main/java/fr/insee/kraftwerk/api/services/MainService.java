@@ -6,7 +6,8 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -115,7 +116,7 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
-		return runWithGenesis(questionnaireId, withDDI, withEncryption, batchSize);
+		return runWithGenesisByQuestionnaire(questionnaireId, withDDI, withEncryption, batchSize);
 	}
 
 
@@ -142,7 +143,7 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = true;
 		boolean withEncryption = false;
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 		Map<String,Object> results;
 		try {
 			results = mpGenesis.runMainJson(campaignId, interrogationId);
@@ -176,7 +177,7 @@ public class MainService extends KraftwerkService {
 	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
@@ -188,10 +189,27 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(campaignId);
 	}
 
+	@NotNull
+	private ResponseEntity<String> runWithGenesisByQuestionnaire(String questionnaireModelId,  boolean withDDI, boolean withEncryption, int batchSize) {
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+
+		try {
+			mpGenesis.runMain(questionnaireModelId, batchSize);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(questionnaireModelId);
+	}
 
 
 
-	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+
+	@NotNull
+	MainProcessingGenesisLegacy getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
 
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				null,
@@ -201,7 +219,26 @@ public class MainService extends KraftwerkService {
 				limitSize
 		);
 
-		return new MainProcessingGenesis(
+		return new MainProcessingGenesisLegacy(
+				configProperties,
+				new GenesisClient(new RestTemplateBuilder(), configProperties),
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
+	}
+
+	@NotNull
+	MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				withDDI,
+				withEncryption,
+				limitSize
+		);
+
+		return new MainProcessingGenesisNew(
 				configProperties,
 				new GenesisClient(new RestTemplateBuilder(), configProperties),
 				fileUtilsInterface,

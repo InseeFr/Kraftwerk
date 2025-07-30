@@ -6,7 +6,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -179,13 +179,13 @@ public class GenesisDefinitions {
                 TestConstants.getKraftwerkExecutionContext(null, isUsingEncryption);
 
 
-        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+        MainProcessingGenesisLegacy mainProcessingGenesisLegacy = new MainProcessingGenesisLegacy(
                 configStub,
                 genesisClientStub,
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 kraftwerkExecutionContext
         );
-        mainProcessingGenesis.runMain(campaignId,1000);
+        mainProcessingGenesisLegacy.runMain(campaignId,1000);
         System.out.println();
     }
 
