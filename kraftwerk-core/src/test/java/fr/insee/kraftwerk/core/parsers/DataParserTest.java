@@ -22,7 +22,7 @@ class DataParserTest {
 
 
     @Test
-    void parseDataFileWithoutDDI(@TempDir Path tempDir) throws Exception {
+    void parseDataFileWithoutDDI(@TempDir Path tempDir) {
         //PREDICATE : "SurveyRawData" MUST NOT BE NULL!
         SurveyRawData data = new SurveyRawData();
         FileUtilsInterface fileUtilsInterface = new FileSystemImpl(tempDir.toString());

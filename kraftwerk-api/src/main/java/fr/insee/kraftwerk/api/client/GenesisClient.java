@@ -143,7 +143,6 @@ public class GenesisClient {
 	public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
 		String url = String.format("%s/questionnaires/by-interrogation?interrogationId=%s", configProperties.getGenesisUrl(), interrogationId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
-		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
