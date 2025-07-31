@@ -28,7 +28,7 @@ class DataParserTest {
         FileUtilsInterface fileUtilsInterface = new FileSystemImpl(tempDir.toString());
         //Note : As "DataParser" is abstract, we instanciate an implementation (here : "XformsDataParser") to unit-test the "DataParser" methods
         DataParser dataParser = new XformsDataParser(data, fileUtilsInterface);
-        dataParser.parseDataFileWithoutDDI(null, null);
+        assertDoesNotThrow(() -> dataParser.parseDataFileWithoutDDI(null, null));
     }
 
 
