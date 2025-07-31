@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.4.1 [2025-07-31]
+### Fixed
+- Reporting data not found on MinIO
+- Spring doc missing description
+### Updated
+- DuckDB 1.3.2.0
+- Trevas 1.10.0
+- Spring boot 3.5.4
+- OpenCSV 5.12.0
+- Cucumber 7.27.0
+- Pitest 1.20.1
+
 ## 3.4.0 [2025-07-08]
 ### Added
 - First version of JSON export
