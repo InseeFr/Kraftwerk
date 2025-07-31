@@ -15,7 +15,7 @@
 
     <properties>
         <lib_java_chiffrement.version>1.3.2</lib_java_chiffrement.version>
-        <kraftwerk.version>3.4.0</kraftwerk.version>
+        <kraftwerk.version>3.4.1</kraftwerk.version>
     </properties>
     <dependencies>
 

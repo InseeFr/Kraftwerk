@@ -12,7 +12,7 @@
 	<name>kraftwerk-tests</name>
 
 	<properties>
-		<kraftwerk.version>3.4.0</kraftwerk.version>
+		<kraftwerk.version>3.4.1</kraftwerk.version>
 	</properties>
 
 	<dependencies>
