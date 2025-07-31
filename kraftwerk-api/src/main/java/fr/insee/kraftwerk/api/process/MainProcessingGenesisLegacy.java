@@ -7,10 +7,8 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
-import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.log4j.Log4j2;
@@ -60,7 +58,7 @@ public class MainProcessingGenesisLegacy extends AbstractMainProcessingGenesis{
 				throw new KraftwerkException(204, null);
 			}
 			for (String questionnaireId : questionnaireModelIds) {
-				processDataByBatch(questionnaireId,batchSize);
+				processDataByBatch(questionnaireId,batchSize,null);
 			}
 			outputFileWriter();
 			writeErrors();

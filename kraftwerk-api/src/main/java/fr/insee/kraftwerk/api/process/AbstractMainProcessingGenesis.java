@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
@@ -82,7 +83,7 @@ public abstract class AbstractMainProcessingGenesis {
         }
     }
 
-    protected void processDataByBatch(String questionnaireModelId, int batchSize) throws KraftwerkException {
+    protected void processDataByBatch(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException {
         List<InterrogationId> ids = client.getInterrogationIds(questionnaireModelId);
         List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
         int nbPartitions = listIds.size();
@@ -91,6 +92,9 @@ public abstract class AbstractMainProcessingGenesis {
             List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, listId);
             log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
             vtlBindings = new VtlBindings();
+            if (dataMode != null){
+                suLatest = suLatest.stream().filter(su-> su.getMode()==dataMode).toList();
+            }
             unimodalProcess(suLatest);
             multimodalProcess();
             insertDatabase();

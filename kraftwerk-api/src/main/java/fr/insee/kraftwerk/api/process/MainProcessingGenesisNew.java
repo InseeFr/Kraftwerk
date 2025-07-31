@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.api.process;
 
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
@@ -25,7 +26,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         super(config,genesisClient,fileUtilsInterface,kraftwerkExecutionContext);
     }
 
-    public void runMain(String questionnaireModelId, int batchSize) throws KraftwerkException, IOException {
+    public void runMain(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
         log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty("java.io.tmpdir"),
                 questionnaireModelId));
@@ -42,7 +43,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 throw new KraftwerkException(500,"Error during internal database creation");
             }
             this.database = tryDatabase.createStatement();
-            processDataByBatch(questionnaireModelId, batchSize);
+            processDataByBatch(questionnaireModelId, batchSize, dataMode);
             outputFileWriter();
             writeErrors();
             if (!database.isClosed()){database.close();}
