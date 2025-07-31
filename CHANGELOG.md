@@ -11,6 +11,7 @@
 - OpenCSV 5.12.0
 - Cucumber 7.27.0
 - Pitest 1.20.1
+- Commons-compress 1.28.0
 
 ## 3.4.0 [2025-07-08]
 ### Added
