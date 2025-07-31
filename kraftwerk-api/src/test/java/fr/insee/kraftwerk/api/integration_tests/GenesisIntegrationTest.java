@@ -54,7 +54,8 @@ class GenesisIntegrationTest {
     @Test
     void getInterrogationIds_test() throws KraftwerkException {
         //When
-        List<InterrogationId> response = genesisClient.getInterrogationIds(QUESTIONNAIRE_ID);
+        //REMINDER : if "totalSize" param is set to "0", "countInterrogationIdsByQuestionnaireId()" will be called to know the exact quantity of data to process.
+        List<InterrogationId> response = genesisClient.getPaginatedInterrogationIds(QUESTIONNAIRE_ID, 0, 1000, 0);
         log.debug("Get interrogationIds returned :\n{}", response);
 
         //Then
@@ -81,8 +82,11 @@ class GenesisIntegrationTest {
             interrogationIds.add(interrogationId);
         }
 
+        List<String> modes = new ArrayList<>();
+        modes.add("WEB");
+
         //When
-        List<SurveyUnitUpdateLatest> response = genesisClient.getUEsLatestState(QUESTIONNAIRE_ID, interrogationIds);
+        List<SurveyUnitUpdateLatest> response = genesisClient.getUEsLatestState(QUESTIONNAIRE_ID, interrogationIds, modes);
         log.debug("Get UEs latest states returned :\n{}", response);
 
         //Then

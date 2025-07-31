@@ -1,10 +1,12 @@
 package stubs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<InterrogationId> getInterrogationIds(String questionnaireId) {
+    public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) {
         List<InterrogationId> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
@@ -46,7 +48,28 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<Mode> getModes(String campaignId) {
+    public Long countInterrogationIds(String questionnaireId) {
+        return 1L;
+    }
+
+    @Override
+    public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) {
+        Set<String> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
+                .filter(
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireId)
+                ).toList();
+
+        for(SurveyUnitUpdateLatest doc : mongoFiltered){
+            set.add(doc.getQuestionnaireId());
+        }
+
+        return set.stream().toList();
+    }
+
+    @Override
+    public List<Mode> getModes(String campaignId) throws KraftwerkException {
         Set<Mode> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
@@ -60,7 +83,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered1 = mongoStub.stream()
@@ -90,7 +113,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<String> getQuestionnaireModelIds(String campaignId) {
+    public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
         Set<String> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered = mongoStub.stream()
@@ -104,4 +127,5 @@ public class GenesisClientStub extends GenesisClient {
 
         return set.stream().toList();
     }
+
 }

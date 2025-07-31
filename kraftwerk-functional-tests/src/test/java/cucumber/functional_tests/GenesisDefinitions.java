@@ -185,9 +185,10 @@ public class GenesisDefinitions {
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 kraftwerkExecutionContext
         );
-        mainProcessingGenesis.runMain(campaignId,1000);
+        mainProcessingGenesis.runMain(campaignId,1000, 1, 1);
         System.out.println();
     }
+
 
     @Then("In root csv output file we should have {string} for survey unit {string}, column {string}")
     public void check_root_csv_output(String value, String interrogationId, String variableName) throws IOException,

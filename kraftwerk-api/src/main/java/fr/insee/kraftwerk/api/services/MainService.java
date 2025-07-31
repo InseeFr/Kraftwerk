@@ -30,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -100,14 +97,19 @@ public class MainService extends KraftwerkService {
 		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
+	/**
+	 * @author Adrien Marchal
+	 */
 	@PutMapping(value = "/main/genesis")
 	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
+			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId) {
 		boolean withDDI = true;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
 	}
 
 
@@ -116,11 +118,14 @@ public class MainService extends KraftwerkService {
 	public ResponseEntity<String> mainGenesisLunaticOnly(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+			@Parameter(description = "Workers number") @RequestParam(value = "workersNumbers", defaultValue = "1") int workersNumbers,
+			@Parameter(description = "WorkerId") @RequestParam(value = "workerId", defaultValue = "1") int workerId
 	) {
 		boolean withDDI = false;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize, workersNumbers, workerId);
 	}
+
 
 	//WIP : poc one interrogation
 	//Objective : give the json with all the data
@@ -163,15 +168,17 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(inDirectoryParam);
 	}
 
-
+	/**
+	 * @author Adrien Marchal
+	 */
 	@NotNull
-	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
+	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize, int workersNumbers, int workerId) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
 		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 
 		try {
-			mpGenesis.runMain(campaignId, batchSize);
+			mpGenesis.runMain(campaignId, batchSize, workersNumbers, workerId);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {

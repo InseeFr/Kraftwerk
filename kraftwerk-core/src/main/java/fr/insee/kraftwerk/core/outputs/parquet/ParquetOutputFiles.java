@@ -46,8 +46,9 @@ public class ParquetOutputFiles extends OutputFiles {
 		super(outDirectory, vtlBindings, modes, database, fileUtilsInterface, kraftwerkExecutionContext, encryptionUtils);
 	}
 
-	
+
 	/**
+	 * @author Adrien Marchal
 	 * Method to write output tables from datasets that are in the bindings.
 	 */
 	@Override

@@ -77,12 +77,36 @@ public class GenesisClient {
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
-	public List<InterrogationId> getInterrogationIds(String questionnaireId) throws KraftwerkException {
-		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s",
-				configProperties.getGenesisUrl(), questionnaireId);
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<InterrogationId> getPaginatedInterrogationIds(String questionnaireId, long totalSize, long blockSize, long page) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire/%s/paginated?totalSize=%s&blockSize=%s&page=%s",
+				configProperties.getGenesisUrl(), questionnaireId, totalSize, blockSize, page);
 		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
+
+
+	/**
+	 * @author Adrien Marchal
+	 */
+	public Long countInterrogationIds(String questionnaireId) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire/%s/count", configProperties.getGenesisUrl(), questionnaireId);
+		ResponseEntity<Long> response = makeApiCall(url,HttpMethod.GET,null, Long.class);
+		return response.getBody() != null ? response.getBody() : null;
+	}
+
+
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<String> getDistinctModesByQuestionnaireId(String questionnaireId) throws KraftwerkException {
+		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+		ResponseEntity<String[]> response = makeApiCall(url,HttpMethod.GET,null, String[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+
 
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
@@ -91,14 +115,25 @@ public class GenesisClient {
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
 	}
+
 	
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) throws KraftwerkException {
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) throws KraftwerkException {
+		//Convert Array into String
+		String modesQueryParam = String.join(",", modes);
+
+		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire-and-modes/latest?questionnaireId=%s&modes=%s",
+				configProperties.getGenesisUrl(), questionnaireId, modesQueryParam);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-    public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
+	/**
+	 * @author Adrien Marchal
+	 */
+	public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -108,7 +143,6 @@ public class GenesisClient {
 	public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
 		String url = String.format("%s/questionnaires/by-interrogation?interrogationId=%s", configProperties.getGenesisUrl(), interrogationId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
-		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? response.getBody() : null;
 	}
 

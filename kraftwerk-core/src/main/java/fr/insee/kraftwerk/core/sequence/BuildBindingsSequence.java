@@ -5,9 +5,6 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
-import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.parsers.DataParser;
@@ -20,13 +17,12 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 @Log4j2
 public class BuildBindingsSequence {
 
 	VtlExecute vtlExecute;
-	private final FileUtilsInterface fileUtilsInterface;
+	private FileUtilsInterface fileUtilsInterface; //NOTE : "@InjectMocks" does not work with "final" keyword in Unit Tests!
 
 	public BuildBindingsSequence(FileUtilsInterface fileUtilsInterface) {
 		vtlExecute = new VtlExecute(fileUtilsInterface);
@@ -58,13 +54,21 @@ public class BuildBindingsSequence {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
+	/**
+	 * package-protected method for unit tests purpose
+	 */
+	void parseParadata(ModeInputs modeInputs, SurveyRawData data) throws NullException {
 		Path paraDataFolder = modeInputs.getParadataFolder();
 		if (paraDataFolder != null) {
-			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
+			ParadataParser paraDataParser = getParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataFolder);
 			paraDataParser.parseParadata(paraData, data);
 		}
+	}
+
+
+	ParadataParser getParadataParser(FileUtilsInterface fileUtilsInterface) {
+		return new ParadataParser(fileUtilsInterface);
 	}
 
 }

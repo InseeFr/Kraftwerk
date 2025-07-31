@@ -29,7 +29,7 @@ public class XmlFileReader {
             if(inputStream == null){
                 return null;
             }
-            Builder parser = new Builder(xsdValidation);
+            Builder parser = getXmlBuilder();
             return parser.build(inputStream);
         } catch (ValidityException ex) {
             log.warn("XSD validation error.", ex);
@@ -47,4 +47,10 @@ public class XmlFileReader {
             return null;
         }
     }
+
+
+    Builder getXmlBuilder() {
+        return new Builder(xsdValidation);
+    }
+
 }

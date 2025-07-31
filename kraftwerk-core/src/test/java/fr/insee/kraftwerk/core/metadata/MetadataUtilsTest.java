@@ -6,9 +6,16 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.inputs.ModeInputs;
+import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.nio.file.Path;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class MetadataUtilsTest {
 
@@ -38,4 +45,66 @@ class MetadataUtilsTest {
         assertEquals(Constants.ROOT_GROUP_NAME,metadata.getVariables().getVariable("COMMENT_QE").getGroup().getName());
 
     }
+
+
+    @Test
+    void getMetadataFromLunatic() {
+        Map<String, ModeInputs> modeInputsMap = new HashMap<>();
+        //PREDICATE FOR THAT TEST : "modeInputs.getLunaticFile()" must not be null & the file must exist!
+        ModeInputs modeInputs1 = new ModeInputs();
+        modeInputs1.setLunaticFile(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "lunatic", "log2021x21_web.json"));
+        modeInputsMap.put("aaa", modeInputs1);
+        ModeInputs modeInputs2 = new ModeInputs();
+        modeInputs2.setLunaticFile(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "lunatic", "log2021x21_web.json")); //same file provided twice
+        modeInputsMap.put("bbb", modeInputs2);
+
+        FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+
+        Map<String, MetadataModel> metadataModels = MetadataUtils.getMetadataFromLunatic(modeInputsMap, fileUtilsInterface);
+
+        //There must be same number of metadataModels than modeInputsMap.size() provided in input parameter
+        assertEquals(2, metadataModels.size());
+    }
+
+
+    @Test
+    void getMetadata() {
+        Map<String, ModeInputs> modeInputsMap = new HashMap<>();
+        //PREDICATE FOR THAT TEST : "modeInputs.getDdiUrl()" must not be null & the DDI file must exist!
+        ModeInputs modeInputs1 = new ModeInputs();
+        modeInputs1.setDdiUrl(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "ddi", "vqs-2021-x00-fo-ddi.xml").toString());
+        modeInputsMap.put("aaa", modeInputs1);
+
+        FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+
+        Map<String, MetadataModel> metadataModels = MetadataUtils.getMetadata(modeInputsMap, fileUtilsInterface);
+
+        //There must be same number of metadataModels than modeInputsMap.size() provided in input parameter
+        assertEquals(1, metadataModels.size());
+        assertEquals(32, metadataModels.get("aaa").getVariables().getVariables().size());
+        assertNull(metadataModels.get("aaa").getGroup("REPORTINGDATA"));
+    }
+
+
+    @Test
+    void getMetadata_with_lunaticAndReportingdataFiles() {
+        Map<String, ModeInputs> modeInputsMap = new HashMap<>();
+        //PREDICATE FOR THAT TEST : "modeInputs.getDdiUrl()" must not be null & the DDI file must exist!
+        ModeInputs modeInputs1 = new ModeInputs();
+        modeInputs1.setDdiUrl(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "ddi", "vqs-2021-x00-fo-ddi.xml").toString());
+        modeInputs1.setLunaticFile(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "lunatic", "log2021x21_web.json"));
+        modeInputs1.setReportingDataFile(Path.of(TestConstants.TEST_RESOURCES_DIRECTORY, "unit_tests", "reportingdata", "reportingdata.xml"));
+        modeInputsMap.put("aaa", modeInputs1);
+
+        FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
+
+        Map<String, MetadataModel> metadataModels = MetadataUtils.getMetadata(modeInputsMap, fileUtilsInterface);
+
+        //There must be same number of metadataModels than modeInputsMap.size() provided in input parameter
+        assertEquals(1, metadataModels.size());
+        assertEquals(269, metadataModels.get("aaa").getVariables().getVariables().size());
+        assertNotNull(metadataModels.get("aaa").getGroup("REPORTINGDATA"));
+    }
+
+
 }

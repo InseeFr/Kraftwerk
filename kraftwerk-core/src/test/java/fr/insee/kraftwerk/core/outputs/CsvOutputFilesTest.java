@@ -97,6 +97,9 @@ class CsvOutputFilesTest {
 		assertTrue(outputDatasetNames.containsAll(Set.of(Constants.ROOT_GROUP_NAME, "LOOP", "FROM_USER")));
 	}
 
+	/**
+	 * @author Adrien Marchal
+	 */
 	@Test
 	@Order(3)
 	void testWriteCsv() throws KraftwerkException, IOException {
