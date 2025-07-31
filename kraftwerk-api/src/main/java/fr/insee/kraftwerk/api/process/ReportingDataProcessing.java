@@ -53,9 +53,6 @@ public class ReportingDataProcessing {
     }
 
 
-    /**
-     * package-scoped method for unit tests coverage
-     */
     void runProcess(FileUtilsInterface fileUtilsInterface,
                            Path inDirectory,
                            Path inOrSpecDirectory,

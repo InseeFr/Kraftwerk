@@ -167,8 +167,6 @@ public class MainProcessingGenesis {
 		List<InterrogationId> ids = client.getPaginatedInterrogationIds(questionnaireId, totalSize, batchSize, absoluteBlockIndex);
 
 		List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireId, ids, modes);
-		//Free RAM with unused List in the rest of the loop.
-		ids = null;
 
 		log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition + 1, workerBlocksNb);
 		vtlBindings = new VtlBindings();
