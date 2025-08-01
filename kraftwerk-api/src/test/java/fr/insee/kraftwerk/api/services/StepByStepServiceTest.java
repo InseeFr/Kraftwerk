@@ -3,7 +3,7 @@ package fr.insee.kraftwerk.api.services;
 import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.TestUtils;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -56,7 +56,7 @@ class StepByStepServiceTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
     @MockitoBean
-    private MainProcessingGenesis mainProcessingGenesis;
+    private MainProcessingGenesisLegacy mainProcessingGenesisLegacy;
     @MockitoBean
     private MainProcessing mainProcessing;
     @MockitoBean

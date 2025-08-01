@@ -6,7 +6,9 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -16,6 +18,7 @@ import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jdk.jfr.DataAmount;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -100,8 +100,15 @@ public class MainService extends KraftwerkService {
 		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
 	}
 
+	/**
+	 * @deprecated
+	 * We decided to switch from campaignId to questionnaireModelId to select data that are extracted.
+	 * One of the reasons is the possibility to face surveys that have multiple questionnaires for one campaign.
+	 * Since 3.4.1
+	 */
+	@Deprecated (since = "3.4.1", forRemoval = true)
 	@PutMapping(value = "/main/genesis")
-	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	@Operation(operationId = "mainGenesis", summary = "${summary.mainGenesis.deprecated}", description = "${description.mainGenesis.deprecated}")
 	public ResponseEntity<String> mainGenesis(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
@@ -110,9 +117,26 @@ public class MainService extends KraftwerkService {
 		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
 	}
 
+	@PutMapping(value = "/main/genesis/by-questionnaire")
+	@Operation(operationId = "mainGenesisByQuestionnaireId", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesisByQuestionnaireId(
+			@Parameter(description = "${param.questionnaireModelId}") @RequestParam(required = true) String questionnaireModelId,
+			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
+		boolean withDDI = true;
+		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+	}
 
+	/**
+	 * @deprecated
+	 * We decided to switch from campaignId to questionnaireModelId to select data that are extracted.
+	 * One of the reasons is the possibility to face surveys that have multiple questionnaires for one campaign.
+	 * Since 3.4.1
+	 */
+	@Deprecated (since = "3.4.1", forRemoval = true)
 	@PutMapping(value = "/main/genesis/lunatic-only")
-	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	@Operation(operationId = "mainGenesisLunaticOnly", summary = "${summary.mainGenesis.lunatic.deprecated}", description = "${description.mainGenesis.lunatic.deprecated}")
 	public ResponseEntity<String> mainGenesisLunaticOnly(
 			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
@@ -120,6 +144,18 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+	}
+
+	@PutMapping(value = "/main/genesis/by-questionnaire/lunatic-only")
+	@Operation(operationId = "mainGenesisLunaticOnlyByQuestionnaire", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
+	public ResponseEntity<String> mainGenesisLunaticOnlyByQuestionnaire(
+			@Parameter(description = "${param.questionnaireModelId}") @RequestParam String questionnaireModelId,
+			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+	) {
+		boolean withDDI = false;
+		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
 	}
 
 	//WIP : poc one interrogation
@@ -134,7 +170,7 @@ public class MainService extends KraftwerkService {
 		boolean withDDI = true;
 		boolean withEncryption = false;
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 		Map<String,Object> results;
 		try {
 			results = mpGenesis.runMainJson(campaignId, interrogationId);
@@ -168,7 +204,7 @@ public class MainService extends KraftwerkService {
 	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 
-		MainProcessingGenesis mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
 
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
@@ -180,10 +216,27 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(campaignId);
 	}
 
+	@NotNull
+	private ResponseEntity<String> runWithGenesisByQuestionnaire(String questionnaireModelId,  boolean withDDI, boolean withEncryption, int batchSize, Mode dataMode) {
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+
+		try {
+			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(questionnaireModelId);
+	}
 
 
 
-	@NotNull MainProcessingGenesis getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+
+	@NotNull
+	MainProcessingGenesisLegacy getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
 
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				null,
@@ -193,7 +246,26 @@ public class MainService extends KraftwerkService {
 				limitSize
 		);
 
-		return new MainProcessingGenesis(
+		return new MainProcessingGenesisLegacy(
+				configProperties,
+				new GenesisClient(new RestTemplateBuilder(), configProperties),
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
+	}
+
+	@NotNull
+	MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+
+		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+				null,
+				false,
+				withDDI,
+				withEncryption,
+				limitSize
+		);
+
+		return new MainProcessingGenesisNew(
 				configProperties,
 				new GenesisClient(new RestTemplateBuilder(), configProperties),
 				fileUtilsInterface,

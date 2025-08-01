@@ -5,10 +5,9 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -97,13 +96,13 @@ public class KraftwerkBatch implements CommandLineRunner {
                 );
 
                 if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
-                    MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+                    MainProcessingGenesisLegacy mainProcessingGenesisLegacy = new MainProcessingGenesisLegacy(
                         configProperties,
                         new GenesisClient(new RestTemplateBuilder(), configProperties),
                         fileSystem,
                         kraftwerkExecutionContext
                     );
-                    mainProcessingGenesis.runMain(inDirectory,1000);
+                    mainProcessingGenesisLegacy.runMain(inDirectory,1000);
                 } else {
                     MainProcessing mainProcessing = new MainProcessing(
                             kraftwerkExecutionContext,
