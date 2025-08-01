@@ -120,12 +120,12 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis/by-questionnaire")
 	@Operation(operationId = "mainGenesisByQuestionnaireId", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisByQuestionnaireId(
-			@Parameter(description = "${param.questionnaireModelId}") @RequestParam(required = true) String questionnaireId,
+			@Parameter(description = "${param.questionnaireModelId}") @RequestParam(required = true) String questionnaireModelId,
 			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
-		return runWithGenesisByQuestionnaire(questionnaireId, withDDI, withEncryption, batchSize, dataMode);
+		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
 	}
 
 	/**
