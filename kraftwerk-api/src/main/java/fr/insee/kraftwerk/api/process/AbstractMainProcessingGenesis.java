@@ -66,12 +66,12 @@ public abstract class AbstractMainProcessingGenesis {
         this.kraftwerkExecutionContext = kraftwerkExecutionContext;
     }
 
-    public void init(String dataSelectionIdentifier) throws KraftwerkException {
+    public void init(String dataSelectionIdentifier, List<Mode> modes) throws KraftwerkException {
         specsDirectory= Paths.get(config.getDefaultDirectory(),"specs", dataSelectionIdentifier);
         //First we check the modes present in database for the given questionnaire
         //We build userInputs for the given questionnaire
         userInputs = new UserInputsGenesis(specsDirectory,
-                client.getModes(dataSelectionIdentifier), fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
+                modes, fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
         if (!userInputs.getModes().isEmpty()) {
             try {
                 metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
@@ -79,7 +79,7 @@ public abstract class AbstractMainProcessingGenesis {
                 throw new KraftwerkException(500, e.getMessage());
             }
         } else {
-            log.error("No specs found in folder {}", dataSelectionIdentifier);
+            throw new KraftwerkException(404, String.format("No modes found in genesis for %s", dataSelectionIdentifier));
         }
     }
 

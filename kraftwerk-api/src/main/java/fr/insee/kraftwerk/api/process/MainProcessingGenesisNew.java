@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 @Slf4j
 public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
@@ -34,7 +35,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         SqlUtils.deleteDatabaseFile(databasePath);
         log.info("Kraftwerk main service started for questionnaire: {} {}", questionnaireModelId, kraftwerkExecutionContext.isWithDDI()
                 ? "with DDI": "without DDI");
-        init(questionnaireModelId);
+        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
+        init(questionnaireModelId, modes);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
