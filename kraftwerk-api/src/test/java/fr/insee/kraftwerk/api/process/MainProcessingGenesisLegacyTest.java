@@ -32,10 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureMockMvc
 @Import(TestConfig.class)
 @ComponentScan(basePackages = {"fr.insee.kraftwerk.core.encryption", "fr.insee.kraftwerk.core.outputs"})
-class MainProcessingGenesisTest {
+class MainProcessingGenesisLegacyTest {
 
     private ConfigProperties configProperties;
-    private MainProcessingGenesis mainProcessing;
+    private MainProcessingGenesisLegacy mainProcessing;
     private RestTemplate restTemplate;
 
 
@@ -91,7 +91,7 @@ class MainProcessingGenesisTest {
                 419430400L
         );
 
-        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
+        mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
     @Test

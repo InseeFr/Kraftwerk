@@ -6,7 +6,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -88,6 +89,22 @@ public class GenesisDefinitions {
         surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
     }
 
+    @Given("We have a collected variable {string} in a document with QuestionnaireModelId {string}, InterrogationId {string} " +
+            "with value {string}")
+    public void add_collected_variable_document_by_questionnaire(String variableName, String questionnaireModelId, String interrogationId,
+                                                String value) {
+
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatestByQuestionnaire(questionnaireModelId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
+        variableModel.setIteration(1);
+        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
+    }
+
     @Given("We have a collected variable {string} in a loop named {string} iteration {int} in a document with " +
             "CampaignId " +
             "{string}, " +
@@ -99,6 +116,29 @@ public class GenesisDefinitions {
                                                      String value) {
 
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
+        variableModel.setScope(loopName);
+        variableModel.setIteration(iteration);
+        variableModel.setIdParent(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getCollectedVariables().add(variableModel);
+    }
+
+    @Given("We have a collected variable {string} in a loop named {string} iteration {int} in a document with " +
+            "QuestionnaireModelId " +
+            "{string}, " +
+            "InterrogationId {string} with value {string}")
+    public void add_loop_collected_variable_document_by_questionnaire( String variableName,
+                                                                       String loopName,
+                                                                       int iteration,
+                                                                       String questionnaireModelId,
+                                                                       String interrogationId,
+                                                                       String value) {
+
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatestByQuestionnaire(questionnaireModelId, interrogationId);
 
         VariableModel variableModel = new VariableModel();
         variableModel.setVarId(variableName);
@@ -127,6 +167,23 @@ public class GenesisDefinitions {
         surveyUnitUpdateLatest.getExternalVariables().add(variableModel);
     }
 
+    @Given("We have a external variable {string} in a document with QuestionnaireModelId {string}, InterrogationId {string} " +
+            "with value {string}")
+    public void add_external_variable_document_by_questionnaire(String variableName,
+                                                                String questionnaireModelId,
+                                                                String interrogationId,
+                                                                String value) {
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatestByQuestionnaire(questionnaireModelId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
+        variableModel.setIteration(1);
+        variableModel.setScope(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getExternalVariables().add(variableModel);
+    }
+
     @Given("We have a external variable {string} in a loop named {string} iteration {int} in a document with " +
             "CampaignId " +
             "{string}, " +
@@ -140,6 +197,30 @@ public class GenesisDefinitions {
     ) {
 
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatest(campaignId, interrogationId);
+
+        VariableModel variableModel = new VariableModel();
+        variableModel.setVarId(variableName);
+        variableModel.setScope(loopName);
+        variableModel.setIteration(iteration);
+        variableModel.setIdParent(Constants.ROOT_GROUP_NAME);
+        variableModel.setValue(value);
+
+        surveyUnitUpdateLatest.getExternalVariables().add(variableModel);
+    }
+
+    @Given("We have a external variable {string} in a loop named {string} iteration {int} in a document with " +
+            "QuestionnaireModelId " +
+            "{string}, " +
+            "InterrogationId {string} with value {string}")
+    public void add_loop_external_variable_document_by_questionnaire(String variableName,
+                                                    String loopName,
+                                                    int iteration,
+                                                    String questionnaireModelId,
+                                                    String interrogationId,
+                                                    String value
+    ) {
+
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = getSurveyUnitUpdateLatestByQuestionnaire(questionnaireModelId, interrogationId);
 
         VariableModel variableModel = new VariableModel();
         variableModel.setVarId(variableName);
@@ -175,11 +256,36 @@ public class GenesisDefinitions {
         return surveyUnitUpdateLatest;
     }
 
+    private SurveyUnitUpdateLatest getSurveyUnitUpdateLatestByQuestionnaire(String questionnaireModelId, String interrogationId) {
+        List<SurveyUnitUpdateLatest> mongoFiltered = genesisClientStub.getMongoStub().stream().filter(
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireModelId)
+                        && surveyUnitUpdateLatest.getInterrogationId().equals(interrogationId)
+        ).toList();
+
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest;
+        if (mongoFiltered.isEmpty()) {
+            surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
+
+            surveyUnitUpdateLatest.setCampaignId(questionnaireModelId);
+            surveyUnitUpdateLatest.setQuestionnaireId(questionnaireModelId);
+            surveyUnitUpdateLatest.setInterrogationId(interrogationId);
+            surveyUnitUpdateLatest.setMode(Mode.WEB);
+
+            surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
+            surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
+        } else {
+            surveyUnitUpdateLatest = mongoFiltered.getFirst();
+        }
+        genesisClientStub.getMongoStub().add(surveyUnitUpdateLatest);
+        return surveyUnitUpdateLatest;
+    }
+
     @Given("We want to encrypt output data at the end of genesis process")
     public void activateEncryption(){
         this.isUsingEncryption = true;
     }
 
+    // To delete when we remove historical genesis endpoints
     @When("We use the Genesis service with campaignId {string}")
     public void launch_genesis(String campaignId) throws IOException, KraftwerkException {
         configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
@@ -188,13 +294,31 @@ public class GenesisDefinitions {
                 TestConstants.getKraftwerkExecutionContext(null, isUsingEncryption);
 
 
-        MainProcessingGenesis mainProcessingGenesis = new MainProcessingGenesis(
+        MainProcessingGenesisLegacy mainProcessingGenesisLegacy = new MainProcessingGenesisLegacy(
                 configStub,
                 genesisClientStub,
                 new FileSystemImpl(configStub.getDefaultDirectory()),
                 kraftwerkExecutionContext
         );
-        mainProcessingGenesis.runMain(campaignId,1000);
+        mainProcessingGenesisLegacy.runMain(campaignId,1000);
+        System.out.println();
+    }
+
+    @When("We use the Genesis service with questionnaireModelId {string}")
+    public void launch_genesis_by_questionnaire(String questionnaireModelId) throws IOException, KraftwerkException {
+        configStub.setDefaultDirectory(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
+
+        kraftwerkExecutionContext =
+                TestConstants.getKraftwerkExecutionContext(null, isUsingEncryption);
+
+
+        MainProcessingGenesisNew mainProcessingGenesisNew = new MainProcessingGenesisNew(
+                configStub,
+                genesisClientStub,
+                new FileSystemImpl(configStub.getDefaultDirectory()),
+                kraftwerkExecutionContext
+        );
+        mainProcessingGenesisNew.runMain(questionnaireModelId,1000,null);
         System.out.println();
     }
 
