@@ -39,12 +39,16 @@ public class SplitterService extends KraftwerkService{
 		log.info("Split XML file : {} into {} SU by file using {}", filename , nbSU ,
 				(fileSystemType.equals(FileSystemType.MINIO) ? "Minio" : "OS file system"));
 
-		FileUtilsInterface fileUtilsInterface = fileSystemType.equals(FileSystemType.MINIO) ?
-				new MinioImpl(MinioClient.builder().credentials(minioConfig.getAccessKey(),minioConfig.getSecretKey()).endpoint(minioConfig.getEndpoint()).build(), minioConfig.getBucketName()) :
-				new FileSystemImpl(defaultDirectory);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface(fileSystemType);
 
 		XmlSplitter.split(String.format("%s/in/%s/",defaultDirectory,inputFolder), filename, String.format("%s/in/%s/",defaultDirectory,outputFolder), "SurveyUnit", nbSU, fileUtilsInterface);
 		return new ResponseEntity<>("File split", HttpStatus.OK);
+	}
+
+	FileUtilsInterface getFileUtilsInterface(FileSystemType fileSystemType) {
+		return fileSystemType.equals(FileSystemType.MINIO) ?
+				new MinioImpl(MinioClient.builder().credentials(minioConfig.getAccessKey(),minioConfig.getSecretKey()).endpoint(minioConfig.getEndpoint()).build(), minioConfig.getBucketName()) :
+				new FileSystemImpl(defaultDirectory);
 	}
 
 }

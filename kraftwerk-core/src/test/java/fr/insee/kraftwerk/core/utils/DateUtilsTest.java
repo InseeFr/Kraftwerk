@@ -19,5 +19,10 @@ class DateUtilsTest {
 		
 	}
 
+	@Test
+	void convertDate_throwException_Test() {
+		assertEquals(0L, DateUtils.convertToTimestamp("aaaaaaa", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")));
+	}
+
 }
 

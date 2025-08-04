@@ -54,7 +54,7 @@ public class PaperDataParser extends DataParser {
 	private void readCsvFileStream(InputStream inputStream) {
 		// Create an object of file reader
 		// class with CSV file as a parameter.
-        /** Input stream reader */
+        /* Input stream reader */
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		// create csvReader object passing
 		// file reader as a parameter
@@ -165,9 +165,12 @@ public class PaperDataParser extends DataParser {
 		}
 	}
 
-	// TODO: do something more robust here (-> needs of standardisation for paper
-	// data files)
-	private String getVariableStem(String variableName) {
+	/**
+	 * package-scoped method for unit tests coverage
+	 */
+	// TODO: do something more robust here (-> needs of standardisation for paper data files)
+	static String getVariableStem(String variableName) {
+		if(variableName == null) {return null;}
 		String[] decomposition = variableName.split("_");
 		if (decomposition.length == 2) { // no "_" in the variable name
 			return decomposition[0];
@@ -176,13 +179,19 @@ public class PaperDataParser extends DataParser {
 		}
 	}
 
-	private String getUcqValue(String variableName) {
+
+	/**
+	 * package-scoped method for unit tests coverage
+	 */
+	static String getUcqValue(String variableName) {
 		String[] decomposition = variableName.split("_");
 		return decomposition[decomposition.length - 1];
 	}
 
+
 	/**
 	 * In paper datafiles, the identifier is like "[interrogationId]_[row identifier]"
+	 * NOTE : package-scoped method for unit tests coverage
 	 *
 	 * @param subGroupId The group level identifier for all variables of a given
 	 *                   questionnaire.
@@ -190,7 +199,7 @@ public class PaperDataParser extends DataParser {
 	 *
 	 * @return A concatenation of these which is a group instance identifier.
 	 */
-	private String createGroupId(String groupName, String subGroupId) {
+	static String createGroupId(String groupName, String subGroupId) {
 		return groupName + "-" + subGroupId;
 	}
 
