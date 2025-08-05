@@ -1,11 +1,13 @@
 package fr.insee.kraftwerk.api.process;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -77,6 +79,20 @@ class MainProcessingGenesisLegacyTest {
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setMode(Mode.WEB);
                 return Collections.singletonList(surveyUnitUpdateLatest);
+            }
+            @Override
+            public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
+                return "id";
+            }
+
+            @Override
+            public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+                return Collections.singletonList(Mode.WEB);
+            }
+
+            @Override
+            public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
+                return new MetadataModel();
             }
         };
 
