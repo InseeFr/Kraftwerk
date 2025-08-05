@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
+import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
@@ -44,7 +45,8 @@ public class MainProcessingGenesisLegacy extends AbstractMainProcessingGenesis{
 		SqlUtils.deleteDatabaseFile(databasePath);
 		log.info("Kraftwerk main service started for campaign: {} {}", campaignId, kraftwerkExecutionContext.isWithDDI()
 				? "with DDI": "without DDI");
-		init(campaignId);
+		List<Mode> modes = client.getModes(campaignId);
+		init(campaignId, modes);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = config.isDuckDbInMemory() ?
 				SqlUtils.openConnection()
@@ -78,7 +80,8 @@ public class MainProcessingGenesisLegacy extends AbstractMainProcessingGenesis{
 				campaignId));
 		//We delete database at start (in case there is already one)
 		SqlUtils.deleteDatabaseFile(databasePath);
-		init(campaignId);
+		List<Mode> modes = client.getModes(campaignId);
+		init(campaignId, modes);
 		//Try with resources to close database when done
 		try (Connection tryDatabase = config.isDuckDbInMemory() ?
 				SqlUtils.openConnection()

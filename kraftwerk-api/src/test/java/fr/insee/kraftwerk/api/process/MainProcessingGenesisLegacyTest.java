@@ -97,8 +97,7 @@ class MainProcessingGenesisLegacyTest {
     @Test
     void testInitLoadsMetadata() throws Exception {
         String idCampaign = "campaign1";
-
-        mainProcessing.init(idCampaign);
+        mainProcessing.init(idCampaign, List.of(Mode.WEB));
 
         assertNotNull(mainProcessing.getMetadataModels());
         assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));

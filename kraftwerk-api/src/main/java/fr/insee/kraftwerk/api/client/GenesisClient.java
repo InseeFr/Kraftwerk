@@ -91,6 +91,14 @@ public class GenesisClient {
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
 	}
+
+	public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireModelId);
+		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
+		List<Mode> modes = new ArrayList<>();
+		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
+		return modes;
+	}
 	
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) throws KraftwerkException {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
