@@ -28,6 +28,7 @@ import org.apache.commons.collections4.ListUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public abstract class AbstractMainProcessingGenesis {
      * Map by mode
      */
     @Getter
-    protected Map<String, MetadataModel> metadataModels;
+    protected Map<String, MetadataModel> metadataModelsByMode;
     protected final GenesisClient client;
     protected final ConfigProperties config;
 
@@ -64,6 +65,7 @@ public abstract class AbstractMainProcessingGenesis {
         this.client = genesisClient;
         this.fileUtilsInterface = fileUtilsInterface;
         this.kraftwerkExecutionContext = kraftwerkExecutionContext;
+        this.metadataModelsByMode = new HashMap<>();
     }
 
     public void init(String dataSelectionIdentifier, List<Mode> modes) throws KraftwerkException {
@@ -73,13 +75,45 @@ public abstract class AbstractMainProcessingGenesis {
         userInputs = new UserInputsGenesis(specsDirectory,
                 modes, fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
         if (!userInputs.getModes().isEmpty()) {
-            try {
-                metadataModels = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface): MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
-            } catch (MetadataParserException e) {
-                throw new KraftwerkException(500, e.getMessage());
-            }
+            getMetadatas(dataSelectionIdentifier, userInputs.getModes());
         } else {
             throw new KraftwerkException(404, String.format("No modes found in genesis for %s", dataSelectionIdentifier));
+        }
+    }
+
+    private void getMetadatas(String questionnaireId, List<String> modes) throws KraftwerkException {
+        try {
+            for (String modeString : modes) {
+                getMetadataByMode(questionnaireId.toUpperCase(), modeString);
+            }
+        }catch (KraftwerkException e) {
+            //Parse if genesis error
+            log.info("Got error {} during get metadatas call : {}\n trying to parse directly...",
+                    e.getStatus(),
+                    e.getMessage()
+            );
+            try {
+                metadataModelsByMode = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface) : MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+            } catch (MetadataParserException mpe) {
+                throw new KraftwerkException(500, mpe.getMessage());
+            }
+            //Update Genesis metadatas
+            for (Map.Entry<String, MetadataModel> entry : metadataModelsByMode.entrySet()) {
+                client.saveMetadata(questionnaireId.toUpperCase(), Mode.getEnumFromModeName(entry.getKey()), entry.getValue());
+            }
+        }
+    }
+
+    private void getMetadataByMode(String questionnaireId, String modeString) throws KraftwerkException {
+        try{
+            Mode mode = Mode.getEnumFromModeName(modeString);
+            MetadataModel metadataModel = client.getMetadataByQuestionnaireIdAndMode(questionnaireId, mode);
+            metadataModelsByMode.put(modeString, metadataModel);
+        }catch (IllegalStateException e){
+            log.warn("Incorrect mode detected in Genesis for questionnaire {} : {}",
+                    questionnaireId,
+                    modeString
+                    );
         }
     }
 
@@ -105,16 +139,16 @@ public abstract class AbstractMainProcessingGenesis {
     protected void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
         BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
         for (String dataMode : userInputs.getModeInputsMap().keySet()) {
-            buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModels, suLatest, specsDirectory);
+            buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModelsByMode, suLatest, specsDirectory);
             UnimodalSequence unimodal = new UnimodalSequence();
-            unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
+            unimodal.applyUnimodalSequence(userInputs, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModelsByMode, fileUtilsInterface);
         }
     }
 
     /* Step 3 : multimodal VTL data processing */
     protected void multimodalProcess() throws KraftwerkException {
         MultimodalSequence multimodalSequence = new MultimodalSequence();
-        multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels,
+        multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModelsByMode,
                 fileUtilsInterface);
     }
 
@@ -127,7 +161,7 @@ public abstract class AbstractMainProcessingGenesis {
     /* Step 5 : Write output files */
     protected void outputFileWriter() throws KraftwerkException {
         WriterSequence writerSequence = new WriterSequence();
-        writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
+        writerSequence.writeOutputFiles(specsDirectory, vtlBindings, userInputs.getModeInputsMap(), metadataModelsByMode, kraftwerkExecutionContext, database, fileUtilsInterface);
     }
 
     /* Step 6 : Write errors */

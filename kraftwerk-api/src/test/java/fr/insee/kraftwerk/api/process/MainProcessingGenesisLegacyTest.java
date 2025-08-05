@@ -99,8 +99,8 @@ class MainProcessingGenesisLegacyTest {
         String idCampaign = "campaign1";
         mainProcessing.init(idCampaign, List.of(Mode.WEB));
 
-        assertNotNull(mainProcessing.getMetadataModels());
-        assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
+        assertNotNull(mainProcessing.getMetadataModelsByMode());
+        assertTrue(mainProcessing.getMetadataModelsByMode().containsKey("WEB"));
     }
 
    @Test

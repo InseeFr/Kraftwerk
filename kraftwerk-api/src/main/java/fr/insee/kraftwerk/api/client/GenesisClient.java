@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.api.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -116,8 +117,19 @@ public class GenesisClient {
 	public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
 		String url = String.format("%s/questionnaires/by-interrogation?interrogationId=%s", configProperties.getGenesisUrl(), interrogationId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
-		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
+	public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
+		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
+				configProperties.getGenesisUrl(), questionnaireId, mode);
+		ResponseEntity<MetadataModel> response = makeApiCall(url,HttpMethod.GET,null,MetadataModel.class);
+		return response.getBody();
+    }
+
+	public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel) throws KraftwerkException {
+		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
+				configProperties.getGenesisUrl(), questionnaireId, mode);
+		makeApiCall(url,HttpMethod.POST,metadataModel,null);
+	}
 }

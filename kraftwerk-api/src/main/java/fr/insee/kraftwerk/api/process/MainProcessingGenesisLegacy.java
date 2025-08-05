@@ -123,7 +123,7 @@ public class MainProcessingGenesisLegacy extends AbstractMainProcessingGenesis{
 	private Map<String,Object> transformDataToJson() throws KraftwerkException {
 		Map<String, Object> resultByScope = new LinkedHashMap<>();
 		try {
-			MetadataModel firstMetadataModel = metadataModels.entrySet().iterator().next().getValue();
+			MetadataModel firstMetadataModel = metadataModelsByMode.entrySet().iterator().next().getValue();
 			Map<String, Group> groups = firstMetadataModel.getGroups();
 			for (String group : groups.keySet()){
 				List<Object> listIteration = new ArrayList<>();
