@@ -75,36 +75,28 @@ public abstract class AbstractMainProcessingGenesis {
         userInputs = new UserInputsGenesis(specsDirectory,
                 modes, fileUtilsInterface, kraftwerkExecutionContext.isWithDDI());
         if (!userInputs.getModes().isEmpty()) {
-            getMetadatas(dataSelectionIdentifier, userInputs.getModes());
+            loadMetadatasAndStoreIfNotExists(dataSelectionIdentifier, userInputs.getModes());
         } else {
             throw new KraftwerkException(404, String.format("No modes found in genesis for %s", dataSelectionIdentifier));
         }
     }
 
-    private void getMetadatas(String questionnaireId, List<String> modes) throws KraftwerkException {
+    private void loadMetadatasAndStoreIfNotExists(String questionnaireId, List<String> modes) throws KraftwerkException {
         try {
             for (String modeString : modes) {
-                getMetadataByMode(questionnaireId.toUpperCase(), modeString);
+                loadMetadatasFromDatabase(questionnaireId.toUpperCase(), modeString);
             }
         }catch (KraftwerkException e) {
             //Parse if genesis error
-            log.info("Got error {} during get metadatas call : {}\n trying to parse directly...",
+            log.info("Got error {} during get metadatas call : {}\n trying to parse directly from file...",
                     e.getStatus(),
                     e.getMessage()
             );
-            try {
-                metadataModelsByMode = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface) : MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
-            } catch (MetadataParserException mpe) {
-                throw new KraftwerkException(500, mpe.getMessage());
-            }
-            //Update Genesis metadatas
-            for (Map.Entry<String, MetadataModel> entry : metadataModelsByMode.entrySet()) {
-                client.saveMetadata(questionnaireId.toUpperCase(), Mode.getEnumFromModeName(entry.getKey()), entry.getValue());
-            }
+            loadMetadataFromFile(questionnaireId);
         }
     }
 
-    private void getMetadataByMode(String questionnaireId, String modeString) throws KraftwerkException {
+    private void loadMetadatasFromDatabase(String questionnaireId, String modeString) throws KraftwerkException {
         try{
             Mode mode = Mode.getEnumFromModeName(modeString);
             MetadataModel metadataModel = client.getMetadataByQuestionnaireIdAndMode(questionnaireId, mode);
@@ -114,6 +106,18 @@ public abstract class AbstractMainProcessingGenesis {
                     questionnaireId,
                     modeString
                     );
+        }
+    }
+
+    private void loadMetadataFromFile(String questionnaireId) throws KraftwerkException {
+        try {
+            metadataModelsByMode = kraftwerkExecutionContext.isWithDDI() ? MetadataUtilsGenesis.getMetadata(userInputs.getModeInputsMap(), fileUtilsInterface) : MetadataUtilsGenesis.getMetadataFromLunatic(userInputs.getModeInputsMap(), fileUtilsInterface);
+        } catch (MetadataParserException mpe) {
+            throw new KraftwerkException(500, mpe.getMessage());
+        }
+        //Update Genesis metadatas
+        for (Map.Entry<String, MetadataModel> entry : metadataModelsByMode.entrySet()) {
+            client.saveMetadata(questionnaireId.toUpperCase(), Mode.getEnumFromModeName(entry.getKey()), entry.getValue());
         }
     }
 
