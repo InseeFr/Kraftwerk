@@ -1,4 +1,13 @@
 # Changelog
+## 3.5.0 [2025-08-07]
+### Added
+- Extraction with QuestionnaireId
+
+## 3.4.3 [2025-08-07]
+### Updated
+- BPM 1.0.12
+- Trevas 1.11.0
+
 ## 3.4.2 [2025-07-31]
 ### Updated
 - BPM 1.0.9
