@@ -1,4 +1,8 @@
 # Changelog
+## 3.5.0 [2025-08-07]
+### Added
+- Extraction with QuestionnaireId
+
 ## 3.4.3 [2025-08-07]
 ### Updated
 - BPM 1.0.12
