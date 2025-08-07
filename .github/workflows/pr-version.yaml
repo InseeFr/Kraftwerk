@@ -1,36 +1,86 @@
-name: New Release Action
+name: Version Update Action
 
 on:
   pull_request:
     branches:
-        - main
+      - main
     types: [labeled]
 
 jobs:
-  upgrade-poms:
+  update-pom-version:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'New Release')
+    if: >
+      contains(github.event.pull_request.labels.*.name, 'Version Update - Staging') ||
+      contains(github.event.pull_request.labels.*.name, 'Version Update - Prod')
     steps:
-      - name: Check out code
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-      - name: Extract version number
+
+      - name: Get Short SHA
+        id: sha
+        run: echo "sha_short=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Extract version from PR title
         id: extract_version
         run: |
-          VERSION_NUMBER=$(echo '${{ github.event.pull_request.title }}' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "new_version=${VERSION_NUMBER}" >> $GITHUB_OUTPUT
+          TITLE_VERSION=$(echo "${{ github.event.pull_request.title }}" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
+          echo "title_version=$TITLE_VERSION" >> $GITHUB_OUTPUT
+          if [ -z "$TITLE_VERSION" ]; then
+            echo "No version in PR title. Will increment patch."
+          else
+            echo "Detected version in PR title: $TITLE_VERSION"
+          fi
 
-      - name: Check for New Release label
+      - name: Get current version from pom.xml
+        id: current_version
         run: |
-          echo "New Release label detected on PR #${{ github.event.pull_request.number }}"
-          echo "Version number: ${{ steps.extract_version.outputs.new_version }}"
-          
-          # Mettez ici vos commandes ou scripts à exécuter
-          mvn versions:set -DnewVersion='${{ steps.extract_version.outputs.new_version }}' -DprocessAllModules
-          mvn versions:set-property -Dproperty=kraftwerk.version -DnewVersion='${{ steps.extract_version.outputs.new_version }}'
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current POM version: $CURRENT_VERSION"
+
+      - name: Determine base version
+        id: base_version
+        env:
+          TITLE_VERSION: ${{ steps.extract_version.outputs.title_version }}
+          CUR_VERSION: ${{ steps.current_version.outputs.current_version }}
+        run: |
+          if [ -n "$TITLE_VERSION" ]; then
+            BASE_VERSION="$TITLE_VERSION"
+          else
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CUR_VERSION"
+            PATCH=$((PATCH + 1))
+            BASE_VERSION="$MAJOR.$MINOR.$PATCH"
+            echo "Auto-incremented patch version: $BASE_VERSION"
+          fi
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine final version
+        id: final_version
+        env:
+          BASE_VERSION: ${{ steps.base_version.outputs.base_version }}
+          STAGING_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'Version Update - Staging') }}
+          SHA_SHORT: ${{ steps.sha.outputs.sha_short }}
+        run: |
+          if [[ "$STAGING_LABEL" == "true" ]]; then
+            FINAL_VERSION="${BASE_VERSION}-${SHA_SHORT}"
+          else
+            FINAL_VERSION="${BASE_VERSION}"
+          fi
+          echo "Final version to set: $FINAL_VERSION"
+          echo "final_version=$FINAL_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update Maven Version
+        run: |
+          mvn versions:set -DnewVersion="${{ steps.final_version.outputs.final_version }}" -DprocessAllModules
           mvn versions:commit
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git commit -m "Update version - auto" --all
+
+      - name: Commit and Push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@github.com'
+          git commit -am "chore: update version to ${{ steps.final_version.outputs.final_version }}" || echo "No changes to commit"
           git push
