@@ -6,7 +6,8 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesis;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -66,13 +67,17 @@ class MainServiceTest {
     private static final String URI_MAIN_LUNATIC = "/main/lunatic-only";
     private static final String URI_MAIN_GENESIS = "/main/genesis";
     private static final String URI_MAIN_GENESIS_LUNATIC = "/main/genesis/lunatic-only";
+    private static final String URI_MAIN_GENESIS_BY_QUESTIONNAIRE = "/main/genesis/by-questionnaire";
+    private static final String URI_MAIN_GENESIS_LUNATIC_BY_QUESTIONNAIRE = "/main/genesis/by-questionnaire/lunatic-only";
     private static final String URI_MAIN_FILE_BY_FILE = "/main/file-by-file";
 
     // Mock beans to replace actual service implementations
     @MockitoBean
     private JwtDecoder jwtDecoder;
     @MockitoBean
-    private MainProcessingGenesis mainProcessingGenesis;
+    private MainProcessingGenesisLegacy mainProcessingGenesisLegacy;
+    @MockitoBean
+    private MainProcessingGenesisNew mainProcessingGenesisNew;
     @MockitoBean
     private MainProcessing mainProcessing;
     @MockitoBean
@@ -101,12 +106,24 @@ class MainServiceTest {
     }
 
     /**
-     * Provides a stream of URIs for the genesis-related endpoints.
+     * Provides a stream of URIs for the genesis-related legacy endpoints.
      */
     private static Stream<Arguments> endpointsMainGenesis(){
         return Stream.of(
                 Arguments.of(URI_MAIN_GENESIS),
-                Arguments.of(URI_MAIN_GENESIS_LUNATIC )
+                Arguments.of(URI_MAIN_GENESIS_LUNATIC)/* ,
+               Arguments.of(URI_MAIN_GENESIS_BY_QUESTIONNAIRE),
+                Arguments.of(URI_MAIN_GENESIS_LUNATIC_BY_QUESTIONNAIRE)*/
+        );
+    }
+
+    /**
+     * Provides a stream of URIs for the genesis-related endpoints.
+     */
+    private static Stream<Arguments> endpointsMainGenesisNew(){
+        return Stream.of(
+               Arguments.of(URI_MAIN_GENESIS_BY_QUESTIONNAIRE),
+                Arguments.of(URI_MAIN_GENESIS_LUNATIC_BY_QUESTIONNAIRE)
         );
     }
 
@@ -127,18 +144,33 @@ class MainServiceTest {
     }
 
     /**
-     * Tests that users with the "USER" role can access genesis-related endpoints.
+     * Tests that users with the "USER" role can access genesis-related legacy endpoints.
      */
     @ParameterizedTest
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Kraftwerk users should access main services with Genesis")
     void kraftwerk_users_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(), anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(), anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("USER"), USER_KRAFTWERK);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests that users with the "USER" role can access genesis-related new endpoints.
+     */
+    @ParameterizedTest
+    @MethodSource("endpointsMainGenesisNew")
+    @DisplayName("Kraftwerk users should access main services with Genesis by questionnaire")
+    void kraftwerk_users_should_access_main_services_with_genesis_by_questionnaire(String endpointURI) throws Exception{
+        doNothing().when(mainProcessingGenesisNew).runMain(anyString(), anyInt(), any());
+        Jwt jwt = testUtils.generateJwt(List.of("USER"), USER_KRAFTWERK);
+        when(jwtDecoder.decode(anyString())).thenReturn(jwt);
+        mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
+                        .param("questionnaireModelId","Test"))
                 .andExpect(status().isOk());
     }
 
@@ -159,18 +191,33 @@ class MainServiceTest {
     }
 
     /**
-     * Tests that admins can access all genesis-related endpoints.
+     * Tests that admins can access all genesis-related legacy endpoints.
      */
     @ParameterizedTest
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Admins should access main services with genesis")
     void admins_should_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(),anyInt());
         Jwt jwt = testUtils.generateJwt(List.of("ADMIN"), ADMIN);
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests that admins can access all genesis-related new endpoints.
+     */
+    @ParameterizedTest
+    @MethodSource("endpointsMainGenesisNew")
+    @DisplayName("Admins should access main services with genesis")
+    void admins_should_access_main_services_with_genesis_by_questionnaire(String endpointURI) throws Exception{
+        doNothing().when(mainProcessingGenesisNew).runMain(anyString(),anyInt(), any());
+        Jwt jwt = testUtils.generateJwt(List.of("ADMIN"), ADMIN);
+        when(jwtDecoder.decode(anyString())).thenReturn(jwt);
+        mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
+                        .param("questionnaireModelId","Test"))
                 .andExpect(status().isOk());
     }
 
@@ -191,18 +238,33 @@ class MainServiceTest {
     }
 
     /**
-     * Tests that users with incorrect roles cannot access genesis-related endpoints.
+     * Tests that users with incorrect roles cannot access genesis-related legacy endpoints.
      */
     @ParameterizedTest
     @MethodSource("endpointsMainGenesis")
     @DisplayName("Incorrect roles should not access main services with Genesis")
     void no_correct_roles_should_not_access_main_services_with_genesis(String endpointURI) throws Exception{
-        doNothing().when(mainProcessingGenesis).runMain(anyString(),anyInt());
+        doNothing().when(mainProcessingGenesisLegacy).runMain(anyString(),anyInt());
         Jwt jwt = testUtils.generateJwt(List.of(""), "Not_a_good_role");
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Tests that users with incorrect roles cannot access genesis-related new endpoints.
+     */
+    @ParameterizedTest
+    @MethodSource("endpointsMainGenesisNew")
+    @DisplayName("Incorrect roles should not access main services with Genesis")
+    void no_correct_roles_should_not_access_main_services_with_genesis_by_questionnaire(String endpointURI) throws Exception{
+        doNothing().when(mainProcessingGenesisNew).runMain(anyString(),anyInt(),any());
+        Jwt jwt = testUtils.generateJwt(List.of(""), "Not_a_good_role");
+        when(jwtDecoder.decode(anyString())).thenReturn(jwt);
+        mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
+                        .param("questionnaireModelId","Test"))
                 .andExpect(status().isForbidden());
     }
 
@@ -346,7 +408,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
@@ -368,7 +430,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -389,7 +451,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -411,7 +473,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -433,7 +495,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
@@ -454,7 +516,7 @@ class MainServiceTest {
 
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
-        MainProcessingGenesis mockMainProcessing = mock(MainProcessingGenesis.class);
+        MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
