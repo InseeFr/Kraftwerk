@@ -43,8 +43,8 @@ import static cucumber.functional_tests.MainDefinitions.outDirectory;
 
 public class GenesisDefinitions {
 
-    ConfigStub configStub = new ConfigStub();
-    GenesisClientStub genesisClientStub = new GenesisClientStub(configStub);
+    static ConfigStub configStub = new ConfigStub();
+    static GenesisClientStub genesisClientStub = new GenesisClientStub(configStub);
 
     private boolean isUsingEncryption;
     KraftwerkExecutionContext kraftwerkExecutionContext;
