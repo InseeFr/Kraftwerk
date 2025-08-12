@@ -163,17 +163,17 @@ public class MainService extends KraftwerkService {
 	@GetMapping(value ="/json")
 	@Operation(operationId = "jsonExtraction", summary = "", description ="")
 	public ResponseEntity<Object> jsonExtraction(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String campaignId,
+			@Parameter(description = "${param.questionnaireModelId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String questionnaireModelId,
 			@Parameter(description = "${param.interrogationId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String interrogationId
 	){
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		boolean withDDI = true;
 		boolean withEncryption = false;
 
-		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 		Map<String,Object> results;
 		try {
-			results = mpGenesis.runMainJson(campaignId, interrogationId);
+			results = mpGenesis.runMainJson(questionnaireModelId, interrogationId);
 			log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
