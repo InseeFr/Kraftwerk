@@ -19,3 +19,5 @@
 | SAMPLETEST-MCQ                   | 1 data file / Questionnaire with only multiple choice questions (DDI + Lunatic)                           | Test metadata parsing of MCQ               | 00000001                                          |
 | SAMPLETEST-TABLES                | 1 data file / Questionnaire with only tables (DDI + Lunatic)                                              | Test metadata parsing of tables            | 00000001                                          |
 | SAMPLETEST-ROUNDABOUT            | 1 data file / Questionnaire with a roundabout component (DDI + Lunatic)                                   | Test metadata parsing of roundabouts       | 00000001                                          |
+
+TESSSST
