@@ -1,0 +1,97 @@
+name: Scheduled version update
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  schedule:
+    - cron: 30 7 * * 4
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Get last commit SHA
+        id: current_sha
+        run: |
+          CURRENT_SHA=$(git log -n 1 --no-merges --pretty=format:"%H")
+          echo "last commit SHA : $CURRENT_SHA"
+          echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Get last version tag SHA
+        id: last_tag
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          TAG_SHA=$(git rev-list -n 1 "$LAST_TAG")
+          echo "last version SHA : TAG_SHA"
+          echo "tag_sha=$TAG_SHA" >> $GITHUB_OUTPUT
+
+      - name: Compare SHAs
+        id: compare
+        run: |
+          if [ "${{ steps.current_sha.outputs.current_sha }}" = "${{ steps.last_tag.outputs.tag_sha }}" ]; then
+            echo "No new commit since version. Exiting."
+            exit 0
+          fi
+
+      - name: Get version from changelog
+        id: changelog_version
+        run: |
+          FILE_VERSION=$(grep -m1 '^## ' CHANGELOG.md | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "file_version=$FILE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine version to use
+        id: determine_version
+        run: |
+          IFS='.' read -r MAJOR LAST_MINOR LAST_PATCH <<< "${{ steps.last_tag.outputs.last_tag#v }}"
+          IFS='.' read -r FILE_MAJOR FILE_MINOR FILE_PATCH <<< "${{ steps.changelog_version.outputs.file_version }}"
+          
+          if [ "$FILE_MAJOR" -gt "$MAJOR" ] || \
+             [ "$FILE_MAJOR" -eq "$MAJOR" -a "$FILE_MINOR" -gt "$LAST_MINOR" ] || \
+             [ "$FILE_MAJOR" -eq "$MAJOR" -a "$FILE_MINOR" -eq "$LAST_MINOR" -a "$FILE_PATCH" -gt "$LAST_PATCH" ]; then
+              NEW_VERSION="${{ steps.changelog_version.outputs.file_version }}"
+          else
+              PATCH=$((LAST_PATCH + 1))
+              NEW_VERSION="$MAJOR.$LAST_MINOR.$PATCH"
+          fi
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create PR branch
+        run: |
+          PR_BRANCH="update-version-${{ steps.determine_version.outputs.new_version }}"
+          git checkout -b "$PR_BRANCH"
+          
+          # Update TODO to today
+          TODAY=$(date +%Y-%m-%d)
+          if grep -q '\[TODO\]' CHANGELOG.md; then
+            sed -i "0,/\[TODO\]/s/\[TODO\]/[$TODAY]/" CHANGELOG.md
+            git add CHANGELOG.md
+            git commit -m "doc: Update CHANGELOG date to $TODAY"
+          else
+            git commit --allow-empty -m "chore: Prepare release ${{ steps.determine_version.outputs.new_version }}"
+          fi
+          
+          git push origin "$PR_BRANCH"
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: "main"
+          branch: "update-version-${{ steps.determine_version.outputs.new_version }}"
+          title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
+          body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
+          labels: "Version Update - Prod"
+
+      - name: Enable Pull Request Automerge
+        run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
