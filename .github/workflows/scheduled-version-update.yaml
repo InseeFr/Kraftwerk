@@ -101,11 +101,11 @@ jobs:
           body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
           labels: "Version Update - Prod"
 
-      - name: Wait 10s for PR checks
-        run: sleep 10s
+      - name: Wait 30s for PR checks
+        run: sleep 30s
         shell: bash
 
-      - name: Enable Pull Request Automerge
-        run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Enable Pull Request Automerge
+      #  run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+      #  env:
+      #    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
