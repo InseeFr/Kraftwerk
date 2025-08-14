@@ -110,4 +110,4 @@ jobs:
 
   launch-create-release-workflow:
     needs: update-version
-    uses: ./.github/workflows/create-release.yml
+    uses: .github/workflows/create-release.yml
