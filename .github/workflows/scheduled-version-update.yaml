@@ -67,7 +67,7 @@ jobs:
           fi
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Update files
+      - name: Update files and commit
         run: |
           #Update pom public
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
@@ -85,12 +85,26 @@ jobs:
           else
             echo "No change done in changelog"
           fi
-
-      - name: Commit and Push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
+          
           git config user.name 'github-actions'
           git config user.email 'github-actions@github.com'
           git commit -am "chore: update version to ${{ steps.determine_version.outputs.new_version }}" || echo "No changes to commit"
-          git push
+          
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: "main"
+          commit-message: "Update for release ${{ steps.determine_version.outputs.new_version }}"
+          branch: "update-version-${{ steps.determine_version.outputs.new_version }}"
+          branch-suffix: timestamp
+          title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
+          body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
+          labels: "Version Update - Prod"
+
+          
+      - name: Merge pull request
+        run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
