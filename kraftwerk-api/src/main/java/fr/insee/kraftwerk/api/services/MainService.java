@@ -18,7 +18,6 @@ import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jdk.jfr.DataAmount;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Map;
-
 
 @RestController
 @Slf4j
@@ -164,23 +161,23 @@ public class MainService extends KraftwerkService {
 	@Operation(operationId = "jsonExtraction", summary = "", description ="")
 	public ResponseEntity<Object> jsonExtraction(
 			@Parameter(description = "${param.questionnaireModelId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String questionnaireModelId,
-			@Parameter(description = "${param.interrogationId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String interrogationId
+			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize
 	){
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		boolean withDDI = true;
 		boolean withEncryption = false;
 
 		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
-		Map<String,Object> results;
 		try {
-			results = mpGenesis.runMainJson(questionnaireModelId, interrogationId);
+			mpGenesis.runMainJson(questionnaireModelId, batchSize, dataMode);
 			log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(results);
+		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",questionnaireModelId));
 	}
 
 	@NotNull
