@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
     branches: [ "main" ]
+  workflow_call:
+
 jobs:
   check-version:
     runs-on: ubuntu-latest

@@ -67,78 +67,33 @@ jobs:
           fi
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create PR branch
+      - name: Update files
         run: |
-          git config user.name 'github-actions'
-          git config user.email 'github-actions@github.com'
-          
           #Update pom public
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
           sed -i -E "/<artifactId>kraftwerk<\/artifactId>/{n;s|<version>[0-9]+\.[0-9]+\.[0-9]+</version>|<version>$NEW_VERSION</version>|;}" pom-public.xml
           git add pom-public.xml
-          git commit -m "chore: Update pom public version to $NEW_VERSION"
+          #Update poms
+          mvn versions:set -DnewVersion="${{ steps.determine_version.outputs.new_version }}" -DprocessAllModules
+          mvn versions:commit
           
           # Update TODO to today in changelog
           TODAY=$(date +%Y-%m-%d)
           if grep -q '\[TODO\]' CHANGELOG.md; then
             sed -i "0,/\[TODO\]/s/\[TODO\]/[$TODAY]/" CHANGELOG.md
             git add CHANGELOG.md
-            git commit -m "doc: Update CHANGELOG date"
           else
             echo "No change done in changelog"
           fi
 
-      - name: Create Pull Request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: "main"
-          commit-message: "Update for release ${{ steps.determine_version.outputs.new_version }}"
-          branch: "update-version-${{ steps.determine_version.outputs.new_version }}"
-          branch-suffix: timestamp
-          title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
-          body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
-
-      - name: Wait 5s
-        run: sleep 5s
-        shell: bash
-
-      - name: Label Pull Request
-        id: label_pr
-        if: steps.create_pr.outputs.pull-request-number != ''
+      - name: Commit and Push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
-          LABEL_NAME: "Version Update - Prod"
         run: |
-          echo "Adding label '$LABEL_NAME' to PR #$PR_NUMBER in $REPO"
-          
-          # Appel API pour ajouter le(s) label(s)
-          resp=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/labels" \
-            -d "{\"labels\":[\"$LABEL_NAME\"]}")
-          
-          http_status=$(echo "$resp" | tail -n1)
-          body=$(echo "$resp" | sed '$d')
-          
-          if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
-            echo "Label ajouté avec succès."
-            echo "$body"
-          else
-            echo "Erreur lors de l'ajout du label (HTTP $http_status):"
-            echo "$body"
-            exit 1
-          fi
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@github.com'
+          git commit -am "chore: update version to ${{ steps.determine_version.outputs.new_version }}" || echo "No changes to commit"
+          git push
 
-      - name: Wait 10s for PR checks
-        run: sleep 10s
-        shell: bash
-
-      #- name: Enable Pull Request Automerge
-      #  run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
-      #  env:
-      #    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Launch create release workflow
+        uses: ./.github/workflows/create-release.yml
