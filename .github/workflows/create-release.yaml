@@ -69,37 +69,43 @@ jobs:
         id: previousTag
         run: echo "previousTag=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | grep "^v[0-9]\+\.[0-9]\+\.[0-9]\+$" | tail -1)" >> $GITHUB_OUTPUT
 
-      - name: Extract content between titles
+      - name: Extract changelog content
         id: changeLogContent
         run: |
           FILE_PATH='CHANGELOG.md'
-          VERSION="${{ needs.check-version.outputs.release-tag }}"
           VERSION_NO_V="${VERSION#v}"
-          ESCAPED_VERSION_NO_V=$(printf '%s\n' "$VERSION_NO_V" | sed 's/[][\\.^$*+?(){}|]/\\&/g')
-
+          
           # Look for release title in changelog
-          TITLE1=$(grep -m1 "^## ${ESCAPED_VERSION_NO_V}" "$FILE_PATH" | sed 's/^## //')
-
+          TITLE1="$(grep -m1 "^## ${VERSION_NO_V}" "$FILE_PATH" | sed 's/^## //')"
+          
           # Generates it not found
           if [ -z "$TITLE1" ]; then
-            DATE=$(date +'%Y-%m-%d')
-            TITLE1="${VERSION_NO_V} [${DATE}]"
+          DATE="$(date +'%Y-%m-%d')"
+          TITLE1="${VERSION_NO_V} [${DATE}]"
           fi
-
+          
           # Gets next title (previous version changes) to extract 
-          TITLE2=$(grep "^## " "$FILE_PATH" | grep -v "^## ${ESCAPED_VERSION_NO_V}" | sed 's/^## //' | head -n1)
-
-          echo "TITLE1=$TITLE1" >> $GITHUB_OUTPUT
-
-          {
-            echo "changes<<EOF"
-            if [ -n "$TITLE2" ]; then
-              sed -n "/^## ${ESCAPED_VERSION_NO_V}/,/^## ${TITLE2}/{//!p}" "$FILE_PATH"
-            else
-              sed -n "/^## ${ESCAPED_VERSION_NO_V}/{//!p}" "$FILE_PATH"
-            fi
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+          TITLE2=$(grep "^## " "$FILE_PATH" | sed '1d' | head -n1 | sed 's/^## //')
+          
+          #Extract what's between lines
+          escape_for_sed() {
+            echo "$1" | sed -e 's/[][\/.^$*]/\\&/g'
+          }
+          
+          ESC_TITLE1=$(escape_for_sed "$TITLE1")
+          ESC_TITLE2=$(escape_for_sed "$TITLE2")
+          
+          if [ -z "$TITLE2" ]; then
+          changes=$(sed -n "/^## $ESC_TITLE1$/,\$p" "$FILE_PATH" | sed '1d')
+          else
+          changes=$(sed -n "/^## $ESC_TITLE1$/,/^## $ESC_TITLE2$/p" "$FILE_PATH" | sed '1d;$d')
+          fi
+          
+          echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
+          echo "TITLE1=${TITLE1}" >> $GITHUB_OUTPUT
+          echo "changes<<EOF" >> "$GITHUB_OUTPUT
+          echo "$changes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v2
         with:
