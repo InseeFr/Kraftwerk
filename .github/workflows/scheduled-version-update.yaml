@@ -72,9 +72,6 @@ jobs:
           git config user.name 'github-actions'
           git config user.email 'github-actions@github.com'
           
-          PR_BRANCH="update-version-${{ steps.determine_version.outputs.new_version }}"
-          git checkout -b "$PR_BRANCH"
-          
           #Update pom public
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
           sed -i -E "/<artifactId>kraftwerk<\/artifactId>/{n;s|<version>[0-9]+\.[0-9]+\.[0-9]+</version>|<version>$NEW_VERSION</version>|;}" pom-public.xml
