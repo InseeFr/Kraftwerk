@@ -80,25 +80,26 @@ jobs:
           
           # Generates it not found
           if [ -z "$TITLE1" ]; then
-          DATE="$(date +'%Y-%m-%d')"
-          TITLE1="${VERSION_NO_V} [${DATE}]"
-          fi
-          
-          # Gets next title (previous version changes) to extract 
-          TITLE2=$(grep "^## " "$FILE_PATH" | sed '1d' | head -n1 | sed 's/^## //')
-          
-          #Extract what's between lines
-          escape_for_sed() {
-            echo "$1" | sed -e 's/[][\/.^$*]/\\&/g'
-          }
-          
-          ESC_TITLE1=$(escape_for_sed "$TITLE1")
-          ESC_TITLE2=$(escape_for_sed "$TITLE2")
-          
-          if [ -z "$TITLE2" ]; then
-          changes=$(sed -n "/^## $ESC_TITLE1$/,\$p" "$FILE_PATH" | sed '1d')
+            DATE="$(date +'%Y-%m-%d')"
+            TITLE1="${VERSION_NO_V} [${DATE}]"
+            changes="No changes found in CHANGELOG.md for this version."
           else
-          changes=$(sed -n "/^## $ESC_TITLE1$/,/^## $ESC_TITLE2$/p" "$FILE_PATH" | sed '1d;$d')
+            # Gets next title (previous version changes) to extract 
+            TITLE2=$(grep "^## " "$FILE_PATH" | sed '1d' | head -n1 | sed 's/^## //')
+            
+            #Extract what's between lines
+            escape_for_sed() {
+              echo "$1" | sed -e 's/[][\/.^$*]/\\&/g'
+            }
+            
+            ESC_TITLE1=$(escape_for_sed "$TITLE1")
+            ESC_TITLE2=$(escape_for_sed "$TITLE2")
+            
+            if [ -z "$TITLE2" ]; then
+            changes=$(sed -n "/^## $ESC_TITLE1$/,\$p" "$FILE_PATH" | sed '1d')
+            else
+            changes=$(sed -n "/^## $ESC_TITLE1$/,/^## $ESC_TITLE2$/p" "$FILE_PATH" | sed '1d;$d')
+            fi
           fi
           
           {
