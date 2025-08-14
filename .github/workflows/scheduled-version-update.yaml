@@ -4,9 +4,7 @@ permissions:
   contents: write
   pull-requests: write
 
-on:
-  schedule:
-    - cron: 30 7 * * 4
+on: workflow_dispatch
 
 jobs:
   update-version:
