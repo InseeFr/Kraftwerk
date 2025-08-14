@@ -73,6 +73,7 @@ jobs:
         id: changeLogContent
         run: |
           FILE_PATH='CHANGELOG.md'
+          VERSION="${{ needs.check-version.outputs.release-tag }}"
           VERSION_NO_V="${VERSION#v}"
           
           # Look for release title in changelog
