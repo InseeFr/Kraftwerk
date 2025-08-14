@@ -100,6 +100,10 @@ jobs:
           title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
           body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
 
+      - name: Wait 5s
+        run: sleep 5s
+        shell: bash
+
       - name: Label Pull Request
         id: label_pr
         if: steps.create_pr.outputs.pull-request-number != ''
