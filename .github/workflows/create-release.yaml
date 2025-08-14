@@ -75,7 +75,7 @@ jobs:
           FILE_PATH='CHANGELOG.md'
           VERSION="${{ needs.check-version.outputs.release-tag }}"
           VERSION_NO_V="${VERSION#v}"
-          ESCAPED_VERSION_NO_V=$(echo "$VERSION_NO_V" | sed 's/\[/\\[/g; s/\]/\\]/g')
+          ESCAPED_VERSION_NO_V=$(printf '%s\n' "$VERSION_NO_V" | sed 's/[][\\.^$*+?(){}|]/\\&/g')
 
           # Look for release title in changelog
           TITLE1=$(grep -m1 "^## ${ESCAPED_VERSION_NO_V}" "$FILE_PATH" | sed 's/^## //')
