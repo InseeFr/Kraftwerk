@@ -33,10 +33,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
+
+    private static final String JSON_EXTENSION = ".json";
 
     public MainProcessingGenesisNew(
             ConfigProperties config,
@@ -89,10 +90,10 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Construct filename
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-        String timestamp = LocalDateTime.now().format(formatter);
-        String fileName = String.format("export_%s_%s.json", questionnaireModelId, timestamp);
-
+        Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
+        String filename = outputFileName(questionnaireModelId);
+        Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
+                filename, null);
         Path outDirectory = FileUtilsInterface.transformToOut(specsDirectory,kraftwerkExecutionContext.getExecutionDateTime());
         try {
             if (Files.notExists(outDirectory)) {
@@ -102,12 +103,12 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         } catch (IOException e) {
             log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
         }
-        Path outputPath = outDirectory.resolve(fileName);
+        Path outputPath = outDirectory.resolve(filename);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
                 : SqlUtils.openConnection(Path.of(databasePath));
-                JsonGenerator jsonGenerator = jsonFactory.createGenerator(outputPath.toFile(), JsonEncoding.UTF8))
+                JsonGenerator jsonGenerator = jsonFactory.createGenerator(tmpOutputFile.toFile(), JsonEncoding.UTF8))
         {
             if(tryDatabase == null){
                 throw new KraftwerkException(500,"Error during internal database creation");
@@ -143,6 +144,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             log.error(e.toString());
             throw new KraftwerkException(500,"SQL error");
         }
+        fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
+        log.info("File: {} successfully written", outputPath);
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
@@ -202,6 +205,15 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             throw new KraftwerkException(500,"SQL error : extraction step");
         }
         return resultByScope;
+    }
+
+    public String outputFileName(String questionnaireModelId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String timestamp = LocalDateTime.now().format(formatter);
+        String fileName = String.format("export_%s_%s", questionnaireModelId, timestamp); ;
+        return kraftwerkExecutionContext.isWithEncryption() ?
+                fileName + JSON_EXTENSION + ".enc"
+                : fileName + JSON_EXTENSION;
     }
 
 }
