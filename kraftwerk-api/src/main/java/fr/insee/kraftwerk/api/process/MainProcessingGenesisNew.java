@@ -4,14 +4,13 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.bpm.metadata.model.Group;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.sequence.JsonWriterSequence;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -23,16 +22,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
@@ -77,6 +71,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
+    /*
+    In this method we write at the end of every batch, not at the end of all batch
+     */
     public void runMainJson(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
 
         log.info("Export json for questionnaireModelId {}", questionnaireModelId);
@@ -88,22 +85,10 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         init(questionnaireModelId, modes);
         JsonFactory jsonFactory = new JsonFactory();
         ObjectMapper objectMapper = new ObjectMapper();
-
         // Construct filename
         Files.createDirectories(Path.of(System.getProperty("java.io.tmpdir")));
-        String filename = outputFileName(questionnaireModelId);
         Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty("java.io.tmpdir")),
-                filename, null);
-        Path outDirectory = FileUtilsInterface.transformToOut(specsDirectory,kraftwerkExecutionContext.getExecutionDateTime());
-        try {
-            if (Files.notExists(outDirectory)) {
-                Files.createDirectories(outDirectory);
-                log.info("Created folder: {}", outDirectory);
-            }
-        } catch (IOException e) {
-            log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
-        }
-        Path outputPath = outDirectory.resolve(filename);
+                outputFileName(questionnaireModelId), null);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
@@ -135,7 +120,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 unimodalProcess(suLatest);
                 multimodalProcess();
                 insertDatabase();
-                writeJsonOutput(listId, suLatest, objectMapper, jsonGenerator);
+                outputJsonFileWriter(listId, suLatest, objectMapper, jsonGenerator, database);
                 indexPartition++;
             }
             jsonGenerator.writeEndArray(); // End of Json Array
@@ -144,67 +129,24 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             log.error(e.toString());
             throw new KraftwerkException(500,"SQL error");
         }
-        fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
-        log.info("File: {} successfully written", outputPath);
+        moveTempFile(outputFileName(questionnaireModelId), tmpOutputFile);
+        writeErrors();
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
-    private void writeJsonOutput(List<InterrogationId> listId, List<SurveyUnitUpdateLatest> suLatest, ObjectMapper objectMapper, JsonGenerator jsonGenerator) throws KraftwerkException, IOException {
-        for (InterrogationId interrogationId : listId){
-            Map<String, Object> result = buildResultMap(suLatest, interrogationId);
-            if (result != null) {
-                objectMapper.writeValue(jsonGenerator, result);
-            }
-        }
-    }
-
-    private Map<String,Object> buildResultMap(List<SurveyUnitUpdateLatest> suLatest, InterrogationId interrogationId) throws KraftwerkException{
-        Map<String,Object> resultById = new HashMap<>();
-        SurveyUnitUpdateLatest currentSu = suLatest.stream()
-                .filter(su -> su.getInterrogationId().equals(interrogationId.getId()))
-                .findFirst()
-                .orElse(null);
-
-        if (currentSu == null) return null;
-
-        resultById.put("partitionId",currentSu.getCampaignId());
-        resultById.put("interrogationId", interrogationId.getId());
-        resultById.put("surveyUnitId",currentSu.getSurveyUnitId());
-        resultById.put("contextualId",currentSu.getContextualId());
-        resultById.put("questionnaireModelId",currentSu.getQuestionnaireId());
-        resultById.put("mode",currentSu.getMode());
-        resultById.put("isCapturedIndirectly",currentSu.getIsCapturedIndirectly());
-        resultById.put("validationDate",currentSu.getValidationDate());
-        resultById.put("data",transformDataToJson(interrogationId));
-        return resultById;
-    }
-
-    private Map<String,Object> transformDataToJson(InterrogationId interrogationId) throws KraftwerkException {
-        Map<String, Object> resultByScope = new LinkedHashMap<>();
+    private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {
+        Path outDirectory = FileUtilsInterface.transformToOut(specsDirectory,kraftwerkExecutionContext.getExecutionDateTime());
         try {
-            MetadataModel firstMetadataModel = metadataModelsByMode.entrySet().iterator().next().getValue();
-            Map<String, Group> groups = firstMetadataModel.getGroups();
-            for (String group : groups.keySet()){
-                List<Object> listIteration = new ArrayList<>();
-                String request = String.format("SELECT * FROM %s WHERE interrogationId='%s'", group, interrogationId.getId());
-                ResultSet rs = database.executeQuery(request);
-                ResultSetMetaData meta = rs.getMetaData();
-                int cols = meta.getColumnCount();
-                while (rs.next()) {
-                    Map<String, Object> row = new LinkedHashMap<>();
-                    for (int i = 1; i <= cols; i++) {
-                        if (meta.getColumnLabel(i).equals("interrogationId")) continue;
-                        row.put(meta.getColumnLabel(i), rs.getObject(i));
-                    }
-                    listIteration.add(row);
-                }
-                resultByScope.put(group,listIteration);
+            if (Files.notExists(outDirectory)) {
+                Files.createDirectories(outDirectory);
+                log.info("Created folder: {}", outDirectory);
             }
-        } catch (Exception e){
-            log.error(e.getMessage());
-            throw new KraftwerkException(500,"SQL error : extraction step");
+        } catch (IOException e) {
+            log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
         }
-        return resultByScope;
+        Path outputPath = outDirectory.resolve(filename);
+        fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
+        log.info("File: {} successfully written", outputPath);
     }
 
     public String outputFileName(String questionnaireModelId) {
@@ -214,6 +156,15 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         return kraftwerkExecutionContext.isWithEncryption() ?
                 fileName + JSON_EXTENSION + ".enc"
                 : fileName + JSON_EXTENSION;
+    }
+
+    protected void outputJsonFileWriter(List<InterrogationId> listIds,
+                                        List<SurveyUnitUpdateLatest> suLatest,
+                                        ObjectMapper objectMapper,
+                                        JsonGenerator jsonGenerator,
+                                        Statement database) throws KraftwerkException, IOException {
+        JsonWriterSequence jsonWriterSequence = new JsonWriterSequence();
+        jsonWriterSequence.writeJsonOutput(listIds, suLatest, objectMapper, jsonGenerator, metadataModelsByMode, database);
     }
 
 }
