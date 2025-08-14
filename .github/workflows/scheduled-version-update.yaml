@@ -4,7 +4,9 @@ permissions:
   contents: write
   pull-requests: write
 
-on: workflow_dispatch
+on:
+  schedule:
+    - cron: 30 7 * * 4
 
 jobs:
   update-version:
@@ -19,7 +21,7 @@ jobs:
       - name: Get last commit SHA
         id: current_sha
         run: |
-          CURRENT_SHA=$(git log -n 1 --no-merges --pretty=format:"%H")
+          CURRENT_SHA=$(git log -n 1 --pretty=format:"%H")
           echo "last commit SHA : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
 
