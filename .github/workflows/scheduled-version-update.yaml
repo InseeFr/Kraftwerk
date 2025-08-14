@@ -99,10 +99,39 @@ jobs:
           branch-suffix: timestamp
           title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
           body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
-          labels: "Version Update - Prod"
 
-      - name: Wait 30s for PR checks
-        run: sleep 30s
+      - name: Label Pull Request
+        id: label_pr
+        if: steps.create_pr.outputs.pull-request-number != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+          LABEL_NAME: "Version Update - Prod"
+        run: |
+          echo "Adding label '$LABEL_NAME' to PR #$PR_NUMBER in $REPO"
+          
+          # Appel API pour ajouter le(s) label(s)
+          resp=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/labels" \
+            -d "{\"labels\":[\"$LABEL_NAME\"]}")
+          
+          http_status=$(echo "$resp" | tail -n1)
+          body=$(echo "$resp" | sed '$d')
+          
+          if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
+            echo "Label ajouté avec succès."
+            echo "$body"
+          else
+            echo "Erreur lors de l'ajout du label (HTTP $http_status):"
+            echo "$body"
+            exit 1
+          fi
+
+      - name: Wait 10s for PR checks
+        run: sleep 10s
         shell: bash
 
       #- name: Enable Pull Request Automerge
