@@ -73,13 +73,14 @@ jobs:
           git config user.email 'github-actions@github.com'
           
           PR_BRANCH="update-version-${{ steps.determine_version.outputs.new_version }}"
-          git checkout -b "$PR_BRANCH"
+          git checkout -B "$PR_BRANCH"
           
           #Update pom public
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
           sed -i -E "/<artifactId>kraftwerk<\/artifactId>/{n;s|<version>[0-9]+\.[0-9]+\.[0-9]+</version>|<version>$NEW_VERSION</version>|;}" pom-public.xml
           git add pom-public.xml
           git commit -m "chore: Update pom public version to $NEW_VERSION"
+          git push origin "$PR_BRANCH"
           
           # Update TODO to today in changelog
           TODAY=$(date +%Y-%m-%d)
@@ -87,11 +88,10 @@ jobs:
             sed -i "0,/\[TODO\]/s/\[TODO\]/[$TODAY]/" CHANGELOG.md
             git add CHANGELOG.md
             git commit -m "doc: Update CHANGELOG date"
+            git push origin "$PR_BRANCH"
           else
             echo "No change done in changelog"
           fi
-          
-          git push origin "$PR_BRANCH"
 
       - name: Create Pull Request
         id: create_pr
