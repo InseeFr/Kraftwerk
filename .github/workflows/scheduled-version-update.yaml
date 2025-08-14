@@ -103,8 +103,10 @@ jobs:
           body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
           labels: "Version Update - Prod"
 
-          
       - name: Merge pull request
         run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Launch create release workflow
+        uses: ./.github/workflows/create-release.yml
