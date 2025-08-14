@@ -23,13 +23,15 @@ jobs:
           echo "last commit SHA : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
 
-      - name: Get last version tag SHA
+      - name: Get last version tag and SHA
         id: last_tag
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           TAG_SHA=$(git rev-list -n 1 "$LAST_TAG")
-          echo "last version SHA : TAG_SHA"
+          echo "Last version SHA : $TAG_SHA"
           echo "tag_sha=$TAG_SHA" >> $GITHUB_OUTPUT
+          echo "Last version tag : $LAST_TAG"
+          echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
 
       - name: Compare SHAs
         id: compare
@@ -43,6 +45,7 @@ jobs:
         id: changelog_version
         run: |
           FILE_VERSION=$(grep -m1 '^## ' CHANGELOG.md | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "Last version in changelog : $FILE_VERSION"
           echo "file_version=$FILE_VERSION" >> $GITHUB_OUTPUT
 
       - name: Determine version to use
