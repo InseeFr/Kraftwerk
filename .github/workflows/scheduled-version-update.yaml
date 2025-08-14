@@ -69,6 +69,8 @@ jobs:
 
       - name: Create PR branch
         run: |
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@github.com'
           PR_BRANCH="update-version-${{ steps.determine_version.outputs.new_version }}"
           git checkout -b "$PR_BRANCH"
           
