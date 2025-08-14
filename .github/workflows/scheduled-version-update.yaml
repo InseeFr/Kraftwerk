@@ -50,7 +50,10 @@ jobs:
       - name: Determine version to use
         id: determine_version
         run: |
-          IFS='.' read -r MAJOR LAST_MINOR LAST_PATCH <<< "${{ steps.last_tag.outputs.last_tag#v }}"
+          RAW_TAG="${{ steps.last_tag.outputs.last_tag }}"
+          RAW_TAG="${RAW_TAG#v}"
+          
+          IFS='.' read -r MAJOR LAST_MINOR LAST_PATCH <<< "$RAW_TAG"
           IFS='.' read -r FILE_MAJOR FILE_MINOR FILE_PATCH <<< "${{ steps.changelog_version.outputs.file_version }}"
           
           if [ "$FILE_MAJOR" -gt "$MAJOR" ] || \
