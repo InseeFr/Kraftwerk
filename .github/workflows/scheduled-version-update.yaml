@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.head_ref }}
+          ref: main
           fetch-depth: 0
 
       - name: Get last commit SHA
@@ -73,14 +73,13 @@ jobs:
           git config user.email 'github-actions@github.com'
           
           PR_BRANCH="update-version-${{ steps.determine_version.outputs.new_version }}"
-          git checkout -B "$PR_BRANCH"
+          git checkout -b "$PR_BRANCH"
           
           #Update pom public
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
           sed -i -E "/<artifactId>kraftwerk<\/artifactId>/{n;s|<version>[0-9]+\.[0-9]+\.[0-9]+</version>|<version>$NEW_VERSION</version>|;}" pom-public.xml
           git add pom-public.xml
           git commit -m "chore: Update pom public version to $NEW_VERSION"
-          git push origin "$PR_BRANCH"
           
           # Update TODO to today in changelog
           TODAY=$(date +%Y-%m-%d)
@@ -88,7 +87,6 @@ jobs:
             sed -i "0,/\[TODO\]/s/\[TODO\]/[$TODAY]/" CHANGELOG.md
             git add CHANGELOG.md
             git commit -m "doc: Update CHANGELOG date"
-            git push origin "$PR_BRANCH"
           else
             echo "No change done in changelog"
           fi
@@ -99,7 +97,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: "main"
+          commit-message: "Update for release ${{ steps.determine_version.outputs.new_version }}"
           branch: "update-version-${{ steps.determine_version.outputs.new_version }}"
+          branch-suffix: timestamp
           title: "Auto release ${{ steps.determine_version.outputs.new_version }}"
           body: "This PR updates the application to version ${{ steps.determine_version.outputs.new_version }}."
           labels: "Version Update - Prod"
