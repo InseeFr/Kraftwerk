@@ -94,6 +94,3 @@ jobs:
           git config user.email 'github-actions@github.com'
           git commit -am "chore: update version to ${{ steps.determine_version.outputs.new_version }}" || echo "No changes to commit"
           git push
-
-      - name: Launch create release workflow
-        uses: ./.github/workflows/create-release.yml
