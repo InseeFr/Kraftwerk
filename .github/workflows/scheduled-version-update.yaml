@@ -108,6 +108,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  launch-create-release-workflow:
+  wait-for-merge:
+    runs-on: ubuntu-latest
     needs: update-version
+    steps:
+      - uses: actions/checkout@v5
+      - name: Wait for merged version commit
+        run: |
+          echo "Fetching main branch..."
+          git fetch origin main
+          
+          while true; do
+            LAST_VERSION_COMMIT=$(git log origin/main --pretty=format:"%H %s" | grep -v 'Merge pull request' | grep 'chore: update version to' | head -n1 | awk '{print $1}')
+            if [ -n "$LAST_VERSION_COMMIT" ]; then
+              echo "Found version commit: $LAST_VERSION_COMMIT"
+              break
+            else
+              echo "Version commit not yet merged, sleeping 10s..."
+              sleep 10
+              git fetch origin main
+            fi
+          done
+
+  launch-create-release-workflow:
+    needs: wait-for-merge
     uses: ./.github/workflows/create-release.yaml
