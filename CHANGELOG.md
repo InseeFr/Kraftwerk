@@ -1,6 +1,7 @@
 # Changelog
-## 3.6.1 [TODO]
+## 3.6.1 [2025-08-19]
 ### Updated
+- BPM 1.0.13
 - Pitest 1.20.2
 - Cucumber 7.27.2
 
