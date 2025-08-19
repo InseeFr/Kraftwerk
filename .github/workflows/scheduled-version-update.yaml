@@ -94,7 +94,7 @@ jobs:
           #Update BPM version
           ##POM
           CURRENT_BPM_VERSION=$(grep -oPm1 "(?<=<bpm.version>)[0-9]+\.[0-9]+\.[0-9]+(?=</bpm.version>)" kraftwerk-core/pom.xml)
-          if [ "CURRENT_BPM_VERSION" != "$BPM_VERSION" ]; then
+          if [ "$CURRENT_BPM_VERSION" != "$BPM_VERSION" ]; then
             echo "BPM version changed!"
             sed -i "s|<bpm.version>.*</bpm.version>|<bpm.version>${BPM_VERSION}</bpm.version>|" kraftwerk-core/pom.xml
             git add kraftwerk-core/pom.xml

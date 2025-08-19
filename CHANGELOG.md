@@ -1,4 +1,9 @@
 # Changelog
+## 3.6.1 [TODO]
+### Updated
+- Pitest 1.20.2
+- Cucumber 7.27.2
+
 ## 3.6.0 [2025-08-07]
 ### Added
 - Load metadata from Genesis and save into it if not exists
