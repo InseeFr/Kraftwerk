@@ -31,6 +31,7 @@ jobs:
       - name: Get last version tag and SHA
         id: last_tag
         run: |
+          cd kraftwerk
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           TAG_SHA=$(git rev-list -n 1 "$LAST_TAG")
           echo "Last version SHA : $TAG_SHA"
@@ -49,6 +50,7 @@ jobs:
       - name: Get version from changelog
         id: changelog_version
         run: |
+          cd kraftwerk
           FILE_VERSION=$(grep -m1 '^## ' CHANGELOG.md | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
           echo "Last version in changelog : $FILE_VERSION"
           echo "file_version=$FILE_VERSION" >> $GITHUB_OUTPUT
@@ -81,15 +83,13 @@ jobs:
       - name: Get BPM version
         id: bpm-version
         run: |
-          cd ..
           cd bpm
           BPM_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           echo "bpm_version=$BPM_VERSION" >> $GITHUB_OUTPUT
-          cd ..
-          cd kraftwerk
 
       - name: Update files and commit
         run: |
+          cd kraftwerk
           BPM_VERSION="${{ steps.bpm-version.outputs.bpm_version }}"
           NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
           NEW_VERSION_NO_V="${NEW_VERSION#v}"
@@ -168,6 +168,7 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v7
         with:
+          path: kraftwerk
           token: ${{ secrets.GITHUB_TOKEN }}
           base: "main"
           commit-message: "Update for release ${{ steps.determine_version.outputs.new_version }}"
@@ -178,7 +179,9 @@ jobs:
           labels: "Version Update - Prod"
 
       - name: Merge pull request
-        run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+        run: |
+          cd kraftwerk
+          gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
