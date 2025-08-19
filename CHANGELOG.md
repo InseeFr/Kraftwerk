@@ -1,5 +1,5 @@
 # Changelog
-## 3.6.1 [2025-08-19]
+## 3.6.1 [TODO]
 ### Updated
 - Pitest 1.20.2
 - Cucumber 7.27.2
