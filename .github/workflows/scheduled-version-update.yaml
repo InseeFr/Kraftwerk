@@ -16,12 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          path: kraftwerk
           ref: main
           fetch-depth: 0
 
       - name: Get last commit SHA
         id: current_sha
         run: |
+          cd kraftwerk
           CURRENT_SHA=$(git log -n 1 --pretty=format:"%H")
           echo "last commit SHA : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
@@ -79,10 +81,12 @@ jobs:
       - name: Get BPM version
         id: bpm-version
         run: |
+          cd ..
           cd bpm
           BPM_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           echo "bpm_version=$BPM_VERSION" >> $GITHUB_OUTPUT
           cd ..
+          cd kraftwerk
 
       - name: Update files and commit
         run: |
@@ -110,14 +114,14 @@ jobs:
               echo "BPM version already present in changelog"
             else
               echo "Adding BPM to changelog"
-              if awk -v ver="## ${VERSION_NO_V}" '
+              if awk -v ver="## ${NEW_VERSION_NO_V}" '
                 $0==ver {in_ver=1; next}
                 in_ver && /^## / {exit}
                 in_ver && /^### Updated/ {found=1; exit}
                 END {exit !found}
               ' "$FILE"; then
-                echo "Adding BPM ${BPM_VERSION} to existing changed"
-                awk -v ver="## ${VERSION_NO_V}" -v newline="$NEW_LINE" '
+                echo "Adding BPM ${BPM_VERSION} to existing changed section"
+                awk -v ver="## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
                   $0==ver {print; in_ver=1; next}
                   in_ver && /^## / {in_ver=0}
                   in_ver && /^### Updated/ {print; print newline; next}
@@ -127,7 +131,7 @@ jobs:
               ### New changed section
               else
                 echo "Adding BPM ${BPM_VERSION} to a new changed section"
-                awk -v ver="## ${VERSION_NO_V}" -v newline="$NEW_LINE" '
+                awk -v ver="## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
                   $0==ver {print; in_ver=1; next}
                   in_ver && /^## / {print "### Updated"; print newline; in_ver=0}
                   {print}
