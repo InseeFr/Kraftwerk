@@ -105,8 +105,8 @@ jobs:
           
             ##Change "Changed" Changelog
             NEW_LINE="- BPM ${BPM_VERSION}"
-            if awk -v ver="## ${NEW_VERSION_NO_V}" -v line="$NEW_LINE" '
-                $0==ver {in_ver=1; next}
+            if awk -v ver="^## ${NEW_VERSION_NO_V}" -v line="$NEW_LINE" '
+                $0 ~ ver {in_ver=1; next}
                 in_ver && /^## / {exit}
                 in_ver && $0==line {found=1; exit}
                 END {exit !found}
@@ -114,15 +114,15 @@ jobs:
               echo "BPM version already present in changelog"
             else
               echo "Adding BPM to changelog"
-              if awk -v ver="## ${NEW_VERSION_NO_V}" '
-                $0==ver {in_ver=1; next}
+              if awk -v ver="^## ${NEW_VERSION_NO_V}" '
+                $0 ~ ver {in_ver=1; next}
                 in_ver && /^## / {exit}
                 in_ver && /^### Updated/ {found=1; exit}
                 END {exit !found}
               ' "$FILE"; then
-                echo "Adding BPM ${BPM_VERSION} to existing changed section"
-                awk -v ver="## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
-                  $0==ver {print; in_ver=1; next}
+                echo "Adding BPM ${BPM_VERSION} to existing updated section"
+                awk -v ver="^## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
+                  $0 ~ ver {print; in_ver=1; next}
                   in_ver && /^## / {in_ver=0}
                   in_ver && /^### Updated/ {print; print newline; next}
                   {print}
@@ -130,9 +130,9 @@ jobs:
     
               ### New changed section
               else
-                echo "Adding BPM ${BPM_VERSION} to a new changed section"
-                awk -v ver="## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
-                  $0==ver {print; in_ver=1; next}
+                echo "Adding BPM ${BPM_VERSION} to a new updated section"
+                awk -v ver="^## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
+                  $0 ~ ver {print; in_ver=1; next}
                   in_ver && /^## / {print "### Updated"; print newline; in_ver=0}
                   {print}
                   END { if(in_ver) {print "### Updated"; print newline} }
