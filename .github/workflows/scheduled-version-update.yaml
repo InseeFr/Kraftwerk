@@ -24,8 +24,8 @@ jobs:
         id: current_sha
         run: |
           cd kraftwerk
-          CURRENT_SHA=$(git log -n 1 --pretty=format:"%H")
-          echo "last commit SHA : $CURRENT_SHA"
+          CURRENT_SHA=$(git log -n 1 --pretty=format:"%H" --invert-grep --grep='^ci:')
+          echo "last commit SHA (ci ignored) : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
 
       - name: Get last version tag and SHA
@@ -44,7 +44,7 @@ jobs:
         run: |
           if [ "${{ steps.current_sha.outputs.current_sha }}" = "${{ steps.last_tag.outputs.tag_sha }}" ]; then
             echo "No new commit since version. Exiting."
-            exit 0
+            exit 1
           fi
 
       - name: Get version from changelog
