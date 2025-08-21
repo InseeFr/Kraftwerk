@@ -1,5 +1,5 @@
 # Changelog
-## 3.6.2 [2025-08-21]
+## 3.6.2 [TODO]
 ### Updated
 - Springdoc 2.8.10
 
