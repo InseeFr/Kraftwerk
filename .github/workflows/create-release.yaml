@@ -16,7 +16,7 @@ jobs:
       should_run_next_job:  ${{ steps.check-tag.outputs.should_continue }}
     steps:
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
