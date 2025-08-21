@@ -1,4 +1,8 @@
 # Changelog
+## 3.6.2 [TODO]
+### Updated
+- Springdoc 2.8.10
+
 ## 3.6.1 [2025-08-19]
 ### Updated
 - BPM 1.0.13
