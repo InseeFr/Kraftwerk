@@ -29,8 +29,11 @@ jobs:
         id: current_sha
         run: |
           cd kraftwerk
-          CURRENT_SHA=$(git log -n 1 --pretty=format:"%H" --invert-grep --grep='^ci:')
-          echo "last commit SHA (ci ignored) : $CURRENT_SHA"
+          CURRENT_SHA=$(
+            git log -n 1 --pretty=format:"%H" \
+            --invert-grep --grep="^(ci:|Merge branch 'main'|Revert )")
+          )
+          echo "last commit SHA : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
 
       - name: Get last version tag and SHA
