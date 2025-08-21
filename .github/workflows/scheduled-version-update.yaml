@@ -30,9 +30,13 @@ jobs:
         run: |
           cd kraftwerk
           CURRENT_SHA=$(
-            git log -n 1 --pretty=format:"%H" \
-            --invert-grep --grep="^(ci:|Merge branch 'main'|Revert )"
+            git log --pretty=format:"%H" \
+            --invert-grep --grep="^ci:" \
+            --invert-grep --grep="^Merge branch 'main'" \
+            --invert-grep --grep="^Revert " \
+            -n 1
           )
+
           echo "last commit SHA : $CURRENT_SHA"
           echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
 
