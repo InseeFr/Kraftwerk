@@ -6,7 +6,12 @@ permissions:
 
 on:
   schedule:
-    - cron: 45 7 * * 4
+    # 08:30 Europe/Paris pendant l'heure d'été (CEST = UTC+2)
+    # mois 3-10 (mars à octobre inclus)
+    - cron: '30 6 * 3-10 4'
+    # 08:30 Europe/Paris pendant l'heure d'hiver (CET = UTC+1)
+    # mois 11,12,1,2 (novembre, décembre, janvier, février)
+    - cron: '30 7 * 11,12,1,2 4'
   workflow_dispatch:
 
 jobs:
