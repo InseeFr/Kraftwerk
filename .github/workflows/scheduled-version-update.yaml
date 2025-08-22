@@ -136,7 +136,7 @@ jobs:
                 awk -v ver="^## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
                   $0 ~ ver {print; in_ver=1; next}
                   in_ver && /^## / {in_ver=0}
-                  in_ver && /^### Updated/ {print; print newline; next}
+                  in_ver && !done && /^### Updated/ {print; print newline; done=1; next}
                   {print}
                 ' "$FILE" > tmp && mv tmp "$FILE"
     
@@ -145,9 +145,11 @@ jobs:
                 echo "Adding BPM ${BPM_VERSION} to a new updated section"
                 awk -v ver="^## ${NEW_VERSION_NO_V}" -v newline="$NEW_LINE" '
                   $0 ~ ver {print; in_ver=1; next}
-                  in_ver && /^## / {print "### Updated"; print newline; in_ver=0}
+                  in_ver && /^## / && !done {
+                    print "### Updated"; print newline; in_ver=0; done=1
+                  }
                   {print}
-                  END { if(in_ver) {print "### Updated"; print newline} }
+                  END { if(in_ver && !done) {print "### Updated"; print newline} }
                 ' "$FILE" > tmp && mv tmp "$FILE"
               fi
             fi
