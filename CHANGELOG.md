@@ -1,4 +1,14 @@
 # Changelog
+## 3.6.2 [2025-08-21]
+### Updated
+- Springdoc 2.8.10
+
+## 3.6.1 [2025-08-19]
+### Updated
+- BPM 1.0.13
+- Pitest 1.20.2
+- Cucumber 7.27.2
+
 ## 3.6.0 [2025-08-07]
 ### Added
 - Load metadata from Genesis and save into it if not exists
