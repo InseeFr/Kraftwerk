@@ -22,7 +22,7 @@ import java.util.Map;
 @Slf4j
 public class JsonWriterSequence {
 
-    public void writeJsonOutput(List<InterrogationId> listId,
+    public void tmpJsonOutput(List<InterrogationId> listId,
                                 List<SurveyUnitUpdateLatest> suLatest,
                                 ObjectMapper objectMapper,
                                 JsonGenerator jsonGenerator,
@@ -34,6 +34,15 @@ public class JsonWriterSequence {
                 objectMapper.writeValue(jsonGenerator, result);
             }
         }
+    }
+
+    public void outputJsonFileWriter(List<InterrogationId> listId,
+                                     List<SurveyUnitUpdateLatest> suLatest,
+                                     ObjectMapper objectMapper,
+                                     JsonGenerator jsonGenerator,
+                                     Map<String,MetadataModel> metadataModelsByMode,
+                                     Statement database) throws KraftwerkException, IOException {
+
     }
 
     private Map<String,Object> buildResultMap(List<SurveyUnitUpdateLatest> suLatest,
