@@ -86,7 +86,15 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     This method can do differential extraction (all data since last extraction) otherwise all data since january 1st 2025
      */
     public void runMainJson(String questionnaireModelId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
+        if (since == null){
+            log.info("No date specified, trying differential extraction for questionnaire {} and mode {}",questionnaireModelId,dataMode);
+        }
         LocalDateTime beginDate = getBeginningDate(questionnaireModelId, dataMode, since);
+        if (beginDate == null){
+            log.info("No extraction date found in database /nExtracting all data");
+        } else {
+            log.info("Extracting data between {} and now",beginDate.toString());
+        }
         log.info("Export json for questionnaireModelId {}", questionnaireModelId);
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
                 questionnaireModelId));
@@ -129,8 +137,10 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
+                // if one mode is specified we filter to keep data of that mode only
                 if (dataMode != null){
                     suLatest = suLatest.stream().filter(su-> su.getMode()==dataMode).toList();
+                    log.info("Number of documents kept for mode {}", dataMode);
                 }
                 unimodalProcess(suLatest);
                 multimodalProcess();
@@ -156,7 +166,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             return since;
         }
         // If no date is provided we try to retrieve last extraction date from genesis
-        try {
+        try{
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
             return LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
         } catch (KraftwerkException e) {
