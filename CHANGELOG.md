@@ -1,4 +1,18 @@
 # Changelog
+
+## 3.6.4 [2025-09-11]
+### Updated
+- DuckDB 1.3.2.1
+- Springdoc openapi webmvc 2.8.13
+- Cucumber 7.28.2
+
+
+## 3.6.3 [2025-08-28]
+### Updated
+- Springboot 3.5.5
+- Springdoc openapi webmvc 2.8.11
+
+
 ## 3.6.2 [2025-08-21]
 ### Updated
 - Springdoc 2.8.10
