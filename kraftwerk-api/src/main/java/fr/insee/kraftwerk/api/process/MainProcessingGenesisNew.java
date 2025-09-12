@@ -19,6 +19,7 @@ import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
@@ -86,54 +88,35 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     This method can do differential extraction (all data since last extraction) otherwise all data since january 1st 2025
      */
     public void runMainJson(String questionnaireModelId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
-        if (since == null){
-            log.info("No date specified, trying differential extraction for questionnaire {} and mode {}",questionnaireModelId,dataMode);
-        }
-        LocalDateTime beginDate = getBeginningDate(questionnaireModelId, dataMode, since);
-        if (beginDate == null){
-            log.info("No extraction date found in database /nExtracting all data");
-        } else {
-            log.info("Extracting data between {} and now",beginDate.toString());
-        }
         log.info("Export json for questionnaireModelId {}", questionnaireModelId);
+
+        LocalDateTime beginDate = resolveBeginDate(questionnaireModelId, dataMode, since);
+
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
                 questionnaireModelId));
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
+
         List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
         init(questionnaireModelId, modes);
-        JsonFactory jsonFactory = new JsonFactory();
-        ObjectMapper objectMapper = new ObjectMapper();
-        // Construct filename
-        Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
-        Path tmpOutputFile = Files.createTempFile(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)),
-                outputFileName(questionnaireModelId), null);
+
+        Path tmpOutputFile = createTempOutputFile(questionnaireModelId);
+
         //Try with resources to close database when done
-        try (Connection tryDatabase = config.isDuckDbInMemory() ?
-                SqlUtils.openConnection()
-                : SqlUtils.openConnection(Path.of(databasePath));
-                JsonGenerator jsonGenerator = jsonFactory.createGenerator(tmpOutputFile.toFile(), JsonEncoding.UTF8))
+        try (Connection connection = openDatabaseConnection(databasePath);
+             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile))
         {
-            if(tryDatabase == null){
-                throw new KraftwerkException(500,"Error during internal database creation");
-            }
-            this.database = tryDatabase.createStatement();
-            if (questionnaireModelId.isEmpty()) {
-                throw new KraftwerkException(204, null);
-            }
-            List<InterrogationId> ids = new ArrayList<>();
-            if (beginDate==null){
-                ids = client.getInterrogationIds(questionnaireModelId);
-            } else {
-                ids = client.getInterrogationIdsFromDate(questionnaireModelId,beginDate);
-            }
-            List<List<InterrogationId>> listIds = ListUtils.partition(ids, batchSize);
-            int nbPartitions = listIds.size();
+            this.database = connection.createStatement();
+
+            List<InterrogationId> ids = fetchInterrogationIds(questionnaireModelId, beginDate);
+            List<List<InterrogationId>> partitions  = ListUtils.partition(ids, batchSize);
+            int nbPartitions = partitions .size();
             int indexPartition = 1;
 
-             jsonGenerator.writeStartArray(); // Beginning of Json Array
+            ObjectMapper objectMapper = new ObjectMapper();
+            jsonGenerator.writeStartArray(); // Beginning of Json Array
 
-            for (List<InterrogationId> listId : listIds) {
+            for (List<InterrogationId> listId : partitions ) {
                 List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
@@ -160,20 +143,69 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
-    private LocalDateTime getBeginningDate(String questionnaireModelId,Mode dataMode,LocalDateTime since) throws KraftwerkException {
-        // If a date is provided we return it
+    private Path createTempOutputFile(String questionnaireModelId) throws IOException {
+        Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
+        return Files.createTempFile(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)),
+                outputFileName(questionnaireModelId), null);
+    }
+
+    private JsonGenerator createJsonGenerator(Path tmpOutputFile) throws IOException {
+        JsonFactory jsonFactory = new JsonFactory();
+        return jsonFactory.createGenerator(tmpOutputFile.toFile(), JsonEncoding.UTF8);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private Connection openDatabaseConnection(String databasePath) throws SQLException, KraftwerkException {
+        Connection connection = config.isDuckDbInMemory()
+                ? SqlUtils.openConnection()
+                : SqlUtils.openConnection(Path.of(databasePath));
+        if (connection == null) {
+            throw new KraftwerkException(500, "Error during internal database creation");
+        }
+        return connection;
+    }
+
+    /**
+     * Resolve the beginning date for extraction.
+     * <p>
+     * Priority :
+     * 1. The explicit 'since' parameter (highest priority),
+     * 2. The last extraction date from Genesis,
+     * 3. Or null if nothing is found (meaning: extract all data).
+     */
+    private LocalDateTime resolveBeginDate(String questionnaireModelId,
+                                           Mode dataMode,
+                                           @Nullable LocalDateTime since) {
+        // 1. Explicit date provided
         if (since != null) {
+            log.info("Using provided extraction start date: {}", since);
             return since;
         }
-        // If no date is provided we try to retrieve last extraction date from genesis
-        try{
+
+        // 2. Try to retrieve from Genesis
+        log.info("No date specified, trying differential extraction for questionnaire {} and mode {}",
+                questionnaireModelId, dataMode);
+
+        try {
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
-            return LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
+            LocalDateTime beginDate = LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
+
+            log.info("Extracting data between {} and now", beginDate);
+            return beginDate;
+
         } catch (KraftwerkException e) {
-            log.info(e.getMessage());
-            // If no date is found we return null
+            log.info("No extraction date found in database → extracting all data (reason: {})", e.getMessage());
             return null;
         }
+    }
+
+    private List<InterrogationId> fetchInterrogationIds(String questionnaireModelId,
+                                                        @Nullable LocalDateTime beginDate)
+            throws KraftwerkException {
+        if (beginDate != null) {
+            return client.getInterrogationIdsFromDate(questionnaireModelId, beginDate);
+        }
+        return client.getInterrogationIds(questionnaireModelId);
     }
 
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {
