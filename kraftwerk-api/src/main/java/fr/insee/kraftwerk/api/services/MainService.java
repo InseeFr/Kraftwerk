@@ -163,7 +163,7 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.questionnaireModelId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String questionnaireModelId,
 			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-			@Parameter(description = "Extract since") @RequestParam(value = "sinceDate") LocalDateTime since
+			@Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since
 			){
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		boolean withDDI = true;
