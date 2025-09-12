@@ -161,8 +161,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             return LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
         } catch (KraftwerkException e) {
             log.info(e.getMessage());
-            // If no date is found we try since the January 1st 2025
-            return LocalDateTime.of(2025,1,1,0,0);
+            // If no date is found we return null
+            return null;
         }
     }
 
