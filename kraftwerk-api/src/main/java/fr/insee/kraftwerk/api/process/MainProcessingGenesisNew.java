@@ -176,7 +176,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                                            @Nullable LocalDateTime since) {
         // 1. Explicit date provided
         if (since != null) {
-            log.info("Using provided extraction start date: {}", since);
+            log.info("Using provided extraction start date {} for questionnaire {}", since, questionnaireModelId);
             return since;
         }
 
@@ -188,11 +188,11 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
             LocalDateTime beginDate = LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
 
-            log.info("Extracting data between {} and now", beginDate);
+            log.info("Extracting data between {} and now for questionnaire {}", beginDate, questionnaireModelId);
             return beginDate;
 
         } catch (KraftwerkException e) {
-            log.info("No extraction date found in database → extracting all data (reason: {})", e.getMessage());
+            log.info("No extraction date found in database → extracting all data (reason: {}) for questionnaire  {}", e.getMessage(), questionnaireModelId);
             return null;
         }
     }
@@ -227,6 +227,15 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         log.info("File: {} successfully written", outputPath);
     }
 
+    /**
+     * Constructs the output file name for the JSON export of a given questionnaire.
+     * <p>
+     * The filename includes the questionnaire ID, a timestamp of the current date and time,
+     * and the appropriate extension depending on whether encryption is enabled.
+     *
+     * @param questionnaireModelId the identifier of the questionnaire
+     * @return the constructed output file name, including the extension
+     */
     public String outputFileName(String questionnaireModelId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String timestamp = LocalDateTime.now().format(formatter);
