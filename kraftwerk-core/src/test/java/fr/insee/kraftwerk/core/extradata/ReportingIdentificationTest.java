@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingIdentification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class ReportingIdentificationTest {
@@ -15,39 +16,9 @@ class ReportingIdentificationTest {
         Assertions.assertNull(reportingIdentification.getOutcomeSpotting(null));
 	}
 
-	// Case old file : no identificationConfiguration but identification is present
-	@Test
-	void getOutcomeSpottingTest_old_files() {
-		String identificationConfiguration = null;
-		ReportingIdentification reportingIdentification = new ReportingIdentification("DESTROY","","","","","","");
-		Assertions.assertEquals("DESTROY",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("UNIDENTIFIED","","","","","","");
-		Assertions.assertEquals("UNIDENTIF",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","NOORDINARY","","","","");
-		Assertions.assertEquals("NACCNO",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ABSORBED","","","","");
-		Assertions.assertEquals("NACCABS",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","VACANT","","","");
-		Assertions.assertEquals("NACCVAC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","SECONDARY","","","");
-		Assertions.assertEquals("NACCSEC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","DK","UNIDENTIFIED","","");
-		Assertions.assertEquals("NACCDKUNIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","PRIMARY","IDENTIFIED","","");
-		Assertions.assertEquals("NACCPRIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","OCCASIONAL","IDENTIFIED","","");
-		Assertions.assertEquals("ACCOCCIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-	}
-
+	// null = Case old file : no identificationConfiguration but identification is present
 	@ParameterizedTest
+	@NullSource
 	@ValueSource(strings = {"IASCO","HOUSEF2F"})
 	void getOutcomeSpottingTest_IASCO_HOUSEF2F(String identificationConfiguration) {
 		ReportingIdentification reportingIdentification = new ReportingIdentification("DESTROY","","","","","","");
