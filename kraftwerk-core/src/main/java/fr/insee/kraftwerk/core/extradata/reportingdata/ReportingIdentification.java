@@ -11,6 +11,11 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportingIdentification {
+    private static final Set<String> CONFIG_IASCO = Set.of("IASCO", "HOUSEF2F");
+    private static final Set<String> CONFIG_PHONE = Set.of("INDTEL", "INTELNOR");
+    private static final Set<String> CONFIG_F2F = Set.of("INDF2F", "INF2FNOR");
+    private static final String ORDINARY = "ORDINARY";
+    private static final String NOORDINARY = "NOORDINARY";
     private String identification;
     private String access;
     private String situation;
@@ -19,16 +24,9 @@ public class ReportingIdentification {
     private String individualStatus;
     private String interviewerCanProcess;
 
-
-    private static final Set<String> CONFIG_IASCO = Set.of("IASCO", "HOUSEF2F");
-    private static final Set<String> CONFIG_PHONE = Set.of("INDTEL", "INTELNOR");
-    private static final Set<String> CONFIG_F2F = Set.of("INDF2F", "INF2FNOR");
-    private static final String ORDINARY = "ORDINARY";
-    private static final String NOORDINARY = "NOORDINARY";
-
     public String getOutcomeSpotting(String identificationConfiguration) {
         // Outcome spotting for reporting data from Moog (WEB) is not applicable
-        if (identificationConfiguration == null && identification == null){
+        if (identificationConfiguration == null && identification == null) {
             return null;
         }
         // Case of old format of reporting data. No identificationConfiguration, but identification is not null.
@@ -42,52 +40,84 @@ public class ReportingIdentification {
         }
         return null;
     }
-    
 
-    public String outcomeForHouseF2F(){
+
+    public String outcomeForHouseF2F() {
         if (StringUtils.isEmpty(identification)) {
             return null;
         }
-        if ("DESTROY".equals(identification)) {
-            return "DESTROY";
+        switch (identification) {
+            case "DESTROY" -> {
+                return "DESTROY";
+            }
+            case "UNIDENTIFIED" -> {
+                return "UNIDENTIF";
+            }
+            case "IDENTIFIED" -> {
+                switch (access) {
+                    case "NACC" -> {
+                        return "NACCNO";
+                    }
+                    case "ACC" -> {
+                        return accessCase();
+                    }
+                    default -> {
+                        return null;
+                    }
+                }
+            }
+            default -> {
+                return null;
+            }
         }
-        if ("UNIDENTIFIED".equals(identification)) {
-            return "UNIDENTIF";
+    }
+
+    private String accessCase() {
+        switch (situation) {
+            case "ABSORBED" -> {
+                return "ACCABS";
+            }
+            case NOORDINARY -> {
+                return "ACCNO";
+            }
+            case ORDINARY -> {
+                return ordinarySituationCase();
+            }
+            default -> {
+                return null;
+            }
         }
-        StringBuilder outcomeSpotting = new StringBuilder();
-        outcomeSpotting.append(access);
-        if (NOORDINARY.equals(situation)) {
-            outcomeSpotting.append("NO");
-            return outcomeSpotting.toString();
+    }
+
+    private String ordinarySituationCase() {
+        switch (category) {
+            case "VACANT" -> {
+                return "ACCVAC";
+            }
+            case "SECONDARY" -> {
+                return "ACCSEC";
+            }
+            case "PRIMARY" -> {
+                return primaryCategoryCase();
+            }
+            default -> {
+                return null;
+            }
         }
-        if ("ABSORBED".equals(situation)) {
-            outcomeSpotting.append("ABS");
-            return outcomeSpotting.toString();
+    }
+
+    private String primaryCategoryCase() {
+        switch (occupant) {
+            case "IDENTIFIED" -> {
+                return "ACCPRIDENT";
+            }
+            case "UNIDENTIFIED" -> {
+                return "ACCPRUNIDENT";
+            }
+            default -> {
+                return null;
+            }
         }
-        if ("VACANT".equals(category)) {
-            outcomeSpotting.append("VAC");
-            return outcomeSpotting.toString();
-        }
-        if ("SECONDARY".equals(category)) {
-            outcomeSpotting.append("SEC");
-            return outcomeSpotting.toString();
-        }
-        if ("DK".equals(category)) {
-            outcomeSpotting.append("DK");
-        }
-        if ("PRIMARY".equals(category)) {
-            outcomeSpotting.append("PR");
-        }
-        if ("OCCASIONAL".equals(category)) {
-            outcomeSpotting.append("OCC");
-        }
-        if ("IDENTIFIED".equals(occupant)) {
-            outcomeSpotting.append("IDENT");
-        }
-        if ("UNIDENTIFIED".equals(occupant)) {
-            outcomeSpotting.append("UNIDENT");
-        }
-        return outcomeSpotting.toString();
     }
 
     private String outcomeForPhone() {
@@ -97,12 +127,13 @@ public class ReportingIdentification {
             case "NOIDENT" -> "INDNOIDENT";
             case "NOFIELD" -> "INDNOFIELD";
             case "SAMEADRESS" -> {
-                    if (ORDINARY.equals(situation)) yield "INDORDSADR";
-                    yield NOORDINARY.equals(situation) ? "INDNORDSADR" : null;
+                if (ORDINARY.equals(situation)) yield "INDORDSADR";
+                yield NOORDINARY.equals(situation) ? "INDNORDSADR" : null;
             }
             case "OTHERADRESS" -> {
-                    if (ORDINARY.equals(situation)) yield "INDORDOADR";
-                    yield NOORDINARY.equals(situation) ? "INDNORDOADR" : null;}
+                if (ORDINARY.equals(situation)) yield "INDORDOADR";
+                yield NOORDINARY.equals(situation) ? "INDNORDOADR" : null;
+            }
             default -> null;
         };
     }
