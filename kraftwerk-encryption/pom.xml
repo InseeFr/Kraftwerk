@@ -22,7 +22,7 @@
         <dependency>
             <groupId>fr.insee.kraftwerk</groupId>
             <artifactId>kraftwerk-core</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
