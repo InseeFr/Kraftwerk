@@ -1,4 +1,7 @@
 # Changelog
+## 3.7.0 [TODO]
+### Changed
+- Reporting data outcome spotting calculation for IASCO and HOUSEF2F
 
 ## 3.6.4 [2025-09-11]
 ### Updated
