@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ReportingIdentificationTest {
 
+	private final String UNKNOWN_VALUE = "TRUC";
+
 	// Moog case : no identificationConfiguration and no identification
 	@Test
 	void getOutcomeSpottingTest_moog_no_identification() {
@@ -47,6 +49,29 @@ class ReportingIdentificationTest {
 
 		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","PRIMARY","UNIDENTIFIED","","");
 		Assertions.assertEquals("ACCPRUNIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"IASCO","HOUSEF2F"})
+	void getOutcomeSpottingTest_IASCO_HOUSEF2F_unknown_values(String identificationConfiguration) {
+
+		ReportingIdentification reportingIdentification = new ReportingIdentification("DESTROY","","","","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(UNKNOWN_VALUE));
+
+		reportingIdentification = new ReportingIdentification(UNKNOWN_VALUE,"","","","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("IDENTIFIED",UNKNOWN_VALUE,"","","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC",UNKNOWN_VALUE,"","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY",UNKNOWN_VALUE,"","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","PRIMARY",UNKNOWN_VALUE,"","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 	}
 
 	@Test
@@ -105,4 +130,13 @@ class ReportingIdentificationTest {
 		Assertions.assertEquals("NOTREAT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 	}
 
+	@ParameterizedTest
+	@ValueSource(strings = {"INDTEL","INDF2F"})
+	void getOutcomeSpottingTest_INDTEL_INDF2F_unknown_value(String identificationConfiguration) {
+		ReportingIdentification reportingIdentification = new ReportingIdentification("","","","","",UNKNOWN_VALUE,"");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("","","","","","OTHERADRESS",UNKNOWN_VALUE);
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+	}
 }
