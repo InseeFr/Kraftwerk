@@ -1,8 +1,10 @@
 # Changelog
-## 3.7.0 [TODO]
+## 3.7.0 [2025-09-25]
 ### Changed
 - Reporting data outcome spotting calculation for IASCO and HOUSEF2F
 
+### Updated
+- BPM 1.0.17
 ## 3.6.4 [2025-09-11]
 ### Updated
 - DuckDB 1.3.2.1
