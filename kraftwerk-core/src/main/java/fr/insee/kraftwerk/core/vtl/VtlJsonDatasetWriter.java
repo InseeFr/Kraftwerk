@@ -92,13 +92,20 @@ public class VtlJsonDatasetWriter {
 
 		Integer variableNumber = 0;
 
-		// Root level identifier
+		// Root level identifiers
 		JSONObject jsonVtlIdentifier = new JSONObject();
 		jsonVtlIdentifier.put(NAME, Constants.ROOT_IDENTIFIER_NAME);
 		jsonVtlIdentifier.put(TYPE, STRING);
 		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
 		dataStructure.add(jsonVtlIdentifier);
 		columnsMapping.put(Constants.ROOT_IDENTIFIER_NAME, variableNumber);
+		variableNumber++;
+		jsonVtlIdentifier = new JSONObject();
+		jsonVtlIdentifier.put(NAME, Constants.SURVEY_UNIT_IDENTIFIER_NAME);
+		jsonVtlIdentifier.put(TYPE, STRING);
+		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
+		dataStructure.add(jsonVtlIdentifier);
+		columnsMapping.put(Constants.SURVEY_UNIT_IDENTIFIER_NAME, variableNumber);
 		variableNumber++;
 		// Group identifiers
 		for (String groupName : metadataModel.getSubGroupNames()) {
@@ -139,8 +146,9 @@ public class VtlJsonDatasetWriter {
 			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
 			// (previous implementation was: fill with empty strings ("")
 
-			// Root level identifier
+			// Root level identifiers
 			rowValues[0] = questionnaireData.getIdentifier();
+			rowValues[1] = questionnaireData.getAnswers().getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
 			
 			// Root variables values
 			addValuesToRow(rootInstance, rowValues);
@@ -190,7 +198,9 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : groupInstance.getVariableNames()) {
 			if (columnsMapping.get(variableName) != null) {
 				String value = groupInstance.getValue(variableName);
-				if (metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN) {
+				if ( !variableName.equals(Constants.SURVEY_UNIT_IDENTIFIER_NAME)
+						&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
+				) {
 					value = convertBooleanValue(value);
 				}
 				rowValues[columnsMapping.get(variableName)] = value;

@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.bpm.metadata.model.Variable;
-import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableModel;
@@ -39,11 +37,6 @@ public class BuildBindingsSequenceGenesis {
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
 		data.setMetadataModel(metadataModels.get(dataMode));
-		data.getMetadataModel().getVariables().putVariable(new Variable(
-				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
-				data.getMetadataModel().getRootGroup(),
-				VariableType.STRING
-		));
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		// To be deported in another place in the code later at refactor step
