@@ -1,6 +1,8 @@
 package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableModel;
@@ -8,9 +10,6 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.extradata.paradata.Paradata;
 import fr.insee.kraftwerk.core.extradata.paradata.ParadataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.CSVReportingDataParser;
-import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingData;
-import fr.insee.kraftwerk.core.extradata.reportingdata.XMLReportingDataParser;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -21,7 +20,6 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +39,11 @@ public class BuildBindingsSequenceGenesis {
 
 		/* Step 2.0 : Read the DDI file (and Lunatic Json for missing variables) to get survey variables */
 		data.setMetadataModel(metadataModels.get(dataMode));
+		data.getMetadataModel().getVariables().putVariable(new Variable(
+				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				data.getMetadataModel().getRootGroup(),
+				VariableType.STRING
+		));
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
 		// To be deported in another place in the code later at refactor step
@@ -51,6 +54,7 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
+			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getSurveyUnitId());
 
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
