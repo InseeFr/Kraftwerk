@@ -33,6 +33,7 @@ public class VtlJsonDatasetWriter {
 	private static final String TYPE = "type";
 	private static final String NAME = "name";
 	private static final String IDENTIFIER = "IDENTIFIER";
+	private static final String MEASURE = "MEASURE";
 	private static final String STRING = "STRING";
 	private final SurveyRawData surveyData;
 	private final MetadataModel metadataModel;
@@ -103,7 +104,7 @@ public class VtlJsonDatasetWriter {
 		jsonVtlIdentifier = new JSONObject();
 		jsonVtlIdentifier.put(NAME, Constants.SURVEY_UNIT_IDENTIFIER_NAME);
 		jsonVtlIdentifier.put(TYPE, STRING);
-		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
+		jsonVtlIdentifier.put(ROLE, MEASURE);
 		dataStructure.add(jsonVtlIdentifier);
 		columnsMapping.put(Constants.SURVEY_UNIT_IDENTIFIER_NAME, variableNumber);
 		variableNumber++;
