@@ -8,7 +8,6 @@ import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -120,7 +119,6 @@ public class FileSystemImpl implements FileUtilsInterface{
 	}
 
 	@Override
-	@Nullable
 	public Boolean isDirectory(String path) {
 		File file = new File(path);
 		if(file.isDirectory()){
