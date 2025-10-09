@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -18,7 +19,6 @@ import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jdk.jfr.DataAmount;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Map;
-
+import java.time.LocalDateTime;
 
 @RestController
 @Slf4j
@@ -158,29 +157,28 @@ public class MainService extends KraftwerkService {
 		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
 	}
 
-	//WIP : poc one interrogation
-	//Objective : give the json with all the data
 	@GetMapping(value ="/json")
 	@Operation(operationId = "jsonExtraction", summary = "", description ="")
 	public ResponseEntity<Object> jsonExtraction(
-			@Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String campaignId,
-			@Parameter(description = "${param.interrogationId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String interrogationId
-	){
+			@Parameter(description = "${param.questionnaireModelId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String questionnaireModelId,
+			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+			@Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since
+			){
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		boolean withDDI = true;
 		boolean withEncryption = false;
 
-		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
-		Map<String,Object> results;
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 		try {
-			results = mpGenesis.runMainJson(campaignId, interrogationId);
+			mpGenesis.runMainJson(questionnaireModelId, batchSize, dataMode, since);
 			log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(results);
+		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",questionnaireModelId));
 	}
 
 	@NotNull
