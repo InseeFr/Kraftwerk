@@ -54,7 +54,7 @@ public class ExportDatasetDefinitions {
 
 	@Then("I should get some dataset values from {string}")
 	public void checkDataset(String nameDataset) {
-		assertEquals(15, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
+		assertEquals(16, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
 		assertEquals(4, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().size());
 		assertEquals("Purple", vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().getFirst().get("CARS_LOOP.CAR_COLOR"));
 		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));
