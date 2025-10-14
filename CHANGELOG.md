@@ -1,4 +1,8 @@
 # Changelog
+## 3.8.0 [TODO]
+### Added
+- Survey unit id export
+
 ## 3.7.0 [2025-09-25]
 ### Changed
 - Reporting data outcome spotting calculation for IASCO and HOUSEF2F
