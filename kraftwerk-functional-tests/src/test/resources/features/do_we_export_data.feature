@@ -15,5 +15,5 @@ Feature: Do we save correctly all data ?
     # - ExpectedDataFieldCount : Expected field quantity
 
     |Directory                        |ExpectedLineCount     |ExpectedDataFieldCount            |
-    |SAMPLETEST-DATAONLY-v1           |4                     |136                               |
-    |SAMPLETEST-PAPERDATA-v1          |6                     |137                               |
+    |SAMPLETEST-DATAONLY-v1           |4                     |137                               |
+    |SAMPLETEST-PAPERDATA-v1          |6                     |138                               |
