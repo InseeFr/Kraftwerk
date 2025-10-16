@@ -10,10 +10,10 @@ Feature: Do we save correctly loop data from Genesis?
     And Step 2 : We check "<LoopName>" output file has <ExpectedFileLinesCount> lines and <ExpectedVariablesCount> variables
     Examples:
       | CampaignId    | InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
-      | TEST-TABLEAUX | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
-      | TEST-GLOB     | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB     | AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB     | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
+      | TEST-TABLEAUX | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 6                      |
+      | TEST-GLOB     | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB     | AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB     | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 15                     |
 
   Scenario Outline: Genesis loop external data export
     Given Step 0 : We have some survey in directory "<CampaignId>"
@@ -25,10 +25,10 @@ Feature: Do we save correctly loop data from Genesis?
     And Step 2 : We check "<LoopName>" output file has <ExpectedFileLinesCount> lines and <ExpectedVariablesCount> variables
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
-      | TEST-TABLEAUX  |  AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
-      | TEST-GLOB      |  AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB      |  AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB      |  AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
+      | TEST-TABLEAUX  |  AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 6                      |
+      | TEST-GLOB      |  AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB      |  AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB      |  AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 15                     |
 
   Scenario Outline: Genesis loop collected data export by questionnaire
     Given Step 0 : We have some survey in directory "<QuestionnaireModelId>"
@@ -40,10 +40,10 @@ Feature: Do we save correctly loop data from Genesis?
     And Step 2 : We check "<LoopName>" output file has <ExpectedFileLinesCount> lines and <ExpectedVariablesCount> variables
     Examples:
       | QuestionnaireModelId    | InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
-      | TEST-TABLEAUX           | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
-      | TEST-GLOB               | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB               | AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB               | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
+      | TEST-TABLEAUX           | AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 6                      |
+      | TEST-GLOB               | AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB               | AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB               | AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 15                     |
 
   Scenario Outline: Genesis loop external data export by questionnaire
     Given Step 0 : We have some survey in directory "<QuestionnaireModelId>"
@@ -55,7 +55,7 @@ Feature: Do we save correctly loop data from Genesis?
     And Step 2 : We check "<LoopName>" output file has <ExpectedFileLinesCount> lines and <ExpectedVariablesCount> variables
     Examples:
       | QuestionnaireModelId     |  InterrogationId | VariableName | Value | LoopName | Iteration | ExpectedFileLinesCount | ExpectedVariablesCount |
-      | TEST-TABLEAUX            |  AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 5                      |
-      | TEST-GLOB                |  AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB                |  AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 14                     |
-      | TEST-GLOB                |  AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 14                     |
+      | TEST-TABLEAUX            |  AUTO11000       | TABESA2      | 66    | TABESA   | 6         | 2                      | 6                      |
+      | TEST-GLOB                |  AUTO203         | TABOFATS4    | 54    | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB                |  AUTO204         | TABOFATS2    | act2  | TABOFATS | 1         | 2                      | 15                     |
+      | TEST-GLOB                |  AUTO204         | TABOFATS2    | act3  | TABOFATS | 2         | 2                      | 15                     |
