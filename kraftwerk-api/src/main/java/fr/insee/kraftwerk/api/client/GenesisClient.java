@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,6 +87,13 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
+	public List<InterrogationId> getInterrogationIdsFromDate(String questionnaireId, LocalDateTime since) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-questionnaire-and-since-datetime?questionnaireId=%s&since=%s",
+				configProperties.getGenesisUrl(), questionnaireId,since);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
@@ -131,5 +140,24 @@ public class GenesisClient {
 		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
 				configProperties.getGenesisUrl(), questionnaireId, mode);
 		makeApiCall(url,HttpMethod.POST,metadataModel,null);
+	}
+
+	public void saveDateExtraction(String questionnaireModelId, Mode mode) throws KraftwerkException {
+		String url = String.format("%s/extractions/json?questionnaireId=%s",
+				configProperties.getGenesisUrl(), questionnaireModelId);
+		if (mode != null) {
+			url += "&mode=" + mode;
+		}
+		makeApiCall(url,HttpMethod.PUT,null,null);
+	}
+
+	public LastJsonExtractionDate getLastExtractionDate(String questionnaireModelId, Mode mode) throws KraftwerkException {
+		String url = String.format("%s/extractions/json?questionnaireId=%s",
+				configProperties.getGenesisUrl(), questionnaireModelId);
+		if (mode != null) {
+			url += "&mode=" + mode;
+		}
+		ResponseEntity<LastJsonExtractionDate> response = makeApiCall(url,HttpMethod.GET,null,LastJsonExtractionDate.class);
+		return response.getBody();
 	}
 }
