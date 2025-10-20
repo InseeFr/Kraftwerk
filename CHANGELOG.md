@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.9.0 [TODO]
+## 3.9.0 [2025-10-20]
 ### Added
 - Extraction in json
 
