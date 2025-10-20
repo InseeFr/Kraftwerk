@@ -1,4 +1,9 @@
 # Changelog
+
+## 3.9.0 [TODO]
+### Added
+- Extraction in json
+
 ## 3.8.0 [2025-10-16]
 ### Added
 - Survey unit id export
