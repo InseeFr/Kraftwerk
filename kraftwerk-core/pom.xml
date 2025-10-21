@@ -15,7 +15,7 @@
 	<name>kraftwerk-core</name>
 
 	<properties>
-		<trevas.version>1.11.0</trevas.version>
+		<trevas.version>2.0.0</trevas.version>
 		<duckdb.version>1.4.1.0</duckdb.version>
 		<bpm.version>1.0.17</bpm.version>
 	</properties>
