@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.9.1 [2025-10-XX]
+## 3.9.2 [2025-10-24]
+### Fixed
+- Inverse the order of files
+
+## 3.9.1 [2025-10-24]
 ### Fixed
 - Read files by their names (which are containing the date of extraction)
 

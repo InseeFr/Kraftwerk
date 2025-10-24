@@ -97,7 +97,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	public List<String> listFilePaths(String dir) {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
-                .sorted(Comparator.comparing(File::getName))
+                .sorted(Comparator.comparing(File::getName).reversed())
 				.map(File::getAbsolutePath)
 				.toList();
 	}
