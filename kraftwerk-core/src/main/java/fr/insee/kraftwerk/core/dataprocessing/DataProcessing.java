@@ -1,8 +1,8 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
@@ -42,8 +42,7 @@ public abstract class DataProcessing {
         String automatedVtlInstructions = applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         // Second step
         if(userVtlInstructionsPath == null || !fileUtilsInterface.isFileExists(userVtlInstructionsPath.toString())){
-            log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
-                    bindingName, getStepName()));
+            log.info("No user VTL instructions given for dataset named {} (step {}).", bindingName, getStepName());
             return automatedVtlInstructions;
         }
         applyUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
@@ -62,7 +61,7 @@ public abstract class DataProcessing {
 
     protected String applyAutomatedVtlInstructions(String bindingName, KraftwerkExecutionContext kraftwerkExecutionContext){
         VtlScript automatedInstructions = generateVtlInstructions(bindingName);
-        log.debug(String.format("Automated VTL instructions generated for step %s: see temp file", getStepName()));
+        log.debug("Automated VTL instructions generated for step {}: see temp file", getStepName());
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, kraftwerkExecutionContext);
         }
@@ -76,8 +75,7 @@ public abstract class DataProcessing {
         } catch ( IOException e){
             throw new KraftwerkException(500, "Reading error on vtl script");
         }
-        log.info(String.format("User VTL instructions read for step %s:%n%s", getStepName(),
-                vtlScript));
+        log.info("User VTL instructions read for step {}:\n{}", getStepName(), vtlScript);
         if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
         	vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
         }
