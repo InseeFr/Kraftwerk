@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.9.1 [2025-10-XX]
+### Fixed
+- Read files by their names (which are containing the date of extraction)
+
 ## 3.9.0 [2025-10-20]
 ### Added
 - Extraction in json
