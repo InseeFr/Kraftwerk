@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -96,6 +97,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	public List<String> listFilePaths(String dir) {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
+                .sorted(Comparator.comparing(File::getName))
 				.map(File::getAbsolutePath)
 				.toList();
 	}
