@@ -15,7 +15,7 @@ Feature: Do we apply a VTL instruction correctly?
     | vtlScript                                        | outputDataset| numberVariables |
     | OUTPUT := COLEMAN [keep interrogationId, LAST_NAME];        | OUTPUT       | 2               |
     | OUTPUT := COLEMAN [keep LAST_NAME];              | OUTPUT       | 1               |
-    | OUTPUT := COLEMAN [calc newinterrogationId := interrogationId];        | OUTPUT       | 17              |
-    | OUTPUT := COLEMAN [rename LAST_NAME to Label_1B];| OUTPUT       | 16              |
-    | COLEMAN := COLEMAN [drop LAST_NAME];             | COLEMAN      | 15              |
+    | OUTPUT := COLEMAN [calc newinterrogationId := interrogationId];        | OUTPUT       | 16              |
+    | OUTPUT := COLEMAN [rename LAST_NAME to Label_1B];| OUTPUT       | 15              |
+    | COLEMAN := COLEMAN [drop LAST_NAME];             | COLEMAN      | 14              |           
     

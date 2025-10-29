@@ -10,4 +10,4 @@ Feature: Do we increment correctly the datasets file by file ?
 
     Examples:
     | Directory                   | lineCount | variableCount |
-    | SAMPLETEST-MULTIPLEDATA-v1  | 7         | 137           |
+    | SAMPLETEST-MULTIPLEDATA-v1  | 7         | 136           |

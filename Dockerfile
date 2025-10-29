@@ -1,5 +1,5 @@
 # Java 21
-FROM gitlab-registry.insee.fr/kubernetes/images/run/java:21.0.8_9-jre-jammy-rootless
+FROM gitlab-registry.insee.fr:443/kubernetes/images/run/jre:21.0.1_12-jre-jammy-rootless
 ARG VERSION_APPLICATION
 COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-$VERSION_APPLICATION.jar kraftwerk.jar
 

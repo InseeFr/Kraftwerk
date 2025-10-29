@@ -11,7 +11,6 @@ import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +35,6 @@ class BuildBIndingsSequenceGenesisTest {
         surveyUnitUpdateLatest.setInterrogationId("0000001");
         surveyUnitUpdateLatest.setCampaignId("TESTCAMPAIGN");
         surveyUnitUpdateLatest.setQuestionnaireId("TESTQUEST");
-        surveyUnitUpdateLatest.setSurveyUnitId("TESTIDUE");
         surveyUnitUpdateLatest.setMode(Mode.valueOf(dataMode));
 
         surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
@@ -111,7 +109,5 @@ class BuildBIndingsSequenceGenesisTest {
         //WHEN + THEN
         assertDoesNotThrow(() -> bbsg.buildVtlBindings(dataMode, vtlBindings, modeMetadataMap, surveyUnits,
                 Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "genesis")));
-        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsKey(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
-        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.SURVEY_UNIT_IDENTIFIER_NAME, "TESTIDUE");
     }
 }

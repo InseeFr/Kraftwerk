@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,7 +22,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -97,7 +97,6 @@ public class FileSystemImpl implements FileUtilsInterface{
 	public List<String> listFilePaths(String dir) {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
-                .sorted(Comparator.comparing(File::getName).reversed())
 				.map(File::getAbsolutePath)
 				.toList();
 	}
@@ -121,6 +120,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	}
 
 	@Override
+	@Nullable
 	public Boolean isDirectory(String path) {
 		File file = new File(path);
 		if(file.isDirectory()){

@@ -1,7 +1,6 @@
 package stubs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
@@ -9,13 +8,10 @@ import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 //This class reproduces Genesis expected behaviour for functionnal tests
@@ -23,12 +19,10 @@ import java.util.Set;
 public class GenesisClientStub extends GenesisClient {
 
     List<SurveyUnitUpdateLatest> mongoStub;
-    Map<QuestionnaireIdModeTuple, MetadataModel> metadataCollectionStub;
 
     public GenesisClientStub(ConfigProperties configProperties) {
         super(configProperties);
         this.mongoStub = new ArrayList<>();
-        this.metadataCollectionStub = new HashMap<>();
     }
 
     @Override
@@ -89,21 +83,7 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
-        Set<Mode> set = new HashSet<>();
-
-        List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireModelId)
-        ).toList();
-
-        for (SurveyUnitUpdateLatest surveyUnitUpdateLatest : filteredMongo){
-            set.add(surveyUnitUpdateLatest.getMode());
-        }
-        return set.stream().toList();
-    }
-
-    @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds, List<String> modes) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered1 = mongoStub.stream()
@@ -148,41 +128,4 @@ public class GenesisClientStub extends GenesisClient {
         return set.stream().toList();
     }
 
-    @Override
-    public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
-        List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getInterrogationId().equals(interrogationId)
-        ).toList();
-
-        return filteredMongo.isEmpty() ? null : filteredMongo.getFirst().getQuestionnaireId();
-    }
-
-    @Override
-    public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
-        List<Map.Entry<QuestionnaireIdModeTuple,MetadataModel>> entries =
-                metadataCollectionStub.entrySet().stream().filter(
-                entry -> entry.getKey().questionnaireId().equals(questionnaireId)
-                && entry.getKey().mode().equals(mode)
-        ).toList();
-        if(entries.isEmpty()){
-            throw new KraftwerkException(404, "Metadata not found in stub");
-        }
-        return entries.getFirst().getValue();
-    }
-
-    @Override
-    @SneakyThrows
-    public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel){
-        //Remove already existing entries
-        List<Map.Entry<QuestionnaireIdModeTuple,MetadataModel>> entries =
-                metadataCollectionStub.entrySet().stream().filter(
-                        entry -> entry.getKey().questionnaireId().equals(questionnaireId)
-                                && entry.getKey().mode().equals(mode)
-                ).toList();
-        for(Map.Entry<QuestionnaireIdModeTuple,MetadataModel> entry : entries){
-            metadataCollectionStub.remove(entry.getKey());
-        }
-
-        metadataCollectionStub.put(new QuestionnaireIdModeTuple(questionnaireId, mode), metadataModel);
-    }
 }

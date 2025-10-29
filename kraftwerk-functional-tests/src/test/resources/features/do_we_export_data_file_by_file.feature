@@ -18,6 +18,6 @@ Feature: Do we save correctly all data file by file?
     # - ExpectedDataFieldCount : Expected field quantity
 
   |Directory                        |ExpectedLineCount     |ExpectedDataFieldCount |LoopName         |ExpectedLoopLineCount     |ExpectedLoopDataFieldCount       |
-  |SAMPLETEST-MULTIPLEDATA-v1       |7                     |137                    |BOUCLE_PRENOMS   |11                        |223                              |
-  |SAMPLETEST-MULTIPLEDATA-v2       |4                     |137                    |BOUCLE_PRENOMS   |6                         |223                              |
-  |SAMPLETEST-PARADATA-v1           |2                     |14                     |B_PRENOMREP      |3                         |1089                             |
+  |SAMPLETEST-MULTIPLEDATA-v1       |7                     |136                    |BOUCLE_PRENOMS   |11                        |222                              |
+  |SAMPLETEST-MULTIPLEDATA-v2       |4                     |136                    |BOUCLE_PRENOMS   |6                         |222                              |
+  |SAMPLETEST-PARADATA-v1           |2                     |13                     |B_PRENOMREP      |3                         |1088                             |

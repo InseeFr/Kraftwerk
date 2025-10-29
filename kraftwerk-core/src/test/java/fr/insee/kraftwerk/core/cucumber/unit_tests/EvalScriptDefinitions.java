@@ -27,7 +27,7 @@ public class EvalScriptDefinitions {
 		SurveyRawData surveyPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
 		vtlExecute.convertToVtlDataset(surveyPaper, "PAPER", vtlBindings);
 
-		assertEquals(16, vtlBindings.getDataset("COLEMAN").getDataStructure().size());
+		assertEquals(15, vtlBindings.getDataset("COLEMAN").getDataStructure().size());
 	} 
 	
 	@When("I try to apply some VTL instruction : {string}")

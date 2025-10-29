@@ -2,8 +2,8 @@ package fr.insee.kraftwerk.core.parsers;
 
 import fr.insee.kraftwerk.core.exceptions.NullException;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
@@ -39,7 +39,7 @@ public abstract class DataParser {
 	public final void parseSurveyData(Path dataPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws NullException {
 		checkDatapathIsNotNull(dataPath);
 		if(fileUtilsInterface.isDirectory(dataPath.toString()) == null){
-			log.warn("Data path given could not be identified as a file or folder: {} /n No data was parsed.", dataPath);
+			log.warn(String.format("Data path given could not be identified as a file or folder: %s /n No data was parsed.", dataPath));
 		}
 		if(Boolean.FALSE.equals(fileUtilsInterface.isDirectory(dataPath.toString()))){
 			parseDataFile(dataPath);

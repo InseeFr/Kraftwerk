@@ -33,7 +33,6 @@ public class VtlJsonDatasetWriter {
 	private static final String TYPE = "type";
 	private static final String NAME = "name";
 	private static final String IDENTIFIER = "IDENTIFIER";
-	private static final String MEASURE = "MEASURE";
 	private static final String STRING = "STRING";
 	private final SurveyRawData surveyData;
 	private final MetadataModel metadataModel;
@@ -93,20 +92,13 @@ public class VtlJsonDatasetWriter {
 
 		Integer variableNumber = 0;
 
-		// Root level identifiers
+		// Root level identifier
 		JSONObject jsonVtlIdentifier = new JSONObject();
 		jsonVtlIdentifier.put(NAME, Constants.ROOT_IDENTIFIER_NAME);
 		jsonVtlIdentifier.put(TYPE, STRING);
 		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
 		dataStructure.add(jsonVtlIdentifier);
 		columnsMapping.put(Constants.ROOT_IDENTIFIER_NAME, variableNumber);
-		variableNumber++;
-		jsonVtlIdentifier = new JSONObject();
-		jsonVtlIdentifier.put(NAME, Constants.SURVEY_UNIT_IDENTIFIER_NAME);
-		jsonVtlIdentifier.put(TYPE, STRING);
-		jsonVtlIdentifier.put(ROLE, MEASURE);
-		dataStructure.add(jsonVtlIdentifier);
-		columnsMapping.put(Constants.SURVEY_UNIT_IDENTIFIER_NAME, variableNumber);
 		variableNumber++;
 		// Group identifiers
 		for (String groupName : metadataModel.getSubGroupNames()) {
@@ -147,9 +139,8 @@ public class VtlJsonDatasetWriter {
 			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
 			// (previous implementation was: fill with empty strings ("")
 
-			// Root level identifiers
+			// Root level identifier
 			rowValues[0] = questionnaireData.getIdentifier();
-			rowValues[1] = questionnaireData.getAnswers().getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
 			
 			// Root variables values
 			addValuesToRow(rootInstance, rowValues);
@@ -199,9 +190,7 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : groupInstance.getVariableNames()) {
 			if (columnsMapping.get(variableName) != null) {
 				String value = groupInstance.getValue(variableName);
-				if ( !variableName.equals(Constants.SURVEY_UNIT_IDENTIFIER_NAME)
-						&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
-				) {
+				if (metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN) {
 					value = convertBooleanValue(value);
 				}
 				rowValues[columnsMapping.get(variableName)] = value;
