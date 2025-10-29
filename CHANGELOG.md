@@ -1,5 +1,80 @@
 # Changelog
 
+## 3.9.2 [2025-10-24]
+### Fixed
+- Inverse the order of files
+
+## 3.9.1 [2025-10-24]
+### Fixed
+- Read files by their names (which are containing the date of extraction)
+
+## 3.9.0 [2025-10-20]
+### Added
+- Extraction in json
+
+## 3.8.0 [2025-10-16]
+### Added
+- Survey unit id export
+
+## 3.7.0 [2025-09-25]
+### Changed
+- Reporting data outcome spotting calculation for IASCO and HOUSEF2F
+
+### Updated
+- BPM 1.0.17
+## 3.6.4 [2025-09-11]
+### Updated
+- DuckDB 1.3.2.1
+- Springdoc openapi webmvc 2.8.13
+- Cucumber 7.28.2
+
+
+## 3.6.3 [2025-08-28]
+### Updated
+- Springboot 3.5.5
+- Springdoc openapi webmvc 2.8.11
+
+
+## 3.6.2 [2025-08-21]
+### Updated
+- Springdoc 2.8.10
+
+## 3.6.1 [2025-08-19]
+### Updated
+- BPM 1.0.13
+- Pitest 1.20.2
+- Cucumber 7.27.2
+
+## 3.6.0 [2025-08-07]
+### Added
+- Load metadata from Genesis and save into it if not exists
+
+## 3.5.0 [2025-08-07]
+### Added
+- Extraction with QuestionnaireId
+
+## 3.4.3 [2025-08-07]
+### Updated
+- BPM 1.0.12
+- Trevas 1.11.0
+
+## 3.4.2 [2025-07-31]
+### Updated
+- BPM 1.0.9
+
+## 3.4.1 [2025-07-31]
+### Fixed
+- Reporting data not found on MinIO
+- Spring doc missing description
+### Updated
+- DuckDB 1.3.2.0
+- Trevas 1.10.0
+- Spring boot 3.5.4
+- OpenCSV 5.12.0
+- Cucumber 7.27.0
+- Pitest 1.20.1
+- Commons-compress 1.28.0
+
 ## 3.4.0 [2025-07-08]
 ### Added
 - First version of JSON export

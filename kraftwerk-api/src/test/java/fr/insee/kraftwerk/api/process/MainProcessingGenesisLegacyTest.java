@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.process;
 
+import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.api.TestConstants;
 import fr.insee.kraftwerk.api.client.GenesisClient;
@@ -7,6 +8,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -31,10 +33,10 @@ import static org.mockito.Mockito.*;
 @AutoConfigureMockMvc
 @Import(TestConfig.class)
 @ComponentScan(basePackages = {"fr.insee.kraftwerk.core.encryption", "fr.insee.kraftwerk.core.outputs"})
-class MainProcessingGenesisTest {
+class MainProcessingGenesisLegacyTest {
 
     private ConfigProperties configProperties;
-    private MainProcessingGenesis mainProcessing;
+    private MainProcessingGenesisLegacy mainProcessing;
     private RestTemplate restTemplate;
 
 
@@ -97,6 +99,20 @@ class MainProcessingGenesisTest {
                 //Get the questionnaireId corresponding to a provided interrogationId
                 return "questionnaire123456";
             }
+            @Override
+            public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
+                return "id";
+            }
+
+            @Override
+            public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+                return Collections.singletonList(Mode.WEB);
+            }
+
+            @Override
+            public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
+                return new MetadataModel();
+            }
         };
 
 
@@ -110,7 +126,7 @@ class MainProcessingGenesisTest {
                 419430400L
         );
 
-        mainProcessing = new MainProcessingGenesis(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
+        mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
     }
 
     /**
@@ -119,11 +135,10 @@ class MainProcessingGenesisTest {
     @Test
     void testInitLoadsMetadata() throws Exception {
         String idCampaign = "campaign1";
+        mainProcessing.init(idCampaign, List.of(Mode.WEB));
 
-        mainProcessing.init(idCampaign);
-
-        assertNotNull(mainProcessing.getMetadataModels());
-        assertTrue(mainProcessing.getMetadataModels().containsKey("WEB"));
+        assertNotNull(mainProcessing.getMetadataModelsByMode());
+        assertTrue(mainProcessing.getMetadataModelsByMode().containsKey("WEB"));
     }
 
     /**
