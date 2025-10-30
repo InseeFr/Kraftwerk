@@ -315,6 +315,18 @@ class KraftwerkBatchTest {
         verifyNoInteractions(reportingDataService);
     }
 
+    @Test
+    void no_questionnaireId_test() {
+        ApplicationArguments args = mock(ApplicationArguments.class);
+        when(args.getOptionNames()).thenReturn(Set.of("service"));
+        when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
+
+        assertThrows(IllegalArgumentException.class, () -> kraftwerkBatch.run(args));
+
+        verifyNoInteractions(mainService);
+        verifyNoInteractions(reportingDataService);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"reporting-data","with-encryption","with-ddi"})
     void invalid_boolean_arg_test(String booleanArgName){

@@ -37,6 +37,7 @@ public class ArgsChecker {
      */
     void checkArgs() throws IllegalArgumentException{
         checkServiceName();
+        checkQuestionnaireId();
         checkArgIsReportingData();
         checkArgWithEncryption();
         checkArgWithDDI();
@@ -54,6 +55,14 @@ public class ArgsChecker {
         }catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("Invalid service argument ! : %s, must be one of %s".formatted(this.argServiceName, KraftwerkServiceType.values()));
         }
+    }
+
+    private void checkQuestionnaireId() {
+        if(argQuestionnaireId != null){
+            this.questionnaireId = argQuestionnaireId;
+            return;
+        }
+        throw new IllegalArgumentException("No questionnaireId !");
     }
 
     private void checkArgIsReportingData() {
