@@ -69,12 +69,15 @@ public class ReportingDataService extends KraftwerkService{
         return launchReportingDataProcessing("reporting/"+reportingDataFileName, campaignId, folderSystem, mode);
     }
 
-    private ResponseEntity<String> launchReportingDataProcessing(String reportingDataFilePath, String campaignId,
-                                                                 FolderSystem folderSystem, @Nullable Mode mode) {
+    private ResponseEntity<String> launchReportingDataProcessing(String reportingDataFilePath,
+                                                                 String campaignId,
+                                                                 FolderSystem folderSystem,
+                                                                 @Nullable Mode mode) {
         ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
         try {
             if(folderSystem.equals(FolderSystem.MAIN)){
-                reportingDataProcessing.runProcessMain(fileUtilsInterface,
+                reportingDataProcessing.runProcessMain(
+                        fileUtilsInterface,
                         defaultDirectory,
                         campaignId,
                         reportingDataFilePath
