@@ -84,6 +84,7 @@ public class KraftwerkBatch implements ApplicationRunner {
                 //Main service
                 if(argsChecker.isWithDDI()){
                     launchMainServiceWithDDI(argsChecker);
+                    return;
                 }
                 launchMainServiceWithoutDDI(argsChecker);
                 return;
