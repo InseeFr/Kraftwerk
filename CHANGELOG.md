@@ -4,6 +4,8 @@
 ### Fixed
 - Inverse the order of files
 
+### Updated
+- BPM 1.0.18
 ## 3.9.1 [2025-10-24]
 ### Fixed
 - Read files by their names (which are containing the date of extraction)
