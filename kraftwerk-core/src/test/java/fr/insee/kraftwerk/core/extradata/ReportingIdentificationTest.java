@@ -3,8 +3,13 @@ package fr.insee.kraftwerk.core.extradata;
 import fr.insee.kraftwerk.core.extradata.reportingdata.ReportingIdentification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ReportingIdentificationTest {
+
+	private final String UNKNOWN_VALUE = "TRUC";
 
 	// Moog case : no identificationConfiguration and no identification
 	@Test
@@ -13,67 +18,60 @@ class ReportingIdentificationTest {
         Assertions.assertNull(reportingIdentification.getOutcomeSpotting(null));
 	}
 
-	// Case old file : no identificationConfiguration but identification is present
-	@Test
-	void getOutcomeSpottingTest_old_files() {
-		String identificationConfiguration = null;
+	// null = Case old file : no identificationConfiguration but identification is present
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"IASCO","HOUSEF2F"})
+	void getOutcomeSpottingTest_IASCO_HOUSEF2F(String identificationConfiguration) {
 		ReportingIdentification reportingIdentification = new ReportingIdentification("DESTROY","","","","","","");
 		Assertions.assertEquals("DESTROY",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
 		reportingIdentification = new ReportingIdentification("UNIDENTIFIED","","","","","","");
 		Assertions.assertEquals("UNIDENTIF",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","NOORDINARY","","","","");
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","","","","","");
 		Assertions.assertEquals("NACCNO",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ABSORBED","","","","");
-		Assertions.assertEquals("NACCABS",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ABSORBED","","","","");
+		Assertions.assertEquals("ACCABS",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","VACANT","","","");
-		Assertions.assertEquals("NACCVAC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","NOORDINARY","","","","");
+		Assertions.assertEquals("ACCNO",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","SECONDARY","","","");
-		Assertions.assertEquals("NACCSEC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","VACANT","","","");
+		Assertions.assertEquals("ACCVAC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","DK","UNIDENTIFIED","","");
-		Assertions.assertEquals("NACCDKUNIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","SECONDARY","","","");
+		Assertions.assertEquals("ACCSEC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","PRIMARY","IDENTIFIED","","");
-		Assertions.assertEquals("NACCPRIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","PRIMARY","IDENTIFIED","","");
+		Assertions.assertEquals("ACCPRIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","OCCASIONAL","IDENTIFIED","","");
-		Assertions.assertEquals("ACCOCCIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","PRIMARY","UNIDENTIFIED","","");
+		Assertions.assertEquals("ACCPRUNIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 	}
-	
-	@Test
-	void getOutcomeSpottingTest_IASCO() {
-		String identificationConfiguration = "IASCO";
+
+	@ParameterizedTest
+	@ValueSource(strings = {"IASCO","HOUSEF2F"})
+	void getOutcomeSpottingTest_IASCO_HOUSEF2F_unknown_values(String identificationConfiguration) {
+
 		ReportingIdentification reportingIdentification = new ReportingIdentification("DESTROY","","","","","","");
-		Assertions.assertEquals("DESTROY",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(UNKNOWN_VALUE));
 
-		reportingIdentification = new ReportingIdentification("UNIDENTIFIED","","","","","","");
-		Assertions.assertEquals("UNIDENTIF",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification(UNKNOWN_VALUE,"","","","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","NOORDINARY","","","","");
-		Assertions.assertEquals("NACCNO",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED",UNKNOWN_VALUE,"","","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ABSORBED","","","","");
-		Assertions.assertEquals("NACCABS",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC",UNKNOWN_VALUE,"","","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","VACANT","","","");
-		Assertions.assertEquals("NACCVAC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY",UNKNOWN_VALUE,"","","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","SECONDARY","","","");
-		Assertions.assertEquals("NACCSEC",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","DK","UNIDENTIFIED","","");
-		Assertions.assertEquals("NACCDKUNIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","NACC","ORDINARY","PRIMARY","IDENTIFIED","","");
-		Assertions.assertEquals("NACCPRIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
-
-		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","OCCASIONAL","IDENTIFIED","","");
-		Assertions.assertEquals("ACCOCCIDENT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+		reportingIdentification = new ReportingIdentification("IDENTIFIED","ACC","ORDINARY","PRIMARY",UNKNOWN_VALUE,"","");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 	}
 
 	@Test
@@ -132,4 +130,13 @@ class ReportingIdentificationTest {
 		Assertions.assertEquals("NOTREAT",reportingIdentification.getOutcomeSpotting(identificationConfiguration));
 	}
 
+	@ParameterizedTest
+	@ValueSource(strings = {"INDTEL","INDF2F"})
+	void getOutcomeSpottingTest_INDTEL_INDF2F_unknown_value(String identificationConfiguration) {
+		ReportingIdentification reportingIdentification = new ReportingIdentification("","","","","",UNKNOWN_VALUE,"");
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+
+		reportingIdentification = new ReportingIdentification("","","","","","OTHERADRESS",UNKNOWN_VALUE);
+		Assertions.assertNull(reportingIdentification.getOutcomeSpotting(identificationConfiguration));
+	}
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.6.3</version>
+		<version>3.9.0</version>
 	</parent>
 
 	<artifactId>kraftwerk-functional-tests</artifactId>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>fr.insee.kraftwerk</groupId>
 			<artifactId>kraftwerk-api</artifactId>
-			<version>${parent.version}</version>
+			<version>${project.parent.version}</version>
 			<classifier>app-to-import</classifier>
 		</dependency>
 	</dependencies>
