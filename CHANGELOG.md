@@ -1,4 +1,7 @@
 # Changelog
+## 3.10.0 [TODO]
+### Changed
+- Batch mode: named and optional parameters
 
 ## 3.9.2 [2025-10-24]
 ### Fixed
