@@ -47,7 +47,6 @@ class KraftwerkBatchTest {
         reportingDataService = mock(ReportingDataService.class);
         mainService = mock(MainService.class);
 
-        // Simuler un Minio désactivé pour éviter la création du client Minio
         when(minioConfig.isEnable()).thenReturn(false);
         when(configProperties.getDefaultDirectory()).thenReturn("/tmp");
 
