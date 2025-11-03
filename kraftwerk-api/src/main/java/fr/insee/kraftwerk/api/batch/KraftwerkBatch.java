@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class KraftwerkBatch implements ApplicationRunner {
-
     ConfigProperties configProperties;
     MinioConfig minioConfig;
     FileUtilsInterface fileSystem;
@@ -43,6 +42,8 @@ public class KraftwerkBatch implements ApplicationRunner {
     private static final String ARG_QUESTIONNAIREID = "questionnaireId";
     private static final String ARG_WITH_ENCRYPTION = "with-encryption";
     private static final String ARG_SINCE = "extract-json-since";
+
+    public static final int BATCH_SIZE = 1000;
 
     @Autowired
     public KraftwerkBatch(ConfigProperties configProperties,
@@ -161,7 +162,7 @@ public class KraftwerkBatch implements ApplicationRunner {
             case GENESIS -> mainService.mainGenesisLunaticOnlyByQuestionnaire(
                     argsChecker.getQuestionnaireId(),
                     null,
-                    1000,
+                    BATCH_SIZE,
                     argsChecker.isWithEncryption()
             );
             case MAIN -> mainService.mainService(
