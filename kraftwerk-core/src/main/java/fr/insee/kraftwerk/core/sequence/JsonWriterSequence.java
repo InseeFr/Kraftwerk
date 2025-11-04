@@ -94,7 +94,7 @@ public class JsonWriterSequence {
     }
 
     /**
-     * //Convert to BigDecimal if double to avoid scientific notation
+     * Convert to BigDecimal if double to avoid scientific notation
      * @param resultSet source table of data
      * @param meta metadata of that source
      * @param columnIndex index of column in table
