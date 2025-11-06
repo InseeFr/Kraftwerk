@@ -10,9 +10,12 @@ import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -77,7 +80,7 @@ public class JsonWriterSequence {
                     Map<String, Object> row = new LinkedHashMap<>();
                     for (int i = 1; i <= cols; i++) {
                         if (meta.getColumnLabel(i).equals("interrogationId")) continue;
-                        row.put(meta.getColumnLabel(i), rs.getObject(i));
+                        addVariableToRow(rs,meta, i, row);
                     }
                     listIteration.add(row);
                 }
@@ -88,5 +91,25 @@ public class JsonWriterSequence {
             throw new KraftwerkException(500,"SQL error : extraction step");
         }
         return resultByScope;
+    }
+
+    /**
+     * Convert to BigDecimal if double to avoid scientific notation
+     * @param resultSet source table of data
+     * @param meta metadata of that source
+     * @param columnIndex index of column in table
+     * @param row map to append
+     */
+    protected static void addVariableToRow(ResultSet resultSet,
+                                         ResultSetMetaData meta,
+                                         int columnIndex,
+                                         Map<String, Object> row
+    ) throws SQLException {
+        if (meta.getColumnType(columnIndex) == Types.DOUBLE){
+            BigDecimal bigDecimal = resultSet.getBigDecimal(columnIndex);
+            row.put(meta.getColumnLabel(columnIndex), bigDecimal);
+            return;
+        }
+        row.put(meta.getColumnLabel(columnIndex), resultSet.getObject(columnIndex));
     }
 }

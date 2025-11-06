@@ -1,4 +1,7 @@
 # Changelog
+## 3.9.4 [TODO]
+### Fixed
+- Scientific notation for Doubles during JSON extraction
 
 ## 3.9.2 [2025-10-24]
 ### Fixed

@@ -112,6 +112,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             int indexPartition = 1;
 
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
             jsonGenerator.writeStartArray(); // Beginning of Json Array
 
             for (List<InterrogationId> listId : partitions ) {
