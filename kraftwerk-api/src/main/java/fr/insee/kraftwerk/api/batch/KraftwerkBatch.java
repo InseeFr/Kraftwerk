@@ -75,6 +75,7 @@ public class KraftwerkBatch implements ApplicationRunner {
         if (!args.getOptionNames().isEmpty()) {
             try{
                 runBatchMode(args);
+                return;
             } catch (Exception e){
                 if (!isTestEnvironment()) {
                     System.exit(1);
