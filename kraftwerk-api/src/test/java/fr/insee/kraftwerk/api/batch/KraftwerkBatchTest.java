@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.env.Environment;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +40,8 @@ class KraftwerkBatchTest {
 
     KraftwerkBatch kraftwerkBatch;
 
+    Environment environment;
+
     @BeforeEach
     void setup() {
         configProperties = mock(ConfigProperties.class);
@@ -46,16 +49,19 @@ class KraftwerkBatchTest {
         vaultConfig = mock(VaultConfig.class);
         reportingDataService = mock(ReportingDataService.class);
         mainService = mock(MainService.class);
+        environment = mock(Environment.class);
 
         when(minioConfig.isEnable()).thenReturn(false);
         when(configProperties.getDefaultDirectory()).thenReturn("/tmp");
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
 
         kraftwerkBatch = new KraftwerkBatch(
                 configProperties,
                 minioConfig,
                 vaultConfig,
                 reportingDataService,
-                mainService
+                mainService,
+                environment
         );
     }
 
@@ -283,12 +289,13 @@ class KraftwerkBatchTest {
         when(minioConfig.getBucketName()).thenReturn("kraftwerk-bucket");
 
         // WHEN
-        KraftwerkBatch kraftwerkBatch = new KraftwerkBatch(
+        kraftwerkBatch = new KraftwerkBatch(
                 configProperties,
                 minioConfig,
                 vaultConfig,
                 reportingDataService,
-                mainService
+                mainService,
+                environment
         );
 
         // THEN

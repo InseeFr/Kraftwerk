@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,6 +35,8 @@ public class KraftwerkBatch implements ApplicationRunner {
     @Value("${fr.insee.postcollecte.size-limit}")
     protected long limitSize;
 
+    private final Environment environment;
+
     //Arguments names (ex: --service=GENESIS)
     private static final String ARG_SERVICE = "service";
     private static final String ARG_WITH_DDI = "with-ddi";
@@ -50,7 +53,8 @@ public class KraftwerkBatch implements ApplicationRunner {
                           MinioConfig minioConfig,
                           VaultConfig vaultConfig,
                           ReportingDataService reportingDataService,
-                          MainService mainService
+                          MainService mainService,
+                          Environment environment
     ){
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
@@ -63,34 +67,45 @@ public class KraftwerkBatch implements ApplicationRunner {
         this.vaultConfig = vaultConfig;
         this.reportingDataService = reportingDataService;
         this.mainService = mainService;
+        this.environment = environment;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-            if (!args.getOptionNames().isEmpty()) {
-                log.info("Launching Kraftwerk in CLI mode...");
-
-                args.getOptionNames().forEach(option ->
-                        log.info("{} = {}", option, args.getOptionValues(option))
-                );
-                ArgsChecker argsChecker = getArgsChecker(args);
-                argsChecker.checkArgs();
-
-                //Run kraftwerk
-                //Reporting data service
-                if(argsChecker.isReportingData()){
-                    launchReportingDataService(argsChecker);
-                    return;
+        if (!args.getOptionNames().isEmpty()) {
+            try{
+                runBatchMode(args);
+            } catch (Exception e){
+                if (!isTestEnvironment()) {
+                    System.exit(1);
                 }
-                //Main service
-                if(argsChecker.isWithDDI()){
-                    launchMainServiceWithDDI(argsChecker);
-                    return;
-                }
-                launchMainServiceWithoutDDI(argsChecker);
-                return;
+                throw e;
             }
+        }
         log.info("Launching Kraftwerk in API mode...");
+    }
+
+    private void runBatchMode(ApplicationArguments args) {
+        log.info("Launching Kraftwerk in CLI mode...");
+
+        args.getOptionNames().forEach(option ->
+                log.info("{} = {}", option, args.getOptionValues(option))
+        );
+        ArgsChecker argsChecker = getArgsChecker(args);
+        argsChecker.checkArgs();
+
+        //Run kraftwerk
+        //Reporting data service
+        if(argsChecker.isReportingData()){
+            launchReportingDataService(argsChecker);
+            return;
+        }
+        //Main service
+        if(argsChecker.isWithDDI()){
+            launchMainServiceWithDDI(argsChecker);
+            return;
+        }
+        launchMainServiceWithoutDDI(argsChecker);
     }
 
     private static ArgsChecker getArgsChecker(ApplicationArguments args) {
@@ -188,5 +203,14 @@ public class KraftwerkBatch implements ApplicationRunner {
                     null
             );
         }
+    }
+
+    private boolean isTestEnvironment() {
+        for (String profile : environment.getActiveProfiles()) {
+            if ("test".equalsIgnoreCase(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
