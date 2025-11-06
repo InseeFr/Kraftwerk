@@ -1,5 +1,5 @@
 # Changelog
-## 3.9.4 [TODO]
+## 3.9.5 [TODO]
 ### Fixed
 - Scientific notation for Doubles during JSON extraction
 
