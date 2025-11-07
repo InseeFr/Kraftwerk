@@ -1,14 +1,10 @@
 package fr.insee.kraftwerk.api.batch;
 
-import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
-import fr.insee.kraftwerk.api.process.MainProcessing;
-import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
-import fr.insee.kraftwerk.api.services.KraftwerkService;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.api.services.MainService;
+import fr.insee.kraftwerk.api.services.ReportingDataService;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
@@ -16,21 +12,22 @@ import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class KraftwerkBatch implements CommandLineRunner {
-
+public class KraftwerkBatch implements ApplicationRunner {
     ConfigProperties configProperties;
     MinioConfig minioConfig;
     FileUtilsInterface fileSystem;
     MinioClient minioClient;
 
     VaultConfig vaultConfig;
+    ReportingDataService reportingDataService;
+    MainService mainService;
 
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
@@ -38,8 +35,27 @@ public class KraftwerkBatch implements CommandLineRunner {
     @Value("${fr.insee.postcollecte.size-limit}")
     protected long limitSize;
 
+    private final Environment environment;
+
+    //Arguments names (ex: --service=GENESIS)
+    private static final String ARG_SERVICE = "service";
+    private static final String ARG_WITH_DDI = "with-ddi";
+    private static final String ARG_REPORTING_DATA = "reporting-data";
+    private static final String ARG_REPORTING_DATA_FILE = "reporting-data-file-path";
+    private static final String ARG_QUESTIONNAIREID = "questionnaireId";
+    private static final String ARG_WITH_ENCRYPTION = "with-encryption";
+    private static final String ARG_SINCE = "extract-json-since";
+
+    public static final int BATCH_SIZE = 1000;
+
     @Autowired
-    public KraftwerkBatch(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
+    public KraftwerkBatch(ConfigProperties configProperties,
+                          MinioConfig minioConfig,
+                          VaultConfig vaultConfig,
+                          ReportingDataService reportingDataService,
+                          MainService mainService,
+                          Environment environment
+    ){
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         if(minioConfig.isEnable()){
@@ -49,107 +65,153 @@ public class KraftwerkBatch implements CommandLineRunner {
             fileSystem = new FileSystemImpl(configProperties.getDefaultDirectory());
         }
         this.vaultConfig = vaultConfig;
+        this.reportingDataService = reportingDataService;
+        this.mainService = mainService;
+        this.environment = environment;
     }
 
     @Override
-    public void run(String... args) {
-        try {
-            //If .jar launched with cli args
-            if (args.length > 0) {
-                log.info("Launching Kraftwerk in CLI mode...");
-
-                //Check arguments
-                checkArgs(args);
-
-                //Parse arguments
-                //0. Service to use (MAIN,FILEBYFILE,GENESIS,LUNATIC_ONLY)
-                //1. Archive at end of execution (false or true)
-                //2. Integrate all reporting datas (false or true)
-                //3. Campaign name
-                //4. Authentication token for Genesis
-                //5. Encrypt at end (false or true)
-                KraftwerkServiceType kraftwerkServiceType = KraftwerkServiceType.valueOf(args[0]);
-                boolean archiveAtEnd = Boolean.parseBoolean(args[1]);
-                boolean withAllReportingData = Boolean.parseBoolean(args[2]);
-                String inDirectory = args[3];
-                boolean withEncryption = Boolean.parseBoolean(args[5]);
-
-                //Kraftwerk service type related parameters
-                boolean fileByFile = kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
-                boolean withDDI = kraftwerkServiceType != KraftwerkServiceType.LUNATIC_ONLY;
-                if (kraftwerkServiceType != KraftwerkServiceType.MAIN) {
-                    withAllReportingData = false;
+    public void run(ApplicationArguments args) {
+        if (!args.getOptionNames().isEmpty()) {
+            try{
+                runBatchMode(args);
+                return;
+            } catch (Exception e){
+                if (!isTestEnvironment()) {
+                    System.exit(1);
                 }
-                if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
-                    archiveAtEnd = false;
-
-                }
-
-
-                //Run kraftwerk
-                KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                        inDirectory,
-                        fileByFile,
-                        withDDI,
-                        withEncryption,
-                        limitSize
-                );
-
-                if (kraftwerkServiceType == KraftwerkServiceType.GENESIS) {
-                    MainProcessingGenesisLegacy mainProcessingGenesisLegacy = new MainProcessingGenesisLegacy(
-                        configProperties,
-                        new GenesisClient(new RestTemplateBuilder(), configProperties),
-                        fileSystem,
-                        kraftwerkExecutionContext
-                    );
-                    mainProcessingGenesisLegacy.runMain(inDirectory,1000);
-                } else {
-                    MainProcessing mainProcessing = new MainProcessing(
-                            kraftwerkExecutionContext,
-                            defaultDirectory,
-                            fileSystem);
-                    mainProcessing.runMain();
-                }
-
-                //Archive
-                if (Boolean.TRUE.equals(archiveAtEnd)) {
-                    KraftwerkService kraftwerkService = new KraftwerkService(configProperties, minioConfig);
-                    kraftwerkService.archive(inDirectory, fileSystem);
-                }
-                System.exit(0);
+                throw e;
             }
-        }catch (KraftwerkException ke) {
-            log.error("Kraftwerk exception caught : Code {}, {}", ke.getStatus(), ke.getMessage());
-            System.exit(1);
-        }catch(Exception e){
-            log.error(e.toString());
-            System.exit(1);
         }
         log.info("Launching Kraftwerk in API mode...");
     }
 
-    /**
-     * Throws a IllegalArgumentException if the arguments are not valid (ex: unparseable boolean)
-     * KraftwerkServiceType is already checked by valueOf
-     * @param args list of CLI arguments
-     * @throws IllegalArgumentException if invalid argument
-     */
-    private static void checkArgs(String[] args) throws IllegalArgumentException{
-        if(args.length != 6) {
-            throw new IllegalArgumentException("Invalid number of arguments ! Got %s instead of 6 !".formatted(args.length));
+    private void runBatchMode(ApplicationArguments args) {
+        log.info("Launching Kraftwerk in CLI mode...");
+
+        args.getOptionNames().forEach(option ->
+                log.info("{} = {}", option, args.getOptionValues(option))
+        );
+        ArgsChecker argsChecker = getArgsChecker(args);
+        argsChecker.checkArgs();
+
+        //Run kraftwerk
+        //Reporting data service
+        if(argsChecker.isReportingData()){
+            launchReportingDataService(argsChecker);
+            return;
         }
-        if(isNotBoolean(args[1])){
-            throw new IllegalArgumentException("Invalid archiveAtEnd boolean argument ! : %s".formatted(args[1]));
+        //Main service
+        if(argsChecker.isWithDDI()){
+            launchMainServiceWithDDI(argsChecker);
+            return;
         }
-        if(isNotBoolean(args[2])){
-            throw new IllegalArgumentException("Invalid withAllReportingData boolean argument ! %s".formatted(args[2]));
+        launchMainServiceWithoutDDI(argsChecker);
+    }
+
+    private static ArgsChecker getArgsChecker(ApplicationArguments args) {
+        ArgsChecker.ArgsCheckerBuilder argsCheckerBuilder = ArgsChecker.builder();
+        for(String option : args.getOptionNames()) {
+            switch(option) {
+                case ARG_SERVICE:
+                    argsCheckerBuilder.argServiceName(getOptionValue(option, args));
+                    break;
+                case ARG_REPORTING_DATA:
+                    argsCheckerBuilder.argIsReportingData(getOptionValue(option, args));
+                    break;
+                case ARG_REPORTING_DATA_FILE:
+                    argsCheckerBuilder.argReportingDataFilePath(getOptionValue(option, args));
+                    break;
+                case ARG_QUESTIONNAIREID:
+                    argsCheckerBuilder.argQuestionnaireId(getOptionValue(option, args));
+                    break;
+                case ARG_WITH_ENCRYPTION:
+                    argsCheckerBuilder.argWithEncryption(getOptionValue(option, args));
+                    break;
+                case ARG_WITH_DDI:
+                    argsCheckerBuilder.argWithDDI(getOptionValue(option, args));
+                    break;
+                case ARG_SINCE:
+                    argsCheckerBuilder.argSince(getOptionValue(option, args));
+                    break;
+                default:
+                    log.warn("unknown option : {}", option);
+                    break;
+            }
         }
-        if(isNotBoolean(args[5])){
-            throw new IllegalArgumentException("Invalid withEncryption boolean argument ! %s".formatted(args[5]));
+        return argsCheckerBuilder.build();
+    }
+
+    private static String getOptionValue(String option, ApplicationArguments args) {
+        return !args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null;
+    }
+
+    private void launchMainServiceWithDDI(ArgsChecker argsChecker) {
+        switch (argsChecker.getKraftwerkServiceType()) {
+            case GENESIS -> mainService.mainGenesisByQuestionnaireId(
+                        argsChecker.getQuestionnaireId(),
+                        null,
+                        1000,
+                        argsChecker.isWithEncryption()
+                );
+            case JSON -> mainService.jsonExtraction(
+                        argsChecker.getQuestionnaireId(),
+                        null,
+                        1000,
+                        argsChecker.getSince()
+                );
+            case MAIN -> mainService.mainService(
+                        argsChecker.getQuestionnaireId(),
+                        false,
+                        argsChecker.isWithEncryption()
+            );
+            case FILE_BY_FILE -> mainService.mainFileByFile(
+                    argsChecker.getArgQuestionnaireId(),
+                    false,
+                    argsChecker.isWithEncryption()
+            );
         }
     }
 
-    private static boolean isNotBoolean(String argToCheck){
-        return !argToCheck.equals("true") && !argToCheck.equals("false");
+    private void launchMainServiceWithoutDDI(ArgsChecker argsChecker) {
+        switch (argsChecker.getKraftwerkServiceType()) {
+            case GENESIS -> mainService.mainGenesisLunaticOnlyByQuestionnaire(
+                    argsChecker.getQuestionnaireId(),
+                    null,
+                    BATCH_SIZE,
+                    argsChecker.isWithEncryption()
+            );
+            case MAIN -> mainService.mainService(
+                    argsChecker.getQuestionnaireId(),
+                    false,
+                    argsChecker.isWithEncryption()
+            );
+            case JSON, FILE_BY_FILE -> launchMainServiceWithDDI(argsChecker);
+        }
+    }
+
+    private void launchReportingDataService(ArgsChecker argsChecker) {
+        if (argsChecker.getKraftwerkServiceType() == KraftwerkServiceType.MAIN) {
+            reportingDataService.processReportingData(
+                    argsChecker.getQuestionnaireId(),
+                    argsChecker.getReportingDataFilePath()
+            );
+        }
+        if (argsChecker.getKraftwerkServiceType() == KraftwerkServiceType.GENESIS) {
+            reportingDataService.processReportingDataGenesis(
+                    argsChecker.getQuestionnaireId(),
+                    argsChecker.getReportingDataFilePath(),
+                    null
+            );
+        }
+    }
+
+    private boolean isTestEnvironment() {
+        for (String profile : environment.getActiveProfiles()) {
+            if ("test".equalsIgnoreCase(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

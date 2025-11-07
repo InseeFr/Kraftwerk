@@ -1,4 +1,8 @@
 # Changelog
+## 3.10.0 [TODO]
+### Changed
+- Batch mode: named and optional parameters
+
 ## 3.9.5 [2025-11-06]
 ### Fixed
 - Scientific notation for Doubles during JSON extraction
