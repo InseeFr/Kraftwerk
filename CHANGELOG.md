@@ -1,5 +1,5 @@
 # Changelog
-## 3.10.0 [TODO]
+## 3.10.0 [2025-11-13]
 ### Changed
 - Batch mode: named and optional parameters
 
