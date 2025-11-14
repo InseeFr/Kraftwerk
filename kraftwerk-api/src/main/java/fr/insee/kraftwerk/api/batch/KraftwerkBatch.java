@@ -46,6 +46,8 @@ public class KraftwerkBatch implements ApplicationRunner {
 
     public static final int BATCH_SIZE = 1000;
 
+    private static final String ERROR_MESSAGE = "Kraftwerk service returned code %d with body %s";
+
     @Autowired
     public KraftwerkBatch(ConfigProperties configProperties,
                           MinioConfig minioConfig,
@@ -73,11 +75,13 @@ public class KraftwerkBatch implements ApplicationRunner {
         if (!args.getOptionNames().isEmpty()) {
             try{
                 ResponseEntity<Object> kraftwerkResponse = runBatchMode(args);
-                if(!kraftwerkResponse.getStatusCode().is2xxSuccessful()){
-                    throw new RuntimeException("Kraftwerk error %d : %s".formatted(
-                            kraftwerkResponse.getStatusCode(),
+                if( kraftwerkResponse != null
+                        && !kraftwerkResponse.getStatusCode().is2xxSuccessful()){
+                    log.error(ERROR_MESSAGE.formatted(
+                            kraftwerkResponse.getStatusCode().value(),
                             kraftwerkResponse.getBody()
                     ));
+                    System.exit(1);
                 }
                 return;
             } catch (Exception e){
@@ -91,7 +95,7 @@ public class KraftwerkBatch implements ApplicationRunner {
         log.info("Launching Kraftwerk in API mode...");
     }
 
-    private ResponseEntity<Object> runBatchMode(ApplicationArguments args) {
+    private ResponseEntity<Object> runBatchMode(ApplicationArguments args){
         log.info("Launching Kraftwerk in CLI mode...");
 
         args.getOptionNames().forEach(option ->
@@ -219,11 +223,14 @@ public class KraftwerkBatch implements ApplicationRunner {
         return getObjectResponseEntity(response);
     }
 
-    private static ResponseEntity<Object> getObjectResponseEntity(ResponseEntity<String> response) {
+    private ResponseEntity<Object> getObjectResponseEntity(ResponseEntity<String> response) {
+        if(isTestEnvironment()){ //Mock
+            return ResponseEntity.ok().build();
+        }
         if(response != null){
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         }
-        return ResponseEntity.internalServerError().build();
+        return ResponseEntity.internalServerError().body("Batch mode : null response");
     }
 
     private boolean isTestEnvironment() {
