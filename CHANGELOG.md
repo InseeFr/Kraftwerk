@@ -1,4 +1,8 @@
 # Changelog
+## 3.10.1 [TODO]
+### Fixed
+- Batch mode error management
+
 ## 3.10.0 [2025-11-13]
 ### Changed
 - Batch mode: named and optional parameters
