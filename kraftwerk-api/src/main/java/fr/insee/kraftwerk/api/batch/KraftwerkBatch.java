@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,9 +33,6 @@ public class KraftwerkBatch implements ApplicationRunner {
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
 
-    @Value("${fr.insee.postcollecte.size-limit}")
-    protected long limitSize;
-
     private final Environment environment;
 
     //Arguments names (ex: --service=GENESIS)
@@ -47,6 +45,8 @@ public class KraftwerkBatch implements ApplicationRunner {
     private static final String ARG_SINCE = "extract-json-since";
 
     public static final int BATCH_SIZE = 1000;
+
+    private static final String ERROR_MESSAGE = "Kraftwerk service returned code %d with body %s";
 
     @Autowired
     public KraftwerkBatch(ConfigProperties configProperties,
@@ -74,10 +74,19 @@ public class KraftwerkBatch implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         if (!args.getOptionNames().isEmpty()) {
             try{
-                runBatchMode(args);
+                ResponseEntity<Object> kraftwerkResponse = runBatchMode(args);
+                if( kraftwerkResponse != null
+                        && !kraftwerkResponse.getStatusCode().is2xxSuccessful()){
+                    log.error(ERROR_MESSAGE.formatted(
+                            kraftwerkResponse.getStatusCode().value(),
+                            kraftwerkResponse.getBody()
+                    ));
+                    System.exit(1);
+                }
                 return;
             } catch (Exception e){
                 if (!isTestEnvironment()) {
+                    log.error(e.toString());
                     System.exit(1);
                 }
                 throw e;
@@ -86,7 +95,7 @@ public class KraftwerkBatch implements ApplicationRunner {
         log.info("Launching Kraftwerk in API mode...");
     }
 
-    private void runBatchMode(ApplicationArguments args) {
+    private ResponseEntity<Object> runBatchMode(ApplicationArguments args){
         log.info("Launching Kraftwerk in CLI mode...");
 
         args.getOptionNames().forEach(option ->
@@ -98,15 +107,13 @@ public class KraftwerkBatch implements ApplicationRunner {
         //Run kraftwerk
         //Reporting data service
         if(argsChecker.isReportingData()){
-            launchReportingDataService(argsChecker);
-            return;
+            return launchReportingDataService(argsChecker);
         }
         //Main service
         if(argsChecker.isWithDDI()){
-            launchMainServiceWithDDI(argsChecker);
-            return;
+            return launchMainServiceWithDDI(argsChecker);
         }
-        launchMainServiceWithoutDDI(argsChecker);
+        return launchMainServiceWithoutDDI(argsChecker);
     }
 
     private static ArgsChecker getArgsChecker(ApplicationArguments args) {
@@ -146,64 +153,84 @@ public class KraftwerkBatch implements ApplicationRunner {
         return !args.getOptionValues(option).isEmpty() ? args.getOptionValues(option).getFirst() : null;
     }
 
-    private void launchMainServiceWithDDI(ArgsChecker argsChecker) {
+    private ResponseEntity<Object> launchMainServiceWithDDI(ArgsChecker argsChecker) {
+        ResponseEntity<String> response = null;
         switch (argsChecker.getKraftwerkServiceType()) {
-            case GENESIS -> mainService.mainGenesisByQuestionnaireId(
+            case GENESIS -> response = mainService.mainGenesisByQuestionnaireId(
                         argsChecker.getQuestionnaireId(),
                         null,
                         1000,
                         argsChecker.isWithEncryption()
                 );
-            case JSON -> mainService.jsonExtraction(
-                        argsChecker.getQuestionnaireId(),
-                        null,
-                        1000,
-                        argsChecker.getSince()
-                );
-            case MAIN -> mainService.mainService(
+            case JSON -> {
+                return mainService.jsonExtraction(
+                            argsChecker.getQuestionnaireId(),
+                            null,
+                            1000,
+                            argsChecker.getSince()
+                    );
+            }
+            case MAIN -> response = mainService.mainService(
                         argsChecker.getQuestionnaireId(),
                         false,
                         argsChecker.isWithEncryption()
             );
-            case FILE_BY_FILE -> mainService.mainFileByFile(
+            case FILE_BY_FILE -> response = mainService.mainFileByFile(
                     argsChecker.getArgQuestionnaireId(),
                     false,
                     argsChecker.isWithEncryption()
             );
         }
+        return getObjectResponseEntity(response);
     }
 
-    private void launchMainServiceWithoutDDI(ArgsChecker argsChecker) {
+    private ResponseEntity<Object> launchMainServiceWithoutDDI(ArgsChecker argsChecker) {
+        ResponseEntity<String> response = null;
         switch (argsChecker.getKraftwerkServiceType()) {
-            case GENESIS -> mainService.mainGenesisLunaticOnlyByQuestionnaire(
+            case GENESIS -> response = mainService.mainGenesisLunaticOnlyByQuestionnaire(
                     argsChecker.getQuestionnaireId(),
                     null,
                     BATCH_SIZE,
                     argsChecker.isWithEncryption()
             );
-            case MAIN -> mainService.mainService(
+            case MAIN -> response = mainService.mainService(
                     argsChecker.getQuestionnaireId(),
                     false,
                     argsChecker.isWithEncryption()
             );
-            case JSON, FILE_BY_FILE -> launchMainServiceWithDDI(argsChecker);
+            case JSON, FILE_BY_FILE -> {
+                return launchMainServiceWithDDI(argsChecker);
+            }
         }
+        return getObjectResponseEntity(response);
     }
 
-    private void launchReportingDataService(ArgsChecker argsChecker) {
+    private ResponseEntity<Object> launchReportingDataService(ArgsChecker argsChecker) {
+        ResponseEntity<String> response = null;
         if (argsChecker.getKraftwerkServiceType() == KraftwerkServiceType.MAIN) {
-            reportingDataService.processReportingData(
+            response = reportingDataService.processReportingData(
                     argsChecker.getQuestionnaireId(),
                     argsChecker.getReportingDataFilePath()
             );
         }
         if (argsChecker.getKraftwerkServiceType() == KraftwerkServiceType.GENESIS) {
-            reportingDataService.processReportingDataGenesis(
+            response = reportingDataService.processReportingDataGenesis(
                     argsChecker.getQuestionnaireId(),
                     argsChecker.getReportingDataFilePath(),
                     null
             );
         }
+        return getObjectResponseEntity(response);
+    }
+
+    private ResponseEntity<Object> getObjectResponseEntity(ResponseEntity<String> response) {
+        if(isTestEnvironment()){ //Mock
+            return ResponseEntity.ok().build();
+        }
+        if(response != null){
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        }
+        return ResponseEntity.internalServerError().body("Batch mode : null response");
     }
 
     private boolean isTestEnvironment() {
