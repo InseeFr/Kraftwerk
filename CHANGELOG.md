@@ -1,5 +1,5 @@
 # Changelog
-## 3.10.1 [TODO]
+## 3.10.1 [2025-11-18]
 ### Fixed
 - Batch mode error management
 
