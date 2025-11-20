@@ -1,8 +1,6 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import lombok.Getter;
+
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;

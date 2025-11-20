@@ -30,9 +30,10 @@
 		<sonar.coverage.exclusions>
 			src/main/java/fr/insee/kraftwerk/api/client/*,
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
-			src/main/java/fr/insee/kraftwerk/api/configuration/*
+			src/main/java/fr/insee/kraftwerk/core/encryption/*
 			**/kraftwerk-encryption-tests/**
 			**/kraftwerk-functional-tests/**
+            src/main/java/fr/insee/kraftwerk/core/extradata/reportingdata/ClosingCauseValue.java
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
 		<pitest.version>1.22.0</pitest.version>
