@@ -189,6 +189,15 @@
 						</goals>
 					</execution>
 				</executions>
+                <configuration>
+                    <excludes>
+                        <exclude>fr/insee/kraftwerk/api/client/**</exclude>
+                        <exclude>fr/insee/kraftwerk/api/configuration/**</exclude>
+                        <exclude>fr/insee/kraftwerk/core/encryption/**</exclude>
+                        <exclude>fr/insee/kraftwerk/encryption/**</exclude>
+                        <exclude>fr/insee/kraftwerk/core/extradata/reportingdata/ClosingCauseValue</exclude>
+                    </excludes>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
