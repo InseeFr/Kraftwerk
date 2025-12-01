@@ -47,7 +47,7 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getSurveyUnitId());
+			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
 
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);

@@ -43,20 +43,19 @@ public class JsonWriterSequence {
                                               InterrogationId interrogationId,
                                               Map<String,MetadataModel> metadataModelsByMode,
                                               Statement database) throws KraftwerkException{
-        Map<String,Object> resultById = new HashMap<>();
+        Map<String,Object> resultById = new LinkedHashMap<>();
         SurveyUnitUpdateLatest currentSu = suLatest.stream()
                 .filter(su -> su.getInterrogationId().equals(interrogationId.getId()))
                 .findFirst()
                 .orElse(null);
 
         if (currentSu == null) return null;
-
-        resultById.put("partitionId",currentSu.getCampaignId());
         resultById.put("interrogationId", interrogationId.getId());
-        resultById.put("surveyUnitId",currentSu.getSurveyUnitId());
-        resultById.put("contextualId",currentSu.getContextualId());
-        resultById.put("questionnaireModelId",currentSu.getQuestionnaireId());
-        resultById.put("mode",currentSu.getMode());
+        resultById.put("technicalSurveyUnitId","");
+        resultById.put("usualSurveyUnitId",currentSu.getUsualSurveyUnitId());
+        resultById.put("partitionId","");
+        resultById.put("collectionInstrumentId",currentSu.getCollectionInstrumentId());
+        resultById.put("mode",currentSu.getMode().getJsonName());
         resultById.put("isCapturedIndirectly",currentSu.getIsCapturedIndirectly());
         resultById.put("validationDate",currentSu.getValidationDate());
         resultById.put("data",transformDataToJson(interrogationId, metadataModelsByMode, database));
