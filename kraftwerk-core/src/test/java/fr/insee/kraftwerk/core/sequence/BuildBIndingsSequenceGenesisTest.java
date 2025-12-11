@@ -35,8 +35,8 @@ class BuildBIndingsSequenceGenesisTest {
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
         surveyUnitUpdateLatest.setInterrogationId("0000001");
         surveyUnitUpdateLatest.setCampaignId("TESTCAMPAIGN");
-        surveyUnitUpdateLatest.setQuestionnaireId("TESTQUEST");
-        surveyUnitUpdateLatest.setSurveyUnitId("TESTIDUE");
+        surveyUnitUpdateLatest.setCollectionInstrumentId("TESTQUEST");
+        surveyUnitUpdateLatest.setUsualSurveyUnitId("TESTIDUE");
         surveyUnitUpdateLatest.setMode(Mode.valueOf(dataMode));
 
         surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());

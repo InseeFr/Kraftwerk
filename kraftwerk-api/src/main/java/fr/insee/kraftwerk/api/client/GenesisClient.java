@@ -111,7 +111,7 @@ public class GenesisClient {
 	}
 	
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) throws KraftwerkException {
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+		String url = String.format("%s/responses/simplified/by-list-interrogation-and-collection-instrument/latest?collectionInstrumentId=%s", configProperties.getGenesisUrl(), questionnaireId);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
@@ -143,7 +143,7 @@ public class GenesisClient {
 	}
 
 	public void saveDateExtraction(String questionnaireModelId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?questionnaireId=%s",
+		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
 				configProperties.getGenesisUrl(), questionnaireModelId);
 		if (mode != null) {
 			url += "&mode=" + mode;
@@ -152,7 +152,7 @@ public class GenesisClient {
 	}
 
 	public LastJsonExtractionDate getLastExtractionDate(String questionnaireModelId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?questionnaireId=%s",
+		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
 				configProperties.getGenesisUrl(), questionnaireModelId);
 		if (mode != null) {
 			url += "&mode=" + mode;
