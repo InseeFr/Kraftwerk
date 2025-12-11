@@ -36,7 +36,7 @@ jobs:
       - name: Print source version
         run: echo ${{ steps.version-step.outputs.newTag }}
 
-      - uses: mukunku/tag-exists-action@v1.6.0
+      - uses: mukunku/tag-exists-action@v1.7.0
         name: Check tag existence
         id: check-tag-exists
         with:
