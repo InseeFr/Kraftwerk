@@ -8,7 +8,6 @@ import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
 import fr.insee.kraftwerk.core.sequence.*;
@@ -97,14 +96,6 @@ public abstract class AbstractMainProcessingGenesis {
             Mode mode = Mode.getEnumFromModeName(modeString);
 
             MetadataModel metadataModel = client.getMetadataByQuestionnaireIdAndMode(questionnaireId, mode);
-
-            ModeInputs modeInputs = userInputs.getModeInputsMap().get(modeString);
-
-            MetadataUtilsGenesis.applyLunaticVariables(
-                    modeInputs,
-                    fileUtilsInterface,
-                    metadataModel
-            );
 
             metadataModelsByMode.put(modeString, metadataModel);
 
