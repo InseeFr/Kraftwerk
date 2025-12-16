@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,17 +29,22 @@ public class MetadataUtilsGenesis {
 		return metadataModels;
 	}
 
-	private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws MetadataParserException {
-		// we add the variables read in the DDI and lunatic
+    private static void putToMetadataVariable(String dataMode, ModeInputs modeInputsGenesis, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws MetadataParserException {
+        // we add the variables read in the DDI and lunatic
+        InputStream ddiStream = fileUtilsInterface.readFile(modeInputsGenesis.getDdiUrl());
+        InputStream lunaticStream = null;
+
+        if (modeInputsGenesis.getLunaticFile() != null) {
+            lunaticStream = fileUtilsInterface.readFile(modeInputsGenesis.getLunaticFile().toString());
+        }
         MetadataModel metadataModel = ReaderUtils.getMetadataFromDDIAndLunatic(
                 modeInputsGenesis.getDdiUrl(),
-                fileUtilsInterface.readFile(modeInputsGenesis.getDdiUrl()),
-                modeInputsGenesis.getLunaticFile() != null ? modeInputsGenesis.getLunaticFile().toString() : null
+                ddiStream,
+                lunaticStream
         );
         metadataModels.put(dataMode, metadataModel);
-
-
     }
+
 
 	public static Map<String, MetadataModel> getMetadataFromLunatic(Map<String, ModeInputs> modeInputsMap, FileUtilsInterface fileUtilsInterface) {
 		Map<String, MetadataModel> metadataModels = new LinkedHashMap<>();

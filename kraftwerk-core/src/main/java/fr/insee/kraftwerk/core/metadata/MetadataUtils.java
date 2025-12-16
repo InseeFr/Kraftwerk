@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,19 +29,22 @@ public class MetadataUtils {
 	private static void putToMetadataModels(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
 		// Step 1 : we add the variables read in the DDI and Lunatic if found
 		try {
-            String lunaticPath = modeInputs.getLunaticFile() != null
-                    ? modeInputs.getLunaticFile().toString()
-                    : null;
+            InputStream ddiStream = fileUtilsInterface.readFile(modeInputs.getDdiUrl());
+            InputStream lunaticStream = null;
+
+            if (modeInputs.getLunaticFile() != null) {
+                lunaticStream = fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString());
+            }
 
             MetadataModel metadataModel = ReaderUtils.getMetadataFromDDIAndLunatic(
                     modeInputs.getDdiUrl(),
-                    fileUtilsInterface.readFile(modeInputs.getDdiUrl()),
-                    lunaticPath
+                    ddiStream,
+                    lunaticStream
             );
             if (modeInputs.getLunaticFile() != null) {
                 log.info("Adding variables from Lunatic file : {}", modeInputs.getLunaticFile().getFileName());
                 // We read and store lunaticModelVersion
-                metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(fileUtilsInterface.readFile(lunaticPath)));
+                metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(lunaticStream));
             }
             if (metadataModel.getVariables().getVariable(Constants.LIENS) != null) {
                 for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
