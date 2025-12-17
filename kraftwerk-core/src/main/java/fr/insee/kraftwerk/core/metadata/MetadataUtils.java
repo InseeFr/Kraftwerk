@@ -31,9 +31,11 @@ public class MetadataUtils {
 		try {
             InputStream ddiStream = fileUtilsInterface.readFile(modeInputs.getDdiUrl());
             InputStream lunaticStream = null;
+            boolean hasLunatic = modeInputs.getLunaticFile() != null;
 
-            if (modeInputs.getLunaticFile() != null) {
+            if (hasLunatic) {
                 lunaticStream = fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString());
+                log.info("Adding variables from Lunatic file: {}", modeInputs.getLunaticFile().getFileName());
             }
 
             MetadataModel metadataModel = ReaderUtils.getMetadataFromDDIAndLunatic(
@@ -41,8 +43,7 @@ public class MetadataUtils {
                     ddiStream,
                     lunaticStream
             );
-            if (modeInputs.getLunaticFile() != null) {
-                log.info("Adding variables from Lunatic file : {}", modeInputs.getLunaticFile().getFileName());
+            if (hasLunatic) {
                 // We read and store lunaticModelVersion
                 metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(lunaticStream));
             }
