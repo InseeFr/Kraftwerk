@@ -1,7 +1,11 @@
 package fr.insee.kraftwerk.core.metadata;
 
 import fr.insee.bpm.exceptions.MetadataParserException;
-import fr.insee.bpm.metadata.model.*;
+import fr.insee.bpm.metadata.model.Group;
+import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.SpecType;
+import fr.insee.bpm.metadata.model.Variable;
+import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.bpm.metadata.reader.ReaderUtils;
 import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
