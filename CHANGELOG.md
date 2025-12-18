@@ -1,5 +1,9 @@
 # Changelog
-## 3.10.5 [TODO]
+## 3.10.6 [TODO]
+### Fixed
+- New BPM version
+
+## 3.10.5 [2025-12-18]
 ### Changed
 - Adaptations to new BPM version regarding missing and filter_results
 
