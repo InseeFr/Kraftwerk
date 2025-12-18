@@ -10,12 +10,7 @@ import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsGenesis;
 import fr.insee.kraftwerk.core.metadata.MetadataUtilsGenesis;
-import fr.insee.kraftwerk.core.sequence.BuildBindingsSequenceGenesis;
-import fr.insee.kraftwerk.core.sequence.ControlInputSequenceGenesis;
-import fr.insee.kraftwerk.core.sequence.InsertDatabaseSequence;
-import fr.insee.kraftwerk.core.sequence.MultimodalSequence;
-import fr.insee.kraftwerk.core.sequence.UnimodalSequence;
-import fr.insee.kraftwerk.core.sequence.WriterSequence;
+import fr.insee.kraftwerk.core.sequence.*;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -97,17 +92,18 @@ public abstract class AbstractMainProcessingGenesis {
     }
 
     private void loadMetadatasFromDatabase(String questionnaireId, String modeString) throws KraftwerkException {
-        try{
+        try {
             Mode mode = Mode.getEnumFromModeName(modeString);
+
             MetadataModel metadataModel = client.getMetadataByQuestionnaireIdAndMode(questionnaireId, mode);
+
             metadataModelsByMode.put(modeString, metadataModel);
-        }catch (IllegalStateException e){
-            log.warn("Incorrect mode detected in Genesis for questionnaire {} : {}",
-                    questionnaireId,
-                    modeString
-                    );
+
+        } catch (IllegalStateException e) {
+            log.warn("Incorrect mode detected in Genesis for questionnaire {} : {}", questionnaireId, modeString);
         }
     }
+
 
     private void loadMetadataFromFile(String questionnaireId) throws KraftwerkException {
         try {
