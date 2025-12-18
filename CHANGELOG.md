@@ -1,5 +1,5 @@
 # Changelog
-## 3.10.6 [TODO]
+## 3.10.6 [2025-12-18]
 ### Fixed
 - New BPM version
 
