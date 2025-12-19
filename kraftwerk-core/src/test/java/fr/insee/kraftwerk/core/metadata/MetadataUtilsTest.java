@@ -5,6 +5,7 @@ import fr.insee.bpm.metadata.model.McqVariable;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.bpm.metadata.reader.ReaderUtils;
 import fr.insee.kraftwerk.core.Constants;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +24,11 @@ class MetadataUtilsTest {
         metadata.getVariables().putVariable(varRoot);
         metadata.getVariables().putVariable(mcqVar);
 
-        MetadataUtils.addLunaticVariable(metadata,"FILTER_RESULT_QUESTION_GRID1", Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
-        MetadataUtils.addLunaticVariable(metadata,"FILTER_RESULT_TYPE_QUEST", Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
-        MetadataUtils.addLunaticVariable(metadata,"QUESTION_GRID1_MISSING", Constants.MISSING_SUFFIX, VariableType.STRING);
-        MetadataUtils.addLunaticVariable(metadata,"TYPE_QUEST_MISSING", Constants.MISSING_SUFFIX, VariableType.STRING);
-        MetadataUtils.addLunaticVariable(metadata,"COMMENT_QE", Constants.MISSING_SUFFIX, VariableType.STRING);
+        ReaderUtils.addLunaticVariable(metadata,"FILTER_RESULT_QUESTION_GRID1", Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
+        ReaderUtils.addLunaticVariable(metadata,"FILTER_RESULT_TYPE_QUEST", Constants.FILTER_RESULT_PREFIX, VariableType.BOOLEAN);
+        ReaderUtils.addLunaticVariable(metadata,"QUESTION_GRID1_MISSING", Constants.MISSING_SUFFIX, VariableType.STRING);
+        ReaderUtils.addLunaticVariable(metadata,"TYPE_QUEST_MISSING", Constants.MISSING_SUFFIX, VariableType.STRING);
+        ReaderUtils.addLunaticVariable(metadata,"COMMENT_QE", Constants.MISSING_SUFFIX, VariableType.STRING);
 
         assertEquals("LOOP1",metadata.getVariables().getVariable("FILTER_RESULT_QUESTION_GRID1").getGroup().getName());
         assertEquals(Constants.ROOT_GROUP_NAME,metadata.getVariables().getVariable("FILTER_RESULT_TYPE_QUEST").getGroup().getName());

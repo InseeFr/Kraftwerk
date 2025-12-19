@@ -1,4 +1,12 @@
 # Changelog
+## 3.10.6 [2025-12-18]
+### Fixed
+- New BPM version
+
+## 3.10.5 [2025-12-18]
+### Changed
+- Adaptations to new BPM version regarding missing and filter_results
+
 ## 3.10.1 [2025-11-18]
 ### Fixed
 - Batch mode error management

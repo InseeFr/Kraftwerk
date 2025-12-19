@@ -97,17 +97,18 @@ public abstract class AbstractMainProcessingGenesis {
     }
 
     private void loadMetadatasFromDatabase(String questionnaireId, String modeString) throws KraftwerkException {
-        try{
+        try {
             Mode mode = Mode.getEnumFromModeName(modeString);
+
             MetadataModel metadataModel = client.getMetadataByQuestionnaireIdAndMode(questionnaireId, mode);
+
             metadataModelsByMode.put(modeString, metadataModel);
-        }catch (IllegalStateException e){
-            log.warn("Incorrect mode detected in Genesis for questionnaire {} : {}",
-                    questionnaireId,
-                    modeString
-                    );
+
+        } catch (IllegalStateException e) {
+            log.warn("Incorrect mode detected in Genesis for questionnaire {} : {}", questionnaireId, modeString);
         }
     }
+
 
     private void loadMetadataFromFile(String questionnaireId) throws KraftwerkException {
         try {
