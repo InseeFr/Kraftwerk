@@ -644,7 +644,7 @@ public class MainDefinitions {
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		CSVReader csvReader = getCSVReader(
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
-		// get header
+		// Get header
 		String[] header = csvReader.readNext();
 		//Assert fields existence
 		Assertions.assertThat(header).contains(Constants.ROOT_IDENTIFIER_NAME).contains(loopName).contains(fieldName);
