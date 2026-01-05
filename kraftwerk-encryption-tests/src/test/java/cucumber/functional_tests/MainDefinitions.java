@@ -646,7 +646,7 @@ public class MainDefinitions {
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + loopName + ".csv"));
 		// Get header
 		String[] header = csvReader.readNext();
-		//Assert fields existence
+		// Assert fields existence
 		Assertions.assertThat(header).contains(Constants.ROOT_IDENTIFIER_NAME).contains(loopName).contains(fieldName);
 		int interrogationIdIndex = Arrays.asList(header).indexOf(Constants.ROOT_IDENTIFIER_NAME);
 		int loopNameIndex = Arrays.asList(header).indexOf(loopName);
