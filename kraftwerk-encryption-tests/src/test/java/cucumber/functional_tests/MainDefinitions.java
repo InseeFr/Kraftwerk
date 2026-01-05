@@ -591,7 +591,7 @@ public class MainDefinitions {
     public void checkCSV() throws IOException {
 		//The CSV format rules is the following :
 		//for booleans : 0 for false, 1 for true
-		//ALL data must be between double quotes
+		//All data must be between double quotes
 
 		// Go to first datetime folder
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
