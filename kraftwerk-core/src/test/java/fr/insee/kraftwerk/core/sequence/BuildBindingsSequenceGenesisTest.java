@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +26,15 @@ import java.util.Map;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class BuildBIndingsSequenceGenesisTest {
+class BuildBindingsSequenceGenesisTest {
     private static final List<SurveyUnitUpdateLatest> surveyUnits = new ArrayList<>();
+
+    private static LocalDateTime validationDate;
 
     @BeforeAll
     static void init(){
         String dataMode = "WEB";
+        validationDate = LocalDateTime.now();
         //Create one document
         surveyUnits.clear();
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
@@ -37,6 +42,8 @@ class BuildBIndingsSequenceGenesisTest {
         surveyUnitUpdateLatest.setCampaignId("TESTCAMPAIGN");
         surveyUnitUpdateLatest.setCollectionInstrumentId("TESTQUEST");
         surveyUnitUpdateLatest.setUsualSurveyUnitId("TESTIDUE");
+        surveyUnitUpdateLatest.setValidationDate(validationDate);
+        surveyUnitUpdateLatest.setQuestionnaireState("FINISHED");
         surveyUnitUpdateLatest.setMode(Mode.valueOf(dataMode));
 
         surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
@@ -113,5 +120,8 @@ class BuildBIndingsSequenceGenesisTest {
                 Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "genesis")));
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsKey(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.SURVEY_UNIT_IDENTIFIER_NAME, "TESTIDUE");
+        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.QUESTIONNAIRE_STATE_NAME, "FINISHED");
+        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.VALIDATION_DATE_NAME, validationDate
+                .format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT)));
     }
 }

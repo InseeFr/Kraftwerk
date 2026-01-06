@@ -42,11 +42,13 @@ public class InformationLevelsProcessing extends DataProcessing {
 		Set<String> rootVariableNames = metadataModel.getVariables().getGroupVariableNames(Constants.ROOT_GROUP_NAME);
 
 		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
-		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
+		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s, %s, %s];",
 				Constants.ROOT_GROUP_NAME,
 				bindingName,
 				Constants.ROOT_IDENTIFIER_NAME,
 				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				Constants.QUESTIONNAIRE_STATE_NAME,
+				Constants.VALIDATION_DATE_NAME,
 				rootMeasures, Constants.MODE_VARIABLE_NAME));
 
 		vtlScript.add(rootInstructions.toString());

@@ -21,6 +21,7 @@ public class SurveyUnitUpdateLatest {
 	private Mode mode;
 	private Boolean isCapturedIndirectly;
 	private LocalDateTime validationDate;
+	private String questionnaireState;
 	@JsonProperty("variablesUpdate")
 	private List<VariableModel> collectedVariables;
 	private List<VariableModel> externalVariables;
