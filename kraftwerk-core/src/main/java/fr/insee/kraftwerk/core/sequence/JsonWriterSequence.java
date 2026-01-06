@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -16,8 +17,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,11 @@ public class JsonWriterSequence {
         resultById.put("collectionInstrumentId",currentSu.getCollectionInstrumentId());
         resultById.put("mode",currentSu.getMode().getJsonName());
         resultById.put("isCapturedIndirectly",currentSu.getIsCapturedIndirectly());
-        resultById.put("validationDate",currentSu.getValidationDate());
+        resultById.put("questionnaireState", currentSu.getQuestionnaireState());
+        if(currentSu.getValidationDate() != null){
+            resultById.put("validationDate",currentSu.getValidationDate()
+                    .format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT)));
+        }
         resultById.put("data",transformDataToJson(interrogationId, metadataModelsByMode, database));
         return resultById;
     }
