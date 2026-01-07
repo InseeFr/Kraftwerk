@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
+import fr.insee.kraftwerk.api.services.async.MainAsyncService;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
@@ -33,12 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @Slf4j
 @Tag(name = "${tag.main}")
 public class MainService extends KraftwerkService {
 
+	MainAsyncService mainAsyncService;
 	ConfigProperties configProperties;
 	MinioClient minioClient;
 	VaultConfig vaultConfig;
@@ -46,8 +49,9 @@ public class MainService extends KraftwerkService {
 
 
 	@Autowired
-	public MainService(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
+	public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
         super(configProperties, minioConfig);
+		this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
 		this.minioConfig = minioConfig;
 		this.vaultConfig = vaultConfig;
@@ -71,7 +75,11 @@ public class MainService extends KraftwerkService {
 			) {
 		boolean fileByFile = false;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	@PutMapping(value = "/main/file-by-file")
@@ -83,7 +91,11 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean fileByFile = true;
 		boolean withDDI = true;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	@PutMapping(value = "/main/lunatic-only")
@@ -95,7 +107,11 @@ public class MainService extends KraftwerkService {
 	) {
 		boolean withDDI = false;
 		boolean fileByFile = false;
-		return runWithoutGenesis(inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	/**
@@ -112,7 +128,11 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithGenesis(jobId,fileUtilsInterface, mpGenesis, campaignId, withDDI, withEncryption, batchSize);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	@PutMapping(value = "/main/genesis/by-questionnaire")
@@ -123,7 +143,11 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
 		boolean withDDI = true;
-		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		String jobId = UUID.randomUUID().toString();
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+		mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	/**
@@ -141,7 +165,11 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 	) {
 		boolean withDDI = false;
-		return runWithGenesis(campaignId, withDDI, withEncryption, batchSize);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithGenesis(jobId,fileUtilsInterface, mpGenesis, campaignId, withDDI, withEncryption, batchSize);
+		return ResponseEntity.accepted().body(jobId);
 	}
 
 	@PutMapping(value = "/main/genesis/by-questionnaire/lunatic-only")
@@ -153,7 +181,12 @@ public class MainService extends KraftwerkService {
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
 	) {
 		boolean withDDI = false;
-		return runWithGenesisByQuestionnaire(questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+		String jobId = UUID.randomUUID().toString();
+		mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+		return ResponseEntity.accepted().body(jobId);
+
 	}
 
 	@GetMapping(value ="/json")
@@ -179,57 +212,6 @@ public class MainService extends KraftwerkService {
 		}
 		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",questionnaireModelId));
 	}
-
-	@NotNull
-	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
-		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-
-		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
-		try {
-			mp.runMain();
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
-		/* Step 4.3- 4.4 : Archive */
-		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam, fileUtilsInterface);
-
-		return ResponseEntity.ok(inDirectoryParam);
-	}
-
-
-	@NotNull
-	private ResponseEntity<String> runWithGenesis(String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
-		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-
-		MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
-
-		try {
-			mpGenesis.runMain(campaignId, batchSize);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		return ResponseEntity.ok(campaignId);
-	}
-
-	@NotNull
-	private ResponseEntity<String> runWithGenesisByQuestionnaire(String questionnaireModelId,  boolean withDDI, boolean withEncryption, int batchSize, Mode dataMode) {
-		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-
-		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
-
-		try {
-			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		return ResponseEntity.ok(questionnaireModelId);
-	}
-
-
 
 
 	@NotNull
@@ -270,7 +252,6 @@ public class MainService extends KraftwerkService {
 		);
 	}
 
-
 	@NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
 		KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
 				inDirectoryParam,
@@ -285,7 +266,7 @@ public class MainService extends KraftwerkService {
 
 	@NotNull FileUtilsInterface getFileUtilsInterface() {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
+		if(useMinio){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl(configProperties.getDefaultDirectory());
@@ -293,5 +274,6 @@ public class MainService extends KraftwerkService {
 		return fileUtilsInterface;
 	}
 
+	public record JobAcceptedResponse(String jobId) {}
 	
 }
