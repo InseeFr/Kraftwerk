@@ -245,7 +245,7 @@ public class GenesisDefinitions {
             surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
 
             surveyUnitUpdateLatest.setCampaignId(campaignId);
-            surveyUnitUpdateLatest.setQuestionnaireId(campaignId);
+            surveyUnitUpdateLatest.setCollectionInstrumentId(campaignId);
             surveyUnitUpdateLatest.setInterrogationId(interrogationId);
             surveyUnitUpdateLatest.setMode(Mode.WEB);
 
@@ -260,7 +260,7 @@ public class GenesisDefinitions {
 
     private SurveyUnitUpdateLatest getSurveyUnitUpdateLatestByQuestionnaire(String questionnaireModelId, String interrogationId) {
         List<SurveyUnitUpdateLatest> mongoFiltered = genesisClientStub.getMongoStub().stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireModelId)
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireModelId)
                         && surveyUnitUpdateLatest.getInterrogationId().equals(interrogationId)
         ).toList();
 
@@ -269,7 +269,7 @@ public class GenesisDefinitions {
             surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
 
             surveyUnitUpdateLatest.setCampaignId(questionnaireModelId);
-            surveyUnitUpdateLatest.setQuestionnaireId(questionnaireModelId);
+            surveyUnitUpdateLatest.setCollectionInstrumentId(questionnaireModelId);
             surveyUnitUpdateLatest.setInterrogationId(interrogationId);
             surveyUnitUpdateLatest.setMode(Mode.WEB);
 

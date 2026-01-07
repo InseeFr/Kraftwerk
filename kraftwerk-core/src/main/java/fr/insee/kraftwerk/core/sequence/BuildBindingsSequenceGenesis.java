@@ -18,6 +18,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class BuildBindingsSequenceGenesis {
 		data.setMetadataModel(metadataModels.get(dataMode));
 
 		/* Step 2.1 : Fill the data object with the survey answers file */
-		// To be deported in another place in the code later at refactor step
+		//TODO To be deported in another place in the code later at refactor step
 		List<SurveyUnitUpdateLatest> surveyUnitsFiltered = surveyUnits.stream().filter(surveyUnit -> dataMode.equals(surveyUnit.getMode().getModeName())).toList();
 		for(SurveyUnitUpdateLatest surveyUnit : surveyUnitsFiltered) {
 			QuestionnaireData questionnaire = new QuestionnaireData();
@@ -47,7 +48,11 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getSurveyUnitId());
+			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
+			answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null ?
+					surveyUnit.getValidationDate().format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT))
+					: null);
+			answers.putValue(Constants.QUESTIONNAIRE_STATE_NAME, surveyUnit.getQuestionnaireState());
 
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
