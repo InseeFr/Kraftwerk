@@ -56,7 +56,10 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "interrogationId";
-	public static final String SURVEY_UNIT_IDENTIFIER_NAME = "IdUE";
+	public static final String SURVEY_UNIT_IDENTIFIER_NAME = "usualSurveyUnitId";
+	public static final String VALIDATION_DATE_NAME = "validationDate";
+	public static final String VALIDATION_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
+	public static final String QUESTIONNAIRE_STATE_NAME = "questionnaireState";
 	public static final String LOOP_NAME_PREFIX = "BOUCLE";
 	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";

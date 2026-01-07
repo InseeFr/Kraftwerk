@@ -52,7 +52,7 @@ public class AggregateDefinitions {
 
 	@Then("The datasets I try to aggregate should return an aggregated dataset")
 	public void the_aggregated_dataset_shoud_exist() {
-		assertEquals(18, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
+		assertEquals(20, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
 		// On check que l'aggregation a conservé les identifiants
 		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));
 		// On check que l'aggregation a conserve les variables qui sont en commun.
