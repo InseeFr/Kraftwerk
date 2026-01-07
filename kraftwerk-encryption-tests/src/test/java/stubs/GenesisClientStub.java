@@ -72,7 +72,7 @@ public class GenesisClientStub extends GenesisClient {
         Set<Mode> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireModelId)
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireModelId)
         ).toList();
 
         for (SurveyUnitUpdateLatest surveyUnitUpdateLatest : filteredMongo){
@@ -134,7 +134,7 @@ public class GenesisClientStub extends GenesisClient {
                 surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getInterrogationId().equals(interrogationId)
         ).toList();
 
-        return filteredMongo.isEmpty() ? null : filteredMongo.getFirst().getQuestionnaireId();
+        return filteredMongo.isEmpty() ? null : filteredMongo.getFirst().getCollectionInstrumentId();
     }
 
     @Override
