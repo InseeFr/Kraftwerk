@@ -51,12 +51,6 @@ public class MetadataUtils {
                 // We read and store lunaticModelVersion
                 metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(lunaticStream));
             }
-            if (metadataModel.getVariables().getVariable(Constants.LIENS) != null) {
-                for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
-                    Variable varLien = new Variable(Constants.LIEN+k, metadataModel.getGroup(Constants.BOUCLE_PRENOMS), VariableType.INTEGER);
-                    metadataModel.getVariables().putVariable(varLien);
-                }
-            }
             // Step 3 : we add reporting data group if there is any reporting data
             if(modeInputs.getReportingDataFile() != null){
                 metadataModel.getGroups().put(Constants.REPORTING_DATA_GROUP_NAME, new Group(Constants.REPORTING_DATA_GROUP_NAME));
@@ -78,20 +72,6 @@ public class MetadataUtils {
 
 	private static void putToMetadataVariableFromLunatic(String dataMode, ModeInputs modeInputs, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
 		MetadataModel metadataModel = LunaticReader.getMetadataFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
-		// We add the variables for pairwise links
-		if (metadataModel.getVariables().getVariable(Constants.LIENS) != null) {
-			// We identify the group containing the individuals
-			// The solution is not pretty (hoping that the group name contains "PRENOM")
-			// It is meant to be temporary until we have a better way to identify the group containing the individuals
-			String groupContainingIndividuals = metadataModel.getGroupNames().stream()
-					.filter(g -> g.contains("PRENOM"))
-					.findFirst()
-					.orElse(metadataModel.getGroupNames().getFirst());
-			for (int k=1;k<Constants.MAX_LINKS_ALLOWED;k++) {
-				Variable varLien = new Variable(Constants.LIEN+k, metadataModel.getGroup(groupContainingIndividuals), VariableType.INTEGER);
-				metadataModel.getVariables().putVariable(varLien);
-			}
-		}
 		metadataModels.put(dataMode, metadataModel);
 	}
 }
