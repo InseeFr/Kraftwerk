@@ -1,4 +1,9 @@
 # Changelog
+## 3.11.0 [2026-01-07]
+- Filiere model in genesis : usualSurveyUnitId, validationDate and questionnaireState
+
+### Updated
+- BPM 1.0.23
 ## 3.10.6 [2025-12-18]
 ### Fixed
 - New BPM version

@@ -94,6 +94,7 @@ public class VtlJsonDatasetWriter {
 		Integer variableNumber = 0;
 
 		// Root level identifiers
+		// TODO Extract into method to avoid repeating lines
 		JSONObject jsonVtlIdentifier = new JSONObject();
 		jsonVtlIdentifier.put(NAME, Constants.ROOT_IDENTIFIER_NAME);
 		jsonVtlIdentifier.put(TYPE, STRING);
@@ -107,6 +108,20 @@ public class VtlJsonDatasetWriter {
 		jsonVtlIdentifier.put(ROLE, MEASURE);
 		dataStructure.add(jsonVtlIdentifier);
 		columnsMapping.put(Constants.SURVEY_UNIT_IDENTIFIER_NAME, variableNumber);
+		variableNumber++;
+		jsonVtlIdentifier = new JSONObject();
+		jsonVtlIdentifier.put(NAME, Constants.VALIDATION_DATE_NAME);
+		jsonVtlIdentifier.put(TYPE, STRING);
+		jsonVtlIdentifier.put(ROLE, MEASURE);
+		dataStructure.add(jsonVtlIdentifier);
+		columnsMapping.put(Constants.VALIDATION_DATE_NAME, variableNumber);
+		variableNumber++;
+		jsonVtlIdentifier = new JSONObject();
+		jsonVtlIdentifier.put(NAME, Constants.QUESTIONNAIRE_STATE_NAME);
+		jsonVtlIdentifier.put(TYPE, STRING);
+		jsonVtlIdentifier.put(ROLE, MEASURE);
+		dataStructure.add(jsonVtlIdentifier);
+		columnsMapping.put(Constants.QUESTIONNAIRE_STATE_NAME, variableNumber);
 		variableNumber++;
 		// Group identifiers
 		for (String groupName : metadataModel.getSubGroupNames()) {
@@ -150,6 +165,8 @@ public class VtlJsonDatasetWriter {
 			// Root level identifiers
 			rowValues[0] = questionnaireData.getIdentifier();
 			rowValues[1] = questionnaireData.getAnswers().getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
+			rowValues[2] = questionnaireData.getAnswers().getValue(Constants.VALIDATION_DATE_NAME);
+			rowValues[3] = questionnaireData.getAnswers().getValue(Constants.QUESTIONNAIRE_STATE_NAME);
 			
 			// Root variables values
 			addValuesToRow(rootInstance, rowValues);
@@ -200,6 +217,8 @@ public class VtlJsonDatasetWriter {
 			if (columnsMapping.get(variableName) != null) {
 				String value = groupInstance.getValue(variableName);
 				if ( !variableName.equals(Constants.SURVEY_UNIT_IDENTIFIER_NAME)
+						&& !variableName.equals(Constants.VALIDATION_DATE_NAME)
+						&& !variableName.equals(Constants.QUESTIONNAIRE_STATE_NAME)
 						&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
 				) {
 					value = convertBooleanValue(value);
