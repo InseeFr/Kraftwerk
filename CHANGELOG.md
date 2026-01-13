@@ -1,5 +1,5 @@
 # Changelog
-## 3.11.1 [TODO]
+## 3.11.1 [2026-01-13]
 ### Fixed
 - Link variables
 
