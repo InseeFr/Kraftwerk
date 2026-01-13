@@ -26,6 +26,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import stubs.ConfigStub;
 import stubs.GenesisClientStub;
@@ -47,6 +48,7 @@ import java.util.Objects;
 import static cucumber.functional_tests.MainDefinitions.database;
 import static cucumber.functional_tests.MainDefinitions.outDirectory;
 
+@SpringBootTest
 public class GenesisDefinitions {
 
     ConfigStub configStub = new ConfigStub();

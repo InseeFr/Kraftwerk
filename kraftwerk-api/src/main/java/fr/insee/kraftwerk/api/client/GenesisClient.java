@@ -75,7 +75,7 @@ public class GenesisClient {
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
 		// We use another restTemplate because we don't need a token to ping Genesis
 		RestTemplate restTemplateWithoutAuth = new RestTemplate();
-		//Null requestEntity because health check is whitelisted
+		// Null requestEntity because health check is whitelisted
 		ResponseEntity<String> response = restTemplateWithoutAuth.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
