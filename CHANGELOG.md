@@ -1,4 +1,8 @@
 # Changelog
+## 3.11.1 [TODO]
+### Fixed
+- Link variables
+
 ## 3.11.0 [2026-01-07]
 - Filiere model in genesis : usualSurveyUnitId, validationDate and questionnaireState
 
