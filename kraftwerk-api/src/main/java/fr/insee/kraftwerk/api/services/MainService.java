@@ -43,13 +43,14 @@ public class MainService extends KraftwerkService {
 	MinioClient minioClient;
 	VaultConfig vaultConfig;
 	boolean useMinio;
+   OutputZipService outputZipService;
 
-
-	@Autowired
-	public MainService(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
+    @Autowired
+	public MainService(ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, OutputZipService outputZipService) {
         super(configProperties, minioConfig);
         this.configProperties = configProperties;
-		this.minioConfig = minioConfig;
+        this.outputZipService = outputZipService;
+        this.minioConfig = minioConfig;
 		this.vaultConfig = vaultConfig;
 
 		useMinio = false;
@@ -171,6 +172,7 @@ public class MainService extends KraftwerkService {
 		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 		try {
 			mpGenesis.runMainJson(questionnaireModelId, batchSize, dataMode, since);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
 			log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
@@ -187,11 +189,12 @@ public class MainService extends KraftwerkService {
 		MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
 		try {
 			mp.runMain();
+            outputZipService.encryptAndArchiveOutputs(mp.getKraftwerkExecutionContext(),fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 		/* Step 4.3- 4.4 : Archive */
-		if (Boolean.TRUE.equals(archiveAtEnd)) archive(inDirectoryParam, fileUtilsInterface);
+		if (archiveAtEnd) archive(inDirectoryParam, fileUtilsInterface);
 
 		return ResponseEntity.ok(inDirectoryParam);
 	}
@@ -205,6 +208,7 @@ public class MainService extends KraftwerkService {
 
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
@@ -221,6 +225,7 @@ public class MainService extends KraftwerkService {
 
 		try {
 			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
@@ -285,7 +290,7 @@ public class MainService extends KraftwerkService {
 
 	@NotNull FileUtilsInterface getFileUtilsInterface() {
 		FileUtilsInterface fileUtilsInterface;
-		if(Boolean.TRUE.equals(useMinio)){
+		if(useMinio){
 			fileUtilsInterface = new MinioImpl(minioClient, minioConfig.getBucketName());
 		}else{
 			fileUtilsInterface = new FileSystemImpl(configProperties.getDefaultDirectory());

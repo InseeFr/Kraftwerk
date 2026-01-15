@@ -4,13 +4,13 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import cucumber.functional_tests.config.CucumberSpringConfiguration;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.api.services.OutputZipService;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.KraftwerkError;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -29,9 +29,7 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionEndpoint;
-import fr.insee.libjavachiffrement.symmetric.SymmetricEncryptionException;
 import fr.insee.libjavachiffrement.vault.VaultCaller;
-import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.And;
@@ -46,6 +44,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -61,10 +60,14 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -706,93 +709,128 @@ public class MainDefinitions {
 		}
 	}
 
-	@Then("We should not be able to read the csv output file")
-	public void check_csv_encrypted() throws IOException, CsvValidationException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 
-		Assertions.assertThat(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-		).doesNotExist();
+    @Then("We should not be able to read the output zip without decryption")
+    public void check_zip_encrypted() throws Exception {
+        Path encryptedZip = resolveEncryptedZipPath();
 
-		CSVReader csvReader = getCSVReader(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
-		);
-		try{
-			String[] header = csvReader.readNext();
-			Assertions.assertThat(header).doesNotContain(Constants.ROOT_IDENTIFIER_NAME);
-		}catch (CsvMalformedLineException e){
-			//Accepted exception
-			Assertions.assertThat(e).isInstanceOf(CsvMalformedLineException.class);
-		}
-	}
+        Assertions.assertThat(encryptedZip).exists();
+        byte[] raw = Files.readAllBytes(encryptedZip);
+        Assertions.assertThat(raw).isNotEmpty();
 
-	@Then("We should not be able to read the parquet output file")
-	public void check_parquet_encrypted() throws SQLException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-		Path filePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet");
-		Assertions.assertThat(filePath).doesNotExist();
+        boolean hasReadableEntry = false;
 
-		Path encryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet.enc");
-		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
-		try (Statement statement = database.createStatement()) {
-			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
-		}
-	}
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(raw))) {
+            ZipEntry e = zis.getNextEntry();
+            hasReadableEntry = (e != null);
+        } catch (ZipException ex) {
+            hasReadableEntry = false;
+        }
 
-	@Then("We should be able to decrypt the file")
-	public void check_file_decryption() throws IOException, SymmetricEncryptionException, SQLException, InterruptedException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-		VaultCaller vaultCaller = context.getBean(VaultCaller.class);
-		symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(vaultCaller);
-
-		//Check CSV
-		Path encryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".csv.enc");
-		Assertions.assertThat(encryptedFilePath).exists();
-
-		Assertions.assertThat(
-				new String(
-						symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath)),
-						StandardCharsets.UTF_8)
-				).contains(Constants.ROOT_IDENTIFIER_NAME);
+        Assertions.assertThat(hasReadableEntry)
+                .as("Encrypted file should not be readable as ZIP: %s".formatted(encryptedZip))
+                .isFalse();
+    }
 
 
-		//Check parquet
-		encryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet.enc");
-		Assertions.assertThat(encryptedFilePath).exists();
-		Path decryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet");
+    @And("We archive and encrypt the outputs")
+    public void archive_and_encrypt_outputs_main() throws KraftwerkException {
+        Path executionOutDirectory = resolveExecutionOutDirectory(); // out/<campaign>/<date>
 
-		Files.write(
-				decryptedFilePath,
-				symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath))
-		);
+        if (kraftwerkExecutionContext == null) {
+            kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext(null, true);
+        }
 
-		try (Statement statement = database.createStatement()) {
-			SqlUtils.readParquetFile(statement, decryptedFilePath);
-			ResultSet resultSet = statement.executeQuery(
-					("SELECT %s " +
-							"FROM '%s' ").formatted(
-							Constants.ROOT_IDENTIFIER_NAME,
-							inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME
-					)
-			);
-			Assertions.assertThat(resultSet.next()).isTrue();
-		}
-	}
+        kraftwerkExecutionContext.setWithEncryption(true);
+        kraftwerkExecutionContext.setOutDirectory(executionOutDirectory);
 
-	@AfterAll
-	public static void closeConnection() throws SQLException {
-		database.close();
-	}
+        OutputZipService outputZipService = context.getBean(OutputZipService.class);
+        FileUtilsInterface fileUtils = new FileSystemImpl(TestConstants.FUNCTIONAL_TESTS_DIRECTORY);
+
+        outputZipService.encryptAndArchiveOutputs(kraftwerkExecutionContext, fileUtils);
+
+
+        Assertions.assertThat(executionOutDirectory)
+                .as("Execution output directory should be deleted after archiving")
+                .doesNotExist();
+
+        Path zipFolder = executionOutDirectory.getParent();
+        String baseName = executionOutDirectory.getFileName().toString();
+
+        Path encryptedZip = zipFolder.resolve(baseName + ".zip.enc");
+
+        Assertions.assertThat(encryptedZip)
+                .as("Encrypted zip should exist after archiving")
+                .exists()
+                .isRegularFile();
+    }
+
+
+    @Then("We should be able to decrypt the zip and read the csv inside")
+    public void check_zip_decryption_and_csv_content() throws Exception {
+        Path encryptedZip = resolveEncryptedZipPath();
+
+        VaultCaller vaultCaller = context.getBean(VaultCaller.class);
+        symmetricEncryptionEndpoint = TestConstants.getSymmetricEncryptionEndpointForTest(vaultCaller);
+
+        Assertions.assertThat(encryptedZip).exists();
+
+        byte[] decryptedZipBytes = symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedZip));
+        Assertions.assertThat(decryptedZipBytes).isNotEmpty();
+
+        boolean found = false;
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decryptedZipBytes))) {
+            ZipEntry e;
+            while ((e = zis.getNextEntry()) != null) {
+                if (e.getName().endsWith(Constants.ROOT_GROUP_NAME + ".csv")) {
+                    found = true;
+                    String csvText = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+                    Assertions.assertThat(csvText).contains(Constants.ROOT_IDENTIFIER_NAME);
+                    break;
+                }
+            }
+        }
+        Assertions.assertThat(found).isTrue();
+    }
+
+    private Path resolveExecutionOutDirectory() {
+        File[] dirs = new File(outDirectory.toString()).listFiles(File::isDirectory);
+        Assertions.assertThat(dirs).isNotNull();
+        Assertions.assertThat(dirs).isNotEmpty();
+
+        File mostRecent = Arrays.stream(dirs)
+                .max(Comparator.comparingLong(File::lastModified))
+                .orElseThrow();
+
+        return outDirectory.resolve(mostRecent.getName()); // out/<campaign>/<date>
+    }
+
+    private Path resolveEncryptedZipPath() throws IOException {
+        Assertions.assertThat(outDirectory).isNotNull();
+        Assertions.assertThat(outDirectory.toFile()).exists().isDirectory();
+
+        try (var s = Files.list(outDirectory)) {
+            return s.filter(p -> p.getFileName().toString().endsWith(".zip.enc"))
+                    .max(Comparator.comparingLong(p -> p.toFile().lastModified()))
+                    .orElseThrow(() -> new AssertionError(
+                            "No .zip.enc found in " + outDirectory +
+                                    ". Files are: " + listFilesForDebug(outDirectory)
+                    ));
+        }
+    }
+
+    private String listFilesForDebug(Path dir) {
+        try (var s = Files.list(dir)) {
+            return s
+                    .map(p -> p.getFileName().toString())
+                    .sorted()
+                    .toList()
+                    .toString();
+        } catch (IOException e) {
+            return "<error listing files: " + e.getMessage() + ">";
+        }
+    }
+
 
 
 }
