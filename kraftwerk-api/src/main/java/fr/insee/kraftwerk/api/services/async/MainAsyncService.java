@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.api.services.OutputZipService;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
@@ -24,11 +25,13 @@ import java.io.IOException;
 public class MainAsyncService extends KraftwerkService {
 
 	private final InMemoryJobStore jobStore;
+	private final OutputZipService outputZipService;;
 
-	public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore) {
+	public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService) {
 		super(configProperties, minioConfig);
 		this.jobStore = jobStore;
-	}
+        this.outputZipService = outputZipService;
+    }
 
 	@GetMapping("/status/{jobId}")
 	public ResponseEntity<JobExecution> getStatus(@PathVariable String jobId) {
@@ -42,7 +45,8 @@ public class MainAsyncService extends KraftwerkService {
 	public void runWithoutGenesis(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessing mp, String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
 		jobStore.start(jobId);
 		try {
-			mp.runMain();
+            outputZipService.encryptAndArchiveOutputs(mp.getKraftwerkExecutionContext(),fileUtilsInterface);
+            mp.runMain();
 			jobStore.success(jobId);
 
 		} catch (KraftwerkException e) {
@@ -60,7 +64,8 @@ public class MainAsyncService extends KraftwerkService {
 		jobStore.start(jobId);
 		try {
 			mpGenesis.runMain(campaignId, batchSize);
-			jobStore.success(jobId);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
+            jobStore.success(jobId);
 
 		} catch (KraftwerkException e) {
 			log.error("KRAFTWERK EXCEPTION for campaign {}: {}", campaignId, e.getMessage());
@@ -78,7 +83,8 @@ public class MainAsyncService extends KraftwerkService {
 		jobStore.start(jobId);
 		try {
 			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
-			jobStore.success(jobId);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
+            jobStore.success(jobId);
 
 		} catch (KraftwerkException e) {
 			log.error("KRAFTWERK EXCEPTION for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());

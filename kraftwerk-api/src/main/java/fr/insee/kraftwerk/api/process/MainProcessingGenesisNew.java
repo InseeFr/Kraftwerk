@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -271,12 +270,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
         }
         Path outputPath = outDirectory.resolve(filename);
-        //Encrypt file if requested
-        if(kraftwerkExecutionContext.isWithEncryption()) {
-            InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-            fileUtilsInterface.writeFile(filename, encryptedStream, true);
-            log.info("File: {} successfully written and encrypted", filename);
-        }
+        kraftwerkExecutionContext.setOutDirectory(outDirectory);
         fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
         log.info("File: {} successfully written", outputPath);
     }
@@ -294,9 +288,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String timestamp = LocalDateTime.now().format(formatter);
         String fileName = String.format("export_%s_%s", questionnaireModelId, timestamp);
-        return kraftwerkExecutionContext.isWithEncryption() ?
-                fileName + JSON_EXTENSION + ".enc"
-                : fileName + JSON_EXTENSION;
+        return fileName + JSON_EXTENSION;
     }
 
     protected void tmpJsonFileWriter(List<InterrogationId> listIds,

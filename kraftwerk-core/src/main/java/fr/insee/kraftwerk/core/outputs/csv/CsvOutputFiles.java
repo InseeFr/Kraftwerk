@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -35,7 +34,9 @@ import java.util.Map;
 @Slf4j
 public class CsvOutputFiles extends OutputFiles {
 
-	/**
+    public static final String CSV_EXTENSION = ".csv";
+
+    /**
 	 * When an instance is created, the output folder is created.
 	 * 
 	 * @param outDirectory Out directory defined in application properties.
@@ -102,14 +103,6 @@ public class CsvOutputFiles extends OutputFiles {
 								this.getDatabase().executeQuery("SELECT COUNT(*) FROM '%s'".formatted(datasetName))){
 						countResult.next();
                         kraftwerkExecutionContext.getLineCountByTableMap().put(datasetName, countResult.getInt(1));
-					}
-
-					//Encrypt file if requested
-					if(kraftwerkExecutionContext.isWithEncryption()) {
-						InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-						getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
-						log.info("File: {} successfully written and encrypted", outputFile);
-						continue; //Go to next dataset to write
 					}
 				}
 				//Move to output folder
@@ -202,10 +195,8 @@ public class CsvOutputFiles extends OutputFiles {
 	 */
 	@Override
 	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
-		String output = getOutputFolder().getParent().getFileName() + "_" + datasetName + ".csv";
-		return kraftwerkExecutionContext.isWithEncryption() ?
-				output + encryptionUtils.getEncryptedFileExtension()
-				: output;
+		String output = getOutputFolder().getParent().getFileName() + "_" + datasetName;
+		return output + CSV_EXTENSION;
 	}
 
 }

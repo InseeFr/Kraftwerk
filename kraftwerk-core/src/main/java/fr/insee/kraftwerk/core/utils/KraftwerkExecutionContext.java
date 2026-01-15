@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.KraftwerkError;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class KraftwerkExecutionContext {
     private boolean withDDI;
     private boolean withEncryption;
     private long limitSize;
-
+    private Path outDirectory;
 
     public KraftwerkExecutionContext(
             String inDirectoryParam,

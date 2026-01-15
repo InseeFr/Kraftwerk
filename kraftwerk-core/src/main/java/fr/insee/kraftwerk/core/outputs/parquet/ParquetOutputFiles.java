@@ -12,7 +12,6 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Statement;
@@ -65,14 +64,6 @@ public class ParquetOutputFiles extends OutputFiles {
 
 				String outputFile = getOutputFolder().resolve(outputFileName(datasetName, kraftwerkExecutionContext)).toString();
 
-				//Encrypt file if requested
-				if(kraftwerkExecutionContext.isWithEncryption()) {
-					InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-					getFileUtilsInterface().writeFile(outputFile, encryptedStream, true);
-					log.info("File: {} successfully written and encrypted", outputFile);
-					continue; //Go to next dataset to write
-				}
-
 				//Move to output folder
 				getFileUtilsInterface().moveFile(tmpOutputFile, outputFile);
 				log.info("File: {} successfully written", outputFile);
@@ -106,9 +97,7 @@ public class ParquetOutputFiles extends OutputFiles {
 	@Override
 	public String outputFileName(String datasetName, KraftwerkExecutionContext kraftwerkExecutionContext) {
 		String path =  getOutputFolder().getParent().getFileName() + "_" + datasetName ;
-		return kraftwerkExecutionContext.isWithEncryption() ?
-			path + PARQUET_EXTENSION + encryptionUtils.getEncryptedFileExtension()
-			: path + PARQUET_EXTENSION;
+		return path + PARQUET_EXTENSION;
 	}
 
 	public List<String> getAllOutputFileNames(String datasetName) {

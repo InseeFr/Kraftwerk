@@ -149,7 +149,6 @@ public class GenesisClientStub extends GenesisClient {
         }
         return entries.getFirst().getValue();
     }
-
     @Override
     @SneakyThrows
     public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel){
@@ -165,4 +164,5 @@ public class GenesisClientStub extends GenesisClient {
 
         metadataCollectionStub.put(new QuestionnaireIdModeTuple(questionnaireId, mode), metadataModel);
     }
+
 }

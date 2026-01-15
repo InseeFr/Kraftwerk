@@ -40,7 +40,7 @@ public class WriterSequence {
 								 Statement database,
 								 FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory,kraftwerkExecutionContext.getExecutionDateTime());
-
+        kraftwerkExecutionContext.setOutDirectory(outDirectory);
 		writeCsvFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, metadataModels, kraftwerkExecutionContext, database, fileUtilsInterface);
 	}
@@ -55,7 +55,7 @@ public class WriterSequence {
 		Path outDirectory = FileUtilsInterface.transformToOut(inDirectory, LocalDateTime.now(), outDirectorySuffix);
 		Map<String, ModeInputs> modeInputsMap = new HashMap<>();
 		modeInputsMap.put(modeInputs.getDataMode(), modeInputs);
-
+        kraftwerkExecutionContext.setOutDirectory(outDirectory);
 		writeCsvFiles(outDirectory, vtlBindings, modeInputsMap, new HashMap<>(), kraftwerkExecutionContext, database,
 				fileUtilsInterface);
 		writeParquetFiles(outDirectory, vtlBindings, modeInputsMap, new HashMap<>(), kraftwerkExecutionContext, database, fileUtilsInterface);
