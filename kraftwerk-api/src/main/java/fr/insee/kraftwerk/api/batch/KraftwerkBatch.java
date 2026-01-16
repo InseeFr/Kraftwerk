@@ -123,9 +123,6 @@ public class KraftwerkBatch implements ApplicationRunner {
                 case ARG_SERVICE:
                     argsCheckerBuilder.argServiceName(getOptionValue(option, args));
                     break;
-                case ARG_REPORTING_DATA:
-                    argsCheckerBuilder.argIsReportingData(getOptionValue(option, args));
-                    break;
                 case ARG_REPORTING_DATA_FILE:
                     argsCheckerBuilder.argReportingDataFilePath(getOptionValue(option, args));
                     break;

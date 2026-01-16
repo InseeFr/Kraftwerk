@@ -15,7 +15,6 @@ public class ArgsChecker {
     //String raw args
     private final String argServiceName;
     private final String argQuestionnaireId;
-    private final String argIsReportingData;
     private final String argReportingDataFilePath;
     private final String argWithDDI;
     private final String argWithEncryption;
@@ -38,7 +37,7 @@ public class ArgsChecker {
     void checkArgs() throws IllegalArgumentException{
         checkServiceName();
         checkQuestionnaireId();
-        checkArgIsReportingData();
+        checkArgReportingDataFilePath();
         checkArgWithEncryption();
         checkArgWithDDI();
 
@@ -65,18 +64,11 @@ public class ArgsChecker {
         throw new IllegalArgumentException("No questionnaireId !");
     }
 
-    private void checkArgIsReportingData() {
-        //If "argIsReportingData" is not supplied in args, "isReportingData" is set to false by default
-        if(this.argIsReportingData == null) {
+    private void checkArgReportingDataFilePath() {
+        //If "argIsReportingData" is not supplied or empty in args, "isReportingData" is set to false by default
+        if(this.argReportingDataFilePath == null || this.argReportingDataFilePath.isEmpty()) {
             this.isReportingData = false;
             return;
-        }
-        if(isNotBoolean(this.argIsReportingData)){
-            throw new IllegalArgumentException("Invalid reportingData boolean argument ! : %s".formatted(this.argIsReportingData));
-        }
-        this.isReportingData = Boolean.parseBoolean(this.argIsReportingData);
-        if(this.argReportingDataFilePath == null){
-            throw new IllegalArgumentException("No reporting data file argument provided !");
         }
         this.reportingDataFilePath = argReportingDataFilePath;
     }
