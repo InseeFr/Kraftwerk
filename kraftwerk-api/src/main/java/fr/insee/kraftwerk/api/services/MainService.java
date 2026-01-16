@@ -206,7 +206,6 @@ public class MainService extends KraftwerkService {
 		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 		try {
 			mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
             log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
