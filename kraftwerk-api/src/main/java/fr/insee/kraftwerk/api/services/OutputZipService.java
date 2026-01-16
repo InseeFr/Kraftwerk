@@ -36,13 +36,11 @@ public class OutputZipService {
     public void encryptAndArchiveOutputs(KraftwerkExecutionContext kraftwerkExecutionContext,
                                          FileUtilsInterface fileUtils) throws KraftwerkException {
 
-        Path outDirectory = kraftwerkExecutionContext.getOutDirectory();
-        if (outDirectory == null) throw new KraftwerkException(500, "outDirectory is null in context");
-
         if (!kraftwerkExecutionContext.isWithEncryption()) {
-            log.info("Outputs kept in {}", outDirectory);
             return;
         }
+        Path outDirectory = kraftwerkExecutionContext.getOutDirectory();
+        if (outDirectory == null) throw new KraftwerkException(500, "outDirectory is null in context");
 
         Path tempZipFile = null;
         Path tempEncFile = null;
