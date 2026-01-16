@@ -710,29 +710,6 @@ public class MainDefinitions {
 	}
 
 
-    @Then("We should not be able to read the output zip without decryption")
-    public void check_zip_encrypted() throws Exception {
-        Path encryptedZip = resolveEncryptedZipPath();
-
-        Assertions.assertThat(encryptedZip).exists();
-        byte[] raw = Files.readAllBytes(encryptedZip);
-        Assertions.assertThat(raw).isNotEmpty();
-
-        boolean hasReadableEntry = false;
-
-        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(raw))) {
-            ZipEntry e = zis.getNextEntry();
-            hasReadableEntry = (e != null);
-        } catch (ZipException ex) {
-            hasReadableEntry = false;
-        }
-
-        Assertions.assertThat(hasReadableEntry)
-                .as("Encrypted file should not be readable as ZIP: %s".formatted(encryptedZip))
-                .isFalse();
-    }
-
-
     @And("We archive and encrypt the outputs")
     public void archive_and_encrypt_outputs_main() throws KraftwerkException {
         Path executionOutDirectory = resolveExecutionOutDirectory(); // out/<campaign>/<date>
@@ -763,6 +740,28 @@ public class MainDefinitions {
                 .as("Encrypted zip should exist after archiving")
                 .exists()
                 .isRegularFile();
+    }
+
+    @Then("We should not be able to read the output zip without decryption")
+    public void check_zip_encrypted() throws Exception {
+        Path encryptedZip = resolveEncryptedZipPath();
+
+        Assertions.assertThat(encryptedZip).exists();
+        byte[] raw = Files.readAllBytes(encryptedZip);
+        Assertions.assertThat(raw).isNotEmpty();
+
+        boolean hasReadableEntry = false;
+
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(raw))) {
+            ZipEntry e = zis.getNextEntry();
+            hasReadableEntry = (e != null);
+        } catch (ZipException ex) {
+            hasReadableEntry = false;
+        }
+
+        Assertions.assertThat(hasReadableEntry)
+                .as("Encrypted file should not be readable as ZIP: %s".formatted(encryptedZip))
+                .isFalse();
     }
 
 
