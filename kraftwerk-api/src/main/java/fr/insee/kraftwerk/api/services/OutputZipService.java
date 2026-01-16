@@ -32,7 +32,6 @@ public class OutputZipService {
 
     /**
      * Create a zip of kraftwerkExecutionContext.outDirectory, then encrypt the zip if kraftwerkExecutionContext.withEncryption=true.
-     * Writes next to outDirectory (same parent).
      */
     public void encryptAndArchiveOutputs(KraftwerkExecutionContext kraftwerkExecutionContext,
                                          FileUtilsInterface fileUtils) throws KraftwerkException {
@@ -40,7 +39,13 @@ public class OutputZipService {
         Path outDirectory = kraftwerkExecutionContext.getOutDirectory();
         if (outDirectory == null) throw new KraftwerkException(500, "outDirectory is null in context");
 
+        if (!kraftwerkExecutionContext.isWithEncryption()) {
+            log.info("Outputs kept in {}", outDirectory);
+            return;
+        }
+
         Path tempZipFile = null;
+        Path tempEncFile = null;
 
         try {
             Path tempDirectory = Path.of(System.getProperty(TMPDIR));
@@ -51,37 +56,44 @@ public class OutputZipService {
 
             buildZip(outDirectory, tempZipFile, fileUtils);
 
+            String encExt = encryptionUtils.getEncryptedFileExtension();
+            if (!encExt.startsWith(".")) encExt = "." + encExt;
+
+            tempEncFile = Files.createTempFile(tempDirectory, baseName + "_", ZIP_EXTENSION + encExt);
+
+            try (InputStream encrypted = encryptionUtils.encryptOutputFile(tempZipFile, kraftwerkExecutionContext);
+                 OutputStream out = Files.newOutputStream(tempEncFile,
+                         StandardOpenOption.TRUNCATE_EXISTING)) {
+                encrypted.transferTo(out);
+            }
+
             Path parent = outDirectory.getParent();
             if (parent == null) throw new KraftwerkException(500, "Cannot resolve parent of outDirectory: " + outDirectory);
 
-            String targetZip = parent.resolve(baseName + ZIP_EXTENSION).toString();
+            String targetEncPath = parent.resolve(baseName + ZIP_EXTENSION + encExt).toString();
 
-            if (kraftwerkExecutionContext.isWithEncryption()) {
-                Path targetZipEnc = Path.of(targetZip + encryptionUtils.getEncryptedFileExtension());
+            // store encrypted file:
+            fileUtils.moveFile(tempEncFile, targetEncPath);
+            tempEncFile = null;
 
-                try (InputStream encrypted = encryptionUtils.encryptOutputFile(tempZipFile, kraftwerkExecutionContext);
-                     OutputStream outputStream = Files.newOutputStream(targetZipEnc,
-                             StandardOpenOption.CREATE,
-                             StandardOpenOption.TRUNCATE_EXISTING)) {
-                    encrypted.transferTo(outputStream);
-                }
-
-                deleteWithRetry(tempZipFile);
-                tempZipFile = null;
-
-            } else {
-                fileUtils.moveFile(tempZipFile, targetZip);
-                tempZipFile = null;
-            }
+            deleteWithRetry(tempZipFile);
+            tempZipFile = null;
 
             fileUtils.deleteDirectory(outDirectory);
 
-        } catch (IOException e) {
-            if (tempZipFile != null) {
-                deleteWithRetry(tempZipFile);
-            }
-            throw new KraftwerkException(500, "IO error during output archive: " + e.getMessage());
+            log.info("Encrypted archive created at {} and outDirectory deleted ({})", targetEncPath, outDirectory);
+
+        } catch (UncheckedIOException | IOException e) {
+            cleanupTemps(tempZipFile, tempEncFile);
+            Throwable cause = e instanceof UncheckedIOException ? e.getCause() : e;
+            throw new KraftwerkException(500, "IO error during output archive: " + cause.getMessage());
         }
+
+    }
+
+    private void cleanupTemps(Path zip, Path enc) {
+        if (enc != null) deleteWithRetry(enc);
+        if (zip != null) deleteWithRetry(zip);
     }
 
 

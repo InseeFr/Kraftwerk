@@ -235,8 +235,6 @@ public class MainService extends KraftwerkService {
 	}
 
 
-
-
 	@NotNull
 	MainProcessingGenesisLegacy getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
 
