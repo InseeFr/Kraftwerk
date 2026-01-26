@@ -26,7 +26,7 @@ public class GenesisClientStub extends GenesisClient {
 
 
     public GenesisClientStub(ConfigProperties configProperties) {
-        super(configProperties);
+        super(null,null,configProperties);
         this.mongoStub = new ArrayList<>();
         this.metadataCollectionStub = new HashMap<>();
 

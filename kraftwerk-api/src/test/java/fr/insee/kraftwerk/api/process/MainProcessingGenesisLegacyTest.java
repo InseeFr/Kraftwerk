@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.api.process;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.bpm.metadata.model.MetadataModel;
-import fr.insee.kraftwerk.TestConfig;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
@@ -13,13 +13,9 @@ import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.RestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,76 +24,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@ActiveProfiles({"test", "ci-public"})
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(TestConfig.class)
-@ComponentScan(basePackages = {"fr.insee.kraftwerk.core.encryption", "fr.insee.kraftwerk.core.outputs"})
+@ExtendWith(MockitoExtension.class)
 class MainProcessingGenesisLegacyTest {
 
-    private ConfigProperties configProperties;
-    private MainProcessingGenesisLegacy mainProcessing;
-    private RestTemplate restTemplate;
+    @Mock
+    private GenesisClient genesisClient;
 
+    private MainProcessingGenesisLegacy mainProcessing;
 
     @BeforeEach
-    void setUp() {
-
-        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-        restTemplate = restTemplateBuilder.additionalInterceptors(Collections.emptyList()).build();
-        restTemplate.setInterceptors(Collections.emptyList());
-
-        configProperties = new ConfigProperties() {
+    void setUp() throws KraftwerkException, JsonProcessingException {
+        FileUtilsInterface fileUtils = new FileSystemImpl("defaultDir");
+        ConfigProperties configProperties = new ConfigProperties() {
             @Override
             public String getDefaultDirectory() {
                 return "src/test/resources";
             }
         };
-
-        GenesisClient genesisClient = new GenesisClient(restTemplate, configProperties) {
-            @Override
-            public List<Mode> getModes(String idCampaign) {
-                return Collections.singletonList(Mode.WEB);
-            }
-
-            @Override
-            public List<String> getQuestionnaireModelIds(String campaignId) {
-                return Collections.singletonList("id");
-            }
-
-            @Override
-            public List<InterrogationId> getInterrogationIds(String questionnaireId) {
-                return Collections.singletonList(new InterrogationId());
-
-            }
-
-            @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
-                SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
-                surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
-                surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
-                surveyUnitUpdateLatest.setMode(Mode.WEB);
-                return Collections.singletonList(surveyUnitUpdateLatest);
-            }
-            @Override
-            public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
-                return "id";
-            }
-
-            @Override
-            public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
-                return Collections.singletonList(Mode.WEB);
-            }
-
-            @Override
-            public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
-                return new MetadataModel();
-            }
-        };
-
-
-        FileUtilsInterface fileUtils = new FileSystemImpl("defaultDir");
 
         KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                 null,
@@ -106,8 +52,8 @@ class MainProcessingGenesisLegacyTest {
                 false,
                 419430400L
         );
-
         mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);
+
     }
 
     @Test
@@ -120,9 +66,32 @@ class MainProcessingGenesisLegacyTest {
     }
 
    @Test
-    void testRunMainOk() {
+    void testRunMainOk() throws KraftwerkException, JsonProcessingException {
+       when(genesisClient.getModes(any()))
+               .thenReturn(List.of(Mode.WEB));
+
+       when(genesisClient.getQuestionnaireModelIds(any()))
+               .thenReturn(List.of("id"));
+
+       when(genesisClient.getInterrogationIds(any()))
+               .thenReturn(List.of(new InterrogationId()));
+
+       when(genesisClient.getUEsLatestState(any(), any()))
+               .thenReturn(mockSurveyUnit());
+
+       when(genesisClient.getMetadataByQuestionnaireIdAndMode(any(), any()))
+               .thenReturn(new MetadataModel()); // 🔑 clé du problème
+
         String idCampaign = "campaign1";
         assertDoesNotThrow(() -> mainProcessing.runMain(idCampaign, 100));
+    }
+
+    private List<SurveyUnitUpdateLatest>  mockSurveyUnit(){
+        SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
+        surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
+        surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
+        surveyUnitUpdateLatest.setMode(Mode.WEB);
+        return Collections.singletonList(surveyUnitUpdateLatest);
     }
 
 

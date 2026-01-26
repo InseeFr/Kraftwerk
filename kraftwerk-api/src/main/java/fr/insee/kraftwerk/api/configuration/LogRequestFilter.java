@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
+import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,8 +42,8 @@ public class LogRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
     	//Cache request to avoid calling twice the same inputStream
-        ContentCachingRequestWrapper req = new ContentCachingRequestWrapper(request);
-        ContentCachingResponseWrapper resp = new ContentCachingResponseWrapper(response);
+        ContentCachingRequestWrapper req = new ContentCachingRequestWrapper(request,0);
+		ContentCachingResponseWrapper resp = new ContentCachingResponseWrapper(response);
         
         log.info(REQUEST_MESSAGE_FORMAT, 
         		req.getMethod(), req.getRequestURI(), 

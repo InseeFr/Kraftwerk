@@ -3,18 +3,15 @@ package fr.insee.kraftwerk.api.integration_tests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.kraftwerk.KraftwerkApi;
 import fr.insee.kraftwerk.api.client.GenesisClient;
-import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -26,20 +23,12 @@ import java.util.List;
 class GenesisIntegrationTest {
 
     @Autowired
-    private ConfigProperties configProperties;
-
     private GenesisClient genesisClient;
 
     //Constants
     private static final String CAMPAIGN_ID = "INTEGRATIONTEST_CAMPAIGN";
     private static final String QUESTIONNAIRE_ID = "INTEGRATIONTEST_QUESTIONNAIRE";
     private static final String[] INTERROGATION_IDS = new String[]{"UE1", "UE2"};
-
-
-    @BeforeEach
-    void init(){
-        genesisClient = new GenesisClient(new RestTemplateBuilder(), configProperties);
-    }
 
     @Test
     void ping_genesis_test(){

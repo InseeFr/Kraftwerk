@@ -23,6 +23,12 @@
 			<version>${project.parent.version}</version>
 			<classifier>app-to-import</classifier>
 		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit</artifactId>
+			<version>${cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

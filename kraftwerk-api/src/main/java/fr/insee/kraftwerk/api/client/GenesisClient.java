@@ -10,93 +10,111 @@ import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+
+@Slf4j
 @Service
 public class GenesisClient {
 
-	private final RestTemplate restTemplate;
-
-	@Getter
+	private final RestClient restClient;
+	private final RestClient genesisHealthRestClient;
 	private final ConfigProperties configProperties;
 
 
 	@Autowired
-	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
-		this.restTemplate = restTemplateBuilder.build();
-		this.configProperties = configProperties;
-		OidcService oidcService = new OidcService(configProperties);
-		this.restTemplate.getInterceptors().add(new GenesisAuthInterceptor(oidcService));
+	public GenesisClient(
+			@Qualifier("genesisRestClient") RestClient genesisRestClient,
+			@Qualifier("genesisHealthRestClient") RestClient genesisHealthRestClient,
+			ConfigProperties configProperties) {
+        this.genesisHealthRestClient = genesisHealthRestClient;
+        this.configProperties = configProperties;
+		this.restClient = genesisRestClient;
 	}
 
-	//Constructors used for tests
-	public GenesisClient(ConfigProperties configProperties) {
-		restTemplate = null;
-		this.configProperties = configProperties;
-	}
-	public GenesisClient(RestTemplate restTemplateForTest, ConfigProperties configProperties) {
-		restTemplate = restTemplateForTest;
-		this.configProperties = configProperties;
-	}
+	private <T, R> ResponseEntity<R> makeApiCall(String url, HttpMethod method, T requestBody, Class<R> responseType) {
+		RestClient.RequestHeadersSpec<?> requestSpec;
 
-	private <T, R> ResponseEntity<R> makeApiCall(String url, HttpMethod method, T requestBody, Class<R> responseType) throws KraftwerkException {
-		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, headers);
+		String methodName = method.name();
+        requestSpec = switch (methodName) {
+            case "GET" -> restClient.get().uri(url);
+            case "POST" -> restClient.post().uri(url).body(requestBody);
+            case "PUT" -> restClient.put().uri(url).body(requestBody);
+            case "DELETE" -> restClient.delete().uri(url);
+            default -> throw new IllegalArgumentException("HTTP method not supported: " + method);
+        };
 
-		try {
-			ResponseEntity<R> response = restTemplate.exchange(url, method, requestEntity, responseType);
-			if (response.getStatusCode().is2xxSuccessful()) {
-				return response;
-			} else {
-				throw new KraftwerkException(500,"Unexpected error : " + response.getStatusCode());
-			}
+		try{
+			return requestSpec
+					.retrieve()
+					.toEntity(responseType);
 		} catch (RestClientResponseException e) {
-			HttpStatusCode statusCode = e.getStatusCode();
-            throw new KraftwerkException(500,String.format("Unable to reach Genesis API, http code received : %d",statusCode.value()));
+			HttpStatus httpStatus = HttpStatus.resolve(e.getStatusCode().value());
+			// Just in case of a non standard statusCode
+			if (httpStatus == null) {
+				httpStatus = HttpStatus.BAD_GATEWAY;
+			}
+			log.error("Error reaching Genesis API, http code received: {}",e.getStatusCode().value());
+			throw new GenesisApiException(
+					httpStatus,
+					String.format("Error reaching Genesis API, http code received: %d", e.getStatusCode().value()),
+					e);
+		} catch (RestClientException e) {
+			log.error("Genesis API unreachable: {}",e.getMessage());
+			throw new GenesisApiException(
+					HttpStatus.SERVICE_UNAVAILABLE,
+					"Genesis API unreachable",
+					e);
+		} catch (Exception e) {
+			log.error("Unexpected error calling Genesis API: {}",e.getMessage());
+			throw new GenesisApiException(
+					HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unexpected error calling Genesis API",
+					e);
 		}
 	}
 
 	public String pingGenesis(){
-		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
-		// We use another restTemplate because we don't need a token to ping Genesis
-		RestTemplate restTemplateWithoutAuth = new RestTemplate();
-		// Null requestEntity because health check is whitelisted
-		ResponseEntity<String> response = restTemplateWithoutAuth.exchange(url, HttpMethod.GET, null, String.class);
-		return response.getBody() != null ? response.getBody() : null;
+		return genesisHealthRestClient.get()
+				.uri("/health-check")
+				.retrieve()
+				.body(String.class);
 	}
 
 	public List<InterrogationId> getInterrogationIds(String questionnaireId) throws KraftwerkException {
 		String url = String.format("%s/interrogations/by-questionnaire?questionnaireId=%s",
 				configProperties.getGenesisUrl(), questionnaireId);
-		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url, GET,null,InterrogationId[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 	public List<InterrogationId> getInterrogationIdsFromDate(String questionnaireId, LocalDateTime since) throws KraftwerkException {
 		String url = String.format("%s/interrogations/by-questionnaire-and-since-datetime?questionnaireId=%s&since=%s",
 				configProperties.getGenesisUrl(), questionnaireId,since);
-		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url, GET,null,InterrogationId[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
-		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
+		ResponseEntity<String[]> response = makeApiCall(url, GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
@@ -104,7 +122,7 @@ public class GenesisClient {
 
 	public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireModelId);
-		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
+		ResponseEntity<String[]> response = makeApiCall(url, GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
@@ -112,34 +130,34 @@ public class GenesisClient {
 	
 	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) throws KraftwerkException {
 		String url = String.format("%s/responses/simplified/by-list-interrogation-and-collection-instrument/latest?collectionInstrumentId=%s", configProperties.getGenesisUrl(), questionnaireId);
-		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
+		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url, POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
     public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
-		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
+		ResponseEntity<String> response = makeApiCall(url, GET,null,String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
 		return response.getBody() != null ? objectMapper.readValue(response.getBody(), new TypeReference<>(){}) : null;
 	}
 
 	public String getQuestionnaireModelIdByInterrogationId(String interrogationId) throws KraftwerkException {
 		String url = String.format("%s/questionnaires/by-interrogation?interrogationId=%s", configProperties.getGenesisUrl(), interrogationId);
-		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
+		ResponseEntity<String> response = makeApiCall(url, GET,null,String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
 
 	public MetadataModel getMetadataByQuestionnaireIdAndMode(String questionnaireId, Mode mode) throws KraftwerkException {
 		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
 				configProperties.getGenesisUrl(), questionnaireId, mode);
-		ResponseEntity<MetadataModel> response = makeApiCall(url,HttpMethod.GET,null,MetadataModel.class);
+		ResponseEntity<MetadataModel> response = makeApiCall(url, GET,null,MetadataModel.class);
 		return response.getBody();
     }
 
 	public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel) throws KraftwerkException {
 		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
 				configProperties.getGenesisUrl(), questionnaireId, mode);
-		makeApiCall(url,HttpMethod.POST,metadataModel,null);
+		makeApiCall(url, POST,metadataModel,null);
 	}
 
 	public void saveDateExtraction(String questionnaireModelId, Mode mode) throws KraftwerkException {
@@ -148,7 +166,7 @@ public class GenesisClient {
 		if (mode != null) {
 			url += "&mode=" + mode;
 		}
-		makeApiCall(url,HttpMethod.PUT,null,null);
+		makeApiCall(url, PUT,null,null);
 	}
 
 	public LastJsonExtractionDate getLastExtractionDate(String questionnaireModelId, Mode mode) throws KraftwerkException {
@@ -157,7 +175,7 @@ public class GenesisClient {
 		if (mode != null) {
 			url += "&mode=" + mode;
 		}
-		ResponseEntity<LastJsonExtractionDate> response = makeApiCall(url,HttpMethod.GET,null,LastJsonExtractionDate.class);
+		ResponseEntity<LastJsonExtractionDate> response = makeApiCall(url, GET,null,LastJsonExtractionDate.class);
 		return response.getBody();
 	}
 }

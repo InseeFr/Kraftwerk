@@ -25,7 +25,7 @@ public class GenesisClientStub extends GenesisClient {
     Map<QuestionnaireIdModeTuple, MetadataModel> metadataCollectionStub;
 
     public GenesisClientStub(ConfigProperties configProperties) {
-        super(configProperties);
+        super(null,null,configProperties);
         this.mongoStub = new ArrayList<>();
         this.metadataCollectionStub = new HashMap<>();
     }
