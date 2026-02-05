@@ -304,6 +304,20 @@ public class SqlUtils {
         return columnNames;
     }
 
+    public static Map<String, String> getColumnTypes(Statement statement, String tableName) throws SQLException {
+        Map<String, String> columnTypes = new LinkedHashMap<>(); // conserve l'ordre des colonnes
+
+        try (ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName))) {
+            while (resultSet.next()) {
+                String columnName = resultSet.getString("column_name");
+                String columnType = resultSet.getString("column_type").toUpperCase(); // ex: BOOLEAN, VARCHAR, INTEGER
+                columnTypes.put(columnName, columnType);
+            }
+        }
+
+        return columnTypes;
+    }
+
     /**
      * Connect to DuckDB and retrieve column names of a table
      *
