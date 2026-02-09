@@ -23,6 +23,8 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
     private Document document;
 
+    private static final String EMPTY_TAG = "___EMPTY___";
+
     public XMLReportingDataParser(FileUtilsInterface fileUtilsInterface) {
         super(fileUtilsInterface);
     }
@@ -46,8 +48,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
         for (Element surveyUnitElement : surveyUnitsNodeList) {
             ReportingDataUE reportingDataUE = new ReportingDataUE();
-            Element identifierElement = surveyUnitElement.getFirstChildElement("Id");
-            String identifier = identifierElement.getValue();
+            String identifier = getElementValueIfExists(surveyUnitElement, "Id");
             reportingDataUE.setIdentifier(identifier);
 
             reportingDataUE.setIdentificationConfiguration(identificationConfiguration);
@@ -69,12 +70,21 @@ public class XMLReportingDataParser extends ReportingDataParser {
             // Get address values
             getAddress(surveyUnitElement, reportingDataUE);
 
-            Elements stateNodeList = surveyUnitElement.getFirstChildElement("States").getChildElements("State");
+            Element statesNode = surveyUnitElement.getFirstChildElement("States");
+            Elements stateNodeList = (statesNode == null)
+                    ? surveyUnitElement.getChildElements(EMPTY_TAG)
+                    : statesNode.getChildElements("State");
+
             for (int j = 0; j < stateNodeList.size(); j++) {
                 Element stateElement = stateNodeList.get(j);
-                String type = stateElement.getFirstChildElement("type").getValue().toUpperCase();
-                String timestamp = stateElement.getFirstChildElement("date").getValue();
-                reportingDataUE.addState(new State(type, Long.parseLong(timestamp)));
+                String type = getElementValueIfExists(stateElement,"type").toUpperCase();
+                String timestamp = getElementValueIfExists(stateElement,"date");
+                if (!type.isEmpty() && !timestamp.isEmpty()) {
+                    try {
+                        reportingDataUE.addState(new State(type, Long.parseLong(timestamp)));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
             }
             reportingDataUE.sortStates();
 
@@ -83,11 +93,19 @@ public class XMLReportingDataParser extends ReportingDataParser {
             reportingDataUE.setContactOutcome(new ContactOutcome());
             if (contactOutcomeElement != null) {
                 reportingDataUE.getContactOutcome()
-                        .setOutcomeType(contactOutcomeElement.getFirstChildElement("outcomeType").getValue());
-                reportingDataUE.getContactOutcome().setDateEndContact(
-                        Long.parseLong(contactOutcomeElement.getFirstChildElement("date").getValue()));
-                reportingDataUE.getContactOutcome().setTotalNumberOfContactAttempts(
-                        Integer.parseInt(contactOutcomeElement.getFirstChildElement("totalNumberOfContactAttempts").getValue()));
+                        .setOutcomeType(getElementValueIfExists(contactOutcomeElement, "outcomeType"));
+
+                String date = getElementValueIfExists(contactOutcomeElement, "date");
+                if (!date.isEmpty()) {
+                    try { reportingDataUE.getContactOutcome().setDateEndContact(Long.parseLong(date)); }
+                    catch (NumberFormatException ignored) {}
+                }
+
+                String attempts = getElementValueIfExists(contactOutcomeElement, "totalNumberOfContactAttempts");
+                if (!attempts.isEmpty()) {
+                    try { reportingDataUE.getContactOutcome().setTotalNumberOfContactAttempts(Integer.parseInt(attempts)); }
+                    catch (NumberFormatException ignored) {}
+                }
             }
 
             Element contactAttemptsNode = surveyUnitElement.getFirstChildElement("ContactAttempts");
@@ -95,9 +113,15 @@ public class XMLReportingDataParser extends ReportingDataParser {
                 Elements contactAttemptsElements = contactAttemptsNode.getChildElements("ContactAttempt");
                 for (int k = 0; k < contactAttemptsElements.size(); k++) {
                     Element contactAttemptsElement = contactAttemptsElements.get(k);
-                    String status = contactAttemptsElement.getFirstChildElement("status").getValue().toUpperCase();
-                    String timestamp = contactAttemptsElement.getFirstChildElement("date").getValue();
-                    reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
+                    String status = getElementValueIfExists(contactAttemptsElement, "status").toUpperCase();
+                    String timestamp = getElementValueIfExists(contactAttemptsElement, "date");
+
+                    if (!status.isEmpty() && !timestamp.isEmpty()) {
+                        try {
+                            reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
                 }
             }
 
@@ -149,6 +173,7 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
     private void getSurveyUnitsFromElement(Element element, List<Element> surveyUnitList) {
         Element surveyUnitsNode = element.getFirstChildElement("SurveyUnits");
+        if (surveyUnitsNode == null) return;
         for (Element surveyUnitElement : surveyUnitsNode.getChildElements("SurveyUnit")) {
             surveyUnitList.add(surveyUnitElement);
         }
@@ -159,24 +184,18 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
         if (addressElement != null) {
             reportingDataUE.setInseeSampleIdentifier(new InseeSampleIdentifier());
-            reportingDataUE.getInseeSampleIdentifier().setRges(addressElement.getFirstChildElement("Rges").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setNumfa(addressElement.getFirstChildElement("Numfa").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setSsech(addressElement.getFirstChildElement("Ssech").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setLe(addressElement.getFirstChildElement("Le").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setEc(addressElement.getFirstChildElement("Ec").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setBs(addressElement.getFirstChildElement("Bs").getValue());
-            reportingDataUE.getInseeSampleIdentifier().setNoi(addressElement.getFirstChildElement("Noi").getValue());
+            reportingDataUE.getInseeSampleIdentifier().setRges(getElementValueIfExists(addressElement,"Rges"));
+            reportingDataUE.getInseeSampleIdentifier().setNumfa(getElementValueIfExists(addressElement,"Numfa"));
+            reportingDataUE.getInseeSampleIdentifier().setSsech(getElementValueIfExists(addressElement,"Ssech"));
+            reportingDataUE.getInseeSampleIdentifier().setLe(getElementValueIfExists(addressElement,"Le"));
+            reportingDataUE.getInseeSampleIdentifier().setEc(getElementValueIfExists(addressElement,"Ec"));
+            reportingDataUE.getInseeSampleIdentifier().setBs(getElementValueIfExists(addressElement,"Bs"));
+            reportingDataUE.getInseeSampleIdentifier().setNoi(getElementValueIfExists(addressElement,"Noi"));
             reportingDataUE.getInseeSampleIdentifier().setNograp(getElementValueIfExists(addressElement, "Nograp"));
             reportingDataUE.getInseeSampleIdentifier().setNolog(getElementValueIfExists(addressElement, "Nolog"));
             reportingDataUE.getInseeSampleIdentifier().setNole(getElementValueIfExists(addressElement, "Nole"));
             reportingDataUE.getInseeSampleIdentifier().setAutre(getElementValueIfExists(addressElement, "Autre"));
         }
-    }
-
-    private String getElementValueIfExists(Element rootElement, String childName) {
-        Element childElement = rootElement.getFirstChildElement(childName);
-        if(childElement == null) return null;
-        return childElement.getValue();
     }
 
     private void getIdentification(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
@@ -186,32 +205,14 @@ public class XMLReportingDataParser extends ReportingDataParser {
             return;
         }
 
-        if (identificationElement.getFirstChildElement("identification") != null) {
-            reportingDataUE.getIdentification().setIdentification(identificationElement.getFirstChildElement("identification").getValue());
-        }
-        if (identificationElement.getFirstChildElement("access") != null) {
-            reportingDataUE.getIdentification().setAccess(identificationElement.getFirstChildElement("access").getValue());
-        }
+        reportingDataUE.getIdentification().setIdentification(getElementValueIfExists(identificationElement, "identification"));
+        reportingDataUE.getIdentification().setAccess(getElementValueIfExists(identificationElement, "access"));
+        reportingDataUE.getIdentification().setSituation(getElementValueIfExists(identificationElement, "situation"));
+        reportingDataUE.getIdentification().setOccupant(getElementValueIfExists(identificationElement, "occupant"));
+        reportingDataUE.getIdentification().setCategory(getElementValueIfExists(identificationElement, "category"));
+        reportingDataUE.getIdentification().setIndividualStatus(getElementValueIfExists(identificationElement, "individualStatus"));
+        reportingDataUE.getIdentification().setInterviewerCanProcess(getElementValueIfExists(identificationElement, "interviewerCanProcess"));
 
-        if (identificationElement.getFirstChildElement("situation") != null) {
-            reportingDataUE.getIdentification().setSituation(identificationElement.getFirstChildElement("situation").getValue());
-        }
-
-        if (identificationElement.getFirstChildElement("occupant") != null) {
-            reportingDataUE.getIdentification().setOccupant(identificationElement.getFirstChildElement("occupant").getValue());
-        }
-
-        if (identificationElement.getFirstChildElement("category") != null) {
-            reportingDataUE.getIdentification().setCategory(identificationElement.getFirstChildElement("category").getValue());
-        }
-
-        if (identificationElement.getFirstChildElement("individualStatus") != null) {
-            reportingDataUE.getIdentification().setIndividualStatus(identificationElement.getFirstChildElement("individualStatus").getValue());
-        }
-
-        if (identificationElement.getFirstChildElement("interviewerCanProcess") != null) {
-            reportingDataUE.getIdentification().setInterviewerCanProcess(identificationElement.getFirstChildElement("interviewerCanProcess").getValue());
-        }
     }
 
     private void getComments(Element surveyUnitElement, ReportingDataUE reportingDataUE) {
@@ -223,8 +224,8 @@ public class XMLReportingDataParser extends ReportingDataParser {
         Elements commentsElements = commentsNode.getChildElements("Comment");
         for (int k = 0; k < commentsElements.size(); k++) {
             Element commentsElement = commentsElements.get(k);
-            String status = commentsElement.getFirstChildElement("type").getValue();
-            String value = commentsElement.getFirstChildElement("value").getValue();
+            String status = getElementValueIfExists(commentsElement, "type");
+            String value = getElementValueIfExists(commentsElement, "value");
             reportingDataUE.addComment(new Comment(status, value));
         }
     }
@@ -294,5 +295,13 @@ public class XMLReportingDataParser extends ReportingDataParser {
             }
         }
         reportingDataUE.setReportingDataClosingCause(reportingDataClosingCause);
+    }
+
+    private static String getElementValueIfExists(Element parent, String childName) {
+        if (parent == null) return "";
+        Element child = parent.getFirstChildElement(childName);
+        if (child == null) return "";
+        String value = child.getValue();
+        return (value == null) ? "" : value;
     }
 }
