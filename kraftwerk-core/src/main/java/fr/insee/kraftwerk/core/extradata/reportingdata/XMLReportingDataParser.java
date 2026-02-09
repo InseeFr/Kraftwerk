@@ -77,11 +77,11 @@ public class XMLReportingDataParser extends ReportingDataParser {
 
             for (int j = 0; j < stateNodeList.size(); j++) {
                 Element stateElement = stateNodeList.get(j);
-                String type = getElementValueIfExists(stateElement,"type").toUpperCase();
+                String type = getElementValueIfExists(stateElement,"type");
                 String timestamp = getElementValueIfExists(stateElement,"date");
                 if (!type.isEmpty() && !timestamp.isEmpty()) {
                     try {
-                        reportingDataUE.addState(new State(type, Long.parseLong(timestamp)));
+                        reportingDataUE.addState(new State(type.toUpperCase(), Long.parseLong(timestamp)));
                     } catch (NumberFormatException ignored) {
                     }
                 }
@@ -113,12 +113,12 @@ public class XMLReportingDataParser extends ReportingDataParser {
                 Elements contactAttemptsElements = contactAttemptsNode.getChildElements("ContactAttempt");
                 for (int k = 0; k < contactAttemptsElements.size(); k++) {
                     Element contactAttemptsElement = contactAttemptsElements.get(k);
-                    String status = getElementValueIfExists(contactAttemptsElement, "status").toUpperCase();
+                    String status = getElementValueIfExists(contactAttemptsElement, "status");
                     String timestamp = getElementValueIfExists(contactAttemptsElement, "date");
 
                     if (!status.isEmpty() && !timestamp.isEmpty()) {
                         try {
-                            reportingDataUE.addContactAttempt(new ContactAttempt(status, Long.parseLong(timestamp)));
+                            reportingDataUE.addContactAttempt(new ContactAttempt(status.toUpperCase(), Long.parseLong(timestamp)));
                         } catch (NumberFormatException ignored) {
                         }
                     }
@@ -298,10 +298,12 @@ public class XMLReportingDataParser extends ReportingDataParser {
     }
 
     private static String getElementValueIfExists(Element parent, String childName) {
-        if (parent == null) return "";
+        if (parent == null) return null;
         Element child = parent.getFirstChildElement(childName);
-        if (child == null) return "";
+        if (child == null) return null;
         String value = child.getValue();
-        return (value == null) ? "" : value;
+        if (value == null) return null;
+        value = value.trim();
+        return value.isEmpty() ? null : value;
     }
 }
