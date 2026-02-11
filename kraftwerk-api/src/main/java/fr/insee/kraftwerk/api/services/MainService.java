@@ -180,6 +180,34 @@ public class MainService extends KraftwerkService {
 		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",questionnaireModelId));
 	}
 
+
+    @GetMapping(value ="/json/replay")
+    @Operation(operationId = "jsonExtractionReplay",
+            summary = "${summary.jsonReplay}",
+            description = "${description.jsonReplay}")
+    public ResponseEntity<Object> jsonExtractionReplay(
+            @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
+            @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+            @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = true) LocalDateTime start,
+            @Parameter(description = "Extract until") @RequestParam(value = "untilDate",required = false) LocalDateTime end
+    ){
+        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        boolean withDDI = true;
+        boolean withEncryption = false;
+
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        try {
+            mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, start, end);
+            log.info("Data extracted");
+        } catch (KraftwerkException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+        return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
+    }
+
 	@NotNull
 	private ResponseEntity<String> runWithoutGenesis(String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();

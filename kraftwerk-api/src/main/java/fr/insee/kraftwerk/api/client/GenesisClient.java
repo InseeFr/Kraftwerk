@@ -94,6 +94,13 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
+    public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, LocalDateTime start, LocalDateTime end) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-collection-instrument-and-between-datetime?collectionInstrumentId=%s&start=%s&end=%s",
+				configProperties.getGenesisUrl(), collectionInstrumentId,start,end);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
