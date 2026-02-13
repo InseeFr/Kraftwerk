@@ -188,6 +188,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         try {
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
             LocalDateTime beginDate = LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
+            // Overlap of 10s to avoid data loss between differential exports
+            beginDate = beginDate.minusSeconds(10);
 
             log.info("Extracting data between {} and now for questionnaire {}", beginDate, questionnaireModelId);
             return beginDate;
