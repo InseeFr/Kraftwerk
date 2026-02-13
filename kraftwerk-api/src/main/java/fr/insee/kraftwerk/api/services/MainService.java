@@ -138,7 +138,7 @@ public class MainService extends KraftwerkService {
 	@PutMapping(value = "/main/genesis/by-questionnaire")
 	@Operation(operationId = "mainGenesisByQuestionnaireId", summary = "${summary.mainGenesis}", description = "${description.mainGenesis}")
 	public ResponseEntity<String> mainGenesisByQuestionnaireId(
-			@Parameter(description = "${param.questionnaireModelId}") @RequestParam(required = true) String questionnaireModelId,
+			@Parameter(description = "${param.collectionInstrumentId}") @RequestParam(required = true) String collectionInstrumentId,
 			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
@@ -146,7 +146,7 @@ public class MainService extends KraftwerkService {
 		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
 		String jobId = UUID.randomUUID().toString();
 		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
-		mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
+		mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, collectionInstrumentId, withDDI, withEncryption, batchSize, dataMode);
 		return ResponseEntity.accepted().body(jobId);
 	}
 
@@ -192,7 +192,7 @@ public class MainService extends KraftwerkService {
 	@GetMapping(value ="/json")
 	@Operation(operationId = "jsonExtraction", summary = "", description ="")
 	public ResponseEntity<Object> jsonExtraction(
-			@Parameter(description = "${param.questionnaireModelId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String questionnaireModelId,
+			@Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
 			@Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
 			@Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
 			@Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since
@@ -203,15 +203,33 @@ public class MainService extends KraftwerkService {
 
 		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 		try {
-			mpGenesis.runMainJson(questionnaireModelId, batchSize, dataMode, since);
+			mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
 			log.info("Data extracted");
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",questionnaireModelId));
+		return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",collectionInstrumentId));
 	}
+
+	@NotNull
+	private ResponseEntity<String> runWithGenesisByQuestionnaire(String questionnaireModelId,  boolean withDDI, boolean withEncryption, int batchSize, Mode dataMode) {
+		FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+
+		MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+
+		try {
+			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(questionnaireModelId);
+	}
+
+
 
 
 	@NotNull
@@ -275,5 +293,5 @@ public class MainService extends KraftwerkService {
 	}
 
 	public record JobAcceptedResponse(String jobId) {}
-	
+
 }
