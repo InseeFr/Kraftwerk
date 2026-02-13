@@ -85,20 +85,20 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     In this method we write at the end of every batch, not at the end of all batch
     This method can do differential extraction (all data since last extraction) otherwise all data since january 1st 2025
      */
-    public void runMainJson(String questionnaireModelId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
-        log.info("Export json for questionnaireModelId {}", questionnaireModelId);
+    public void runMainJson(String collectionInstrumentId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
+        log.info("Export json for collectionInstrumentId {}", collectionInstrumentId);
 
-        LocalDateTime beginDate = resolveBeginDate(questionnaireModelId, dataMode, since);
+        LocalDateTime beginDate = resolveBeginDate(collectionInstrumentId, dataMode, since);
 
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                questionnaireModelId));
+                collectionInstrumentId));
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
 
-        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
-        init(questionnaireModelId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(collectionInstrumentId);
+        init(collectionInstrumentId, modes);
 
-        Path tmpOutputFile = createTempOutputFile(questionnaireModelId);
+        Path tmpOutputFile = createTempOutputFile(collectionInstrumentId);
 
         //Try with resources to close database when done
         try (Connection connection = openDatabaseConnection(databasePath);
@@ -106,7 +106,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         {
             this.database = connection.createStatement();
 
-            List<InterrogationId> ids = fetchInterrogationIds(questionnaireModelId, beginDate);
+            List<InterrogationId> ids = fetchInterrogationIds(collectionInstrumentId, beginDate);
             List<List<InterrogationId>> partitions  = ListUtils.partition(ids, batchSize);
             int nbPartitions = partitions .size();
             int indexPartition = 1;
@@ -116,7 +116,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             jsonGenerator.writeStartArray(); // Beginning of Json Array
 
             for (List<InterrogationId> listId : partitions ) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, listId);
+                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(collectionInstrumentId, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
                 // if one mode is specified we filter to keep data of that mode only
@@ -136,9 +136,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             log.error(e.toString());
             throw new KraftwerkException(500,"SQL error");
         }
-        moveTempFile(outputFileName(questionnaireModelId), tmpOutputFile);
+        moveTempFile(outputFileName(collectionInstrumentId), tmpOutputFile);
         writeErrors();
-        client.saveDateExtraction(questionnaireModelId, dataMode);
+        client.saveDateExtraction(collectionInstrumentId, dataMode);
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
