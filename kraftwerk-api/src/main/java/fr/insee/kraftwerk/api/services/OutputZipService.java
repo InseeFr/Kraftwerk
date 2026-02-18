@@ -133,11 +133,11 @@ public class OutputZipService {
 
         Files.deleteIfExists(zipFile);
 
-        try (ZipOutputStream zos = new ZipOutputStream(
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(
                 Files.newOutputStream(zipFile, StandardOpenOption.CREATE_NEW))) {
 
             if (Files.isDirectory(outDirectory)) {
-                zipLocalDirectory(outDirectory, zos);
+                zipLocalDirectory(outDirectory, zipOutputStream);
                 return;
             }
 
@@ -145,22 +145,22 @@ public class OutputZipService {
                 throw new KraftwerkException(400, "outDirectory must be a directory, got: " + outDirectory);
             }
 
-            zipMinioPrefix(outDirectory, zos, fileUtils);
+            zipMinioPrefix(outDirectory, zipOutputStream, fileUtils);
         }
     }
 
-    private void zipLocalDirectory(Path outDirectory, ZipOutputStream zos) throws IOException {
+    private void zipLocalDirectory(Path outDirectory, ZipOutputStream zipOutputStream) throws IOException {
         try (var paths = Files.walk(outDirectory)) {
             for (Path path : (Iterable<Path>) paths::iterator) {
                 if (!Files.isRegularFile(path)) {
                     continue;
                 }
-                addFileToZip(outDirectory, path, zos);
+                addFileToZip(outDirectory, path, zipOutputStream);
             }
         }
     }
 
-    private void zipMinioPrefix(Path outDirectory, ZipOutputStream zos, FileUtilsInterface fileUtils)
+    private void zipMinioPrefix(Path outDirectory, ZipOutputStream zipOutputStream, FileUtilsInterface fileUtils)
             throws KraftwerkException {
 
         String prefix = normalizePrefix(outDirectory.toString());
@@ -172,7 +172,7 @@ public class OutputZipService {
 
         for (String objectPath : objects) {
             if (objectPath.endsWith("/")) continue;
-            addMinioObjectToZip(prefix, objectPath, zos, fileUtils);
+            addMinioObjectToZip(prefix, objectPath, zipOutputStream, fileUtils);
         }
     }
 
