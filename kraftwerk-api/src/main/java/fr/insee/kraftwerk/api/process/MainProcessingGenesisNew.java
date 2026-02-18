@@ -90,38 +90,65 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
         LocalDateTime beginDate = resolveBeginDate(collectionInstrumentId, dataMode, since);
 
-        String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                collectionInstrumentId));
+        List<InterrogationId> ids =
+                fetchInterrogationIds(collectionInstrumentId, beginDate);
+
+        runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, true);
+    }
+
+    public void runMainJsonReplay(String collectionInstrumentId,
+                                  int batchSize,
+                                  Mode dataMode,
+                                  LocalDateTime start,
+                                  @Nullable LocalDateTime end)
+            throws KraftwerkException, IOException {
+
+        List<InterrogationId> ids =
+                fetchInterrogationIdsWithRecordDateBetween(collectionInstrumentId, start, end);
+
+        runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, false);
+    }
+
+    private void runMainJsonInternal(
+            String id,
+            int batchSize,
+            Mode dataMode,
+            List<InterrogationId> ids,
+            boolean updateLastExtraction
+    ) throws KraftwerkException, IOException {
+
+        String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb"
+                .formatted(System.getProperty(JAVA_TMPDIR_PROPERTY), id));
+
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
 
-        List<Mode> modes = client.getModesByQuestionnaire(collectionInstrumentId);
-        init(collectionInstrumentId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(id);
+        init(id, modes);
 
-        Path tmpOutputFile = createTempOutputFile(collectionInstrumentId);
+        Path tmpOutputFile = createTempOutputFile(id);
 
         //Try with resources to close database when done
         try (Connection connection = openDatabaseConnection(databasePath);
-             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile))
-        {
+             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile)) {
+
             this.database = connection.createStatement();
 
-            List<InterrogationId> ids = fetchInterrogationIds(collectionInstrumentId, beginDate);
-            List<List<InterrogationId>> partitions  = ListUtils.partition(ids, batchSize);
-            int nbPartitions = partitions .size();
+            List<List<InterrogationId>> partitions = ListUtils.partition(ids, batchSize);
+            int nbPartitions = partitions.size();
             int indexPartition = 1;
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
-            jsonGenerator.writeStartArray(); // Beginning of Json Array
+            jsonGenerator.writeStartArray();
 
-            for (List<InterrogationId> listId : partitions ) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(collectionInstrumentId, listId);
+            for (List<InterrogationId> listId : partitions) {
+                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(id, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
                 // if one mode is specified we filter to keep data of that mode only
-                if (dataMode != null){
-                    suLatest = suLatest.stream().filter(su-> su.getMode()==dataMode).toList();
+                if (dataMode != null) {
+                    suLatest = suLatest.stream().filter(su -> su.getMode() == dataMode).toList();
                     log.info("Number of documents kept for mode {}", dataMode);
                 }
                 unimodalProcess(suLatest);
@@ -130,17 +157,24 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 tmpJsonFileWriter(listId, suLatest, objectMapper, jsonGenerator, database);
                 indexPartition++;
             }
+
             jsonGenerator.writeEndArray(); // End of Json Array
-            if (!database.isClosed()){database.close();}
-        }catch (SQLException e){
+            if (!database.isClosed()) database.close();
+        } catch (SQLException e) {
             log.error(e.toString());
-            throw new KraftwerkException(500,"SQL error");
+            throw new KraftwerkException(500, "SQL error");
         }
-        moveTempFile(outputFileName(collectionInstrumentId), tmpOutputFile);
+
+        moveTempFile(outputFileName(id), tmpOutputFile);
         writeErrors();
-        client.saveDateExtraction(collectionInstrumentId, dataMode);
+
+        if (updateLastExtraction) {
+            client.saveDateExtraction(id, dataMode);
+        }
+
         SqlUtils.deleteDatabaseFile(databasePath);
     }
+
 
     private Path createTempOutputFile(String questionnaireModelId) throws IOException {
         Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
@@ -207,6 +241,23 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             return client.getInterrogationIdsFromDate(questionnaireModelId, beginDate);
         }
         return client.getInterrogationIds(questionnaireModelId);
+    }
+
+    private List<InterrogationId> fetchInterrogationIdsWithRecordDateBetween(
+            String collectionInstrumentId,
+            LocalDateTime start,
+            @Nullable LocalDateTime end
+    ) throws KraftwerkException {
+
+         end = (end != null)
+                ? end
+                : LocalDateTime.now();
+
+        if (end.isBefore(start)) {
+            throw new KraftwerkException(400, "endDate must be after startDate");
+        }
+
+        return client.getInterrogationIdsBetweenDates(collectionInstrumentId, start, end);
     }
 
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {

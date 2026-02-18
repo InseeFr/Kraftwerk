@@ -18,12 +18,14 @@ import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -213,6 +215,40 @@ public class MainService extends KraftwerkService {
         return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",collectionInstrumentId));
     }
 
+    @GetMapping(value ="/json/replay")
+    @Operation(operationId = "jsonExtractionReplay",
+            summary = "${summary.jsonReplay}",
+            description = "${description.jsonReplay}")
+    public ResponseEntity<Object> jsonExtractionReplay(
+            @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
+            @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
+            @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(description = "Extract since",
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00")
+            )
+            @RequestParam(value = "sinceDate",required = true) LocalDateTime start,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(description = "Extract until",
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00")
+            )
+            @RequestParam(value = "untilDate",required = false) LocalDateTime end
+    ){
+        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        boolean withDDI = true;
+        boolean withEncryption = false;
+
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        try {
+            mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, start, end);
+            log.info("Data extracted");
+        } catch (KraftwerkException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+        return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
+    }
 
     @NotNull
     MainProcessingGenesisLegacy getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
