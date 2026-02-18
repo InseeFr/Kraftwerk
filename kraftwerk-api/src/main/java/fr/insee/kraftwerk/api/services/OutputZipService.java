@@ -183,6 +183,14 @@ public class OutputZipService {
         zipOutputStream.closeEntry();
     }
 
+    /**
+     * Adds a Minio/S3 object to the zip archive.
+     *
+     * @param prefix Minio directory prefix (used to compute relative zip entry name)
+     * @param objectPath full Minio object path
+     * @param zipOutputStream open zip output stream
+     * @param fileUtils abstraction used to read Minio objects
+     */
     private void addMinioObjectToZip(String prefix,
                                      String objectPath,
                                      ZipOutputStream zipOutputStream,
