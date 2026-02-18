@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
+import static fr.insee.kraftwerk.core.Constants.ENCRYPTED_FILE_EXTENSION;
+
 @Component
 @Primary
 @Profile("!ci-public")
@@ -30,8 +32,6 @@ import java.nio.file.Path;
 public class EncryptionUtilsImpl implements EncryptionUtils {
     private static final String VAULT_NAME = "filiere_enquetes";
     private static final String VAULT_PROPERTY_NAME = "value";
-
-    public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
 
     private static final int ENCRYPTION_BUFFER_SIZE = 8192;
 

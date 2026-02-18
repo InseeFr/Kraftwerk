@@ -29,7 +29,9 @@ public final class Constants {
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 
-	// Normalized name for VTL user scripts when using Genesis data
+    public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
+
+    // Normalized name for VTL user scripts when using Genesis data
 	public static final String USER_VTL_UNIMODAL_SCRIPT_NAME = "script_unimodal.vtl";
 	public static final String USER_VTL_FINAL_SCRIPT_NAME = "script_final.vtl";
 

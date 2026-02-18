@@ -51,16 +51,16 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         super(config,genesisClient,fileUtilsInterface,kraftwerkExecutionContext);
     }
 
-    public void runMain(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
+    public void runMain(String collectionInstrumentId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
         log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                questionnaireModelId));
+                collectionInstrumentId));
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
-        log.info("Kraftwerk main service started for questionnaire: {} {}", questionnaireModelId, kraftwerkExecutionContext.isWithDDI()
+        log.info("Kraftwerk main service started for questionnaire: {} {}", collectionInstrumentId, kraftwerkExecutionContext.isWithDDI()
                 ? "with DDI": "without DDI");
-        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
-        init(questionnaireModelId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(collectionInstrumentId);
+        init(collectionInstrumentId, modes);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
@@ -69,7 +69,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 throw new KraftwerkException(500,"Error during internal database creation");
             }
             this.database = tryDatabase.createStatement();
-            processDataByBatch(questionnaireModelId, batchSize, dataMode);
+            processDataByBatch(collectionInstrumentId, batchSize, dataMode);
             outputFileWriter();
             writeErrors();
             if (!database.isClosed()){database.close();}

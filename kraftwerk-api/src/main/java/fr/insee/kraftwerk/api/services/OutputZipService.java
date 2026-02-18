@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -20,57 +19,56 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.insee.kraftwerk.core.Constants.ENCRYPTED_FILE_EXTENSION;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class OutputZipService {
 
     private static final String ZIP_EXTENSION = ".zip";
-    private static final String TMPDIR = "java.io.tmpdir";
+    private static final String TMPDIR_PROPERTY = "java.io.tmpdir";
 
     private final EncryptionUtils encryptionUtils;
 
     /**
-     * Create a zip of kraftwerkExecutionContext.outDirectory, then encrypt the zip if kraftwerkExecutionContext.withEncryption=true.
+     * Archives outputs only when encryption is enabled.
+     *
+     * <p>If withEncryption=false: no-op (keeps outDirectory as-is).</p>
+     *
+     * <p>If withEncryption=true:</p>
+     * <ul>
+     *   <li>creates a zip from outDirectory (local directory or Minio/S3 prefix),</li>
+     *   <li>encrypts it into &lt;outDirectoryName&gt;.zip.enc next to outDirectory (same parent),</li>
+     *   <li>then deletes outDirectory.</li>
+     * </ul>
      */
     public void encryptAndArchiveOutputs(KraftwerkExecutionContext kraftwerkExecutionContext,
                                          FileUtilsInterface fileUtils) throws KraftwerkException {
 
         if (!kraftwerkExecutionContext.isWithEncryption()) {
+            log.debug("withEncryption=false -> skip archive/encryption");
             return;
         }
-        Path outDirectory = kraftwerkExecutionContext.getOutDirectory();
-        if (outDirectory == null) throw new KraftwerkException(500, "outDirectory is null in context");
+        Path outDirectory = requireOutDirectory(kraftwerkExecutionContext);
 
         Path tempZipFile = null;
         Path tempEncFile = null;
 
         try {
-            Path tempDirectory = Path.of(System.getProperty(TMPDIR));
-            Files.createDirectories(tempDirectory);
-
+            Path tmpDir = Path.of(System.getProperty(TMPDIR_PROPERTY));
+            Files.createDirectories(tmpDir);
             String baseName = outDirectory.getFileName().toString();
-            tempZipFile = Files.createTempFile(tempDirectory, baseName + "_", ZIP_EXTENSION);
 
+            tempZipFile = Files.createTempFile(tmpDir, baseName + "_", ZIP_EXTENSION);
             buildZip(outDirectory, tempZipFile, fileUtils);
 
-            String encExt = encryptionUtils.getEncryptedFileExtension();
-            if (!encExt.startsWith(".")) encExt = "." + encExt;
+            tempEncFile = Files.createTempFile(tmpDir, baseName + "_", ZIP_EXTENSION + ENCRYPTED_FILE_EXTENSION);
 
-            tempEncFile = Files.createTempFile(tempDirectory, baseName + "_", ZIP_EXTENSION + encExt);
+            encryptZipToEncryptedFile(tempZipFile, tempEncFile, kraftwerkExecutionContext);
 
-            try (InputStream encrypted = encryptionUtils.encryptOutputFile(tempZipFile, kraftwerkExecutionContext);
-                 OutputStream out = Files.newOutputStream(tempEncFile,
-                         StandardOpenOption.TRUNCATE_EXISTING)) {
-                encrypted.transferTo(out);
-            }
+            String targetEncPath = resolveTargetEncPath(outDirectory, baseName, ENCRYPTED_FILE_EXTENSION);
 
-            Path parent = outDirectory.getParent();
-            if (parent == null) throw new KraftwerkException(500, "Cannot resolve parent of outDirectory: " + outDirectory);
-
-            String targetEncPath = parent.resolve(baseName + ZIP_EXTENSION + encExt).toString();
-
-            // store encrypted file:
             fileUtils.moveFile(tempEncFile, targetEncPath);
             tempEncFile = null;
 
@@ -79,15 +77,45 @@ public class OutputZipService {
 
             fileUtils.deleteDirectory(outDirectory);
 
-            log.info("Encrypted archive created at {} and outDirectory deleted ({})", targetEncPath, outDirectory);
+            log.info("Encrypted archive created at {}", targetEncPath);
+            log.info("Deleted outDirectory {}", outDirectory);
 
-        } catch (UncheckedIOException | IOException e) {
+        } catch (IOException e) {
             cleanupTemps(tempZipFile, tempEncFile);
-            Throwable cause = e instanceof UncheckedIOException ? e.getCause() : e;
-            throw new KraftwerkException(500, "IO error during output archive: " + cause.getMessage());
+            throw new KraftwerkException(500, "IO error during output archive: " + e.getMessage());
         }
-
     }
+
+    /**
+     * Encrypts a local zip file into a local encrypted file.
+     */
+    private void encryptZipToEncryptedFile(Path zipFile, Path encFile, KraftwerkExecutionContext kraftwerkExecutionContext)
+            throws IOException, KraftwerkException {
+        try (InputStream encrypted = encryptionUtils.encryptOutputFile(zipFile, kraftwerkExecutionContext);
+             OutputStream out = Files.newOutputStream(encFile, StandardOpenOption.TRUNCATE_EXISTING)) {
+            encrypted.transferTo(out);
+        }
+    }
+
+    private String resolveTargetEncPath(Path outDirectory, String baseName, String encExt) throws KraftwerkException {
+        Path parent = outDirectory.getParent();
+        if (parent == null) {
+            throw new KraftwerkException(500, "Cannot resolve parent of outDirectory: " + outDirectory);
+        }
+        return parent.resolve(baseName + ZIP_EXTENSION + encExt).toString();
+    }
+
+    /**
+     * Validates and returns outDirectory from the execution context.
+     */
+    private Path requireOutDirectory(KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
+        Path outDirectory = kraftwerkExecutionContext.getOutDirectory();
+        if (outDirectory == null) {
+            throw new KraftwerkException(500, "outDirectory is null in context");
+        }
+        return outDirectory;
+    }
+
 
     private void cleanupTemps(Path zip, Path enc) {
         if (enc != null) deleteWithRetry(enc);
@@ -100,31 +128,51 @@ public class OutputZipService {
      * - filesystem outDir (exists locally)
      * - Minio outDir (prefix)
      */
-    private void buildZip(Path outDirectory, Path zipFile, FileUtilsInterface fileUtils) throws KraftwerkException, IOException {
+    private void buildZip(Path outDirectory, Path zipFile, FileUtilsInterface fileUtils)
+            throws KraftwerkException, IOException {
+
         Files.deleteIfExists(zipFile);
 
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(
+        try (ZipOutputStream zos = new ZipOutputStream(
                 Files.newOutputStream(zipFile, StandardOpenOption.CREATE_NEW))) {
 
-            if (Files.exists(outDirectory) && Files.isDirectory(outDirectory)) {
-                try (var paths = Files.walk(outDirectory)) {
-                    paths.filter(Files::isRegularFile).forEach(path -> {
-                        try {
-                            addFileToZip(outDirectory, path, zipOutputStream);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
-                    });
-
-                }
-            } else {
-                String prefix = normalizePrefix(outDirectory.toString());
-                List<String> objects = fileUtils.listFileNames(prefix);
-                for (String objectPath : objects) {
-                    if (objectPath.endsWith("/")) continue;
-                    addMinioObjectToZip(prefix, objectPath, zipOutputStream, fileUtils);
-                }
+            if (Files.isDirectory(outDirectory)) {
+                zipLocalDirectory(outDirectory, zos);
+                return;
             }
+
+            if (Files.exists(outDirectory)) {
+                throw new KraftwerkException(400, "outDirectory must be a directory, got: " + outDirectory);
+            }
+
+            zipMinioPrefix(outDirectory, zos, fileUtils);
+        }
+    }
+
+    private void zipLocalDirectory(Path outDirectory, ZipOutputStream zos) throws IOException {
+        try (var paths = Files.walk(outDirectory)) {
+            for (Path path : (Iterable<Path>) paths::iterator) {
+                if (!Files.isRegularFile(path)) {
+                    continue;
+                }
+                addFileToZip(outDirectory, path, zos);
+            }
+        }
+    }
+
+    private void zipMinioPrefix(Path outDirectory, ZipOutputStream zos, FileUtilsInterface fileUtils)
+            throws KraftwerkException {
+
+        String prefix = normalizePrefix(outDirectory.toString());
+        List<String> objects = fileUtils.listFileNames(prefix);
+
+        if (objects == null || objects.isEmpty()) {
+            throw new KraftwerkException(404, "No objects found for Minio prefix: " + prefix);
+        }
+
+        for (String objectPath : objects) {
+            if (objectPath.endsWith("/")) continue;
+            addMinioObjectToZip(prefix, objectPath, zos, fileUtils);
         }
     }
 
@@ -134,7 +182,6 @@ public class OutputZipService {
         Files.copy(file, zipOutputStream);
         zipOutputStream.closeEntry();
     }
-
 
     private void addMinioObjectToZip(String prefix,
                                      String objectPath,
@@ -157,23 +204,26 @@ public class OutputZipService {
         }
     }
 
+    /**
+     * Normalizes a Minio prefix: uses '/' separators and ensures it ends with '/'.
+     */
     private String normalizePrefix(String p) {
         String s = p.replace("\\", "/");
         return s.endsWith("/") ? s : s + "/";
     }
 
-    private String relativize(String basePath, String fullPath) {
-        String normalizedFullPath = fullPath.replace("\\", "/");
-        String normalizedBasePath = basePath.replace("\\", "/");
-        if (normalizedFullPath.startsWith(normalizedBasePath)) return normalizedFullPath.substring(normalizedBasePath.length());
+    /**
+     * Removes the Minio/S3 prefix from an object path to build the zip entry name.
+     * Example: prefix="out/campaign/" object="out/campaign/a/b.csv" -> "a/b.csv"
+     */
+    private String relativize(String prefix, String objectPath) {
+        String normalizedPrefix = normalizePrefix(prefix);
+        String normalizedObject = objectPath.replace("\\", "/");
 
-        String basePathWithoutTrailingSlash = normalizedBasePath.endsWith("/") ? normalizedBasePath.substring(0, normalizedBasePath.length() - 1) : normalizedBasePath;
-        if (normalizedFullPath.startsWith(basePathWithoutTrailingSlash)) {
-            String relativePath = normalizedFullPath.substring(basePathWithoutTrailingSlash.length());
-            if (relativePath.startsWith("/")) relativePath = relativePath.substring(1);
-            return relativePath;
+        if (normalizedObject.startsWith(normalizedPrefix)) {
+            return normalizedObject.substring(normalizedPrefix.length());
         }
-        return normalizedFullPath;
+        return normalizedObject;
     }
 
     private void deleteWithRetry(Path path) {
