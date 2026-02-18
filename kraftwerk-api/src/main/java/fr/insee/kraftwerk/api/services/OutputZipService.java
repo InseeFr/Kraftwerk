@@ -39,7 +39,7 @@ public class OutputZipService {
      * <p>If withEncryption=true:</p>
      * <ul>
      *   <li>creates a zip from outDirectory (local directory or Minio/S3 prefix),</li>
-     *   <li>encrypts it into &lt;outDirectoryName&gt;.zip.enc next to outDirectory (same parent),</li>
+     *   <li>encrypts it into outDirectoryName.zip.enc next to outDirectory (same parent),</li>
      *   <li>then deletes outDirectory.</li>
      * </ul>
      */
