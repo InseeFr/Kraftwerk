@@ -67,11 +67,11 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+    public List<Mode> getModesByQuestionnaire(String collectionInstrumentId) throws KraftwerkException {
         Set<Mode> set = new HashSet<>();
 
         List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireModelId)
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(collectionInstrumentId)
         ).toList();
 
         for (SurveyUnitUpdateLatest surveyUnitUpdateLatest : filteredMongo){
@@ -81,12 +81,12 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
-    public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+    public List<SurveyUnitUpdateLatest> getUEsLatestState(String collectionInstrumentId, List<InterrogationId> interrogationIds) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
         List<SurveyUnitUpdateLatest> mongoFiltered1 = mongoStub.stream()
                 .filter(
-                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireId)
+                        surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(collectionInstrumentId)
                 ).toList();
 
         Set<SurveyUnitUpdateLatest> mongoFiltered2 = new HashSet<>();

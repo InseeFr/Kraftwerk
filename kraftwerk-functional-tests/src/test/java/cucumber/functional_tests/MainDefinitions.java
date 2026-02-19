@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
@@ -720,43 +719,6 @@ public class MainDefinitions {
 			);
 			Assertions.assertThat(resultSet.next()).isTrue();
 			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
-		}
-	}
-
-	@Then("We should not be able to read the csv output file")
-	public void check_csv_encrypted() throws IOException, CsvValidationException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-		Assertions.assertThat(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-		).doesNotExist();
-
-		CSVReader csvReader = getCSVReader(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
-		);
-		try{
-			String[] header = csvReader.readNext();
-			Assertions.assertThat(header).doesNotContain(Constants.ROOT_IDENTIFIER_NAME);
-		}catch (CsvMalformedLineException e){
-			//Accepted exception
-			Assertions.assertThat(e).isInstanceOf(CsvMalformedLineException.class);
-		}
-	}
-
-	@Then("We should not be able to read the parquet output file")
-	public void check_parquet_encrypted() throws SQLException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-		Path filePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet");
-		Assertions.assertThat(filePath).doesNotExist();
-
-		Path encryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet.enc");
-		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
-		try (Statement statement = database.createStatement()) {
-			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
 		}
 	}
 

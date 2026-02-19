@@ -92,6 +92,8 @@ class MainServiceTest {
     @MockitoSpyBean
     private MainAsyncService mainAsyncService;
 
+    @MockitoBean
+    private OutputZipService outputZipService;
 
     @Autowired
     private TestUtils testUtils;

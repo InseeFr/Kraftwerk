@@ -1,29 +1,19 @@
 package fr.insee.kraftwerk.api.process;
 
-import fr.insee.bpm.metadata.model.Group;
-import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
-import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
-import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.SqlUtils;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Log4j2
 public class MainProcessingGenesisLegacy extends AbstractMainProcessingGenesis{
