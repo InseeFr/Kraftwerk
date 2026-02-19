@@ -92,6 +92,8 @@ class MainServiceTest {
     @MockitoSpyBean
     private MainAsyncService mainAsyncService;
 
+    @MockitoBean
+    private OutputZipService outputZipService;
 
     @Autowired
     private TestUtils testUtils;
@@ -289,7 +291,6 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();
@@ -372,7 +373,6 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
         doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
         doNothing().when(mockMainProcessing).runMain();

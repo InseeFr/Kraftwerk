@@ -45,9 +45,9 @@ public class MainAsyncService extends KraftwerkService {
 	public void runWithoutGenesis(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessing mp, String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
 		jobStore.start(jobId);
 		try {
-            outputZipService.encryptAndArchiveOutputs(mp.getKraftwerkExecutionContext(),fileUtilsInterface);
             mp.runMain();
-			jobStore.success(jobId);
+            outputZipService.encryptAndArchiveOutputs(mp.getKraftwerkExecutionContext(),fileUtilsInterface);
+            jobStore.success(jobId);
 
 		} catch (KraftwerkException e) {
 			log.error(e.getMessage());
