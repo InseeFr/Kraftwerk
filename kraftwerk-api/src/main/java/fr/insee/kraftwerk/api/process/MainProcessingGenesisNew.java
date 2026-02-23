@@ -175,6 +175,95 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     }
 
 
+    public void runMainJsonDebug(
+            String id,
+            int batchSize,
+            Mode dataMode,
+            List<InterrogationId> interrogationIds
+    ) throws KraftwerkException, IOException {
+
+        String databasePath = ("%s/kraftwerk_temp/%s/db_debug.duckdb"
+                .formatted(System.getProperty(JAVA_TMPDIR_PROPERTY), id));
+
+        SqlUtils.deleteDatabaseFile(databasePath);
+
+        List<Mode> modes = client.getModesByQuestionnaire(id);
+        init(id, modes);
+
+        Path tmpOutputFile = createTempOutputFile(id);
+
+        try (Connection connection = openDatabaseConnection(databasePath);
+             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile)) {
+
+            this.database = connection.createStatement();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+
+            jsonGenerator.writeStartArray();
+
+            List<List<InterrogationId>> partitions = ListUtils.partition(interrogationIds, batchSize);
+            int nbPartitions = partitions.size();
+            int indexPartition = 1;
+
+            for (List<InterrogationId> part : partitions) {
+                log.info("DEBUG partition {}/{} (size={})", indexPartition, nbPartitions, part.size());
+
+                for (InterrogationId interrogationId : part) {
+                    List<SurveyUnitUpdateLatest> suLatest = null;
+
+                    try {
+                        log.info("DEBUG processing interrogationId={}", interrogationId);
+
+                        suLatest = client.getUEsLatestState(id, List.of(interrogationId));
+
+                        if (suLatest == null || suLatest.isEmpty()) {
+                            log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);
+                            continue;
+                        }
+
+                        vtlBindings = new VtlBindings();
+
+                        if (dataMode != null) {
+                            suLatest = suLatest.stream()
+                                    .filter(su -> su.getMode() == dataMode)
+                                    .toList();
+                        }
+
+                        unimodalProcess(suLatest);
+                        multimodalProcess();
+                        insertDatabase();
+
+                        tmpJsonFileWriter(List.of(interrogationId), suLatest, objectMapper, jsonGenerator, database);
+
+                    } catch (Exception e) {
+                        String usuId = (suLatest != null && !suLatest.isEmpty())
+                                ? suLatest.get(0).getUsualSurveyUnitId()
+                                : null;
+
+                        log.error("DEBUG FAILED interrogationId={}, usualSurveyUnitId={}", interrogationId, usuId, e);
+                    }
+                }
+
+                indexPartition++;
+            }
+
+            jsonGenerator.writeEndArray();
+
+            if (!database.isClosed()) {
+                database.close();
+            }
+
+        } catch (SQLException e) {
+            log.error(e.toString());
+            throw new KraftwerkException(500, "SQL error");
+        } finally {
+            SqlUtils.deleteDatabaseFile(databasePath);
+        }
+        moveTempFile(outputFileName(id), tmpOutputFile);
+        writeErrors();
+    }
+
     private Path createTempOutputFile(String questionnaireModelId) throws IOException {
         Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
         return Files.createTempFile(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)),
