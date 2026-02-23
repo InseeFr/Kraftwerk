@@ -104,7 +104,8 @@ class MainProcessingGenesisLegacyTest {
                 false,
                 true,
                 false,
-                419430400L
+                419430400L,
+                false
         );
 
         mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);

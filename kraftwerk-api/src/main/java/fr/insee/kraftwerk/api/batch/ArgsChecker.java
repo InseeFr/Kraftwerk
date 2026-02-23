@@ -20,6 +20,7 @@ public class ArgsChecker {
     private final String argWithDDI;
     private final String argWithEncryption;
     private final String argSince;
+    private final String argAddStates;
 
     //Typed args
     private KraftwerkServiceType kraftwerkServiceType;
@@ -30,6 +31,7 @@ public class ArgsChecker {
     private boolean isFileByFile;
     private boolean withDDI;
     private LocalDateTime since;
+    private boolean addStates;
 
     /**
      * Throws a IllegalArgumentException if the arguments are not valid (ex: unparseable boolean)
@@ -41,6 +43,7 @@ public class ArgsChecker {
         checkArgIsReportingData();
         checkArgWithEncryption();
         checkArgWithDDI();
+        checkArgAddStates();
 
         if(kraftwerkServiceType == KraftwerkServiceType.JSON){
             checkArgSince();
@@ -52,7 +55,7 @@ public class ArgsChecker {
     private void checkServiceName() {
         try {
             this.kraftwerkServiceType = KraftwerkServiceType.valueOf(this.argServiceName);
-        }catch (IllegalArgumentException iae) {
+        }catch (IllegalArgumentException | NullPointerException e) {
             throw new IllegalArgumentException("Invalid service argument ! : %s, must be one of %s".formatted(this.argServiceName, KraftwerkServiceType.values()));
         }
     }
@@ -75,6 +78,9 @@ public class ArgsChecker {
             throw new IllegalArgumentException("Invalid reportingData boolean argument ! : %s".formatted(this.argIsReportingData));
         }
         this.isReportingData = Boolean.parseBoolean(this.argIsReportingData);
+        if(!this.isReportingData){
+            return;
+        }
         if(this.argReportingDataFilePath == null){
             throw new IllegalArgumentException("No reporting data file argument provided !");
         }
@@ -115,6 +121,18 @@ public class ArgsChecker {
                 throw new IllegalArgumentException("Invalid since argument ! : %s, should be YYYY-MM-DDThh:mm:ss");
             }
         }
+    }
+
+    private void checkArgAddStates() {
+        //true by default
+        if(this.argAddStates == null) {
+            this.addStates = kraftwerkServiceType == KraftwerkServiceType.JSON; //True by default if JSON
+            return;
+        }
+        if(isNotBoolean(this.argAddStates)){
+            throw new IllegalArgumentException("Invalid addStates boolean argument ! : %s".formatted(this.argAddStates));
+        }
+        this.addStates = Boolean.parseBoolean(this.argAddStates);
     }
 
     private static boolean isNotBoolean(String argToCheck){

@@ -160,25 +160,29 @@ public class KraftwerkBatch implements ApplicationRunner {
                         argsChecker.getQuestionnaireId(),
                         null,
                         1000,
-                        argsChecker.isWithEncryption()
+                        argsChecker.isWithEncryption(),
+                        argsChecker.isAddStates()
                 );
             case JSON -> {
                 return mainService.jsonExtraction(
-                            argsChecker.getQuestionnaireId(),
-                            null,
-                            1000,
-                            argsChecker.getSince()
-                    );
+                        argsChecker.getQuestionnaireId(),
+                        null,
+                        1000,
+                        argsChecker.getSince(),
+                        argsChecker.isAddStates()
+                );
             }
             case MAIN -> response = mainService.mainService(
-                        argsChecker.getQuestionnaireId(),
-                        false,
-                        argsChecker.isWithEncryption()
+                    argsChecker.getQuestionnaireId(),
+                    false,
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case FILE_BY_FILE -> response = mainService.mainFileByFile(
                     argsChecker.getArgQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
         }
         return getObjectResponseEntity(response);
@@ -191,12 +195,14 @@ public class KraftwerkBatch implements ApplicationRunner {
                     argsChecker.getQuestionnaireId(),
                     null,
                     BATCH_SIZE,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case MAIN -> response = mainService.mainService(
                     argsChecker.getQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case JSON, FILE_BY_FILE -> {
                 return launchMainServiceWithDDI(argsChecker);

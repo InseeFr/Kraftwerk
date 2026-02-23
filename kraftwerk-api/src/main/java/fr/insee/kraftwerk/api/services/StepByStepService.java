@@ -81,7 +81,8 @@ public class StepByStepService extends KraftwerkService {
 				fileByFile,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
@@ -130,7 +131,8 @@ public class StepByStepService extends KraftwerkService {
 				fileByFile,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 
@@ -169,7 +171,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		//Read data in JSON file
@@ -232,7 +235,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 
@@ -280,7 +284,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		// Read all bindings necessary to produce output

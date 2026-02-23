@@ -76,7 +76,14 @@ public class ReportingDataProcessing {
                 vtlBindings,
                 new MetadataModel(),
                 fileUtilsInterface);
-        KraftwerkExecutionContext context = new KraftwerkExecutionContext("",false,true,false,0L);
+        KraftwerkExecutionContext context = new KraftwerkExecutionContext(
+                "",
+                false,
+                true,
+                false,
+                0L,
+                false
+        );
         dataProcessing.applyVtlTransformations(
                 Constants.REPORTING_DATA_GROUP_NAME,
                 Path.of(Constants.VTL_FOLDER_PATH)

@@ -73,12 +73,20 @@ public class MainService extends KraftwerkService {
     public ResponseEntity<String> mainService(
             @Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
             @Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
-    ) {
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
+    ){
         boolean fileByFile = false;
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+        MainProcessing mp = getMainProcessing(
+                inDirectoryParam,
+                fileByFile,
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
         return ResponseEntity.accepted().body(jobId);
@@ -89,12 +97,21 @@ public class MainService extends KraftwerkService {
     public ResponseEntity<String> mainFileByFile(
             @Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
             @Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
-    ) {
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
+
+    ){
         boolean fileByFile = true;
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+        MainProcessing mp = getMainProcessing(
+                inDirectoryParam,
+                fileByFile,
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
         return ResponseEntity.accepted().body(jobId);
@@ -105,12 +122,20 @@ public class MainService extends KraftwerkService {
     public ResponseEntity<String> mainLunaticOnly(
             @Parameter(description = "${param.inDirectory}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String inDirectoryParam,
             @Parameter(description = "${param.archiveAtEnd}", required = false) @RequestParam(defaultValue = "false") boolean archiveAtEnd,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
-    ) {
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
+    ){
         boolean withDDI = false;
         boolean fileByFile = false;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(inDirectoryParam, fileByFile, withDDI, withEncryption, fileUtilsInterface);
+        MainProcessing mp = getMainProcessing(
+                inDirectoryParam,
+                fileByFile,
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithoutGenesis(jobId, fileUtilsInterface, mp, inDirectoryParam, archiveAtEnd, fileByFile, withDDI, withEncryption);
         return ResponseEntity.accepted().body(jobId);
@@ -128,10 +153,15 @@ public class MainService extends KraftwerkService {
     public ResponseEntity<String> mainGenesis(
             @Parameter(description = "${param.campaignId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestBody String campaignId,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+    ){
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                false
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithGenesis(jobId,fileUtilsInterface, mpGenesis, campaignId, withDDI, withEncryption, batchSize);
         return ResponseEntity.accepted().body(jobId);
@@ -143,11 +173,18 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.questionnaireModelId}") @RequestParam(required = true) String questionnaireModelId,
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption) {
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
+    ){
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         String jobId = UUID.randomUUID().toString();
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
         return ResponseEntity.accepted().body(jobId);
     }
@@ -168,7 +205,12 @@ public class MainService extends KraftwerkService {
     ) {
         boolean withDDI = false;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisLegacy mpGenesis = getMainProcessingGenesis(
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                false
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithGenesis(jobId,fileUtilsInterface, mpGenesis, campaignId, withDDI, withEncryption, batchSize);
         return ResponseEntity.accepted().body(jobId);
@@ -180,11 +222,17 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.questionnaireModelId}") @RequestParam String questionnaireModelId,
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption
+            @Parameter(description = "${param.withEncryption}") @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
     ) {
         boolean withDDI = false;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         String jobId = UUID.randomUUID().toString();
         mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
         return ResponseEntity.accepted().body(jobId);
@@ -197,13 +245,19 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since
+            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since,
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "true") boolean addStates
     ){
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
         boolean withEncryption = false;
 
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
             log.info("Data extracted");
@@ -232,13 +286,21 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "Extract until",
                     schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00")
             )
-            @RequestParam(value = "untilDate",required = false) LocalDateTime end
+            @RequestParam(value = "untilDate",required = false) LocalDateTime end,
+            @Parameter(description = "${param.addStates}")
+            @RequestParam(value = "addStates", defaultValue = "true")
+            boolean addStates
     ){
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
         boolean withEncryption = false;
 
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
         try {
             mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, start, end);
             log.info("Data extracted");
@@ -251,14 +313,20 @@ public class MainService extends KraftwerkService {
     }
 
     @NotNull
-    MainProcessingGenesisLegacy getMainProcessingGenesis(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+    MainProcessingGenesisLegacy getMainProcessingGenesis(
+            boolean withDDI,
+            boolean withEncryption,
+            FileUtilsInterface fileUtilsInterface,
+            boolean addStates
+    ){
 
         KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                 null,
                 false,
                 withDDI,
                 withEncryption,
-                limitSize
+                limitSize,
+                addStates
         );
 
         return new MainProcessingGenesisLegacy(
@@ -270,14 +338,19 @@ public class MainService extends KraftwerkService {
     }
 
     @NotNull
-    MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
-
+    MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(
+            boolean withDDI,
+            boolean withEncryption,
+            FileUtilsInterface fileUtilsInterface,
+            boolean addStates
+    ){
         KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                 null,
                 false,
                 withDDI,
                 withEncryption,
-                limitSize
+                limitSize,
+                addStates
         );
 
         return new MainProcessingGenesisNew(
@@ -288,13 +361,21 @@ public class MainService extends KraftwerkService {
         );
     }
 
-    @NotNull MainProcessing getMainProcessing(String inDirectoryParam, boolean fileByFile, boolean withDDI, boolean withEncryption, FileUtilsInterface fileUtilsInterface) {
+    @NotNull MainProcessing getMainProcessing(
+            String inDirectoryParam,
+            boolean fileByFile,
+            boolean withDDI,
+            boolean withEncryption,
+            FileUtilsInterface fileUtilsInterface,
+            boolean addStates
+    ) {
         KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
                 inDirectoryParam,
                 fileByFile,
                 withDDI,
                 withEncryption,
-                limitSize
+                limitSize,
+                addStates
         );
 
         return new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
