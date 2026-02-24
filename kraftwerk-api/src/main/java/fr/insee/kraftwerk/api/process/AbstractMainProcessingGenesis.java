@@ -43,6 +43,7 @@ public abstract class AbstractMainProcessingGenesis {
     protected UserInputsGenesis userInputs;
     protected final FileUtilsInterface fileUtilsInterface;
     protected Statement database;
+    @Getter
     protected final KraftwerkExecutionContext kraftwerkExecutionContext;
     /* SPECIFIC VARIABLES */
     @Getter
