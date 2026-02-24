@@ -246,7 +246,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
                     } catch (Exception e) {
                         String usuId = (suLatest != null && !suLatest.isEmpty())
-                                ? suLatest.get(0).getUsualSurveyUnitId()
+                                ? suLatest.getFirst().getUsualSurveyUnitId()
                                 : null;
 
                         log.error("DEBUG FAILED interrogationId={}, usualSurveyUnitId={}", interrogationId, usuId, e);
