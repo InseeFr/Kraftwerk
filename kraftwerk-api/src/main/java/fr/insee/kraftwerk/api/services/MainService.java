@@ -253,8 +253,11 @@ public class MainService extends KraftwerkService {
     }
 
     @PostMapping(value = "/debug/json")
-    @Operation(operationId = "jsonDebugExtraction", summary = "", description = "Debug JSON export from a list of InterrogationId")
-    public ResponseEntity<Object> jsonDebugExtraction(
+    @Operation(
+            operationId = "jsonDebugExtraction",
+            summary = "DEBUG – JSON export for specific InterrogationIds",
+            description = "Debug endpoint used to isolate and diagnose problematic InterrogationIds"
+    )    public ResponseEntity<Object> jsonDebugExtraction(
             @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE)
             @RequestParam String collectionInstrumentId,
 
