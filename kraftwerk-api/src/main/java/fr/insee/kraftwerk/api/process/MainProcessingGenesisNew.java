@@ -174,7 +174,15 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
-
+    /**
+     * DEBUG ONLY.
+     *
+     * Helper method to debug problematic InterrogationIds.
+     * Processes each InterrogationId individually (with isolated try/catch)
+     * to identify failures without stopping the whole execution.
+     *
+     * This method intentionally duplicates part of the main logic for debugging purposes
+     */
     public void runMainJsonDebug(
             String id,
             int batchSize,
