@@ -99,6 +99,7 @@ public class MainDefinitions {
 	@Before
 	public void init(){
 		this.isUsingEncryption = false;
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -229,7 +230,10 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+					kraftwerkExecutionContext
+			);
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
@@ -290,7 +294,9 @@ public class MainDefinitions {
 		reportingDataProcessing.runProcessMain(fileUtilsInterface,
 				FUNCTIONAL_TESTS_DIRECTORY,
 				campaignName,
-				reportingDataPathParam);
+				reportingDataPathParam,
+				kraftwerkExecutionContext
+		);
 	}
 
 	@When("We launch reporting data service with genesis input path with mode {string}")
@@ -300,7 +306,9 @@ public class MainDefinitions {
 		reportingDataProcessing.runProcessGenesis(fileUtilsInterface, Mode.valueOf(modeParam),
 				FUNCTIONAL_TESTS_DIRECTORY,
 				campaignName,
-				reportingDataPathParam);
+				reportingDataPathParam,
+				kraftwerkExecutionContext
+		);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")

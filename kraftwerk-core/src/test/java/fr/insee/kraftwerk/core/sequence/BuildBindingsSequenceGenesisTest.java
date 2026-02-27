@@ -183,6 +183,7 @@ class BuildBindingsSequenceGenesisTest {
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap()).hasSize(1);
         Map<String, Object> surveyUnitData = vtlBindings.getDataset("WEB").getDataAsMap().getFirst();
         Assertions.assertThat(surveyUnitData)
+                .containsKey(ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME)
                 .containsEntry(
                         ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
                         DataState.COLLECTED.toString()

@@ -33,7 +33,7 @@ public class BuildBindingsSequenceGenesis {
 	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface,
 										KraftwerkExecutionContext kraftwerkExecutionContext
 	) {
-		vtlExecute = new VtlExecute(fileUtilsInterface);
+		vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 		this.fileUtilsInterface = fileUtilsInterface;
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
@@ -83,19 +83,15 @@ public class BuildBindingsSequenceGenesis {
 			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
 				groupInstance.putValue(variable.getVarId(), variable.getValue());
 				if (kraftwerkExecutionContext.isAddStates()){
-					addVariableState(variable, groupInstance);
+					groupInstance.putValue(
+							variable.getVarId() + Constants.VARIABLE_STATE_SUFFIX_NAME,
+							variable.getState().toString()
+					);
 				}
 				continue;
 			}
 			addGroupVariables(data.getMetadataModel(), variable, questionnaire.getAnswers());
 		}
-	}
-
-	/**
-	 * Adds variable dataState into the groupInstance
-	 */
-	private void addVariableState(VariableModel variable, GroupInstance groupInstance) {
-		//TODO
 	}
 
 	private void addGroupVariables(MetadataModel metadataModel,
@@ -112,16 +108,13 @@ public class BuildBindingsSequenceGenesis {
 					variableModel.getIteration() - 1
 			);
 			if (kraftwerkExecutionContext.isAddStates()){
-				addVariableState(variableModel, groupData);
+				groupData.putValue(
+						variableModel.getState().toString(),
+						variableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
+						variableModel.getIteration() - 1
+				);
 			}
 		}
-	}
-
-	/**
-	 * Adds variable dataState into the groupInstance
-	 */
-	private void addVariableState(VariableModel variable, GroupData groupData) {
-		//TODO
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path specsDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {

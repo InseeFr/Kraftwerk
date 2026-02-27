@@ -30,7 +30,7 @@ class VtlJsonDatasetWriterTest {
 	private VtlBindings vtlBindings;
 
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, TestConstants.getKraftwerkExecutionContext());
 
 	@BeforeEach
 	void initVtlBindings() {

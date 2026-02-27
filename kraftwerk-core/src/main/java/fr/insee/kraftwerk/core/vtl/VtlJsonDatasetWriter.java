@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,9 +36,11 @@ public class VtlJsonDatasetWriter {
 	private static final String IDENTIFIER = "IDENTIFIER";
 	private static final String MEASURE = "MEASURE";
 	private static final String STRING = "STRING";
+
 	private final SurveyRawData surveyData;
 	private final MetadataModel metadataModel;
 	private final String datasetName;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/*
 	 * Local variable to ensure that data points will have variables in the same
@@ -51,10 +54,14 @@ public class VtlJsonDatasetWriter {
 	 * @param datasetName The name (without extension) of the dataset file which
 	 *                       will be written.
 	 */
-	public VtlJsonDatasetWriter(SurveyRawData surveyData, String datasetName) {
+	public VtlJsonDatasetWriter(SurveyRawData surveyData,
+								String datasetName,
+								KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
 		this.surveyData = surveyData;
 		this.metadataModel = surveyData.getMetadataModel();
 		this.datasetName = datasetName;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 	/**
@@ -145,9 +152,32 @@ public class VtlJsonDatasetWriter {
 			dataStructure.add(jsonVtlVariable);
 			columnsMapping.put(variableName, variableNumber);
 			variableNumber++;
+			if(kraftwerkExecutionContext.isAddStates()){
+				addVariableStateFieldToStructure(variable, dataStructure, variableNumber);
+				variableNumber++;
+			}
 		}
 
 		return dataStructure;
+	}
+
+	/**
+	 * Adds the variable state (COLLECTED, EDITED...) to the VTL dataset structure
+	 */
+	@SuppressWarnings("unchecked")
+	private void addVariableStateFieldToStructure(Variable variable, JSONArray dataStructure, int variableNumber) {
+		JSONObject jsonVtlVariable = new JSONObject();
+		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
+		jsonVtlVariable.put(NAME, variableStateFieldName);
+		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
+		jsonVtlVariable.put(ROLE, "MEASURE");
+		dataStructure.add(jsonVtlVariable);
+		columnsMapping.put(variableStateFieldName, variableNumber);
+		metadataModel.getVariables().putVariable(new Variable(
+				variableStateFieldName,
+				variable.getGroup(),
+				VariableType.STRING
+		));
 	}
 
 	@SuppressWarnings("unchecked")
