@@ -73,7 +73,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+            public List<SurveyUnitUpdateLatest> getResponses(String questionnaireId, List<InterrogationId> interrogationIds) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
