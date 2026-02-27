@@ -238,7 +238,10 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+					kraftwerkExecutionContext
+			);
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,

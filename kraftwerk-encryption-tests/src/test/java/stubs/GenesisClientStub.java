@@ -69,6 +69,20 @@ public class GenesisClientStub extends GenesisClient {
     }
 
     @Override
+    public List<Mode> getModesByQuestionnaire(String questionnaireId) {
+        Set<Mode> set = new HashSet<>();
+
+        List<SurveyUnitUpdateLatest> filteredMongo = mongoStub.stream().filter(
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireId)
+        ).toList();
+
+        for (SurveyUnitUpdateLatest surveyUnitUpdateLatest : filteredMongo){
+            set.add(surveyUnitUpdateLatest.getMode());
+        }
+        return set.stream().toList();
+    }
+
+    @Override
     public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) {
         List<SurveyUnitUpdateLatest> list = new ArrayList<>();
 
