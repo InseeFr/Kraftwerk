@@ -43,6 +43,7 @@ public class KraftwerkBatch implements ApplicationRunner {
     private static final String ARG_QUESTIONNAIREID = "questionnaireId";
     private static final String ARG_WITH_ENCRYPTION = "with-encryption";
     private static final String ARG_SINCE = "extract-json-since";
+    private static final String ARG_ADD_STATES = "add-states";
 
     public static final int BATCH_SIZE = 1000;
 
@@ -140,6 +141,9 @@ public class KraftwerkBatch implements ApplicationRunner {
                     break;
                 case ARG_SINCE:
                     argsCheckerBuilder.argSince(getOptionValue(option, args));
+                    break;
+                case ARG_ADD_STATES:
+                    argsCheckerBuilder.argAddStates(getOptionValue(option, args));
                     break;
                 default:
                     log.warn("unknown option : {}", option);

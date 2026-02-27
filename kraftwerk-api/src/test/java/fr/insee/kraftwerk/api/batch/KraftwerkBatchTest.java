@@ -135,11 +135,11 @@ class KraftwerkBatchTest {
     @Test
     void main_service_genesis_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
-        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "addState"));
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
         when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
-        when(args.getOptionValues("addState")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
 
         kraftwerkBatch.run(args);
 
