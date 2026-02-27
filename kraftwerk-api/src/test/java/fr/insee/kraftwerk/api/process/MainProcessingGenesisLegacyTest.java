@@ -73,7 +73,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getResponses(String questionnaireId, List<InterrogationId> interrogationIds) {
+            public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
@@ -86,7 +86,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+            public List<Mode> getModesByQuestionnaire(String collectionInstrumentId) throws KraftwerkException {
                 return Collections.singletonList(Mode.WEB);
             }
 

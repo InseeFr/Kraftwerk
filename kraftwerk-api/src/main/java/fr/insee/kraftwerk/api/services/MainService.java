@@ -261,13 +261,13 @@ public class MainService extends KraftwerkService {
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
             log.info("Data extracted");
-        } catch (KraftwerkException e) {
-            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-        return ResponseEntity.ok(String.format("Data extracted for questionnaireModelId %s",collectionInstrumentId));
-    }
+		} catch (KraftwerkException e) {
+			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+		return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
+	}
 
     @GetMapping(value ="/json/replay")
     @Operation(operationId = "jsonExtractionReplay",
@@ -311,6 +311,7 @@ public class MainService extends KraftwerkService {
         }
         return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
     }
+
 
     @NotNull
     MainProcessingGenesisLegacy getMainProcessingGenesis(

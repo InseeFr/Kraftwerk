@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -52,16 +51,16 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         super(config,genesisClient,fileUtilsInterface,kraftwerkExecutionContext);
     }
 
-    public void runMain(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
+    public void runMain(String collectionInstrumentId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
         log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                questionnaireModelId));
+                collectionInstrumentId));
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
-        log.info("Kraftwerk main service started for questionnaire: {} {}", questionnaireModelId, kraftwerkExecutionContext.isWithDDI()
+        log.info("Kraftwerk main service started for questionnaire: {} {}", collectionInstrumentId, kraftwerkExecutionContext.isWithDDI()
                 ? "with DDI": "without DDI");
-        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
-        init(questionnaireModelId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(collectionInstrumentId);
+        init(collectionInstrumentId, modes);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
@@ -70,7 +69,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 throw new KraftwerkException(500,"Error during internal database creation");
             }
             this.database = tryDatabase.createStatement();
-            processDataByBatch(questionnaireModelId, batchSize, dataMode);
+            processDataByBatch(collectionInstrumentId, batchSize, dataMode);
             outputFileWriter();
             writeErrors();
             if (!database.isClosed()){database.close();}
@@ -271,12 +270,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
         }
         Path outputPath = outDirectory.resolve(filename);
-        //Encrypt file if requested
-        if(kraftwerkExecutionContext.isWithEncryption()) {
-            InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-            fileUtilsInterface.writeFile(filename, encryptedStream, true);
-            log.info("File: {} successfully written and encrypted", filename);
-        }
+        kraftwerkExecutionContext.setOutDirectory(outDirectory);
         fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
         log.info("File: {} successfully written", outputPath);
     }
@@ -294,9 +288,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String timestamp = LocalDateTime.now().format(formatter);
         String fileName = String.format("export_%s_%s", questionnaireModelId, timestamp);
-        return kraftwerkExecutionContext.isWithEncryption() ?
-                fileName + JSON_EXTENSION + ".enc"
-                : fileName + JSON_EXTENSION;
+        return fileName + JSON_EXTENSION;
     }
 
     protected void tmpJsonFileWriter(List<InterrogationId> listIds,
