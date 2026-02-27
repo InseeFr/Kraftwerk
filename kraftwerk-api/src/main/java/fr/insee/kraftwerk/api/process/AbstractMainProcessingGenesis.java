@@ -143,7 +143,10 @@ public abstract class AbstractMainProcessingGenesis {
     }
 
     protected void unimodalProcess(List<SurveyUnitUpdateLatest> suLatest) throws KraftwerkException {
-        BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(fileUtilsInterface);
+        BuildBindingsSequenceGenesis buildBindingsSequenceGenesis = new BuildBindingsSequenceGenesis(
+                fileUtilsInterface,
+                kraftwerkExecutionContext
+        );
         for (String dataMode : userInputs.getModeInputsMap().keySet()) {
             buildBindingsSequenceGenesis.buildVtlBindings(dataMode, vtlBindings, metadataModelsByMode, suLatest, specsDirectory);
             UnimodalSequence unimodal = new UnimodalSequence();

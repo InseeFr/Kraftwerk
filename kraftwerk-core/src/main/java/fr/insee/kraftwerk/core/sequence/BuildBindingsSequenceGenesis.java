@@ -12,6 +12,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
@@ -27,10 +28,14 @@ public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
 	FileUtilsInterface fileUtilsInterface;
+	KraftwerkExecutionContext kraftwerkExecutionContext;
 
-	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface) {
+	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface,
+										KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
 		vtlExecute = new VtlExecute(fileUtilsInterface);
 		this.fileUtilsInterface = fileUtilsInterface;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path specsDirectory) throws KraftwerkException {
@@ -48,6 +53,7 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
+			// Add surveyUnit/response level variables
 			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
 			answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null ?
 					surveyUnit.getValidationDate().format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT))
@@ -69,17 +75,27 @@ public class BuildBindingsSequenceGenesis {
 	}
 
 	private void addVariablesToGroupInstance(List<VariableModel> variables,
-											 GroupInstance groupInstance,
+											 GroupInstance groupInstance, //Answers from questionnaireData
 											 SurveyRawData data,
 											 QuestionnaireData questionnaire
 	) {
 		for (VariableModel variable : variables) {
 			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
 				groupInstance.putValue(variable.getVarId(), variable.getValue());
+				if (kraftwerkExecutionContext.isAddStates()){
+					addVariableState(variable, groupInstance);
+				}
 				continue;
 			}
 			addGroupVariables(data.getMetadataModel(), variable, questionnaire.getAnswers());
 		}
+	}
+
+	/**
+	 * Adds variable dataState into the groupInstance
+	 */
+	private void addVariableState(VariableModel variable, GroupInstance groupInstance) {
+		//TODO
 	}
 
 	private void addGroupVariables(MetadataModel metadataModel,
@@ -95,7 +111,17 @@ public class BuildBindingsSequenceGenesis {
 					variableName,
 					variableModel.getIteration() - 1
 			);
+			if (kraftwerkExecutionContext.isAddStates()){
+				addVariableState(variableModel, groupData);
+			}
 		}
+	}
+
+	/**
+	 * Adds variable dataState into the groupInstance
+	 */
+	private void addVariableState(VariableModel variable, GroupData groupData) {
+		//TODO
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path specsDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {

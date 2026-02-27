@@ -108,9 +108,9 @@ public final class Constants {
 	// ----- Reporting Variables Names in output file
 	public static final String REPORTING_DATA_PREFIX_NAME = "REPORT_";
 	public static final String IDENTIFICATION_CONFIGURATION = "TYPE_SPOTTING";
-	public static final String STATE_SUFFIX_NAME = "STATE";
+	public static final String REPORTING_DATA_STATE_SUFFIX_NAME = "STATE";
 	public static final String COMMENT_PREFIX_NAME = "COMMENT";
-	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
+	public static final String LAST_STATE_NAME = "LAST_" + Constants.REPORTING_DATA_STATE_SUFFIX_NAME;
 	  
 	public static final String INTERVIEWER_ID_NAME = "IDENQ";
 	public static final String ORGANIZATION_UNIT_ID_NAME = "ORGANIZATION_UNIT_ID";
