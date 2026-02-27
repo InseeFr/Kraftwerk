@@ -68,13 +68,25 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
-		for (VariableModel collectedVariables : surveyUnit) {
+	private void addVariablesToGroupInstance(List<VariableModel> variables,
+											 GroupInstance groupInstance,
+											 SurveyRawData data,
+											 QuestionnaireData questionnaire
+	) {
+		for (VariableModel collectedVariables : variables) {
 			if (collectedVariables.getScope().equals(Constants.ROOT_GROUP_NAME)) {
-				answers.putValue(collectedVariables.getVarId(), collectedVariables.getValue());
-			} else {
-				addGroupVariables(data.getMetadataModel(), collectedVariables.getVarId(), questionnaire.getAnswers(), collectedVariables);
+				groupInstance.putValue(collectedVariables.getVarId(), collectedVariables.getValue());
+				continue;
 			}
+			addGroupVariables(data.getMetadataModel(), collectedVariables.getVarId(), questionnaire.getAnswers(), collectedVariables);
+		}
+	}
+
+	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
+		if (models.getVariables().hasVariable(variableName)) {
+			String groupName = models.getVariables().getVariable(variableName).getGroupName();
+			GroupData groupData = answers.getSubGroup(groupName);
+			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIteration() - 1);
 		}
 	}
 
@@ -84,14 +96,6 @@ public class BuildBindingsSequenceGenesis {
 			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
-		}
-	}
-
-	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
-		if (models.getVariables().hasVariable(variableName)) {
-			String groupName = models.getVariables().getVariable(variableName).getGroupName();
-			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIteration() - 1);
 		}
 	}
 
