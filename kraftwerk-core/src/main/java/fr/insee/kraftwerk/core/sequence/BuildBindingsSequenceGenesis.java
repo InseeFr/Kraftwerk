@@ -73,20 +73,28 @@ public class BuildBindingsSequenceGenesis {
 											 SurveyRawData data,
 											 QuestionnaireData questionnaire
 	) {
-		for (VariableModel collectedVariables : variables) {
-			if (collectedVariables.getScope().equals(Constants.ROOT_GROUP_NAME)) {
-				groupInstance.putValue(collectedVariables.getVarId(), collectedVariables.getValue());
+		for (VariableModel variable : variables) {
+			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
+				groupInstance.putValue(variable.getVarId(), variable.getValue());
 				continue;
 			}
-			addGroupVariables(data.getMetadataModel(), collectedVariables.getVarId(), questionnaire.getAnswers(), collectedVariables);
+			addGroupVariables(data.getMetadataModel(), variable, questionnaire.getAnswers());
 		}
 	}
 
-	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
-		if (models.getVariables().hasVariable(variableName)) {
-			String groupName = models.getVariables().getVariable(variableName).getGroupName();
-			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIteration() - 1);
+	private void addGroupVariables(MetadataModel metadataModel,
+								   VariableModel variableModel,
+								   GroupInstance groupInstance
+	) {
+		String variableName = variableModel.getVarId();
+		if (metadataModel.getVariables().hasVariable(variableName)) {
+			String groupName = metadataModel.getVariables().getVariable(variableName).getGroupName();
+			GroupData groupData = groupInstance.getSubGroup(groupName);
+			groupData.putValue(
+					variableModel.getValue(),
+					variableName,
+					variableModel.getIteration() - 1
+			);
 		}
 	}
 
