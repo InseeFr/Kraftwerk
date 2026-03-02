@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class BuildBindingsSequenceGenesis {
@@ -142,9 +143,10 @@ public class BuildBindingsSequenceGenesis {
 	private void fillNullVariableStates(GroupInstance rootGroupInstance, MetadataModel metadataModel) {
 		fillNullVariableStatesForGroupInstance(rootGroupInstance, metadataModel);
 		for(String metadataModelSubGroupName : metadataModel.getSubGroupNames()){
+			GroupData subGroup = rootGroupInstance.getSubGroup(metadataModelSubGroupName);
 			//Will create one instance if not exists
-			rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstance(0);
-			for(GroupInstance subGroupInstance : rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstances()) {
+			ensureOneInstanceExists(subGroup);
+			for(GroupInstance subGroupInstance : subGroup.getInstances()) {
 				fillNullVariableStatesForGroupInstance(
 						subGroupInstance,
 						metadataModel
@@ -153,21 +155,28 @@ public class BuildBindingsSequenceGenesis {
 		}
 	}
 
+	private static void ensureOneInstanceExists(GroupData group) {
+		group.getInstance(0);
+	}
+
 	private void fillNullVariableStatesForGroupInstance(GroupInstance groupInstance,
 														MetadataModel metadataModel) {
-		//Iterate through variables present in metadataModel for the group but not in groupInstance
-		for(Map.Entry<String, Variable> absentVariableEntry :
-				metadataModel.getVariables().getVariables().entrySet().stream().filter(
-						variableEntry ->
-								!groupInstance.getVariableNames().contains(variableEntry.getKey())
-								&& groupInstance.getGroupName().equals(variableEntry.getValue().getGroupName())
-				).toList()) {
-			String absentVariableName = absentVariableEntry.getKey();
-			groupInstance.putValue(
-					absentVariableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
-					""
-			);
-		}
+
+		Map<String, Variable> modelVariables =
+				metadataModel.getVariables().getVariables();
+
+		Set<String> existingNames = groupInstance.getVariableNames();
+		String groupName = groupInstance.getGroupName();
+
+		modelVariables.entrySet().stream()
+				.filter(entry -> groupName.equals(entry.getValue().getGroupName()))
+				.filter(entry -> !existingNames.contains(entry.getKey()))
+				.forEach(entry ->
+						groupInstance.putValue(
+								entry.getKey() + Constants.VARIABLE_STATE_SUFFIX_NAME,
+								""
+						)
+				);
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path specsDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
