@@ -54,15 +54,20 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
-			// Add surveyUnit/response level variables
+
+			// Add surveyUnit/response variables to answers
 			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
 			answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null ?
 					surveyUnit.getValidationDate().format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT))
-					: null);
+					: null
+			);
 			answers.putValue(Constants.QUESTIONNAIRE_STATE_NAME, surveyUnit.getQuestionnaireState());
 
+			// Add collected/external variables of the surveyUnit/response
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
+
+			// Add variables states for absent variables
 			if(kraftwerkExecutionContext.isAddStates()){
 				fillNullVariableStates(answers, data.getMetadataModel());
 			}
@@ -135,27 +140,33 @@ public class BuildBindingsSequenceGenesis {
 	 * of SurveyUnitUpdateLatest variables
 	 */
 	private void fillNullVariableStates(GroupInstance rootGroupInstance, MetadataModel metadataModel) {
-		//Iterate through variables present in metadataModel but not in answers
-		for(Map.Entry<String, Variable> absentVariableEntry :
-				metadataModel.getVariables().getVariables().entrySet().stream().filter(
-						variableEntry -> !rootGroupInstance.getVariableNames().contains(
-								variableEntry.getKey()
-						) && rootGroupInstance.getGroupName().equals(variableEntry.getValue().getGroupName())
-				).toList()) {
-			String absentVariableName = absentVariableEntry.getKey();
-			rootGroupInstance.putValue(
-					absentVariableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
-					""
-			);
-		}
+		fillNullVariableStatesForGroupInstance(rootGroupInstance, metadataModel);
 		for(String metadataModelSubGroupName : metadataModel.getSubGroupNames()){
-			//FIXME create instance if not exists
-			for(GroupInstance groupInstance : rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstances()) {
-				fillNullVariableStates(
-						groupInstance,
+			//Will create one instance if not exists
+			rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstance(0);
+			for(GroupInstance subGroupInstance : rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstances()) {
+				fillNullVariableStatesForGroupInstance(
+						subGroupInstance,
 						metadataModel
 				);
 			}
+		}
+	}
+
+	private void fillNullVariableStatesForGroupInstance(GroupInstance groupInstance,
+														MetadataModel metadataModel) {
+		//Iterate through variables present in metadataModel for the group but not in groupInstance
+		for(Map.Entry<String, Variable> absentVariableEntry :
+				metadataModel.getVariables().getVariables().entrySet().stream().filter(
+						variableEntry ->
+								!groupInstance.getVariableNames().contains(variableEntry.getKey())
+								&& groupInstance.getGroupName().equals(variableEntry.getValue().getGroupName())
+				).toList()) {
+			String absentVariableName = absentVariableEntry.getKey();
+			groupInstance.putValue(
+					absentVariableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
+					""
+			);
 		}
 	}
 

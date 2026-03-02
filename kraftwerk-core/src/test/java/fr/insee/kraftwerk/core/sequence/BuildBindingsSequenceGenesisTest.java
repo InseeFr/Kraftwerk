@@ -43,8 +43,9 @@ class BuildBindingsSequenceGenesisTest {
     void init(){
         String dataMode = "WEB";
         validationDate = LocalDateTime.now();
-        //Create one document
         surveyUnits.clear();
+
+        //Create one document
         SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
         surveyUnitUpdateLatest.setInterrogationId("0000001");
         surveyUnitUpdateLatest.setCampaignId("TESTCAMPAIGN");
