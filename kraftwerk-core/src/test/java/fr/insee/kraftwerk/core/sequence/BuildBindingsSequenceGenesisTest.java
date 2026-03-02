@@ -14,7 +14,7 @@ import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +39,8 @@ class BuildBindingsSequenceGenesisTest {
     private static final String ROOT_EXTERNAL_VARIABLE_NAME = "EXTVAR1";
     private static final String GROUP_EXTERNAL_VARIABLE_NAME = "EXTVAR2";
 
-    @BeforeAll
-    static void init(){
+    @BeforeEach
+    void init(){
         String dataMode = "WEB";
         validationDate = LocalDateTime.now();
         //Create one document
@@ -199,6 +199,50 @@ class BuildBindingsSequenceGenesisTest {
                 .containsEntry(
                         GROUP_EXTERNAL_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
                         DataState.EDITED.toString()
+                );
+    }
+
+    @Test
+    @DisplayName("State field should be not null and empty if no data")
+    void buildVtlBindings_handle_do_data_state(){
+        //GIVEN
+        String dataMode = "WEB";
+
+        //Remove ROOT COLLECTED variable
+        surveyUnits.getFirst().getCollectedVariables().removeIf(variableModel ->
+                variableModel.getVarId().equals(ROOT_COLLECTED_VARIABLE_NAME));
+
+
+        VtlBindings vtlBindings = new VtlBindings();
+        KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+        kraftwerkExecutionContext.setAddStates(true);
+        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(
+                new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+                kraftwerkExecutionContext
+        );
+
+        MetadataModel metadata = new MetadataModel();
+
+        metadata.getVariables().putVariable(new Variable(ROOT_COLLECTED_VARIABLE_NAME, metadata.getRootGroup(), VariableType.STRING));
+        Group group = new Group("TESTLOOP",Constants.ROOT_GROUP_NAME);
+        metadata.getVariables().putVariable(new Variable(GROUP_COLLECTED_VARIABLE_NAME, group, VariableType.STRING));
+
+        metadata.getVariables().putVariable(new Variable(ROOT_EXTERNAL_VARIABLE_NAME, metadata.getRootGroup(), VariableType.STRING));
+        metadata.getVariables().putVariable(new Variable(GROUP_EXTERNAL_VARIABLE_NAME, group, VariableType.STRING));
+        metadata.getGroups().put("TESTLOOP", group);
+        Map<String, MetadataModel> modeMetadataMap = new HashMap<>();
+        modeMetadataMap.put(dataMode,metadata);
+
+        //WHEN + THEN
+        assertDoesNotThrow(() -> bbsg.buildVtlBindings(dataMode, vtlBindings, modeMetadataMap, surveyUnits,
+                Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "genesis")));
+        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap()).hasSize(1);
+        Map<String, Object> surveyUnitData = vtlBindings.getDataset("WEB").getDataAsMap().getFirst();
+        Assertions.assertThat(surveyUnitData)
+                .containsKey(ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME)
+                .containsEntry(
+                        ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
+                        ""
                 );
     }
 }
