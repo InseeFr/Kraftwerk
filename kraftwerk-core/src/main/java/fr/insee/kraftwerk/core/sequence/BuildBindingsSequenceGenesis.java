@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableModel;
@@ -62,6 +63,9 @@ public class BuildBindingsSequenceGenesis {
 
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
+			if(kraftwerkExecutionContext.isAddStates()){
+				fillNullVariableStates(answers, data.getMetadataModel());
+			}
 
 			data.getQuestionnaires().add(questionnaire);
 		}
@@ -85,7 +89,7 @@ public class BuildBindingsSequenceGenesis {
 				if (kraftwerkExecutionContext.isAddStates()){
 					groupInstance.putValue(
 							variable.getVarId() + Constants.VARIABLE_STATE_SUFFIX_NAME,
-							variable.getState().toString()
+							getVariableStateString(variable)
 					);
 				}
 				continue;
@@ -109,9 +113,47 @@ public class BuildBindingsSequenceGenesis {
 			);
 			if (kraftwerkExecutionContext.isAddStates()){
 				groupData.putValue(
-						variableModel.getState().toString(),
+						getVariableStateString(variableModel),
 						variableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
 						variableModel.getIteration() - 1
+				);
+			}
+		}
+	}
+
+	/**
+	 * Defines what to write in the variable state field
+	 */
+	private String getVariableStateString(VariableModel variableModel) {
+		return variableModel.getState() == null ? ""
+				: variableModel.getState().toString();
+	}
+
+	/**
+	 * TO USE ONLY IF ADDSTATES IS TRUE
+	 * Goes through all variables of a metadataModel to add an empty string to the variable state field
+	 * of SurveyUnitUpdateLatest variables
+	 */
+	private void fillNullVariableStates(GroupInstance rootGroupInstance, MetadataModel metadataModel) {
+		//Iterate through variables present in metadataModel but not in answers
+		for(Map.Entry<String, Variable> absentVariableEntry :
+				metadataModel.getVariables().getVariables().entrySet().stream().filter(
+						variableEntry -> !rootGroupInstance.getVariableNames().contains(
+								variableEntry.getKey()
+						) && rootGroupInstance.getGroupName().equals(variableEntry.getValue().getGroupName())
+				).toList()) {
+			String absentVariableName = absentVariableEntry.getKey();
+			rootGroupInstance.putValue(
+					absentVariableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
+					""
+			);
+		}
+		for(String metadataModelSubGroupName : metadataModel.getSubGroupNames()){
+			//FIXME create instance if not exists
+			for(GroupInstance groupInstance : rootGroupInstance.getSubGroup(metadataModelSubGroupName).getInstances()) {
+				fillNullVariableStates(
+						groupInstance,
+						metadataModel
 				);
 			}
 		}

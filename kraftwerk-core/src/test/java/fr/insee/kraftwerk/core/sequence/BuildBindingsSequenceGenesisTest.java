@@ -203,15 +203,17 @@ class BuildBindingsSequenceGenesisTest {
     }
 
     @Test
-    @DisplayName("State field should be not null and empty if no data")
-    void buildVtlBindings_handle_do_data_state(){
+    @DisplayName("State field should be not null and empty if no data (root variables)")
+    void buildVtlBindings_handle_do_data_state_root(){
         //GIVEN
         String dataMode = "WEB";
 
         //Remove ROOT COLLECTED variable
         surveyUnits.getFirst().getCollectedVariables().removeIf(variableModel ->
                 variableModel.getVarId().equals(ROOT_COLLECTED_VARIABLE_NAME));
-
+        //Remove ROOT EXTERNAL variable
+        surveyUnits.getFirst().getExternalVariables().removeIf(variableModel ->
+                variableModel.getVarId().equals(ROOT_EXTERNAL_VARIABLE_NAME));
 
         VtlBindings vtlBindings = new VtlBindings();
         KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
@@ -239,9 +241,61 @@ class BuildBindingsSequenceGenesisTest {
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap()).hasSize(1);
         Map<String, Object> surveyUnitData = vtlBindings.getDataset("WEB").getDataAsMap().getFirst();
         Assertions.assertThat(surveyUnitData)
-                .containsKey(ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME)
                 .containsEntry(
                         ROOT_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
+                        ""
+                )
+                .containsEntry(
+                        ROOT_EXTERNAL_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
+                        ""
+                );
+    }
+
+    @Test
+    @DisplayName("State field should be not null and empty if no data (group variables)")
+    void buildVtlBindings_handle_do_data_state_group(){
+        //GIVEN
+        String dataMode = "WEB";
+
+        //Remove GROUP COLLECTED variable
+        surveyUnits.getFirst().getCollectedVariables().removeIf(variableModel ->
+                variableModel.getVarId().equals(GROUP_COLLECTED_VARIABLE_NAME));
+        //Remove GROUP EXTERNAL variable
+        surveyUnits.getFirst().getExternalVariables().removeIf(variableModel ->
+                variableModel.getVarId().equals(GROUP_EXTERNAL_VARIABLE_NAME));
+
+        VtlBindings vtlBindings = new VtlBindings();
+        KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+        kraftwerkExecutionContext.setAddStates(true);
+        BuildBindingsSequenceGenesis bbsg = new BuildBindingsSequenceGenesis(
+                new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+                kraftwerkExecutionContext
+        );
+
+        MetadataModel metadata = new MetadataModel();
+
+        metadata.getVariables().putVariable(new Variable(ROOT_COLLECTED_VARIABLE_NAME, metadata.getRootGroup(), VariableType.STRING));
+        Group group = new Group("TESTLOOP",Constants.ROOT_GROUP_NAME);
+        metadata.getVariables().putVariable(new Variable(GROUP_COLLECTED_VARIABLE_NAME, group, VariableType.STRING));
+
+        metadata.getVariables().putVariable(new Variable(ROOT_EXTERNAL_VARIABLE_NAME, metadata.getRootGroup(), VariableType.STRING));
+        metadata.getVariables().putVariable(new Variable(GROUP_EXTERNAL_VARIABLE_NAME, group, VariableType.STRING));
+        metadata.getGroups().put("TESTLOOP", group);
+        Map<String, MetadataModel> modeMetadataMap = new HashMap<>();
+        modeMetadataMap.put(dataMode,metadata);
+
+        //WHEN + THEN
+        assertDoesNotThrow(() -> bbsg.buildVtlBindings(dataMode, vtlBindings, modeMetadataMap, surveyUnits,
+                Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "genesis")));
+        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap()).hasSize(1);
+        Map<String, Object> surveyUnitData = vtlBindings.getDataset("WEB").getDataAsMap().getFirst();
+        Assertions.assertThat(surveyUnitData)
+                .containsEntry(
+                        GROUP_COLLECTED_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
+                        ""
+                )
+                .containsEntry(
+                        GROUP_EXTERNAL_VARIABLE_NAME + Constants.VARIABLE_STATE_SUFFIX_NAME,
                         ""
                 );
     }
