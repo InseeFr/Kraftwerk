@@ -1,9 +1,9 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
@@ -148,7 +148,7 @@ public class VtlJsonDatasetWriter {
 			JSONObject jsonVtlVariable = new JSONObject();
 			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
 			jsonVtlVariable.put(TYPE, convertToVtlType(variable.getType()));
-			jsonVtlVariable.put(ROLE, "MEASURE");
+			jsonVtlVariable.put(ROLE, MEASURE);
 			dataStructure.add(jsonVtlVariable);
 			columnsMapping.put(variableName, variableNumber);
 			variableNumber++;
@@ -170,7 +170,7 @@ public class VtlJsonDatasetWriter {
 		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
 		jsonVtlVariable.put(NAME, variableStateFieldName);
 		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
-		jsonVtlVariable.put(ROLE, "MEASURE");
+		jsonVtlVariable.put(ROLE, MEASURE);
 		dataStructure.add(jsonVtlVariable);
 		columnsMapping.put(variableStateFieldName, variableNumber);
 		metadataModel.getVariables().putVariable(new Variable(
