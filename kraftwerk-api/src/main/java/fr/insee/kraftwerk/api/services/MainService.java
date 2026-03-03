@@ -246,7 +246,7 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since,
-            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "true") boolean addStates
+            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
     ){
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
@@ -288,7 +288,7 @@ public class MainService extends KraftwerkService {
             )
             @RequestParam(value = "untilDate",required = false) LocalDateTime end,
             @Parameter(description = "${param.addStates}")
-            @RequestParam(value = "addStates", defaultValue = "true")
+            @RequestParam(value = "addStates", defaultValue = "false")
             boolean addStates
     ){
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();

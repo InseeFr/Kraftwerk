@@ -124,9 +124,9 @@ public class ArgsChecker {
     }
 
     private void checkArgAddStates() {
-        //true by default
+        //false by default
         if(this.argAddStates == null) {
-            this.addStates = kraftwerkServiceType == KraftwerkServiceType.JSON; //True by default if JSON
+            this.addStates = false;
             return;
         }
         if(isNotBoolean(this.argAddStates)){
