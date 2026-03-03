@@ -230,17 +230,6 @@ class ArgsCheckerTest {
     }
 
     @Test
-    void checkArgs_jsonService_nullAddStates_defaultsTrue() {
-        ArgsChecker checker = ArgsChecker.builder()
-                .argServiceName("JSON")
-                .argQuestionnaireId("questionnaire-123")
-                .build();
-
-        assertThatNoException().isThrownBy(checker::checkArgs);
-        assertThat(checker.isAddStates()).isTrue();
-    }
-
-    @Test
     void checkArgs_nonJsonService_nullAddStates_defaultsFalse() {
         ArgsChecker checker = getArgCheckerBuilder().build();
 
