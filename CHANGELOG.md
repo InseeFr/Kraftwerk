@@ -1,4 +1,8 @@
 # Changelog
+## 3.12.0 [TODO]
+### Added
+- Variable states from Genesis in exports if addStates is true
+
 ## 3.11.1 [2026-01-13]
 ### Fixed
 - Link variables
