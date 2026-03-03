@@ -57,7 +57,9 @@ class CalculatedProcessingTest {
     @Test
     void testIfCalculatedAreCorrectlyResolved() {
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindings, fooCalculated, fileUtilsInterface);
+        CalculatedProcessing processing = new CalculatedProcessing(
+                vtlBindings, fooCalculated, fileUtilsInterface, kraftwerkExecutionContext
+        );
         VtlScript vtlScript = processing.generateVtlInstructions("TEST");
 
         //
@@ -73,7 +75,9 @@ class CalculatedProcessingTest {
         //
         VtlBindings vtlBindingsTest = getVtlBindings();
         //
-        CalculatedProcessing processing = new CalculatedProcessing(vtlBindingsTest, fooCalculated, fileUtilsInterface);
+        CalculatedProcessing processing = new CalculatedProcessing(
+                vtlBindingsTest, fooCalculated, fileUtilsInterface, kraftwerkExecutionContext
+        );
         processing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         //
         Dataset outDataset = vtlBindingsTest.getDataset("TEST");

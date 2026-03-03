@@ -1,6 +1,8 @@
 package fr.insee.kraftwerk.core.rawdata;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,6 +46,17 @@ public class GroupData {
             return newInstance;
         }
 
+    }
+
+    /**
+     * Returns all group instances of that group
+     */
+    public List<GroupInstance> getInstances(){
+        List<GroupInstance> groupInstanceList = new ArrayList<>();
+        for(Map.Entry<String, GroupInstance> groupInstance : groupInstances.entrySet()){
+            groupInstanceList.add(groupInstance.getValue());
+        }
+        return groupInstanceList;
     }
 
     /** Return the instance corresponding to the given number.

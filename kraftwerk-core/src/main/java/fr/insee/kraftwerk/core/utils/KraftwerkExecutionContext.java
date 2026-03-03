@@ -35,6 +35,8 @@ public class KraftwerkExecutionContext {
     private boolean withDDI;
     private boolean withEncryption;
     private long limitSize;
+    private boolean addStates;
+
     private Path outDirectory;
 
     public KraftwerkExecutionContext(
@@ -42,7 +44,9 @@ public class KraftwerkExecutionContext {
             boolean fileByFile,
             boolean withDDI,
             boolean withEncryption,
-            long limitSize) {
+            long limitSize,
+            boolean addStates
+    ) {
         this.startTimeStamp = System.currentTimeMillis();
         this.executionDateTime = LocalDateTime.now();
         this.lineCountByTableMap = new HashMap<>();
@@ -54,7 +58,7 @@ public class KraftwerkExecutionContext {
         this.withDDI = withDDI;
         this.withEncryption = withEncryption;
         this.limitSize = limitSize;
-
+        this.addStates = addStates;
     }
 
     public String getFormattedString() {

@@ -34,15 +34,17 @@ public class VtlExecute {
     /** Engine that will execute VTL instructions */
     private final ScriptEngine engine;
     private final FileUtilsInterface fileUtilsInterface;
+    private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 
-    public VtlExecute(FileUtilsInterface fileUtilsInterface){
+    public VtlExecute(FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext){
         mapper = new ObjectMapper();
         mapper.registerModule(new TrevasModule());
         // Engine
         engine = new ScriptEngineManager()
                 .getEngineByName("vtl");
         this.fileUtilsInterface = fileUtilsInterface;
+        this.kraftwerkExecutionContext = kraftwerkExecutionContext;
     }
     
     /**
@@ -58,7 +60,7 @@ public class VtlExecute {
      */
     public void convertToVtlDataset(SurveyRawData surveyRawData, String bindingName, VtlBindings bindings){
         // Write data in a json file
-        var vtlJsonDatasetWriter = new VtlJsonDatasetWriter(surveyRawData, bindingName);
+        var vtlJsonDatasetWriter = new VtlJsonDatasetWriter(surveyRawData, bindingName, kraftwerkExecutionContext);
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName, bindings);

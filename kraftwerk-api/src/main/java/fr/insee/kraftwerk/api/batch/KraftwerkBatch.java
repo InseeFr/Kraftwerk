@@ -43,6 +43,7 @@ public class KraftwerkBatch implements ApplicationRunner {
     private static final String ARG_QUESTIONNAIREID = "questionnaireId";
     private static final String ARG_WITH_ENCRYPTION = "with-encryption";
     private static final String ARG_SINCE = "extract-json-since";
+    private static final String ARG_ADD_STATES = "add-states";
 
     public static final int BATCH_SIZE = 1000;
 
@@ -141,6 +142,9 @@ public class KraftwerkBatch implements ApplicationRunner {
                 case ARG_SINCE:
                     argsCheckerBuilder.argSince(getOptionValue(option, args));
                     break;
+                case ARG_ADD_STATES:
+                    argsCheckerBuilder.argAddStates(getOptionValue(option, args));
+                    break;
                 default:
                     log.warn("unknown option : {}", option);
                     break;
@@ -160,25 +164,29 @@ public class KraftwerkBatch implements ApplicationRunner {
                         argsChecker.getQuestionnaireId(),
                         null,
                         1000,
-                        argsChecker.isWithEncryption()
+                        argsChecker.isWithEncryption(),
+                        argsChecker.isAddStates()
                 );
             case JSON -> {
                 return mainService.jsonExtraction(
-                            argsChecker.getQuestionnaireId(),
-                            null,
-                            1000,
-                            argsChecker.getSince()
-                    );
+                        argsChecker.getQuestionnaireId(),
+                        null,
+                        1000,
+                        argsChecker.getSince(),
+                        argsChecker.isAddStates()
+                );
             }
             case MAIN -> response = mainService.mainService(
-                        argsChecker.getQuestionnaireId(),
-                        false,
-                        argsChecker.isWithEncryption()
+                    argsChecker.getQuestionnaireId(),
+                    false,
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case FILE_BY_FILE -> response = mainService.mainFileByFile(
                     argsChecker.getArgQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
         }
         return getObjectResponseEntity(response);
@@ -191,12 +199,14 @@ public class KraftwerkBatch implements ApplicationRunner {
                     argsChecker.getQuestionnaireId(),
                     null,
                     BATCH_SIZE,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case MAIN -> response = mainService.mainService(
                     argsChecker.getQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case JSON, FILE_BY_FILE -> {
                 return launchMainServiceWithDDI(argsChecker);

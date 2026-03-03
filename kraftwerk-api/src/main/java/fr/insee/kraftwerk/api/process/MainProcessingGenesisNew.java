@@ -142,7 +142,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             jsonGenerator.writeStartArray();
 
             for (List<InterrogationId> listId : partitions) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(id, listId);
+                List<SurveyUnitUpdateLatest> suLatest = client.getResponses(id, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
                 // if one mode is specified we filter to keep data of that mode only

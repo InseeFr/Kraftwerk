@@ -73,7 +73,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String collectionInstrumentId, List<InterrogationId> interrogationIds) {
+            public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
@@ -104,7 +104,8 @@ class MainProcessingGenesisLegacyTest {
                 false,
                 true,
                 false,
-                419430400L
+                419430400L,
+                false
         );
 
         mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);

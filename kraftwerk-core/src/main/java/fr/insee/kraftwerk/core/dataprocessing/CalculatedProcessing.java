@@ -20,8 +20,12 @@ public class CalculatedProcessing extends DataProcessing {
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
     private final CalculatedVariables calculatedVariables;
 
-    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, FileUtilsInterface fileUtilsInterface) {
-        super(vtlBindings, fileUtilsInterface);
+    public CalculatedProcessing(VtlBindings vtlBindings,
+                                CalculatedVariables calculatedVariables,
+                                FileUtilsInterface fileUtilsInterface,
+                                KraftwerkExecutionContext kraftwerkExecutionContext
+    ) {
+        super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
         this.calculatedVariables = calculatedVariables;
     }
 

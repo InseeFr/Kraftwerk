@@ -117,8 +117,8 @@ public class GenesisClient {
 		return modes;
 	}
 	
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String collectionInstrumentId, List<InterrogationId> interrogationIds) throws KraftwerkException {
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-collection-instrument/latest?collectionInstrumentId=%s", configProperties.getGenesisUrl(), collectionInstrumentId);
+	public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) throws KraftwerkException {
+		String url = String.format("%s/responses/%s", configProperties.getGenesisUrl(), collectionInstrumentId);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}

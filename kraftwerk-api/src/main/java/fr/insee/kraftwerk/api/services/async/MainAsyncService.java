@@ -25,7 +25,7 @@ import java.io.IOException;
 public class MainAsyncService extends KraftwerkService {
 
 	private final InMemoryJobStore jobStore;
-	private final OutputZipService outputZipService;;
+	private final OutputZipService outputZipService;
 
 	public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService) {
 		super(configProperties, minioConfig);
@@ -58,6 +58,8 @@ public class MainAsyncService extends KraftwerkService {
 
 	}
 
+	/**
+	 * @deprecated since 3.4.1 (use by campaignId which does no longer exist)*/
 	@Async("kraftwerkExecutor")
 	@Deprecated(since = "3.4.1", forRemoval = true)
 	public void runWithGenesis(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessingGenesisLegacy mpGenesis,String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {

@@ -124,7 +124,9 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws KraftwerkException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+				fileUtilsInterface, kraftwerkExecutionContext
+		);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, kraftwerkExecutionContext.isWithDDI(),

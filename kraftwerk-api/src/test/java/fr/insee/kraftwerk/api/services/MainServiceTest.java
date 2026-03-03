@@ -292,11 +292,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         assertAsyncStatus(response, JobStatus.SUCCESS);
@@ -311,11 +323,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -333,11 +357,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         assertAsyncStatus(response, JobStatus.SUCCESS);
@@ -352,11 +388,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -374,11 +422,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         assertAsyncStatus(response, JobStatus.SUCCESS);
@@ -393,11 +453,23 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -415,11 +487,20 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         assertAsyncStatus(response, JobStatus.SUCCESS);
@@ -435,11 +516,20 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -455,11 +545,20 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -476,11 +575,20 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         assertAsyncStatus(response, JobStatus.SUCCESS);
@@ -512,11 +620,20 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
@@ -532,11 +649,21 @@ class MainServiceTest {
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        // TODO use by questionnaire
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
