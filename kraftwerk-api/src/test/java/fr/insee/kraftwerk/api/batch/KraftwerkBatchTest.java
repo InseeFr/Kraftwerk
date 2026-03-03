@@ -198,11 +198,11 @@ class KraftwerkBatchTest {
     @Test
     void json_service_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
-        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "addState"));
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
         when(args.getOptionValues("service")).thenReturn(List.of("JSON"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
-        when(args.getOptionValues("addState")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
 
         kraftwerkBatch.run(args);
 
@@ -232,7 +232,7 @@ class KraftwerkBatchTest {
                 any(),
                 anyInt(),
                 eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0)),
-                eq(true)
+                eq(false)
         );
         verifyNoInteractions(reportingDataService);
     }
