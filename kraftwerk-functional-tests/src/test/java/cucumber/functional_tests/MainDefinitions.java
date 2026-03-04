@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -336,6 +337,7 @@ public class MainDefinitions {
 
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
 	public void check_csv_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
+		System.out.println("Charset utilisé :" + Charset.defaultCharset());
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		CSVReader csvReader = getCSVReader(
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
@@ -624,7 +626,7 @@ public class MainDefinitions {
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
 				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
-		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
+		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)){
 			String line = bufferedReader.readLine();
 			//Check header
 			String[] header = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
