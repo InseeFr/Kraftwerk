@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -143,7 +145,8 @@ public class VtlJsonDatasetWriter {
 		}
 
 		// Variables
-		for (String variableName : metadataModel.getVariables().getVariableNames()) {
+        List<String> variableNames = new ArrayList<>(metadataModel.getVariables().getVariableNames());
+        for (String variableName : variableNames) {
 			Variable variable = metadataModel.getVariables().getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
 			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
@@ -168,6 +171,12 @@ public class VtlJsonDatasetWriter {
 	private void addVariableStateFieldToStructure(Variable variable, JSONArray dataStructure, int variableNumber) {
 		JSONObject jsonVtlVariable = new JSONObject();
 		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
+        if (metadataModel.getVariables().getVariable(variableStateFieldName) != null) {
+            return;
+        }
+        if (columnsMapping.containsKey(variableStateFieldName)) {
+            return;
+        }
 		jsonVtlVariable.put(NAME, variableStateFieldName);
 		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
 		jsonVtlVariable.put(ROLE, MEASURE);
@@ -188,7 +197,7 @@ public class VtlJsonDatasetWriter {
 		for (QuestionnaireData questionnaireData : surveyData.getQuestionnaires()) {
 			GroupInstance rootInstance = questionnaireData.getAnswers();
 
-			String[] rowValues = new String[columnsMapping.size()];
+			String[] rowValues = new String[datasetWidth()];
 			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
 			// (previous implementation was: fill with empty strings ("")
 
@@ -283,5 +292,12 @@ public class VtlJsonDatasetWriter {
 			return null;
 		}
 	}
+
+    private int datasetWidth() {
+        return columnsMapping.values().stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(-1) + 1;
+    }
 
 }
