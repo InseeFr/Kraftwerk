@@ -173,11 +173,6 @@ public class VtlJsonDatasetWriter {
 		jsonVtlVariable.put(ROLE, MEASURE);
 		dataStructure.add(jsonVtlVariable);
 		columnsMapping.put(variableStateFieldName, variableNumber);
-		metadataModel.getVariables().putVariable(new Variable(
-				variableStateFieldName,
-				variable.getGroup(),
-				VariableType.STRING
-		));
 	}
 
 	@SuppressWarnings("unchecked")

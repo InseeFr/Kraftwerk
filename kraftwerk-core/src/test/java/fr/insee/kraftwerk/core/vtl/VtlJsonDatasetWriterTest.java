@@ -213,4 +213,18 @@ class VtlJsonDatasetWriterTest {
 		assertEquals(4, dataset.getDataPoints().size());
 	}
 
+    @Test
+    void writerMustNotMutateMetadata_evenWhenAddStatesTrue() {
+        SurveyRawData testData = SurveyRawDataTest.createFakeData_oneLevel();
+        MetadataModel mm = testData.getMetadataModel();
+
+        int before = mm.getVariables().getVariableNames().size();
+
+        var writer = new VtlJsonDatasetWriter(testData, "TEST", TestConstants.getKraftwerkExecutionContext());
+        writer.writeVtlJsonDataset();
+
+        int after = mm.getVariables().getVariableNames().size();
+        assertEquals(before, after, "Writer must not add variables to metadata while generating VTL dataset");
+    }
+
 }
