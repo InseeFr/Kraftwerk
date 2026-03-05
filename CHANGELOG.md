@@ -1,4 +1,8 @@
 # Changelog
+## 3.12.1 [2026-03-05]
+### Fixed
+- addState crash fix 
+
 ## 3.12.0 [2026-03-05]
 ### Added
 - Variable states from Genesis in exports if addStates is true
