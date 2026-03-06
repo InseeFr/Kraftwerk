@@ -311,7 +311,7 @@ class MainServiceTest {
         );
 
         // THEN
-        assertAsyncStatus(response, JobStatus.SUCCESS);
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -376,7 +376,7 @@ class MainServiceTest {
         );
 
         // THEN
-        assertAsyncStatus(response, JobStatus.SUCCESS);
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -441,7 +441,7 @@ class MainServiceTest {
         );
 
         // THEN
-        assertAsyncStatus(response, JobStatus.SUCCESS);
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -503,7 +503,7 @@ class MainServiceTest {
         );
 
         // THEN
-        assertAsyncStatus(response, JobStatus.SUCCESS);
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -591,7 +591,7 @@ class MainServiceTest {
         );
 
         // THEN
-        assertAsyncStatus(response, JobStatus.SUCCESS);
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     private JobExecution assertAsyncStatus(ResponseEntity<String> response, JobStatus success) {

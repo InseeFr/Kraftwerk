@@ -20,7 +20,7 @@ public class InMemoryExportJobStore {
         jobsMap.put(
                 jobId,
                 ExportJobResultDto.builder()
-                        .status(ExportJobStatus.RUNNING)
+                        .status(JobStatus.RUNNING)
                         .errors(new ArrayList<>())
                         .startTime(LocalDateTime.now())
                         .build()
@@ -35,8 +35,8 @@ public class InMemoryExportJobStore {
             job.setEndTime(LocalDateTime.now());
 
             job.setStatus(errors == null || errors.isEmpty()
-                    ? ExportJobStatus.DONE
-                    : ExportJobStatus.PARTIAL);
+                    ? JobStatus.DONE
+                    : JobStatus.PARTIAL);
 
             return job;
         });
@@ -46,7 +46,7 @@ public class InMemoryExportJobStore {
         jobsMap.computeIfPresent(jobId, (id, job) -> {
 
             job.getErrors().add(e.getMessage());
-            job.setStatus(ExportJobStatus.ERROR);
+            job.setStatus(JobStatus.FAILED);
             job.setEndTime(LocalDateTime.now());
 
             return job;

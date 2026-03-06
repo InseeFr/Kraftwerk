@@ -1,6 +1,6 @@
 package fr.insee.kraftwerk.api.dto;
 
-import fr.insee.kraftwerk.api.services.async.ExportJobStatus;
+import fr.insee.kraftwerk.api.services.async.JobStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class ExportJobResultDto {
 
-    private ExportJobStatus status;
+    private JobStatus status;
     private ExportCheckResultDto checkResult;
     private List<String> errors;
     private LocalDateTime startTime;
