@@ -1,4 +1,8 @@
 # Changelog
+## 3.12.2 [TODO]
+### Fixed
+- Crash when too much data in one batch to write into VTL JSON dataset
+
 ## 3.12.1 [2026-03-05]
 ### Fixed
 - addState crash fix 
