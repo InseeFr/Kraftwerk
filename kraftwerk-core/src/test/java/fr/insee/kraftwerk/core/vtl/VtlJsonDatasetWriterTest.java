@@ -11,10 +11,13 @@ import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,12 +29,15 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,6 +54,8 @@ class VtlJsonDatasetWriterTest {
 	@Mock private KraftwerkExecutionContext context;
 
 	private VtlJsonDatasetWriter writer;
+
+	private static final List<Path> tempFiles = new ArrayList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -67,6 +75,7 @@ class VtlJsonDatasetWriterTest {
 
 		// WHEN
 		String path = writer.writeVtlJsonDataset();
+		if (path != null) tempFiles.add(Path.of(path));
 
 		// THEN
 		assertThat(path).isNotNull().endsWith(".json");
@@ -81,8 +90,10 @@ class VtlJsonDatasetWriterTest {
 
 		// WHEN
 		String path = writer.writeVtlJsonDataset();
+		if (path != null) tempFiles.add(Path.of(path));
 
 		// THEN
+		Assertions.assertThat(path).isNotNull();
 		String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
 		JSONObject parsed = (JSONObject) new JSONParser().parse(content);
 
@@ -90,9 +101,9 @@ class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	void jsonDataStructure_shouldAlwaysContainFourRootIdentifiers() {
+	void getDataStructure_JSONArray_shouldAlwaysContainFourRootIdentifiers() {
 		// WHEN
-		JSONArray structure = writer.jsonDataStructure();
+		JSONArray structure = writer.getDataStructureJSONArray();
 
 		// THEN
 		List<String> names = extractNames(structure);
@@ -106,12 +117,12 @@ class VtlJsonDatasetWriterTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	void jsonDataStructure_shouldContainGroupIdentifier_whenSubGroupExists() {
+	void getDataStructure_JSONArray_shouldContainGroupIdentifier_whenSubGroupExists() {
 		// GIVEN
 		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
 
 		// WHEN
-		JSONArray structure = writer.jsonDataStructure();
+		JSONArray structure = writer.getDataStructureJSONArray();
 
 		// THEN
 		assertThat(extractNames(structure)).contains("LOOP1");
@@ -120,14 +131,14 @@ class VtlJsonDatasetWriterTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	void jsonDataStructure_shouldContainVariable_withCorrectTypeAndRole() {
+	void getDataStructure_JSONArray_shouldContainVariable_withCorrectTypeAndRole() {
 		// GIVEN
 		Variable variable = new Variable("MY_VAR", mock(Group.class), VariableType.STRING);
 		when(variablesMap.getVariableNames()).thenReturn(Set.of("MY_VAR"));
 		when(variablesMap.getVariable("MY_VAR")).thenReturn(variable);
 
 		// WHEN
-		JSONArray structure = writer.jsonDataStructure();
+		JSONArray structure = writer.getDataStructureJSONArray();
 
 		// THEN
 		JSONObject entry = findEntry(structure, "MY_VAR");
@@ -137,7 +148,7 @@ class VtlJsonDatasetWriterTest {
 	}
 
 	@Test
-	void jsonDataStructure_shouldAddStateField_whenAddStatesIsEnabled() {
+	void getDataStructure_JSONArray_shouldAddStateField_whenAddStatesIsEnabled() {
 		// GIVEN
 		when(context.isAddStates()).thenReturn(true);
 		Variable variable = new Variable("MY_VAR", mock(Group.class), VariableType.STRING);
@@ -149,28 +160,95 @@ class VtlJsonDatasetWriterTest {
 		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
 
 		// WHEN
-		JSONArray structure = writer.jsonDataStructure();
+		JSONArray structure = writer.getDataStructureJSONArray();
 
 		// THEN
 		assertThat(extractNames(structure)).contains(stateFieldName);
 	}
 
 	@Test
-	void jsonDataPoints_shouldBeEmpty_whenNoQuestionnaires() {
+	@SneakyThrows
+	void columnsMapping_shouldContainAllVariableNames_withCorrectIndices() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+
+		// Add two variables to the metadata model
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.INTEGER));
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+
+		when(context.isAddStates()).thenReturn(false);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test-dataset", context);
+
+		// WHEN
+		writer.getDataStructureJSONArray();
+
+		// THEN
+		// Access the private columnsMapping field via reflection
+		Field field = VtlJsonDatasetWriter.class.getDeclaredField("columnsMapping");
+		field.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		Map<String, Integer> columnsMapping = (Map<String, Integer>) field.get(writer);
+
+		// Root identifiers should be mapped
+		assertThat(columnsMapping).containsKeys(
+				Constants.ROOT_IDENTIFIER_NAME,
+				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				Constants.VALIDATION_DATE_NAME,
+				Constants.QUESTIONNAIRE_STATE_NAME,
+				"VAR1", "VAR2"
+		)
+		// Each variable should have a unique column index
+		.doesNotContainEntry("VAR1", columnsMapping.get("VAR2"));
+	}
+
+	@Test
+	@SneakyThrows
+	void getDataStructure_JSONArray_columnsMapping_shouldNotContainDuplicateIndexes() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+
+		// Add two variables to the metadata model
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.INTEGER));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test-dataset", context);
+
+		//WHEN
+		writer.getDataStructureJSONArray();
+
+		//THEN
+		Field field = VtlJsonDatasetWriter.class.getDeclaredField("columnsMapping");
+		field.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		Map<String, Integer> columnsMapping = (Map<String, Integer>) field.get(writer);
+		// All column indexes should be distinct
+		long distinctCount = columnsMapping.values().stream().distinct().count();
+		assertThat(distinctCount)
+				.as("All indexes must be unique")
+				.isEqualTo(columnsMapping.size());
+	}
+
+	@Test
+	void getDataPoints_JSONArray_shouldBeEmpty_whenNoQuestionnaires() {
 		// GIVEN
 		when(surveyData.getQuestionnaires()).thenReturn(Collections.emptyList());
 
 		// WHEN
-		JSONArray dataPoints = writer.jsonDataPoints();
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
 
 		// THEN
 		assertThat(dataPoints).isEmpty();
 	}
 
 	@Test
-	void jsonDataPoints_shouldContainOneRow_perQuestionnaireWithoutSubGroups() {
+	void getDataPoints_JSONArray_shouldContainOneRow_perQuestionnaireWithoutSubGroups() {
 		// GIVEN
-		writer.jsonDataStructure();
+		writer.getDataStructureJSONArray();
 		//3 answers
 		List<QuestionnaireData> questionnaires = java.util.stream.IntStream.range(0, 3)
 				.mapToObj(i -> {
@@ -190,39 +268,39 @@ class VtlJsonDatasetWriterTest {
 		when(surveyData.getQuestionnaires()).thenReturn(questionnaires);
 
 		// WHEN
-		JSONArray dataPoints = writer.jsonDataPoints();
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
 
 		// THEN
 		assertThat(dataPoints).hasSize(3);
 	}
 
 	@Test
-	void jsonDataPoints_shouldContainOneRowPerGroupInstance_whenSubGroupsExist() {
+	void getDataPoints_JSONArray_shouldContainOneRowPerGroupInstance_whenSubGroupsExist() {
 		// GIVEN
 		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
-		writer.jsonDataStructure();
+		writer.getDataStructureJSONArray();
 
 		QuestionnaireData qd = buildQuestionnaireWithSubGroup(2);
 		when(surveyData.getQuestionnaires()).thenReturn(List.of(qd));
 
 		// WHEN
-		JSONArray dataPoints = writer.jsonDataPoints();
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
 
-		// THEN : 2 instances de groupe → 2 lignes
+		// THEN
 		assertThat(dataPoints).hasSize(2);
 	}
 
 	@Test
-	void jsonDataPoints_shouldWriteSingleRow_whenSubGroupsAreEmpty() {
+	void getDataPoints_JSONArray_shouldWriteSingleRow_whenSubGroupsAreEmpty() {
 		// GIVEN
 		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
-		writer.jsonDataStructure();
+		writer.getDataStructureJSONArray();
 
 		QuestionnaireData qd = buildQuestionnaireWithSubGroup(0);
 		when(surveyData.getQuestionnaires()).thenReturn(List.of(qd));
 
 		// WHEN
-		JSONArray dataPoints = writer.jsonDataPoints();
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
 
 		// THEN
 		assertThat(dataPoints).hasSize(1);
@@ -230,14 +308,26 @@ class VtlJsonDatasetWriterTest {
 
 	@Test
 	void convertToVtlType_shouldReturnString_whenTypeIsNull() {
+		// WHEN + THEN
 		assertThat(VtlJsonDatasetWriter.convertToVtlType(null)).isEqualTo("STRING");
 	}
 
 	@ParameterizedTest
 	@EnumSource(VariableType.class)
 	void convertToVtlType_shouldReturnCorrectVtlType_forEachVariableType(VariableType variableType) {
+		// WHEN + THEN
 		assertThat(VtlJsonDatasetWriter.convertToVtlType(variableType)).isEqualTo(variableType.getVtlType());
 	}
+
+	@AfterAll
+	@SneakyThrows
+	static void clean(){
+		for (Path path : tempFiles) {
+			Files.deleteIfExists(path);
+		}
+	}
+
+
 
 	// UTILS
 	@SuppressWarnings("unchecked")
