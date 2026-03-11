@@ -81,7 +81,8 @@ public class StepByStepService extends KraftwerkService {
 				fileByFile,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
@@ -93,8 +94,14 @@ public class StepByStepService extends KraftwerkService {
 		}
 				
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 
 		for (String dataMode : mp.getUserInputsFile().getModeInputsMap().keySet()) {
 			try{
@@ -130,7 +137,8 @@ public class StepByStepService extends KraftwerkService {
 				fileByFile,
 				withDDI,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 		MainProcessing mp = new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
 
@@ -141,14 +149,20 @@ public class StepByStepService extends KraftwerkService {
 		}
 		
 		//Process
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		try{
 			buildBindingsSequence.buildVtlBindings(mp.getUserInputsFile(), dataMode, mp.getVtlBindings(), mp.getMetadataModels().get(dataMode), withDDI, kraftwerkExecutionContext);
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
 
-        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+        VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		vtlWriterSequence.writeTempBindings(mp.getInDirectory(), dataMode, mp.getVtlBindings(), StepEnum.BUILD_BINDINGS);
 		
 		return ResponseEntity.ok(inDirectoryParam+ " - "+dataMode);
@@ -169,7 +183,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		//Read data in JSON file
@@ -187,7 +202,10 @@ public class StepByStepService extends KraftwerkService {
 		}
 		VtlBindings vtlBindings = new VtlBindings();
 
-		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+		VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		vtlReaderSequence.readDataset(FileUtilsInterface.transformToTemp(inDirectory).toString(),dataMode, StepEnum.BUILD_BINDINGS, vtlBindings);
 
 		Map<String, MetadataModel> metadataModelMap = MetadataUtils.getMetadata(userInputsFile.getModeInputsMap(), fileUtilsInterface);
@@ -197,7 +215,10 @@ public class StepByStepService extends KraftwerkService {
 		unimodal.applyUnimodalSequence(userInputsFile, dataMode, vtlBindings, kraftwerkExecutionContext, metadataModelMap, fileUtilsInterface);
 		
 		//Write technical outputs
-		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+		VtlReaderWriterSequence vtlWriterSequence = new VtlReaderWriterSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		vtlWriterSequence.writeTempBindings(inDirectory, dataMode, vtlBindings, StepEnum.UNIMODAL_PROCESSING);
 		TextFileWriter.writeErrorsFile(inDirectory, kraftwerkExecutionContext, fileUtilsInterface);
 		
@@ -232,11 +253,15 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 
-		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+		VtlReaderWriterSequence vtlReaderWriterSequence = new VtlReaderWriterSequence(
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 
 		//Test
 		VtlBindings vtlBindings = new VtlBindings();
@@ -280,7 +305,8 @@ public class StepByStepService extends KraftwerkService {
 				false,
 				true,
 				false,
-				limitSize
+				limitSize,
+				false
 		);
 
 		// Read all bindings necessary to produce output
@@ -290,7 +316,10 @@ public class StepByStepService extends KraftwerkService {
 		for (String name : fileNames){
 			String pathBindings = path + File.separator + name;
 			String bindingName =  name.substring(0, name.indexOf("_"+StepEnum.MULTIMODAL_PROCESSING.getStepLabel()));
-			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(fileUtilsInterface);
+			VtlReaderWriterSequence vtlReaderSequence = new VtlReaderWriterSequence(
+					fileUtilsInterface,
+					kraftwerkExecutionContext
+			);
 			vtlReaderSequence.readDataset(pathBindings, bindingName, vtlBindings);
 		}
 		WriterSequence writerSequence = new WriterSequence();

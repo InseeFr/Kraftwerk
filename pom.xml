@@ -5,21 +5,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.11.4</version>
+	<version>3.12.1</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.10</version>
+		<version>3.5.11</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>7.34.2</cucumber.version>
 		<junit-jupiter.version>5.13.4</junit-jupiter.version>
+		<jackson-bom.version>2.21.1</jackson-bom.version>
 
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.14</jacoco.version>
@@ -133,7 +134,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
+			<optional>true</optional>
 			<!-- version from parent pom -->
 		</dependency>
 
@@ -141,6 +142,18 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
 				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>

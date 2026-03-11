@@ -46,7 +46,9 @@ public class UnimodalSequence {
 		if (modeInputs.getLunaticFile() != null) {
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
-			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings, calculatedVariables, fileUtilsInterface);
+			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(
+					vtlBindings, calculatedVariables, fileUtilsInterface, kraftwerkExecutionContext
+			);
 			vtlGenerate = calculatedProcessing.applyCalculatedVtlTransformations(dataMode, modeInputs.getModeVtlFile(), kraftwerkExecutionContext);
 			TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CalculatedProcessing", dataMode),
 					vtlGenerate, fileUtilsInterface);
@@ -56,12 +58,22 @@ public class UnimodalSequence {
 		}
 
 		/* Step 2.4c : Prefix variable names with their belonging group names */
-		vtlGenerate = new GroupProcessing(vtlBindings, metadataModels.get(dataMode), fileUtilsInterface).applyVtlTransformations(dataMode, null, kraftwerkExecutionContext);
+		vtlGenerate = new GroupProcessing(
+				vtlBindings,
+				metadataModels.get(dataMode),
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		).applyVtlTransformations(dataMode, null, kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "GroupProcessing", dataMode), vtlGenerate, fileUtilsInterface);
 
 		/* Step 2.5 : Apply standard mode-specific VTL transformations */
-		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(modeInputs.getDataFormat(),
-				vtlBindings, metadataModels.get(dataMode), fileUtilsInterface);
+		UnimodalDataProcessing dataProcessing = DataProcessingManager.getProcessingClass(
+				modeInputs.getDataFormat(),
+				vtlBindings,
+				metadataModels.get(dataMode),
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		vtlGenerate = dataProcessing.applyVtlTransformations(
 				dataMode,
 				Path.of(Constants.VTL_FOLDER_PATH)
@@ -71,7 +83,12 @@ public class UnimodalSequence {
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "StandardVtl", dataMode), vtlGenerate, fileUtilsInterface);
 
 		/* Step 2.5b : Apply TCM VTL transformations */
-		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(vtlBindings,metadataModels.get(dataMode) , Constants.VTL_FOLDER_PATH, fileUtilsInterface);
+		TCMSequencesProcessing tcmSequencesProcessing = new TCMSequencesProcessing(
+				vtlBindings,metadataModels.get(dataMode),
+				Constants.VTL_FOLDER_PATH,
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		vtlGenerate = tcmSequencesProcessing.applyAutomatedVtlInstructions(dataMode, kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "TCMSequenceVTL", dataMode), vtlGenerate, fileUtilsInterface);
 

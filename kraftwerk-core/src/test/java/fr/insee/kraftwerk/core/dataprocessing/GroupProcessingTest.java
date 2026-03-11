@@ -48,7 +48,9 @@ class GroupProcessingTest {
         metadata.getVariables().putVariable(new Variable("FOO1", metadata.getGroup("DEPTH1"), VariableType.NUMBER));
         metadata.getVariables().putVariable(new Variable("FOO2", metadata.getGroup("DEPTH2"), VariableType.NUMBER));
         //
-        new GroupProcessing(vtlBindings, metadata, fileUtilsInterface).applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
+        new GroupProcessing(
+                vtlBindings, metadata, fileUtilsInterface, kraftwerkExecutionContext
+        ).applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //

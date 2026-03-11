@@ -24,24 +24,32 @@ public class MultimodalSequence {
 		String multimodeDatasetName = Constants.MULTIMODE_DATASET_NAME;
 
 		/* Step 3.1 : aggregate unimodal datasets into a multimodal unique dataset */
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
+		DataProcessing reconciliationProcessing = new ReconciliationProcessing(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		String vtlGenerate = reconciliationProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlReconciliationFile(), kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadataModels, fileUtilsInterface);
+		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(
+				vtlBindings, metadataModels, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
-		DataProcessing multimodeTransformations = new MultimodeTransformations(vtlBindings, fileUtilsInterface);
+		DataProcessing multimodeTransformations = new MultimodeTransformations(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		vtlGenerate = multimodeTransformations.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlTransformationsFile(), kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "MultimodeTransformations",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
 		/* Step 3.3 : create datasets on each information level (i.e. each group) */
-		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
+		DataProcessing informationLevelsProcessing = new InformationLevelsProcessing(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		vtlGenerate = informationLevelsProcessing.applyVtlTransformations(multimodeDatasetName,
 				userInputs.getVtlInformationLevelsFile(), kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);

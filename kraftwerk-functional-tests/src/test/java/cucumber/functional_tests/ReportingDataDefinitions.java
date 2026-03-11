@@ -33,7 +33,7 @@ import static cucumber.TestConstants.FUNCTIONAL_TESTS_INPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_OUTPUT_DIRECTORY;
 import static cucumber.TestConstants.FUNCTIONAL_TESTS_TEMP_DIRECTORY;
 import static fr.insee.kraftwerk.core.Constants.OUTCOME_ATTEMPT_SUFFIX_NAME;
-import static fr.insee.kraftwerk.core.Constants.STATE_SUFFIX_NAME;
+import static fr.insee.kraftwerk.core.Constants.REPORTING_DATA_STATE_SUFFIX_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -57,8 +57,8 @@ public class ReportingDataDefinitions {
             Constants.ADRESS_BS_NAME,
             Constants.ADRESS_NOI_NAME,
             Constants.ADRESS_ID_STAT_INSEE,
-            Constants.STATE_SUFFIX_NAME + "_1",
-            Constants.STATE_SUFFIX_NAME + "_1_DATE",
+            Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_1",
+            Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_1_DATE",
             Constants.LAST_STATE_NAME,
             Constants.OUTCOME_NAME,
             Constants.OUTCOME_DATE,
@@ -210,7 +210,7 @@ public class ReportingDataDefinitions {
 
             // Increment if valid
             if (element.equals(expectedStatus) // the field content matches with expected
-                    && fieldName.startsWith(STATE_SUFFIX_NAME) // is a contact attempt field
+                    && fieldName.startsWith(REPORTING_DATA_STATE_SUFFIX_NAME) // is a contact attempt field
                     && !fieldName.contains("DATE")) { // not the attempt date field
                 actualSpecificStatusCount++;
             }

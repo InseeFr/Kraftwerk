@@ -54,6 +54,7 @@ public class ReportingIdentification {
                 return "UNIDENTIF";
             }
             case "IDENTIFIED" -> {
+                if (access == null) return null;
                 switch (access) {
                     case "NACC" -> {
                         return "NACCNO";
@@ -73,6 +74,7 @@ public class ReportingIdentification {
     }
 
     private String accessCase() {
+        if (situation == null) return null;
         switch (situation) {
             case "ABSORBED" -> {
                 return "ACCABS";
@@ -90,6 +92,7 @@ public class ReportingIdentification {
     }
 
     private String ordinarySituationCase() {
+        if (category == null) return null;
         switch (category) {
             case "VACANT" -> {
                 return "ACCVAC";
@@ -107,6 +110,7 @@ public class ReportingIdentification {
     }
 
     private String primaryCategoryCase() {
+        if (occupant == null) return null;
         switch (occupant) {
             case "IDENTIFIED" -> {
                 return "ACCPRIDENT";

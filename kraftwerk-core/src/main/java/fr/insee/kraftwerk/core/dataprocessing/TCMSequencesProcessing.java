@@ -16,8 +16,13 @@ public class TCMSequencesProcessing extends DataProcessing {
     private final String vtlDirectory;
     private final MetadataModel metadataModel;
 
-    public TCMSequencesProcessing(VtlBindings vtlBindings, MetadataModel metadataModel, String vtlDirectory, FileUtilsInterface fileUtilsInterface) {
-        super(vtlBindings, fileUtilsInterface);
+    public TCMSequencesProcessing(VtlBindings vtlBindings,
+                                  MetadataModel metadataModel,
+                                  String vtlDirectory,
+                                  FileUtilsInterface fileUtilsInterface,
+                                  KraftwerkExecutionContext kraftwerkExecutionContext
+    ) {
+        super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
         this.metadataModel = metadataModel;
         this.vtlDirectory = vtlDirectory;
     }

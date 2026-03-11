@@ -24,8 +24,11 @@ public class BuildBindingsSequence {
 	VtlExecute vtlExecute;
 	private final FileUtilsInterface fileUtilsInterface;
 
-	public BuildBindingsSequence(FileUtilsInterface fileUtilsInterface) {
-		vtlExecute = new VtlExecute(fileUtilsInterface);
+	public BuildBindingsSequence(
+			FileUtilsInterface fileUtilsInterface,
+			KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
+		vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 

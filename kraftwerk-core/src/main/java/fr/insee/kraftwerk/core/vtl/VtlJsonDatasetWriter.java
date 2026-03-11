@@ -1,13 +1,14 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -17,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,9 +38,11 @@ public class VtlJsonDatasetWriter {
 	private static final String IDENTIFIER = "IDENTIFIER";
 	private static final String MEASURE = "MEASURE";
 	private static final String STRING = "STRING";
+
 	private final SurveyRawData surveyData;
 	private final MetadataModel metadataModel;
 	private final String datasetName;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/*
 	 * Local variable to ensure that data points will have variables in the same
@@ -51,10 +56,14 @@ public class VtlJsonDatasetWriter {
 	 * @param datasetName The name (without extension) of the dataset file which
 	 *                       will be written.
 	 */
-	public VtlJsonDatasetWriter(SurveyRawData surveyData, String datasetName) {
+	public VtlJsonDatasetWriter(SurveyRawData surveyData,
+								String datasetName,
+								KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
 		this.surveyData = surveyData;
 		this.metadataModel = surveyData.getMetadataModel();
 		this.datasetName = datasetName;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 	/**
@@ -136,18 +145,48 @@ public class VtlJsonDatasetWriter {
 		}
 
 		// Variables
-		for (String variableName : metadataModel.getVariables().getVariableNames()) {
+        List<String> variableNames = new ArrayList<>(metadataModel.getVariables().getVariableNames());
+        for (String variableName : variableNames) {
 			Variable variable = metadataModel.getVariables().getVariable(variableName);
 			JSONObject jsonVtlVariable = new JSONObject();
 			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
 			jsonVtlVariable.put(TYPE, convertToVtlType(variable.getType()));
-			jsonVtlVariable.put(ROLE, "MEASURE");
+			jsonVtlVariable.put(ROLE, MEASURE);
 			dataStructure.add(jsonVtlVariable);
 			columnsMapping.put(variableName, variableNumber);
 			variableNumber++;
+			if(kraftwerkExecutionContext.isAddStates()){
+				addVariableStateFieldToStructure(variable, dataStructure, variableNumber);
+				variableNumber++;
+			}
 		}
 
 		return dataStructure;
+	}
+
+	/**
+	 * Adds the variable state (COLLECTED, EDITED...) to the VTL dataset structure
+	 */
+	@SuppressWarnings("unchecked")
+	private void addVariableStateFieldToStructure(Variable variable, JSONArray dataStructure, int variableNumber) {
+		JSONObject jsonVtlVariable = new JSONObject();
+		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
+        if (metadataModel.getVariables().getVariable(variableStateFieldName) != null) {
+            return;
+        }
+        if (columnsMapping.containsKey(variableStateFieldName)) {
+            return;
+        }
+		jsonVtlVariable.put(NAME, variableStateFieldName);
+		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
+		jsonVtlVariable.put(ROLE, MEASURE);
+		dataStructure.add(jsonVtlVariable);
+		columnsMapping.put(variableStateFieldName, variableNumber);
+		metadataModel.getVariables().putVariable(new Variable(
+				variableStateFieldName,
+				variable.getGroup(),
+				VariableType.STRING
+		));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -158,7 +197,7 @@ public class VtlJsonDatasetWriter {
 		for (QuestionnaireData questionnaireData : surveyData.getQuestionnaires()) {
 			GroupInstance rootInstance = questionnaireData.getAnswers();
 
-			String[] rowValues = new String[columnsMapping.size()];
+			String[] rowValues = new String[datasetWidth()];
 			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
 			// (previous implementation was: fill with empty strings ("")
 
@@ -253,5 +292,12 @@ public class VtlJsonDatasetWriter {
 			return null;
 		}
 	}
+
+    private int datasetWidth() {
+        return columnsMapping.values().stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(-1) + 1;
+    }
 
 }

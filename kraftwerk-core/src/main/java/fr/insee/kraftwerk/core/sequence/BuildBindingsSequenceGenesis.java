@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.data.model.VariableModel;
@@ -12,6 +13,7 @@ import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
@@ -21,16 +23,21 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class BuildBindingsSequenceGenesis {
 
 	VtlExecute vtlExecute;
 	FileUtilsInterface fileUtilsInterface;
+	KraftwerkExecutionContext kraftwerkExecutionContext;
 
-	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface) {
-		vtlExecute = new VtlExecute(fileUtilsInterface);
+	public BuildBindingsSequenceGenesis(FileUtilsInterface fileUtilsInterface,
+										KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
+		vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 		this.fileUtilsInterface = fileUtilsInterface;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
 	public void buildVtlBindings(String dataMode, VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, List<SurveyUnitUpdateLatest> surveyUnits, Path specsDirectory) throws KraftwerkException {
@@ -48,14 +55,23 @@ public class BuildBindingsSequenceGenesis {
 			data.getIdSurveyUnits().add(surveyUnit.getInterrogationId());
 
 			GroupInstance answers = questionnaire.getAnswers();
+
+			// Add surveyUnit/response variables to answers
 			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
 			answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null ?
 					surveyUnit.getValidationDate().format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT))
-					: null);
+					: null
+			);
 			answers.putValue(Constants.QUESTIONNAIRE_STATE_NAME, surveyUnit.getQuestionnaireState());
 
+			// Add collected/external variables of the surveyUnit/response
 			addVariablesToGroupInstance(surveyUnit.getCollectedVariables(), answers, data, questionnaire);
 			addVariablesToGroupInstance(surveyUnit.getExternalVariables(), answers, data, questionnaire);
+
+			// Add variables states for absent variables
+			if(kraftwerkExecutionContext.isAddStates()){
+				fillNullVariableStates(answers, data.getMetadataModel());
+			}
 
 			data.getQuestionnaires().add(questionnaire);
 		}
@@ -68,14 +84,99 @@ public class BuildBindingsSequenceGenesis {
 		vtlExecute.convertToVtlDataset(data, dataMode, vtlBindings);
 	}
 
-	private void addVariablesToGroupInstance(List<VariableModel> surveyUnit, GroupInstance answers, SurveyRawData data, QuestionnaireData questionnaire) {
-		for (VariableModel collectedVariables : surveyUnit) {
-			if (collectedVariables.getScope().equals(Constants.ROOT_GROUP_NAME)) {
-				answers.putValue(collectedVariables.getVarId(), collectedVariables.getValue());
-			} else {
-				addGroupVariables(data.getMetadataModel(), collectedVariables.getVarId(), questionnaire.getAnswers(), collectedVariables);
+	private void addVariablesToGroupInstance(List<VariableModel> variables,
+											 GroupInstance groupInstance, //Answers from questionnaireData
+											 SurveyRawData data,
+											 QuestionnaireData questionnaire
+	) {
+		for (VariableModel variable : variables) {
+			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
+				groupInstance.putValue(variable.getVarId(), variable.getValue());
+				if (kraftwerkExecutionContext.isAddStates()){
+					groupInstance.putValue(
+							variable.getVarId() + Constants.VARIABLE_STATE_SUFFIX_NAME,
+							getVariableStateString(variable)
+					);
+				}
+				continue;
+			}
+			addGroupVariables(data.getMetadataModel(), variable, questionnaire.getAnswers());
+		}
+	}
+
+	private void addGroupVariables(MetadataModel metadataModel,
+								   VariableModel variableModel,
+								   GroupInstance groupInstance
+	) {
+		String variableName = variableModel.getVarId();
+		if (metadataModel.getVariables().hasVariable(variableName)) {
+			String groupName = metadataModel.getVariables().getVariable(variableName).getGroupName();
+			GroupData groupData = groupInstance.getSubGroup(groupName);
+			groupData.putValue(
+					variableModel.getValue(),
+					variableName,
+					variableModel.getIteration() - 1
+			);
+			if (kraftwerkExecutionContext.isAddStates()){
+				groupData.putValue(
+						getVariableStateString(variableModel),
+						variableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
+						variableModel.getIteration() - 1
+				);
 			}
 		}
+	}
+
+	/**
+	 * Defines what to write in the variable state field
+	 */
+	private String getVariableStateString(VariableModel variableModel) {
+		return variableModel.getState() == null ? ""
+				: variableModel.getState().toString();
+	}
+
+	/**
+	 * TO USE ONLY IF ADDSTATES IS TRUE
+	 * Goes through all variables of a metadataModel to add an empty string to the variable state field
+	 * of SurveyUnitUpdateLatest variables
+	 */
+	private void fillNullVariableStates(GroupInstance rootGroupInstance, MetadataModel metadataModel) {
+		fillNullVariableStatesForGroupInstance(rootGroupInstance, metadataModel);
+		for(String metadataModelSubGroupName : metadataModel.getSubGroupNames()){
+			GroupData subGroup = rootGroupInstance.getSubGroup(metadataModelSubGroupName);
+			//Will create one instance if not exists
+			ensureOneInstanceExists(subGroup);
+			for(GroupInstance subGroupInstance : subGroup.getInstances()) {
+				fillNullVariableStatesForGroupInstance(
+						subGroupInstance,
+						metadataModel
+				);
+			}
+		}
+	}
+
+	private static void ensureOneInstanceExists(GroupData group) {
+		group.getInstance(0);
+	}
+
+	private void fillNullVariableStatesForGroupInstance(GroupInstance groupInstance,
+														MetadataModel metadataModel) {
+
+		Map<String, Variable> modelVariables =
+				metadataModel.getVariables().getVariables();
+
+		Set<String> existingNames = groupInstance.getVariableNames();
+		String groupName = groupInstance.getGroupName();
+
+		modelVariables.entrySet().stream()
+				.filter(entry -> groupName.equals(entry.getValue().getGroupName()))
+				.filter(entry -> !existingNames.contains(entry.getKey()))
+				.forEach(entry ->
+						groupInstance.putValue(
+								entry.getKey() + Constants.VARIABLE_STATE_SUFFIX_NAME,
+								""
+						)
+				);
 	}
 
 	private void parseParadata(String dataMode, SurveyRawData data, Path specsDirectory, FileUtilsInterface fileUtilsInterface) throws NullException {
@@ -84,14 +185,6 @@ public class BuildBindingsSequenceGenesis {
 			ParadataParser paraDataParser = new ParadataParser(fileUtilsInterface);
 			Paradata paraData = new Paradata(paraDataPath);
 			paraDataParser.parseParadata(paraData, data);
-		}
-	}
-
-	private void addGroupVariables(MetadataModel models, String variableName, GroupInstance answers, VariableModel variableModel) {
-		if (models.getVariables().hasVariable(variableName)) {
-			String groupName = models.getVariables().getVariable(variableName).getGroupName();
-			GroupData groupData = answers.getSubGroup(groupName);
-			groupData.putValue(variableModel.getValue(), variableName, variableModel.getIteration() - 1);
 		}
 	}
 

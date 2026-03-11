@@ -30,7 +30,7 @@ class VtlBindingsTest {
 	private VtlBindings vtlBindings;
 	private KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 
 	Dataset ds1 = new InMemoryDataset(
 			List.of(

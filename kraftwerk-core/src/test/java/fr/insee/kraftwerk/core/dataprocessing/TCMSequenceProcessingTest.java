@@ -82,7 +82,13 @@ class TCMSequenceProcessingTest {
         String expectedScript = expectedScriptBuilder.toString();
 
         //WHEN
-        TCMSequencesProcessing processing = new TCMSequencesProcessing(vtlBindings, metadataModel, Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString(), fileUtilsInterface);
+        TCMSequencesProcessing processing = new TCMSequencesProcessing(
+                vtlBindings,
+                metadataModel,
+                Path.of(TestConstants.UNIT_TESTS_DIRECTORY).resolve("vtl").toString(),
+                fileUtilsInterface,
+                kraftwerkExecutionContext
+        );
         String scriptString = processing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
 
         //THEN

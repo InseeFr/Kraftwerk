@@ -29,9 +29,12 @@ public abstract class DataProcessing {
 
     FileUtilsInterface fileUtilsInterface;
 
-    protected DataProcessing(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface){
+    protected DataProcessing(VtlBindings vtlBindings,
+                             FileUtilsInterface fileUtilsInterface,
+                             KraftwerkExecutionContext kraftwerkExecutionContext
+    ){
         this.vtlBindings = vtlBindings;
-        vtlExecute = new VtlExecute(fileUtilsInterface);
+        vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
         this.fileUtilsInterface = fileUtilsInterface;
     }
 

@@ -115,27 +115,31 @@ class KraftwerkBatchTest {
     @Test
     void main_service_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
-        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi"));
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "addState"));
         when(args.getOptionValues("service")).thenReturn(List.of("MAIN"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("addState")).thenReturn(List.of("false"));
 
         kraftwerkBatch.run(args);
 
         verify(mainService, atLeastOnce()).mainService(
                 any(),
                 anyBoolean(),
-                eq(false));
+                eq(false),
+                eq(false)
+        );
         verifyNoInteractions(reportingDataService);
     }
 
     @Test
     void main_service_genesis_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
-        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi"));
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
         when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
 
         kraftwerkBatch.run(args);
 
@@ -143,7 +147,8 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 anyInt(),
-                eq(false)
+                eq(false),
+                eq(true)
         );
         verifyNoInteractions(reportingDataService);
     }
@@ -162,7 +167,9 @@ class KraftwerkBatchTest {
         verify(mainService, atLeastOnce()).mainService(
                 any(),
                 anyBoolean(),
-                eq(true)
+                eq(true),
+                eq(false)
+
         );
         verifyNoInteractions(reportingDataService);
     }
@@ -182,7 +189,8 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 anyInt(),
-                eq(true)
+                eq(true),
+                eq(false)
         );
         verifyNoInteractions(reportingDataService);
     }
@@ -190,10 +198,11 @@ class KraftwerkBatchTest {
     @Test
     void json_service_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
-        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi"));
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
         when(args.getOptionValues("service")).thenReturn(List.of("JSON"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
 
         kraftwerkBatch.run(args);
 
@@ -201,7 +210,8 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 anyInt(),
-                eq(null)
+                eq(null),
+                eq(true)
         );
         verifyNoInteractions(reportingDataService);
     }
@@ -221,7 +231,8 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 anyInt(),
-                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0))
+                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0)),
+                eq(false)
         );
         verifyNoInteractions(reportingDataService);
     }
@@ -254,6 +265,7 @@ class KraftwerkBatchTest {
         verify(mainService, atLeastOnce()).mainFileByFile(
                 any(),
                 anyBoolean(),
+                eq(false),
                 eq(false)
         );
         verifyNoInteractions(reportingDataService);
@@ -274,7 +286,8 @@ class KraftwerkBatchTest {
         verify(mainService, atLeastOnce()).mainFileByFile(
                 any(),
                 anyBoolean(),
-                eq(true)
+                eq(true),
+                eq(false)
         );
         verifyNoInteractions(reportingDataService);
     }

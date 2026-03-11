@@ -1,4 +1,16 @@
 # Changelog
+## 3.12.1 [2026-03-05]
+### Fixed
+- addState crash fix 
+
+## 3.12.0 [2026-03-05]
+### Added
+- Variable states from Genesis in exports if addStates is true
+### Changed
+- Java 21 -> 25
+
+### Updated
+- BPM 1.1.0
 ## 3.11.1 [2026-01-13]
 ### Fixed
 - Link variables

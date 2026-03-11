@@ -17,8 +17,11 @@ import static org.junit.Assert.assertEquals;
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
 	KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+	VtlExecute vtlExecute = new VtlExecute(
+			new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), kraftwerkExecutionContext
+	);
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() {
