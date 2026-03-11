@@ -30,6 +30,7 @@ import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -403,6 +404,42 @@ class VtlJsonDatasetWriterTest {
 		// THEN
 		JSONArray row = (JSONArray) dataPoints.getFirst();
 		assertThat(row).contains("hello").doesNotContain("ghost"); // la valeur inconnue ne doit pas apparaître
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnTrueForTrueCompatibleValues() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "true")).isEqualTo("true");
+		assertThat(method.invoke(null, "1")).isEqualTo("true");
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnFalseForFalseCompatibleValues() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "false")).isEqualTo("false");
+		assertThat(method.invoke(null, "0")).isEqualTo("false");
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnNullForUnrecognizedValue() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "yes")).isNull();
+		assertThat(method.invoke(null, "oui")).isNull();
+		assertThat(method.invoke(null, "")).isNull();
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnNullForNullInput() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, (Object) null)).isNull();
 	}
 
 	@AfterAll
