@@ -167,7 +167,7 @@ public class VtlJsonDatasetWriter {
 					dataStructure,
 					variableNumber
 			);
-			if(kraftwerkExecutionContext.isAddStates()){
+			if(kraftwerkExecutionContext.isAddStates() && !variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)){
 				addVariableStateFieldToStructure(variable, dataStructure, variableNumber);
 				variableNumber++;
 			}
