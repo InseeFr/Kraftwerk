@@ -319,6 +319,92 @@ class VtlJsonDatasetWriterTest {
 		assertThat(VtlJsonDatasetWriter.convertToVtlType(variableType)).isEqualTo(variableType.getVtlType());
 	}
 
+	@Test
+	@SneakyThrows
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldFillRowWithVariableValues(){
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.STRING));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		// Build questionnaire data
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-001");
+		questionnaireData.getAnswers().putValue("VAR1", "foo");
+		questionnaireData.getAnswers().putValue("VAR2", "bar");
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray(); // populate columnsMapping
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("foo", "bar");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldConvertBooleanValues() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("BOOL_VAR", metadataModel.getRootGroup(), VariableType.BOOLEAN));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-002");
+		questionnaireData.getAnswers().putValue("BOOL_VAR", "1"); // valeur "1" doit devenir "true"
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray();
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("true").doesNotContain("1");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldLeaveNullForUnknownVariables() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("KNOWN_VAR", metadataModel.getRootGroup(), VariableType.STRING));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-003");
+		questionnaireData.getAnswers().putValue("KNOWN_VAR", "hello");
+		questionnaireData.getAnswers().putValue("UNKNOWN_VAR", "ghost"); // absent du metadataModel
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray();
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("hello").doesNotContain("ghost"); // la valeur inconnue ne doit pas apparaître
+	}
+
 	@AfterAll
 	@SneakyThrows
 	static void clean(){
