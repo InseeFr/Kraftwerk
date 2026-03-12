@@ -92,7 +92,9 @@ public class BuildBindingsSequenceGenesis {
 		for (VariableModel variable : variables) {
 			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
 				groupInstance.putValue(variable.getVarId(), variable.getValue());
-				if (kraftwerkExecutionContext.isAddStates()){
+				boolean isFilterResultOrMissing = variable.getVarId().startsWith(Constants.FILTER_RESULT_PREFIX)
+						|| variable.getVarId().endsWith(Constants.MISSING_SUFFIX);
+				if (kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing){
 					groupInstance.putValue(
 							variable.getVarId() + Constants.VARIABLE_STATE_SUFFIX_NAME,
 							getVariableStateString(variable)
@@ -117,7 +119,9 @@ public class BuildBindingsSequenceGenesis {
 					variableName,
 					variableModel.getIteration() - 1
 			);
-			if (kraftwerkExecutionContext.isAddStates()){
+			boolean isFilterResultOrMissing = variableName.startsWith(Constants.FILTER_RESULT_PREFIX)
+					|| variableName.endsWith(Constants.MISSING_SUFFIX);
+			if (kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing){
 				groupData.putValue(
 						getVariableStateString(variableModel),
 						variableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
@@ -171,6 +175,8 @@ public class BuildBindingsSequenceGenesis {
 		modelVariables.entrySet().stream()
 				.filter(entry -> groupName.equals(entry.getValue().getGroupName()))
 				.filter(entry -> !existingNames.contains(entry.getKey()))
+				.filter(entry -> !entry.getKey().startsWith(Constants.FILTER_RESULT_PREFIX)
+						&& !entry.getKey().endsWith(Constants.MISSING_SUFFIX))
 				.forEach(entry ->
 						groupInstance.putValue(
 								entry.getKey() + Constants.VARIABLE_STATE_SUFFIX_NAME,
