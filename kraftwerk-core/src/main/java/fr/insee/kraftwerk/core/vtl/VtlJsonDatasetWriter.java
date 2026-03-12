@@ -160,7 +160,9 @@ public class VtlJsonDatasetWriter {
 	private void addVariablesToDataStructure(JSONArray dataStructure, Integer variableNumber) {
 		List<String> variableNames = new ArrayList<>(metadataModel.getVariables().getVariableNames());
 		for (String variableName : variableNames) {
-			if(variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)){
+			if(variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)
+				&& !variableName.equals(Constants.LAST_STATE_NAME)
+			){
 				continue;
 			}
 			Variable variable = metadataModel.getVariables().getVariable(variableName);
@@ -299,7 +301,7 @@ public class VtlJsonDatasetWriter {
 		for (String variableName : groupInstance.getVariableNames()) {
 			if (columnsMapping.get(variableName) == null) {
 				log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
-				return;
+				continue;
 			}
 			String value = groupInstance.getValue(variableName);
 			Set<String> rootLevelVariables = Set.of(
