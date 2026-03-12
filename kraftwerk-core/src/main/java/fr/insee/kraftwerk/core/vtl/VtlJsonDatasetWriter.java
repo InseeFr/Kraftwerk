@@ -69,6 +69,7 @@ public class VtlJsonDatasetWriter {
 		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
+	//TODO Remove JSON temp file writing (not cloud native)
 	/**
 	 * Write the given survey data in a temporary JSON file '[datasetName].json'.
 	 *
