@@ -26,7 +26,7 @@ public class InMemoryJobStore {
         jobs.computeIfPresent(jobId, (id, job) ->
                 new JobExecution(
                         id,
-                        JobStatus.SUCCESS,
+                        JobStatus.DONE,
                         null,
                         job.startedAt(),
                         Instant.now()

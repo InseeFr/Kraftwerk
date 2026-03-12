@@ -5,9 +5,11 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
+import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
 import fr.insee.kraftwerk.api.services.async.MainAsyncService;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
@@ -29,6 +31,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,15 +51,17 @@ public class MainService extends KraftwerkService {
     MinioClient minioClient;
     VaultConfig vaultConfig;
     boolean useMinio;
+    InMemoryExportJobStore exportJobStore;
 
 
     @Autowired
-    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env) {
+    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore) {
         super(configProperties, minioConfig);
         this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
         this.vaultConfig = vaultConfig;
+        this.exportJobStore = exportJobStore;
 
         useMinio = false;
         if(minioConfig == null){
@@ -179,6 +184,7 @@ public class MainService extends KraftwerkService {
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         String jobId = UUID.randomUUID().toString();
+        exportJobStore.start(jobId);
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
                 withEncryption,
@@ -187,6 +193,20 @@ public class MainService extends KraftwerkService {
         );
         mainAsyncService.runWithGenesisByQuestionnaire(jobId,fileUtilsInterface, mpGenesis, questionnaireModelId, withDDI, withEncryption, batchSize, dataMode);
         return ResponseEntity.accepted().body(jobId);
+    }
+
+    @GetMapping("/jobs/{jobId}")
+    public ResponseEntity<ExportJobResultDto> getJobStatus(@PathVariable String jobId) throws KraftwerkException {
+
+        try {
+            UUID.fromString(jobId);
+        } catch (IllegalArgumentException e) {
+            throw new KraftwerkException(400, "unknown format");
+        }
+
+        ExportJobResultDto job = exportJobStore.get(jobId)
+                .orElseThrow(() -> new KraftwerkException(404, "this uuid is unknown"));
+        return ResponseEntity.ok(job);
     }
 
     /**
