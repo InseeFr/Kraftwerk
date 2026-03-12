@@ -119,7 +119,7 @@ public class VtlJsonDatasetWriter {
 		variableNumber = addGroupIdentifiers(dataStructure, variableNumber);
 
 		// Variables
-		addVariables(dataStructure, variableNumber);
+		addVariablesToDataStructure(dataStructure, variableNumber);
 
 		return dataStructure;
 	}
@@ -157,9 +157,12 @@ public class VtlJsonDatasetWriter {
 	 * Adds the variables to the dataStructure
 	 * @param variableNumber the beginning index
 	 */
-	private void addVariables(JSONArray dataStructure, Integer variableNumber) {
+	private void addVariablesToDataStructure(JSONArray dataStructure, Integer variableNumber) {
 		List<String> variableNames = new ArrayList<>(metadataModel.getVariables().getVariableNames());
 		for (String variableName : variableNames) {
+			if(variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)){
+				continue;
+			}
 			Variable variable = metadataModel.getVariables().getVariable(variableName);
 			variableNumber = addToDataStructure(
 					variableName,
@@ -168,7 +171,7 @@ public class VtlJsonDatasetWriter {
 					dataStructure,
 					variableNumber
 			);
-			if(kraftwerkExecutionContext.isAddStates() && !variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)){
+			if(kraftwerkExecutionContext.isAddStates()){
 				addVariableStateFieldToStructure(variable, dataStructure, variableNumber);
 				variableNumber++;
 			}
@@ -176,7 +179,7 @@ public class VtlJsonDatasetWriter {
 	}
 
 	/**
-	 * Adds a new object in the VTL dataStructure
+	 * Adds a new object in the VTL dataStructure and columnsMapping
 	 * @param name name of the object
 	 * @param type VTL type (cf. VariableType VTL names)
 	 * @param role role of the object (IDENTIFIER or MEASURE)
@@ -209,22 +212,23 @@ public class VtlJsonDatasetWriter {
 	private void addVariableStateFieldToStructure(Variable variable, JSONArray dataStructure, int variableNumber) {
 		JSONObject jsonVtlVariable = new JSONObject();
 		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
-        if (metadataModel.getVariables().getVariable(variableStateFieldName) != null) {
-            return;
-        }
-        if (columnsMapping.containsKey(variableStateFieldName)) {
-            return;
-        }
 		jsonVtlVariable.put(NAME, variableStateFieldName);
 		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
 		jsonVtlVariable.put(ROLE, MEASURE);
+
 		dataStructure.add(jsonVtlVariable);
-		columnsMapping.put(variableStateFieldName, variableNumber);
-		metadataModel.getVariables().putVariable(new Variable(
-				variableStateFieldName,
-				variable.getGroup(),
-				VariableType.STRING
-		));
+
+		if (!columnsMapping.containsKey(variableStateFieldName)) {
+			columnsMapping.put(variableStateFieldName, variableNumber);
+		}
+
+		if (metadataModel.getVariables().getVariable(variableStateFieldName) == null) {
+			metadataModel.getVariables().putVariable(new Variable(
+					variableStateFieldName,
+					variable.getGroup(),
+					VariableType.STRING
+			));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -291,19 +295,23 @@ public class VtlJsonDatasetWriter {
 
 	private void addValuesToRow(GroupInstance groupInstance, String[] rowValues) {
 		for (String variableName : groupInstance.getVariableNames()) {
-			if (columnsMapping.get(variableName) != null) {
-				String value = groupInstance.getValue(variableName);
-				if ( !variableName.equals(Constants.SURVEY_UNIT_IDENTIFIER_NAME)
-						&& !variableName.equals(Constants.VALIDATION_DATE_NAME)
-						&& !variableName.equals(Constants.QUESTIONNAIRE_STATE_NAME)
-						&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
-				) {
-					value = convertBooleanValue(value);
-				}
-				rowValues[columnsMapping.get(variableName)] = value;
-			} else {
+			if (columnsMapping.get(variableName) == null) {
 				log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
+				return;
 			}
+			String value = groupInstance.getValue(variableName);
+			Set<String> rootLevelVariables = Set.of(
+					Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+					Constants.VALIDATION_DATE_NAME,
+					Constants.QUESTIONNAIRE_STATE_NAME
+			);
+			if (
+					!rootLevelVariables.contains(variableName)
+					&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
+			) {
+				value = convertBooleanValue(value);
+			}
+			rowValues[columnsMapping.get(variableName)] = value;
 		}
 	}
 
@@ -333,7 +341,7 @@ public class VtlJsonDatasetWriter {
 
     private int datasetWidth() {
         return columnsMapping.values().stream()
-                .mapToInt(Integer::intValue)
+				.mapToInt(Integer::intValue)
                 .max()
                 .orElse(-1) + 1;
     }
