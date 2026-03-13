@@ -1,5 +1,5 @@
 # Changelog
-## 3.12.2 [TODO]
+## 3.12.2 [2026-03-13]
 ### Changed
 - Max allocated JVM memory to 2GB
 ### Fixed
