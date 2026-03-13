@@ -261,14 +261,6 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {
         Path outDirectory = FileUtilsInterface.transformToOut(specsDirectory,kraftwerkExecutionContext.getExecutionDateTime());
-        try {
-            if (Files.notExists(outDirectory)) {
-                Files.createDirectories(outDirectory);
-                log.info("Created folder: {}", outDirectory);
-            }
-        } catch (IOException e) {
-            log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
-        }
         Path outputPath = outDirectory.resolve(filename);
         kraftwerkExecutionContext.setOutDirectory(outDirectory);
         fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
