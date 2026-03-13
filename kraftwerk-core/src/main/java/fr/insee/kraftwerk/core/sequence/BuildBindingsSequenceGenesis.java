@@ -92,8 +92,7 @@ public class BuildBindingsSequenceGenesis {
 		for (VariableModel variable : variables) {
 			if (variable.getScope().equals(Constants.ROOT_GROUP_NAME)) {
 				groupInstance.putValue(variable.getVarId(), variable.getValue());
-				boolean isFilterResultOrMissing = variable.getVarId().startsWith(Constants.FILTER_RESULT_PREFIX)
-						|| variable.getVarId().endsWith(Constants.MISSING_SUFFIX);
+				boolean isFilterResultOrMissing = isFilterResultOrMissing(variable.getVarId());
 				if (kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing){
 					groupInstance.putValue(
 							variable.getVarId() + Constants.VARIABLE_STATE_SUFFIX_NAME,
@@ -119,9 +118,7 @@ public class BuildBindingsSequenceGenesis {
 					variableName,
 					variableModel.getIteration() - 1
 			);
-			boolean isFilterResultOrMissing = variableName.startsWith(Constants.FILTER_RESULT_PREFIX)
-					|| variableName.endsWith(Constants.MISSING_SUFFIX);
-			if (kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing){
+			if (kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing(variableName)){
 				groupData.putValue(
 						getVariableStateString(variableModel),
 						variableName + Constants.VARIABLE_STATE_SUFFIX_NAME,
@@ -129,6 +126,11 @@ public class BuildBindingsSequenceGenesis {
 				);
 			}
 		}
+	}
+
+	private static boolean isFilterResultOrMissing(String variableName) {
+		return variableName.startsWith(Constants.FILTER_RESULT_PREFIX)
+				|| variableName.endsWith(Constants.MISSING_SUFFIX);
 	}
 
 	/**
@@ -175,8 +177,7 @@ public class BuildBindingsSequenceGenesis {
 		modelVariables.entrySet().stream()
 				.filter(entry -> groupName.equals(entry.getValue().getGroupName()))
 				.filter(entry -> !existingNames.contains(entry.getKey()))
-				.filter(entry -> !entry.getKey().startsWith(Constants.FILTER_RESULT_PREFIX)
-						&& !entry.getKey().endsWith(Constants.MISSING_SUFFIX))
+				.filter(entry -> !isFilterResultOrMissing(entry.getKey()))
 				.forEach(entry ->
 						groupInstance.putValue(
 								entry.getKey() + Constants.VARIABLE_STATE_SUFFIX_NAME,

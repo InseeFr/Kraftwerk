@@ -12,11 +12,10 @@ import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -82,23 +81,21 @@ public class VtlJsonDatasetWriter {
 			datasetFile.deleteOnExit();
 			String tempPath = datasetFile.getAbsolutePath();
 
-			try (BufferedWriter writer = Files.newBufferedWriter(
+			Map<String,Object> mapVtlDataset = new HashMap<>();
+
+			// dataStructure
+			mapVtlDataset.put("dataStructure", getDataStructureJSONArray());
+
+			// dataPoints
+			mapVtlDataset.put("dataPoints", getDataPointsJSONArray());
+			JSONObject jsonVtlDataset = new JSONObject(mapVtlDataset);
+
+			try (Writer writer = Files.newBufferedWriter(
 					Paths.get(tempPath),
 					StandardCharsets.UTF_8,
 					StandardOpenOption.TRUNCATE_EXISTING)) {
 
-				writer.write("{");
-
-				// dataStructure
-				writer.write("\"dataStructure\":");
-				JSONValue.writeJSONString(getDataStructureJSONArray(), writer);
-				writer.write(",");
-
-				// dataPoints
-				writer.write("\"dataPoints\":");
-				JSONValue.writeJSONString(getDataPointsJSONArray(), writer);
-
-				writer.write("}");
+				jsonVtlDataset.writeJSONString(writer);
 			}
 			return tempPath;
 		} catch (IOException e) {
@@ -222,9 +219,7 @@ public class VtlJsonDatasetWriter {
 
 		dataStructure.add(jsonVtlVariable);
 
-		if (!columnsMapping.containsKey(variableStateFieldName)) {
-			columnsMapping.put(variableStateFieldName, variableNumber);
-		}
+		columnsMapping.putIfAbsent(variableStateFieldName, variableNumber);
 
 		if (metadataModel.getVariables().getVariable(variableStateFieldName) == null) {
 			metadataModel.getVariables().putVariable(new Variable(
@@ -300,7 +295,7 @@ public class VtlJsonDatasetWriter {
 	private void addValuesToRow(GroupInstance groupInstance, String[] rowValues) {
 		for (String variableName : groupInstance.getVariableNames()) {
 			if (columnsMapping.get(variableName) == null) {
-				log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
+				log.debug("Variable named \"{}\" found in data object is unknown.", variableName);
 				continue;
 			}
 			String value = groupInstance.getValue(variableName);
@@ -327,7 +322,7 @@ public class VtlJsonDatasetWriter {
 		return variableType.getVtlType();
 	}
 
-	/** Compatible boolean values for "true */
+	/** Compatible boolean values for "true" */
 	private static final Set<String> trueValues = Set.of("true", "1");
 	/** Compatible boolean values for "false" */
 	private static final Set<String> falseValues = Set.of("false", "0");
