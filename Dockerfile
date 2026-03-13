@@ -5,7 +5,8 @@ COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-
 
 ENV JAVA_TOOL_OPTIONS_DEFAULT \
     -XX:MaxRAMPercentage=75 \
-    -XX:+UseZGC
+    -XX:+UseZGC \
+    -Xmx2g
 
 EXPOSE 8080
 
