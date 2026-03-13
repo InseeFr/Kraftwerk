@@ -46,7 +46,8 @@ public class VtlExecute {
         this.fileUtilsInterface = fileUtilsInterface;
         this.kraftwerkExecutionContext = kraftwerkExecutionContext;
     }
-    
+
+    //TODO Remove JSON temp file writing (not cloud native)
     /**
      * Transform the given data object into a Trevas VTL dataset, and put it in the bindings.
      * The variables map of the given data object is also stored and can later be get using the method
@@ -91,7 +92,7 @@ public class VtlExecute {
             bindings.put(bindingName, vtlDataset);
         }
         catch(IOException e){
-            log.error("Unable to connect dataset from url {}: {}", url, e);
+            log.error("Unable to connect dataset from url {}: {} caused by {}", url, e, e.getCause().toString());
         }
     }
 

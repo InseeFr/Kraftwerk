@@ -4,213 +4,498 @@ import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.bpm.metadata.model.VariablesMap;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.outputs.scripts.ImportScriptTest;
+import fr.insee.kraftwerk.core.rawdata.GroupData;
+import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
-import fr.insee.kraftwerk.core.rawdata.SurveyRawDataTest;
-import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.vtl.model.Dataset;
-import org.apache.commons.lang3.tuple.Pair;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class VtlJsonDatasetWriterTest {
 
-	private VtlBindings vtlBindings;
+	@Mock private SurveyRawData surveyData;
+	@Mock private MetadataModel metadataModel;
+	@Mock private VariablesMap variablesMap;
+	@Mock private KraftwerkExecutionContext context;
 
-	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, TestConstants.getKraftwerkExecutionContext());
+	private VtlJsonDatasetWriter writer;
+
+	private static final List<Path> tempFiles = new ArrayList<>();
 
 	@BeforeEach
-	void initVtlBindings() {
-		vtlBindings = new VtlBindings();
+	void setUp() {
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(metadataModel.getVariables()).thenReturn(variablesMap);
+		when(metadataModel.getSubGroupNames()).thenReturn(Collections.emptyList());
+		when(variablesMap.getVariableNames()).thenReturn(new HashSet<>());
+		when(context.isAddStates()).thenReturn(false);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test-dataset", context);
 	}
 
 	@Test
-	void testConvertToVtlDataset_rootOnly() {
-		//
-		MetadataModel variablesMap = ImportScriptTest.createVariablesMap_rootOnly();
-		//
-		SurveyRawData testData = SurveyRawDataTest.createFakeData_rootOnly();
-		//
-		vtlExecute.convertToVtlDataset(testData, "TEST", vtlBindings);
-		Dataset ds = vtlBindings.getDataset("TEST");
+	void writeVtlJsonDataset_shouldCreateFileAndReturnItsPath_whenDataIsEmpty() {
+		// GIVEN
+		when(surveyData.getQuestionnaires()).thenReturn(Collections.emptyList());
 
-		//
-		assertNotNull(ds);
-		//
-		assertEquals(6, ds.getDataStructure().keySet().size());
-		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
-		for(String variableName : variablesMap.getVariables().getVariableNames()) {
-			String fullyQualifiedName = variablesMap.getFullyQualifiedName(variableName);
-			assertTrue(ds.getDataStructure().containsKey(fullyQualifiedName));
-			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(fullyQualifiedName).getRole());
+		// WHEN
+		String path = writer.writeVtlJsonDataset();
+		if (path != null) tempFiles.add(Path.of(path));
+
+		// THEN
+		assertThat(path).isNotNull().endsWith(".json");
+		assertThat(Files.exists(Path.of(path))).isTrue();
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void writeVtlJsonDataset_shouldProduceWellFormedJson_withBothTopLevelKeys() throws IOException, ParseException {
+		// GIVEN
+		when(surveyData.getQuestionnaires()).thenReturn(Collections.emptyList());
+
+		// WHEN
+		String path = writer.writeVtlJsonDataset();
+		if (path != null) tempFiles.add(Path.of(path));
+
+		// THEN
+		Assertions.assertThat(path).isNotNull();
+		String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
+		JSONObject parsed = (JSONObject) new JSONParser().parse(content);
+
+		assertThat(parsed).containsKeys("dataStructure", "dataPoints");
+	}
+
+	@Test
+	void getDataStructure_JSONArray_shouldAlwaysContainFourRootIdentifiers() {
+		// WHEN
+		JSONArray structure = writer.getDataStructureJSONArray();
+
+		// THEN
+		List<String> names = extractNames(structure);
+		assertThat(names).contains(
+				Constants.ROOT_IDENTIFIER_NAME,
+				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				Constants.VALIDATION_DATE_NAME,
+				Constants.QUESTIONNAIRE_STATE_NAME
+		);
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void getDataStructure_JSONArray_shouldContainGroupIdentifier_whenSubGroupExists() {
+		// GIVEN
+		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
+
+		// WHEN
+		JSONArray structure = writer.getDataStructureJSONArray();
+
+		// THEN
+		assertThat(extractNames(structure)).contains("LOOP1");
+		assertThat(findEntry(structure, "LOOP1")).containsEntry("role", "IDENTIFIER");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void getDataStructure_JSONArray_shouldContainVariable_withCorrectTypeAndRole() {
+		// GIVEN
+		Variable variable = new Variable("MY_VAR", mock(Group.class), VariableType.STRING);
+		when(variablesMap.getVariableNames()).thenReturn(Set.of("MY_VAR"));
+		when(variablesMap.getVariable("MY_VAR")).thenReturn(variable);
+
+		// WHEN
+		JSONArray structure = writer.getDataStructureJSONArray();
+
+		// THEN
+		JSONObject entry = findEntry(structure, "MY_VAR");
+		assertThat(entry)
+				.containsEntry("type","STRING")
+				.containsEntry("role", "MEASURE");
+	}
+
+	@Test
+	void getDataStructure_JSONArray_shouldAddStateField_whenAddStatesIsEnabled() {
+		// GIVEN
+		when(context.isAddStates()).thenReturn(true);
+		Variable variable = new Variable("MY_VAR", mock(Group.class), VariableType.STRING);
+		when(variablesMap.getVariableNames()).thenReturn(Set.of("MY_VAR"));
+		when(variablesMap.getVariable("MY_VAR")).thenReturn(variable);
+		String stateFieldName = "MY_VAR" + Constants.VARIABLE_STATE_SUFFIX_NAME;
+		when(variablesMap.getVariable(stateFieldName)).thenReturn(null);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+
+		// WHEN
+		JSONArray structure = writer.getDataStructureJSONArray();
+
+		// THEN
+		assertThat(extractNames(structure)).contains(stateFieldName);
+	}
+
+	@Test
+	@SneakyThrows
+	void columnsMapping_shouldContainAllVariableNames_withCorrectIndices() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+
+		// Add two variables to the metadata model
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.INTEGER));
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+
+		when(context.isAddStates()).thenReturn(false);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test-dataset", context);
+
+		// WHEN
+		writer.getDataStructureJSONArray();
+
+		// THEN
+		// Access the private columnsMapping field via reflection
+		Field field = VtlJsonDatasetWriter.class.getDeclaredField("columnsMapping");
+		field.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		Map<String, Integer> columnsMapping = (Map<String, Integer>) field.get(writer);
+
+		// Root identifiers should be mapped
+		assertThat(columnsMapping).containsKeys(
+				Constants.ROOT_IDENTIFIER_NAME,
+				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				Constants.VALIDATION_DATE_NAME,
+				Constants.QUESTIONNAIRE_STATE_NAME,
+				"VAR1", "VAR2"
+		)
+		// Each variable should have a unique column index
+		.doesNotContainEntry("VAR1", columnsMapping.get("VAR2"));
+	}
+
+	@Test
+	@SneakyThrows
+	void getDataStructure_JSONArray_columnsMapping_shouldNotContainDuplicateIndexes() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+
+		// Add two variables to the metadata model
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.INTEGER));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test-dataset", context);
+
+		//WHEN
+		writer.getDataStructureJSONArray();
+
+		//THEN
+		Field field = VtlJsonDatasetWriter.class.getDeclaredField("columnsMapping");
+		field.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		Map<String, Integer> columnsMapping = (Map<String, Integer>) field.get(writer);
+		// All column indexes should be distinct
+		long distinctCount = columnsMapping.values().stream().distinct().count();
+		assertThat(distinctCount)
+				.as("All indexes must be unique")
+				.isEqualTo(columnsMapping.size());
+	}
+
+	@Test
+	void getDataPoints_JSONArray_shouldBeEmpty_whenNoQuestionnaires() {
+		// GIVEN
+		when(surveyData.getQuestionnaires()).thenReturn(Collections.emptyList());
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		assertThat(dataPoints).isEmpty();
+	}
+
+	@Test
+	void getDataPoints_JSONArray_shouldContainOneRow_perQuestionnaireWithoutSubGroups() {
+		// GIVEN
+		writer.getDataStructureJSONArray();
+		//3 answers
+		List<QuestionnaireData> questionnaires = java.util.stream.IntStream.range(0, 3)
+				.mapToObj(i -> {
+					GroupInstance root = mock(GroupInstance.class);
+					when(root.getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME)).thenReturn(null);
+					when(root.getValue(Constants.VALIDATION_DATE_NAME)).thenReturn(null);
+					when(root.getValue(Constants.QUESTIONNAIRE_STATE_NAME)).thenReturn(null);
+					when(root.hasSubGroups()).thenReturn(false);
+					when(root.getVariableNames()).thenReturn(new HashSet<>());
+
+					QuestionnaireData qd = mock(QuestionnaireData.class);
+					when(qd.getIdentifier()).thenReturn("ID_" + i);
+					when(qd.getAnswers()).thenReturn(root);
+					return qd;
+				})
+				.toList();
+		when(surveyData.getQuestionnaires()).thenReturn(questionnaires);
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		assertThat(dataPoints).hasSize(3);
+	}
+
+	@Test
+	void getDataPoints_JSONArray_shouldContainOneRowPerGroupInstance_whenSubGroupsExist() {
+		// GIVEN
+		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
+		writer.getDataStructureJSONArray();
+
+		QuestionnaireData qd = buildQuestionnaireWithSubGroup(2);
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(qd));
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		assertThat(dataPoints).hasSize(2);
+	}
+
+	@Test
+	void getDataPoints_JSONArray_shouldWriteSingleRow_whenSubGroupsAreEmpty() {
+		// GIVEN
+		when(metadataModel.getSubGroupNames()).thenReturn(List.of("LOOP1"));
+		writer.getDataStructureJSONArray();
+
+		QuestionnaireData qd = buildQuestionnaireWithSubGroup(0);
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(qd));
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		assertThat(dataPoints).hasSize(1);
+	}
+
+	@Test
+	void convertToVtlType_shouldReturnString_whenTypeIsNull() {
+		// WHEN + THEN
+		assertThat(VtlJsonDatasetWriter.convertToVtlType(null)).isEqualTo("STRING");
+	}
+
+	@ParameterizedTest
+	@EnumSource(VariableType.class)
+	void convertToVtlType_shouldReturnCorrectVtlType_forEachVariableType(VariableType variableType) {
+		// WHEN + THEN
+		assertThat(VtlJsonDatasetWriter.convertToVtlType(variableType)).isEqualTo(variableType.getVtlType());
+	}
+
+	@Test
+	@SneakyThrows
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldFillRowWithVariableValues(){
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("VAR1", metadataModel.getRootGroup(), VariableType.STRING));
+		metadataModel.getVariables().putVariable(new Variable("VAR2", metadataModel.getRootGroup(), VariableType.STRING));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		// Build questionnaire data
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-001");
+		questionnaireData.getAnswers().putValue("VAR1", "foo");
+		questionnaireData.getAnswers().putValue("VAR2", "bar");
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray(); // populate columnsMapping
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("foo", "bar");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldConvertBooleanValues() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("BOOL_VAR", metadataModel.getRootGroup(), VariableType.BOOLEAN));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-002");
+		questionnaireData.getAnswers().putValue("BOOL_VAR", "1"); // valeur "1" doit devenir "true"
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray();
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("true").doesNotContain("1");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void addValuesToRow_shouldLeaveNullForUnknownVariables() {
+		// GIVEN
+		metadataModel = new MetadataModel();
+		metadataModel.getVariables().putVariable(new Variable("KNOWN_VAR", metadataModel.getRootGroup(), VariableType.STRING));
+
+		when(surveyData.getMetadataModel()).thenReturn(metadataModel);
+		when(context.isAddStates()).thenReturn(false);
+
+		QuestionnaireData questionnaireData = new QuestionnaireData();
+		questionnaireData.setIdentifier("ID-003");
+		questionnaireData.getAnswers().putValue("KNOWN_VAR", "hello");
+		questionnaireData.getAnswers().putValue("UNKNOWN_VAR", "ghost"); // absent du metadataModel
+
+		when(surveyData.getQuestionnaires()).thenReturn(List.of(questionnaireData));
+
+		writer = new VtlJsonDatasetWriter(surveyData, "test", context);
+		writer.getDataStructureJSONArray();
+
+		// WHEN
+		JSONArray dataPoints = writer.getDataPointsJSONArray();
+
+		// THEN
+		JSONArray row = (JSONArray) dataPoints.getFirst();
+		assertThat(row).contains("hello").doesNotContain("ghost"); // la valeur inconnue ne doit pas apparaître
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnTrueForTrueCompatibleValues() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "true")).isEqualTo("true");
+		assertThat(method.invoke(null, "1")).isEqualTo("true");
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnFalseForFalseCompatibleValues() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "false")).isEqualTo("false");
+		assertThat(method.invoke(null, "0")).isEqualTo("false");
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnNullForUnrecognizedValue() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, "yes")).isNull();
+		assertThat(method.invoke(null, "oui")).isNull();
+		assertThat(method.invoke(null, "")).isNull();
+	}
+
+	@Test
+	void convertBooleanValue_shouldReturnNullForNullInput() throws Exception {
+		Method method = VtlJsonDatasetWriter.class.getDeclaredMethod("convertBooleanValue", String.class);
+		method.setAccessible(true);
+
+		assertThat(method.invoke(null, (Object) null)).isNull();
+	}
+
+	@AfterAll
+	@SneakyThrows
+	static void clean(){
+		for (Path path : tempFiles) {
+			Files.deleteIfExists(path);
 		}
-		//
-		assertEquals(2, ds.getDataPoints().size());
-		Set<String> expectedIdentifiers = Set.of("S0000001", "S0000002");
-		Set<String> dsIdentifiers = new HashSet<>();
-		ds.getDataPoints().forEach(
-				dataPoint -> dsIdentifiers.add( (String) dataPoint.get(Constants.ROOT_IDENTIFIER_NAME) )
-		);
-		assertEquals(expectedIdentifiers, dsIdentifiers);
-		Set<Double> expectedIncomes = Set.of(20000d, 30000d);
-		Set<Double> dsIncomes = new HashSet<>();
-		ds.getDataPoints().forEach(
-				dataPoint -> dsIncomes.add(
-						(Double) dataPoint.get(variablesMap.getFullyQualifiedName("HOUSEHOLD_INCOME")) )
-		);
-		assertEquals(expectedIncomes, dsIncomes);
 	}
 
-	@Test
-	void testConvertToVtlDataset_oneLevel() {
-		//
-		MetadataModel variablesMap = ImportScriptTest.createVariablesMap_oneLevel();
-		//
-		SurveyRawData testData = SurveyRawDataTest.createFakeData_oneLevel();
-		//
-		vtlExecute.convertToVtlDataset(testData, "TEST", vtlBindings);
-		Dataset ds = vtlBindings.getDataset("TEST");
 
-		//
-		assertNotNull(ds);
-		//
-		assertEquals(10, ds.getDataStructure().keySet().size());
-		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get(Constants.ROOT_IDENTIFIER_NAME).getRole());
-		assertEquals(Dataset.Role.IDENTIFIER, ds.getDataStructure().get("INDIVIDUALS_LOOP").getRole());
-		for(String variableName : variablesMap.getVariables().getVariableNames()) {
-			assertTrue(ds.getDataStructure().containsKey(variableName));
-			assertEquals(Dataset.Role.MEASURE, ds.getDataStructure().get(variableName).getRole());
+
+	// UTILS
+	@SuppressWarnings("unchecked")
+	private List<String> extractNames(JSONArray structure) {
+		return structure.stream()
+				.map(o -> ((JSONObject) o).get("name"))
+				.toList();
+	}
+
+	private JSONObject findEntry(JSONArray structure, String name) {
+		for (Object o : structure) {
+			if (o instanceof JSONObject entry && name.equals(entry.get("name"))) {
+				return entry;
+			}
 		}
-		//
-		assertEquals(4, ds.getDataPoints().size());
-		Set<String> expectedIdentifiers = Set.of("S0000001", "S0000002");
-		Set<String> dsIdentifiers = new HashSet<>();
-		ds.getDataPoints().forEach(
-				dataPoint -> dsIdentifiers.add( (String) dataPoint.get(Constants.ROOT_IDENTIFIER_NAME) )
-		);
-		assertEquals(expectedIdentifiers, dsIdentifiers);
-		Set<String> expectedFirstNames = Set.of("Homer", "Marge", "Santa's Little Helper", "Ned");
-		Set<String> dsFirstNames = new HashSet<>();
-		ds.getDataPoints().forEach(
-				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get("FIRST_NAME") )
-		);
-		assertEquals(expectedFirstNames, dsFirstNames);
+		throw new AssertionError("Entry not found in dataStructure: " + name);
 	}
 
-	/** In paper data, a single survey unit may be split into several questionnaires.
-	 * This method test if VTL conversion works well in that case. */
-	@Test
-	void convertToVtlDataset_withSplitQuestionnaires() {
-		//
-		SurveyRawData paperLikeData = new SurveyRawData();
-		//
-		MetadataModel variables = ImportScriptTest.createVariablesMap_oneLevel();
-		paperLikeData.setMetadataModel(variables);
+	private QuestionnaireData buildQuestionnaireWithSubGroup(int instanceCount) {
+		GroupInstance root = mock(GroupInstance.class);
+		when(root.getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME)).thenReturn(null);
+		when(root.getValue(Constants.VALIDATION_DATE_NAME)).thenReturn(null);
+		when(root.getValue(Constants.QUESTIONNAIRE_STATE_NAME)).thenReturn(null);
+		when(root.getVariableNames()).thenReturn(new HashSet<>());
+		when(root.hasSubGroups()).thenReturn(true);
+		when(root.getSubGroupNames()).thenReturn(Set.of("LOOP1"));
 
-		// First household but split in several questionnaires
-		for (int i=0; i<3; i++) {
-			QuestionnaireData q1 = new QuestionnaireData();
-			q1.setIdentifier("S0000001");
-			q1.putValue("20000", "HOUSEHOLD_INCOME");
-			q1.putValue("740 Evergreen Terrace", "ADDRESS");
-			String firstName = List.of("Homer", "Marge", "Santa's Little Helper").get(i);
-			q1.putValue(firstName, "FIRST_NAME", Pair.of("INDIVIDUALS_LOOP", i));
-			paperLikeData.addQuestionnaire(q1);
+		GroupData groupData = mock(GroupData.class);
+		Set<String> instanceIds = new HashSet<>(java.util.stream.IntStream.range(0, instanceCount)
+				.mapToObj(i -> "inst_" + i)
+				.toList());
+		when(groupData.getInstanceIds()).thenReturn(instanceIds);
+
+		for (String instanceId : instanceIds) {
+			GroupInstance groupInstance = mock(GroupInstance.class);
+			when(groupInstance.getId()).thenReturn(instanceId);
+			when(groupInstance.getVariableNames()).thenReturn(new HashSet<>());
+			when(groupData.getInstance(instanceId)).thenReturn(groupInstance);
 		}
 
-		// Second household with one individual
-		QuestionnaireData q2 = new QuestionnaireData();
-		q2.setIdentifier("S0000002");
-		q2.putValue("30000", "HOUSEHOLD_INCOME");
-		q2.putValue("742 Evergreen Terrace", "ADDRESS");
-		q2.putValue("Ned", "FIRST_NAME", Pair.of("INDIVIDUALS_LOOP", 0));
-		paperLikeData.addQuestionnaire(q2);
+		when(root.getSubGroup("LOOP1")).thenReturn(groupData);
 
-		//
-		vtlExecute.convertToVtlDataset(paperLikeData, "TEST", vtlBindings);
-		Dataset ds = vtlBindings.getDataset("TEST");
-
-		//
-		assertNotNull(ds);
-		//
-		assertEquals(4, ds.getDataPoints().size());
-		Set<String> expectedFirstNames = Set.of("Homer", "Marge", "Santa's Little Helper", "Ned");
-		Set<String> dsFirstNames = new HashSet<>();
-		ds.getDataPoints().forEach(
-				dataPoint -> dsFirstNames.add(
-						(String) dataPoint.get("FIRST_NAME") )
-		);
-		assertEquals(expectedFirstNames, dsFirstNames);
+		QuestionnaireData qd = mock(QuestionnaireData.class);
+		when(qd.getIdentifier()).thenReturn("ID001");
+		when(qd.getAnswers()).thenReturn(root);
+		return qd;
 	}
-
-	@Test
-	void convertSurveyRawDataWithEmptyGroup() {
-		//
-		SurveyRawData srd = new SurveyRawData();
-		//
-		MetadataModel metadataModel = new MetadataModel();
-		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
-		metadataModel.putGroup(new Group("DEPTH1", metadataModel.getRootGroup().getName()));
-		metadataModel.getVariables().putVariable(new Variable("FOO1", metadataModel.getGroup("DEPTH1"), VariableType.STRING));
-		srd.setMetadataModel(metadataModel);
-		//
-		QuestionnaireData questionnaire = new QuestionnaireData();
-		questionnaire.putValue("foo", "FOO");
-		questionnaire.getAnswers().getSubGroup("DEPTH1"); // this call adds a GroupInstance in the data object
-		srd.addQuestionnaire(questionnaire);
-
-		//
-		vtlExecute.convertToVtlDataset(srd, "test", vtlBindings);
-		Dataset dataset = vtlBindings.getDataset("test");
-
-		//
-		assertEquals(1, dataset.getDataPoints().size());
-	}
-
-	@Test
-	void convertSurveyRawDataWithTwoParallelGroups() {
-		//
-		SurveyRawData srd = new SurveyRawData();
-		//
-		MetadataModel metadataModel = new MetadataModel();
-		metadataModel.getVariables().putVariable(new Variable("FOO", metadataModel.getRootGroup(), VariableType.STRING));
-		metadataModel.putGroup(new Group("GROUP_A", metadataModel.getRootGroup().getName()));
-		metadataModel.putGroup(new Group("GROUP_B", metadataModel.getRootGroup().getName()));
-		metadataModel.getVariables().putVariable(new Variable("FOO_A", metadataModel.getGroup("GROUP_A"), VariableType.STRING));
-		metadataModel.getVariables().putVariable(new Variable("FOO_B", metadataModel.getGroup("GROUP_B"), VariableType.STRING));
-		srd.setMetadataModel(metadataModel);
-		//
-		QuestionnaireData completeQuestionnaire = new QuestionnaireData();
-		completeQuestionnaire.putValue("foo", "FOO");
-		completeQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 0));
-		completeQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 1));
-		completeQuestionnaire.putValue("foo_b", "FOO_B", Pair.of("GROUP_B", 0));
-		srd.addQuestionnaire(completeQuestionnaire);
-		//
-		QuestionnaireData oneGroupQuestionnaire = new QuestionnaireData();
-		oneGroupQuestionnaire.putValue("foo_a", "FOO_A", Pair.of("GROUP_A", 0));
-		srd.addQuestionnaire(oneGroupQuestionnaire);
-
-		//
-		vtlExecute.convertToVtlDataset(srd, "test", vtlBindings);
-		Dataset dataset = vtlBindings.getDataset("test");
-
-		//
-		assertEquals(4, dataset.getDataPoints().size());
-	}
-
 }

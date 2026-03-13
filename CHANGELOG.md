@@ -1,4 +1,11 @@
 # Changelog
+## 3.12.2 [TODO]
+### Changed
+- Max allocated JVM memory to 2GB
+### Fixed
+- Crash when too much data in one batch to write into VTL JSON dataset
+- Exponential variables "_STATE" created per partition
+
 ## 3.12.1 [2026-03-05]
 ### Fixed
 - addState crash fix 
