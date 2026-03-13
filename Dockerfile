@@ -4,7 +4,6 @@ ARG VERSION_APPLICATION
 COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-$VERSION_APPLICATION.jar kraftwerk.jar
 
 ENV JAVA_TOOL_OPTIONS \
-    -XX:MaxRAMPercentage=75 \
     -XX:+UseZGC \
     -Xmx2g
 
