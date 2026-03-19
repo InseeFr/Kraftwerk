@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.batch;
 
+import fr.insee.kraftwerk.core.data.model.Mode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ public class ArgsChecker {
     private final String argWithEncryption;
     private final String argSince;
     private final String argAddStates;
+    private final String argBatchSize;
+    private final String argMode;
 
     //Typed args
     private KraftwerkServiceType kraftwerkServiceType;
@@ -32,6 +35,8 @@ public class ArgsChecker {
     private boolean withDDI;
     private LocalDateTime since;
     private boolean addStates;
+    private Integer batchSize;
+    private Mode mode;
 
     /**
      * Throws a IllegalArgumentException if the arguments are not valid (ex: unparseable boolean)
@@ -50,6 +55,9 @@ public class ArgsChecker {
         }
 
         this.isFileByFile = this.kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
+
+        checkArgBatchSize();
+        checkArgMode();
     }
 
     private void checkServiceName() {
@@ -133,6 +141,26 @@ public class ArgsChecker {
             throw new IllegalArgumentException("Invalid addStates boolean argument ! : %s".formatted(this.argAddStates));
         }
         this.addStates = Boolean.parseBoolean(this.argAddStates);
+    }
+
+    private void checkArgBatchSize(){
+        if(this.argBatchSize != null){
+            try {
+                this.batchSize = Integer.parseInt(argBatchSize);
+            }catch (NumberFormatException e){
+                throw new IllegalArgumentException("Invalid batchSize int argument ! : %s".formatted(this.argBatchSize));
+            }
+        }
+    }
+
+    private void checkArgMode() {
+        if(this.argMode != null) {
+            try {
+                this.mode = Mode.valueOf(this.argMode);
+            } catch (IllegalArgumentException | NullPointerException e) {
+                throw new IllegalArgumentException("Invalid mode argument ! : %s, must be one of %s".formatted(this.argMode, Mode.values()));
+            }
+        }
     }
 
     private static boolean isNotBoolean(String argToCheck){
