@@ -198,6 +198,28 @@ class KraftwerkBatchTest {
     }
 
     @Test
+    void main_service_genesis_with_empty_mode_test() {
+        ApplicationArguments args = mock(ApplicationArguments.class);
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states", "mode"));
+        when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
+        when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
+        when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
+        when(args.getOptionValues("mode")).thenReturn(List.of(""));
+
+        kraftwerkBatch.run(args);
+
+        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+                any(),
+                eq(null),
+                eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
+                eq(false),
+                eq(true)
+        );
+        verifyNoInteractions(reportingDataService);
+    }
+
+    @Test
     void main_service_with_encryption_test() {
         ApplicationArguments args = mock(ApplicationArguments.class);
         when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "with-encryption"));

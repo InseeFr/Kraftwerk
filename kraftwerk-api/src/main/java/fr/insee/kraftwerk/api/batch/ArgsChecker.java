@@ -155,6 +155,9 @@ public class ArgsChecker {
 
     private void checkArgMode() {
         if(this.argMode != null) {
+            if(argMode.isEmpty()){
+                return;
+            }
             try {
                 this.mode = Mode.valueOf(this.argMode);
             } catch (IllegalArgumentException | NullPointerException e) {

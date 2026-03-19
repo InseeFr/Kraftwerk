@@ -323,6 +323,16 @@ class ArgsCheckerTest {
         assertThat(checker.getMode()).isEqualTo(mode);
     }
 
+    @Test
+    void checkArgs_empty_mode() {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argMode("")
+                .build();
+
+        assertThatNoException().isThrownBy(checker::checkArgs);
+        assertThat(checker.getMode()).isNull();
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"yes", "1" ,"TRUE"})
     void checkArgs_invalidMode_throwsIllegalArgumentException(String value) {
