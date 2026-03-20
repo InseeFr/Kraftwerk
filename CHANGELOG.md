@@ -1,5 +1,5 @@
 # Changelog
-## 3.13.0 [TODO]
+## 3.13.0 [2026-03-20]
 ### Added
 - Batch mode : BatchSize and Mode parameters
 
