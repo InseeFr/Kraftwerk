@@ -1,7 +1,9 @@
 package fr.insee.kraftwerk.api.batch;
 
+import fr.insee.kraftwerk.core.data.model.Mode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
@@ -286,6 +288,61 @@ class ArgsCheckerTest {
 
         assertThatNoException().isThrownBy(checker::checkArgs);
         assertThat(checker.isFileByFile()).isFalse();
+    }
+
+    @Test
+    void checkArgs_batchSize() {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argBatchSize("100")
+                .build();
+
+        assertThatNoException().isThrownBy(checker::checkArgs);
+        assertThat(checker.getBatchSize()).isEqualTo(100);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"yes", "TRUE"})
+    void checkArgs_batchSizeInvalidInteger_throwsIllegalArgumentException(String value) {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argBatchSize(value)
+                .build();
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(checker::checkArgs)
+                .withMessageContaining("Invalid batchSize int argument");
+    }
+
+    @ParameterizedTest
+    @EnumSource(Mode.class)
+    void checkArgs_mode(Mode mode) {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argMode(mode.getModeName())
+                .build();
+
+        assertThatNoException().isThrownBy(checker::checkArgs);
+        assertThat(checker.getMode()).isEqualTo(mode);
+    }
+
+    @Test
+    void checkArgs_empty_mode() {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argMode("")
+                .build();
+
+        assertThatNoException().isThrownBy(checker::checkArgs);
+        assertThat(checker.getMode()).isNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"yes", "1" ,"TRUE"})
+    void checkArgs_invalidMode_throwsIllegalArgumentException(String value) {
+        ArgsChecker checker = getArgCheckerBuilder()
+                .argMode(value)
+                .build();
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(checker::checkArgs)
+                .withMessageContaining("Invalid mode argument");
     }
 
     //UTILS

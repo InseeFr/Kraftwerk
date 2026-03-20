@@ -1,4 +1,8 @@
 # Changelog
+### 3.13.0 [TODO]
+### Added
+- Batch mode : BatchSize and Mode parameters
+
 ## 3.12.2 [2026-03-13]
 ### Changed
 - Max allocated JVM memory to 2GB
