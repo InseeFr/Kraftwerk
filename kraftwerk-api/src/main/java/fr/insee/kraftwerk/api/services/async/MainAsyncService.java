@@ -1,8 +1,10 @@
 package fr.insee.kraftwerk.api.services.async;
 
 
+import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.dto.ExportCheckResultDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -26,11 +30,15 @@ public class MainAsyncService extends KraftwerkService {
 
 	private final InMemoryJobStore jobStore;
 	private final OutputZipService outputZipService;
+    private final InMemoryExportJobStore exportJobStore;
+    protected final GenesisClient client;
 
-	public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService) {
+    public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService, InMemoryExportJobStore exportJobStore, GenesisClient client) {
 		super(configProperties, minioConfig);
 		this.jobStore = jobStore;
         this.outputZipService = outputZipService;
+        this.exportJobStore = exportJobStore;
+        this.client = client;
     }
 
 	@GetMapping("/status/{jobId}")
@@ -80,27 +88,52 @@ public class MainAsyncService extends KraftwerkService {
 		}
 	}
 
-	@Async("kraftwerkExecutor")
-	public void runWithGenesisByQuestionnaire(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessingGenesisNew mpGenesis,String questionnaireModelId,  boolean withDDI, boolean withEncryption, int batchSize, Mode dataMode) {
-		jobStore.start(jobId);
-		try {
-			mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
-            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
-            jobStore.success(jobId);
+    @Async("kraftwerkExecutor")
+    public void runWithGenesisByQuestionnaire(
+            String jobId,
+            FileUtilsInterface fileUtilsInterface,
+            MainProcessingGenesisNew mpGenesis,
+            String questionnaireModelId,
+            boolean withDDI,
+            boolean withEncryption,
+            int batchSize,
+            Mode dataMode
+    ) {
 
-		} catch (KraftwerkException e) {
-			log.error("KRAFTWERK EXCEPTION for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
-			jobStore.fail(jobId, e);
+        try {
 
-		} catch (IOException e) {
-			log.error("INTERNAL ERROR for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
-			jobStore.fail(jobId, e);
+            long interrogationsCount = client.getInterrogationIds(questionnaireModelId).size();
 
-		}
-	}
+            mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
 
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
+            );
 
+            List<String> errors = new ArrayList<>();
 
+            if (mpGenesis.getKraftwerkExecutionContext().getErrors() != null) {
+                mpGenesis.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
 
-	
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    questionnaireModelId,
+                    interrogationsCount
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
+        } catch (KraftwerkException e) {
+            log.error("KRAFTWERK EXCEPTION for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
+            exportJobStore.fail(jobId, e);
+
+        } catch (IOException e) {
+            log.error("INTERNAL ERROR for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
+            exportJobStore.fail(jobId, e);
+        }
+    }
+
 }
