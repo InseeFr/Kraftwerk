@@ -1,5 +1,5 @@
 # Changelog
-## 3.14.0 [TODO]
+## 3.14.0 [2026-03-26]
 ### Added
 - Get status of export endpoint
 
