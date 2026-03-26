@@ -1,4 +1,8 @@
 # Changelog
+## 3.14.0 [TODO]
+### Added
+- Get status of export endpoint
+
 ## 3.13.0 [2026-03-20]
 ### Added
 - Batch mode : BatchSize and Mode parameters
