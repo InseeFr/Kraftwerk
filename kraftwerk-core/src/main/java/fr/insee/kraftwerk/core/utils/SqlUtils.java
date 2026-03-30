@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -192,7 +193,19 @@ public class SqlUtils {
                 appender.beginRow();
                 for (String columnName : sqlSchema.keySet()) {
                     String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
-                    appendValueWithType(appender, data, sqlSchema.get(columnName));
+                    try{
+                        appendValueWithType(appender, data, sqlSchema.get(columnName));
+                    }catch (SQLException | NumberFormatException | DateTimeParseException e) {
+                        throw new SQLException(
+                                "Error Appender DuckDB"
+                                        + " [col=" + columnName
+                                        + ", type=" + sqlSchema.get(columnName)
+                                        + ", value=" + data
+                                        + ", raw=" + dataRow.get("interrogationId")
+                                        + "]",
+                                e
+                        );
+                    }
                 }
                 appender.endRow();
             }
