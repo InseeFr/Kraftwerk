@@ -1,4 +1,10 @@
 # Changelog
+## 3.14.1 [2026-03-30]
+### Added
+- Some logs
+### Updated
+- Springboot 3.5.13
+
 ## 3.14.0 [2026-03-26]
 ### Added
 - Get status of export endpoint
