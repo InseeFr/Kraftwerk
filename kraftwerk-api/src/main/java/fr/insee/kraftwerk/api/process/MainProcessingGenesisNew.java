@@ -223,7 +223,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                     try {
                         log.info("DEBUG processing interrogationId={}", interrogationId);
 
-                        suLatest = client.getUEsLatestState(id, List.of(interrogationId));
+                        suLatest = client.getResponses(id, List.of(interrogationId));
 
                         if (suLatest == null || suLatest.isEmpty()) {
                             log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);

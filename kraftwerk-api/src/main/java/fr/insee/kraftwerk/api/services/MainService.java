@@ -356,7 +356,7 @@ public class MainService extends KraftwerkService {
         boolean withDDI = true;
         boolean withEncryption = false;
 
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface,addStates);
 
         try {
             if (debugJsonExportDto == null || debugJsonExportDto.getInterrogationIds() == null || debugJsonExportDto.getInterrogationIds().isEmpty()) {
