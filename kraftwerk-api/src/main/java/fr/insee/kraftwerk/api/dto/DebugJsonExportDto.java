@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DebugJsonExport {
+public class DebugJsonExportDto {
     private List<InterrogationId> interrogationIds;
 }

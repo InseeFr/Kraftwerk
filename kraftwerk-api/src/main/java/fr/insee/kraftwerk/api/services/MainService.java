@@ -5,8 +5,8 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
-import fr.insee.kraftwerk.api.dto.DebugJsonExport;
 import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -350,20 +350,20 @@ public class MainService extends KraftwerkService {
             @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
 
-            @RequestBody DebugJsonExport debugJsonExport
+            @RequestBody DebugJsonExportDto debugJsonExportDto
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
         boolean withEncryption = false;
 
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface,addStates);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface);
 
         try {
-            if (debugJsonExport == null || debugJsonExport.getInterrogationIds() == null || debugJsonExport.getInterrogationIds().isEmpty()) {
+            if (debugJsonExportDto == null || debugJsonExportDto.getInterrogationIds() == null || debugJsonExportDto.getInterrogationIds().isEmpty()) {
                 return ResponseEntity.badRequest().body("interrogationIds must not be empty");
             }
 
-            mpGenesis.runMainJsonDebug(collectionInstrumentId, batchSize, dataMode, debugJsonExport.getInterrogationIds());
+            mpGenesis.runMainJsonDebug(collectionInstrumentId, batchSize, dataMode, debugJsonExportDto.getInterrogationIds());
             log.info("Debug data extracted");
 
             return ResponseEntity.ok(String.format("Debug data extracted for collectionInstrumentId %s", collectionInstrumentId));
