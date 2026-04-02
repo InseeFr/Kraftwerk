@@ -248,7 +248,7 @@ public class MinioImpl implements FileUtilsInterface {
                         PutObjectArgs.builder().bucket(bucketName).stream(
                                 inputStream,
                                 fileSize,
-                                fileSize == -1 ? 10485760 : -1
+                                10485760
                         ).object(minioPath.replace("\\","/")).build());
                 return;
             }
