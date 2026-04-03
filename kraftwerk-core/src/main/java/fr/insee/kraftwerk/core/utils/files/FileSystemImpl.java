@@ -170,7 +170,13 @@ public class FileSystemImpl implements FileUtilsInterface{
 		}
 	}
 
-	@Override
+    @Override
+    public void deleteDirectoryContent(Path directoryPath) throws KraftwerkException {
+
+        deleteDirectory(directoryPath);
+    }
+
+    @Override
 	public InputStream readFile(String path) {
 		try{
 			return Files.newInputStream(Path.of(path));

@@ -98,6 +98,9 @@ public interface FileUtilsInterface {
     String findFile(String directory, String fileRegex) throws KraftwerkException;
 
     //File listing
+
+    void deleteDirectoryContent(Path directoryPath) throws KraftwerkException;
+
     /**
      * List file names in a directory
      * @param dir directory to list files from
