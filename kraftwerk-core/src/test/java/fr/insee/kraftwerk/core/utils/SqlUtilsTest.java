@@ -138,6 +138,68 @@ class SqlUtilsTest {
     }
 
     @Test
+    void convertVTLBindingTest_int_variable_on_string() throws SQLException, KraftwerkException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //GIVEN
+            String variableName = "TestVar";
+            UserInputsFile testUserInputsFile = new UserInputsFile(
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"),
+                    new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY)
+            );
+
+            //First batch
+            VtlBindings vtlBindings = new VtlBindings();
+            Dataset testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, String.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            Map<String, Object> dataRow = new HashMap<>();
+            dataRow.put(variableName, "");
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //First conversion
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement);
+
+            //Second batch, variable is string this time
+            vtlBindings = new VtlBindings();
+            testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, Integer.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            dataRow = new HashMap<>();
+            dataRow.put(variableName, 1);
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //WHEN
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement);
+
+            //THEN
+            //Table has 2 data rows
+            ResultSet resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
+            int rowCount = 0;
+            while (resultSet.next()){
+                rowCount++;
+            }
+            Assertions.assertThat(rowCount).isEqualTo(2);
+        }
+    }
+
+    @Test
     void getColumnNamesTest() throws SQLException {
         try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()){
             //Given
