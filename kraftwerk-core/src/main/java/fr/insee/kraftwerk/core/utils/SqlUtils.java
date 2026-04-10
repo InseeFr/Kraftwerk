@@ -205,12 +205,14 @@ public class SqlUtils {
                     try{
                         appendValueWithType(appender, data, variableType);
                     }catch (SQLException | NumberFormatException | DateTimeParseException e) {
+                        log.error(e.toString());
                         throw new SQLException(
                                 "Error Appender DuckDB"
                                         + " [col=" + columnName
                                         + ", type=" + sqlSchema.get(columnName)
                                         + ", value=" + data
-                                        + ", raw=" + dataRow.get("interrogationId")
+                                        //Cannot be replaced by getOrDefault, ignore the warning
+                                        + ", raw=" + (dataRow.containsKey("interrogationId") ? dataRow.get("interrogationId") : "unknown")
                                         + "]",
                                 e
                         );
@@ -225,7 +227,7 @@ public class SqlUtils {
     private static void appendValueWithType(DuckDBAppender appender,
                                             String data,
                                             VariableType variableType) throws SQLException {
-        if (data == null){
+        if (data == null || data.isEmpty()){
             appender.appendNull();
             return;
         }
