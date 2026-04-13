@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.dto.InterrogationBatchResponse;
 import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -22,10 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenesisClient {
@@ -87,11 +90,18 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-	public List<InterrogationId> getInterrogationIdsFromDate(String questionnaireId, LocalDateTime since) throws KraftwerkException {
-		String url = String.format("%s/interrogations/by-questionnaire-and-since-datetime?questionnaireId=%s&since=%s",
-				configProperties.getGenesisUrl(), questionnaireId,since);
-		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	public InterrogationBatchResponse getInterrogationBatchAll(String collectionInstrumentId) throws KraftwerkException {
+		String url = String.format("%s/collection-instruments/%s/interrogations/all",
+				configProperties.getGenesisUrl(), collectionInstrumentId);
+		ResponseEntity<InterrogationBatchResponse> response = makeApiCall(url,HttpMethod.GET,null,InterrogationBatchResponse.class);
+		return Optional.ofNullable(response.getBody()).orElseThrow(() -> new KraftwerkException(502,"Empty response body from Genesis API"));
+	}
+
+	public InterrogationBatchResponse getInterrogationBatchSince(String collectionInstrumentId, Instant since) throws KraftwerkException {
+		String url = String.format("%s/collection-instruments/%s/interrogations?since=%s",
+				configProperties.getGenesisUrl(), collectionInstrumentId, since);
+		ResponseEntity<InterrogationBatchResponse> response = makeApiCall(url,HttpMethod.GET,null,InterrogationBatchResponse.class);
+		return Optional.ofNullable(response.getBody()).orElseThrow(() -> new KraftwerkException(502,"Empty response body from Genesis API"));
 	}
 
     public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, LocalDateTime start, LocalDateTime end) throws KraftwerkException {
@@ -117,8 +127,11 @@ public class GenesisClient {
 		return modes;
 	}
 	
-	public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) throws KraftwerkException {
+	public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds, Instant recordedBefore) throws KraftwerkException {
 		String url = String.format("%s/responses/%s", configProperties.getGenesisUrl(), collectionInstrumentId);
+		if (recordedBefore != null) {
+			url += "?recordedBefore=" + recordedBefore;
+		}
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
@@ -149,20 +162,20 @@ public class GenesisClient {
 		makeApiCall(url,HttpMethod.POST,metadataModel,null);
 	}
 
-	public void saveDateExtraction(String collectionInstrumentId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
+	public void saveDateExtraction(String collectionInstrumentId, Mode mode, LastJsonExtractionDate lastJsonExtractionDate) throws KraftwerkException {
+		String url = String.format("%s/collection-instruments/%s/extractions/json/last",
 				configProperties.getGenesisUrl(), collectionInstrumentId);
 		if (mode != null) {
-			url += "&mode=" + mode;
+			url += "?mode=" + mode;
 		}
-		makeApiCall(url,HttpMethod.PUT,null,null);
+		makeApiCall(url,HttpMethod.PUT,lastJsonExtractionDate,null);
 	}
 
-	public LastJsonExtractionDate getLastExtractionDate(String questionnaireModelId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
-				configProperties.getGenesisUrl(), questionnaireModelId);
+	public LastJsonExtractionDate getLastExtractionDate(String collectionInstrumentId, Mode mode) throws KraftwerkException {
+		String url = String.format("%s/collection-instruments/%s/extractions/json/last",
+				configProperties.getGenesisUrl(), collectionInstrumentId);
 		if (mode != null) {
-			url += "&mode=" + mode;
+			url += "?mode=" + mode;
 		}
 		ResponseEntity<LastJsonExtractionDate> response = makeApiCall(url,HttpMethod.GET,null,LastJsonExtractionDate.class);
 		return response.getBody();

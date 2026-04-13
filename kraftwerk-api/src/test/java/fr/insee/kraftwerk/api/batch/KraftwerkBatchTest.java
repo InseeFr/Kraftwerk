@@ -15,6 +15,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.env.Environment;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -341,7 +342,7 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
-                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0)),
+                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0).toInstant(ZoneOffset.UTC)),
                 eq(false)
         );
         verifyNoInteractions(reportingDataService);
