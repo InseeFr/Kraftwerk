@@ -334,7 +334,7 @@ class KraftwerkBatchTest {
         when(args.getOptionValues("service")).thenReturn(List.of("JSON"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
-        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00"));
+        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00Z"));
 
         kraftwerkBatch.run(args);
 
