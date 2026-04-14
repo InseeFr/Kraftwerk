@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
 import fr.insee.kraftwerk.api.dto.DebugJsonExportDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
@@ -335,38 +336,32 @@ public class MainService extends KraftwerkService {
     }
 
     @PostMapping(value = "/debug/json")
-    @Operation(
-            operationId = "jsonDebugExtraction",
-            summary = "DEBUG – JSON export for specific InterrogationIds",
-            description = "Debug endpoint used to isolate and diagnose problematic InterrogationIds"
-    )    public ResponseEntity<Object> jsonDebugExtraction(
-            @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE)
+    public ResponseEntity<Object> jsonDebugExtraction(
             @RequestParam String collectionInstrumentId,
-
-            @Parameter(description = "${param.dataMode}")
             @RequestParam(required = false) Mode dataMode,
-
-            @Parameter(description = "${param.batchSize}")
             @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
-
+            @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
             @RequestBody DebugJsonExportDto debugJsonExportDto
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
         boolean withEncryption = false;
 
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface,addStates);
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface, addStates);
 
         try {
             if (debugJsonExportDto == null || debugJsonExportDto.getInterrogationIds() == null || debugJsonExportDto.getInterrogationIds().isEmpty()) {
                 return ResponseEntity.badRequest().body("interrogationIds must not be empty");
             }
 
-            mpGenesis.runMainJsonDebug(collectionInstrumentId, batchSize, dataMode, debugJsonExportDto.getInterrogationIds());
-            log.info("Debug data extracted");
+            DebugJsonExportResultDto result = mpGenesis.runMainJsonDebug(
+                    collectionInstrumentId,
+                    batchSize,
+                    dataMode,
+                    debugJsonExportDto.getInterrogationIds()
+            );
 
-            return ResponseEntity.ok(String.format("Debug data extracted for collectionInstrumentId %s", collectionInstrumentId));
+            return ResponseEntity.ok(result);
 
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());

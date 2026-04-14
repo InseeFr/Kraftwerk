@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.dto.DebugErrorDto;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -30,6 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -183,7 +186,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
      *
      * This method intentionally duplicates part of the main logic for debugging purposes
      */
-    public void runMainJsonDebug(
+    public DebugJsonExportResultDto runMainJsonDebug(
             String id,
             int batchSize,
             Mode dataMode,
@@ -199,6 +202,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         init(id, modes);
 
         Path tmpOutputFile = createTempOutputFile(id);
+        List<InterrogationId> successIds = new ArrayList<>();
+        List<DebugErrorDto> errors = new ArrayList<>();
 
         try (Connection connection = openDatabaseConnection(databasePath);
              JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile)) {
@@ -227,6 +232,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
                         if (suLatest == null || suLatest.isEmpty()) {
                             log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);
+                            errors.add(new DebugErrorDto(interrogationId, null, "No SurveyUnit found"));
                             continue;
                         }
 
@@ -238,11 +244,18 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                                     .toList();
                         }
 
+                        if (suLatest.isEmpty()) {
+                            errors.add(new DebugErrorDto(interrogationId, null, "No SurveyUnit found after dataMode filtering"));
+                            continue;
+                        }
+
                         unimodalProcess(suLatest);
                         multimodalProcess();
                         insertDatabase();
 
                         tmpJsonFileWriter(List.of(interrogationId), suLatest, objectMapper, jsonGenerator, database);
+
+                        successIds.add(interrogationId);
 
                     } catch (Exception e) {
                         String usuId = (suLatest != null && !suLatest.isEmpty())
@@ -250,6 +263,12 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                                 : null;
 
                         log.error("DEBUG FAILED interrogationId={}, usualSurveyUnitId={}", interrogationId, usuId, e);
+
+                        errors.add(new DebugErrorDto(
+                                interrogationId,
+                                usuId,
+                                e.getMessage()
+                        ));
                     }
                 }
 
@@ -270,6 +289,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         }
         moveTempFile(outputFileName(id), tmpOutputFile);
         writeErrors();
+
+        return new DebugJsonExportResultDto(id, successIds, errors);
     }
 
     private Path createTempOutputFile(String questionnaireModelId) throws IOException {
