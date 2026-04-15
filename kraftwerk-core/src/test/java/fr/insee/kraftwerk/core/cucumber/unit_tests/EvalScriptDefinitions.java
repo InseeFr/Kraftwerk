@@ -17,8 +17,11 @@ import static org.junit.Assert.assertEquals;
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+
 	KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+	VtlExecute vtlExecute = new VtlExecute(
+			new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), kraftwerkExecutionContext
+	);
 
 	@Given("We have some simple VTLBindings")
 	public void initialize() {
@@ -27,7 +30,7 @@ public class EvalScriptDefinitions {
 		SurveyRawData surveyPaper = SurveyRawDataTest.createFakePapiSurveyRawData();
 		vtlExecute.convertToVtlDataset(surveyPaper, "PAPER", vtlBindings);
 
-		assertEquals(16, vtlBindings.getDataset("COLEMAN").getDataStructure().size());
+		assertEquals(18, vtlBindings.getDataset("COLEMAN").getDataStructure().size());
 	} 
 	
 	@When("I try to apply some VTL instruction : {string}")

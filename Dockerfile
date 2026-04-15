@@ -1,11 +1,11 @@
-# Java 21
-FROM gitlab-registry.insee.fr/kubernetes/images/run/java:21.0.8_9-jre-jammy-rootless
+# Java 25
+FROM gitlab-registry.insee.fr/kubernetes/images/run/java:25.0.1_8-jre-rootless
 ARG VERSION_APPLICATION
 COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-$VERSION_APPLICATION.jar kraftwerk.jar
 
-ENV JAVA_TOOL_OPTIONS_DEFAULT \
-    -XX:MaxRAMPercentage=75 \
-    -XX:+UseZGC
+ENV JAVA_TOOL_OPTIONS \
+    -XX:+UseZGC \
+    -Xmx2g
 
 EXPOSE 8080
 

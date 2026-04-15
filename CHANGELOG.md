@@ -1,4 +1,54 @@
 # Changelog
+## 3.14.1 [2026-03-30]
+### Added
+- Some logs
+### Updated
+- Springboot 3.5.13
+
+## 3.14.0 [2026-03-26]
+### Added
+- Get status of export endpoint
+
+## 3.13.0 [2026-03-20]
+### Added
+- Batch mode : BatchSize and Mode parameters
+
+## 3.12.2 [2026-03-13]
+### Changed
+- Max allocated JVM memory to 2GB
+### Fixed
+- Crash when too much data in one batch to write into VTL JSON dataset
+- Exponential variables "_STATE" created per partition
+
+## 3.12.1 [2026-03-05]
+### Fixed
+- addState crash fix 
+
+## 3.12.0 [2026-03-05]
+### Added
+- Variable states from Genesis in exports if addStates is true
+### Changed
+- Java 21 -> 25
+
+### Updated
+- BPM 1.1.0
+## 3.11.1 [2026-01-13]
+### Fixed
+- Link variables
+
+## 3.11.0 [2026-01-07]
+- Filiere model in genesis : usualSurveyUnitId, validationDate and questionnaireState
+
+### Updated
+- BPM 1.0.23
+## 3.10.6 [2025-12-18]
+### Fixed
+- New BPM version
+
+## 3.10.5 [2025-12-18]
+### Changed
+- Adaptations to new BPM version regarding missing and filter_results
+
 ## 3.10.1 [2025-11-18]
 ### Fixed
 - Batch mode error management

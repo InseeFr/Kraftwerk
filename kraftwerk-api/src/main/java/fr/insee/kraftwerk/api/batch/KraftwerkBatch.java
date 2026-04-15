@@ -43,8 +43,11 @@ public class KraftwerkBatch implements ApplicationRunner {
     private static final String ARG_QUESTIONNAIREID = "questionnaireId";
     private static final String ARG_WITH_ENCRYPTION = "with-encryption";
     private static final String ARG_SINCE = "extract-json-since";
+    private static final String ARG_ADD_STATES = "add-states";
+    private static final String ARG_BATCH_SIZE = "batch-size";
+    private static final String ARG_MODE = "mode";
 
-    public static final int BATCH_SIZE = 1000;
+    public static final int DEFAULT_BATCH_SIZE = 1000;
 
     private static final String ERROR_MESSAGE = "Kraftwerk service returned code %d with body %s";
 
@@ -141,6 +144,15 @@ public class KraftwerkBatch implements ApplicationRunner {
                 case ARG_SINCE:
                     argsCheckerBuilder.argSince(getOptionValue(option, args));
                     break;
+                case ARG_ADD_STATES:
+                    argsCheckerBuilder.argAddStates(getOptionValue(option, args));
+                    break;
+                case ARG_BATCH_SIZE:
+                    argsCheckerBuilder.argBatchSize(getOptionValue(option, args));
+                    break;
+                case ARG_MODE:
+                    argsCheckerBuilder.argMode(getOptionValue(option,args));
+                    break;
                 default:
                     log.warn("unknown option : {}", option);
                     break;
@@ -157,28 +169,32 @@ public class KraftwerkBatch implements ApplicationRunner {
         ResponseEntity<String> response = null;
         switch (argsChecker.getKraftwerkServiceType()) {
             case GENESIS -> response = mainService.mainGenesisByQuestionnaireId(
-                        argsChecker.getQuestionnaireId(),
-                        null,
-                        1000,
-                        argsChecker.isWithEncryption()
-                );
+                argsChecker.getQuestionnaireId(),
+                argsChecker.getMode(),
+                argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
+                argsChecker.isWithEncryption(),
+                argsChecker.isAddStates()
+            );
             case JSON -> {
                 return mainService.jsonExtraction(
-                            argsChecker.getQuestionnaireId(),
-                            null,
-                            1000,
-                            argsChecker.getSince()
-                    );
+                        argsChecker.getQuestionnaireId(),
+                        argsChecker.getMode(),
+                        argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
+                        argsChecker.getSince(),
+                        argsChecker.isAddStates()
+                );
             }
             case MAIN -> response = mainService.mainService(
-                        argsChecker.getQuestionnaireId(),
-                        false,
-                        argsChecker.isWithEncryption()
+                    argsChecker.getQuestionnaireId(),
+                    false,
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case FILE_BY_FILE -> response = mainService.mainFileByFile(
                     argsChecker.getArgQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
         }
         return getObjectResponseEntity(response);
@@ -189,14 +205,16 @@ public class KraftwerkBatch implements ApplicationRunner {
         switch (argsChecker.getKraftwerkServiceType()) {
             case GENESIS -> response = mainService.mainGenesisLunaticOnlyByQuestionnaire(
                     argsChecker.getQuestionnaireId(),
-                    null,
-                    BATCH_SIZE,
-                    argsChecker.isWithEncryption()
+                    argsChecker.getMode(),
+                    argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case MAIN -> response = mainService.mainService(
                     argsChecker.getQuestionnaireId(),
                     false,
-                    argsChecker.isWithEncryption()
+                    argsChecker.isWithEncryption(),
+                    argsChecker.isAddStates()
             );
             case JSON, FILE_BY_FILE -> {
                 return launchMainServiceWithDDI(argsChecker);

@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -186,13 +187,34 @@ public class SqlUtils {
         }
 
         DuckDBConnection duckDBConnection = (DuckDBConnection) database.getConnection();
+        List<String> tableColumns = getColumnNames(database, datasetName);
+
+
         log.debug("URL de connexion : {}", duckDBConnection.getMetaData().getURL());
         try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
             for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
                 appender.beginRow();
-                for (String columnName : sqlSchema.keySet()) {
+                for (String columnName : tableColumns) {
+                    VariableType variableType = sqlSchema.get(columnName);
+                    if (variableType == null) { //variable not presents in the sqlScheme extracted from VTL bindings
+                        appender.appendNull();
+                        continue;
+                    }
+
                     String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
-                    appendValueWithType(appender, data, sqlSchema.get(columnName));
+                    try{
+                        appendValueWithType(appender, data, variableType);
+                    }catch (SQLException | NumberFormatException | DateTimeParseException e) {
+                        throw new SQLException(
+                                "Error Appender DuckDB"
+                                        + " [col=" + columnName
+                                        + ", type=" + sqlSchema.get(columnName)
+                                        + ", value=" + data
+                                        + ", raw=" + dataRow.get("interrogationId")
+                                        + "]",
+                                e
+                        );
+                    }
                 }
                 appender.endRow();
             }

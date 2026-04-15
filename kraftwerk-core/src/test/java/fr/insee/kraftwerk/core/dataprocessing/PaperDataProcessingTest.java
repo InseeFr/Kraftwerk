@@ -73,7 +73,12 @@ class PaperDataProcessingTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("TEST", paperDataset);
 		//
-		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
+		PaperDataProcessing paperDataProcessing = new PaperDataProcessing(
+				vtlBindings,
+				metadataModel,
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		paperDataProcessing.applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
 		//
 		Dataset paperDsModified = vtlBindings.getDataset("TEST");

@@ -5,21 +5,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.10.2</version>
+	<version>3.14.2</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.7</version>
+		<version>3.5.13</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>7.31.0</cucumber.version>
+		<cucumber.version>7.34.3</cucumber.version>
 		<junit-jupiter.version>5.13.4</junit-jupiter.version>
+		<jackson-bom.version>2.21.1</jackson-bom.version>
 
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.14</jacoco.version>
@@ -36,7 +37,7 @@
             src/main/java/fr/insee/kraftwerk/core/extradata/reportingdata/ClosingCauseValue.java
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.22.0</pitest.version>
+		<pitest.version>1.23.0</pitest.version>
 		<pitest.junit.version>1.2.3</pitest.junit.version>
 	
 	</properties>
@@ -134,7 +135,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
+			<optional>true</optional>
 			<!-- version from parent pom -->
 		</dependency>
 
@@ -143,9 +144,21 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
-					<version>5.3.0.6276</version>
+					<version>5.5.0.6356</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>

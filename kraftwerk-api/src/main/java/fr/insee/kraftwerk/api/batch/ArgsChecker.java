@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.api.batch;
 
+import fr.insee.kraftwerk.core.data.model.Mode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ public class ArgsChecker {
     private final String argWithDDI;
     private final String argWithEncryption;
     private final String argSince;
+    private final String argAddStates;
+    private final String argBatchSize;
+    private final String argMode;
 
     //Typed args
     private KraftwerkServiceType kraftwerkServiceType;
@@ -30,6 +34,9 @@ public class ArgsChecker {
     private boolean isFileByFile;
     private boolean withDDI;
     private LocalDateTime since;
+    private boolean addStates;
+    private Integer batchSize;
+    private Mode mode;
 
     /**
      * Throws a IllegalArgumentException if the arguments are not valid (ex: unparseable boolean)
@@ -41,18 +48,22 @@ public class ArgsChecker {
         checkArgIsReportingData();
         checkArgWithEncryption();
         checkArgWithDDI();
+        checkArgAddStates();
 
         if(kraftwerkServiceType == KraftwerkServiceType.JSON){
             checkArgSince();
         }
 
         this.isFileByFile = this.kraftwerkServiceType == KraftwerkServiceType.FILE_BY_FILE;
+
+        checkArgBatchSize();
+        checkArgMode();
     }
 
     private void checkServiceName() {
         try {
             this.kraftwerkServiceType = KraftwerkServiceType.valueOf(this.argServiceName);
-        }catch (IllegalArgumentException iae) {
+        }catch (IllegalArgumentException | NullPointerException e) {
             throw new IllegalArgumentException("Invalid service argument ! : %s, must be one of %s".formatted(this.argServiceName, KraftwerkServiceType.values()));
         }
     }
@@ -75,6 +86,9 @@ public class ArgsChecker {
             throw new IllegalArgumentException("Invalid reportingData boolean argument ! : %s".formatted(this.argIsReportingData));
         }
         this.isReportingData = Boolean.parseBoolean(this.argIsReportingData);
+        if(!this.isReportingData){
+            return;
+        }
         if(this.argReportingDataFilePath == null){
             throw new IllegalArgumentException("No reporting data file argument provided !");
         }
@@ -113,6 +127,41 @@ public class ArgsChecker {
             }catch (DateTimeParseException e){
                 log.error(e.toString());
                 throw new IllegalArgumentException("Invalid since argument ! : %s, should be YYYY-MM-DDThh:mm:ss");
+            }
+        }
+    }
+
+    private void checkArgAddStates() {
+        //false by default
+        if(this.argAddStates == null) {
+            this.addStates = false;
+            return;
+        }
+        if(isNotBoolean(this.argAddStates)){
+            throw new IllegalArgumentException("Invalid addStates boolean argument ! : %s".formatted(this.argAddStates));
+        }
+        this.addStates = Boolean.parseBoolean(this.argAddStates);
+    }
+
+    private void checkArgBatchSize(){
+        if(this.argBatchSize != null){
+            try {
+                this.batchSize = Integer.parseInt(argBatchSize);
+            }catch (NumberFormatException e){
+                throw new IllegalArgumentException("Invalid batchSize int argument ! : %s".formatted(this.argBatchSize));
+            }
+        }
+    }
+
+    private void checkArgMode() {
+        if(this.argMode != null) {
+            if(argMode.isEmpty()){
+                return;
+            }
+            try {
+                this.mode = Mode.valueOf(this.argMode);
+            } catch (IllegalArgumentException | NullPointerException e) {
+                throw new IllegalArgumentException("Invalid mode argument ! : %s, must be one of %s".formatted(this.argMode, Mode.values()));
             }
         }
     }

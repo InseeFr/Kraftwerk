@@ -1,24 +1,29 @@
 package fr.insee.kraftwerk.core.vtl;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.GroupData;
 import fr.insee.kraftwerk.core.rawdata.GroupInstance;
 import fr.insee.kraftwerk.core.rawdata.QuestionnaireData;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,9 +40,11 @@ public class VtlJsonDatasetWriter {
 	private static final String IDENTIFIER = "IDENTIFIER";
 	private static final String MEASURE = "MEASURE";
 	private static final String STRING = "STRING";
+
 	private final SurveyRawData surveyData;
 	private final MetadataModel metadataModel;
 	private final String datasetName;
+	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 	/*
 	 * Local variable to ensure that data points will have variables in the same
@@ -51,105 +58,195 @@ public class VtlJsonDatasetWriter {
 	 * @param datasetName The name (without extension) of the dataset file which
 	 *                       will be written.
 	 */
-	public VtlJsonDatasetWriter(SurveyRawData surveyData, String datasetName) {
+	public VtlJsonDatasetWriter(SurveyRawData surveyData,
+								String datasetName,
+								KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
 		this.surveyData = surveyData;
 		this.metadataModel = surveyData.getMetadataModel();
 		this.datasetName = datasetName;
+		this.kraftwerkExecutionContext = kraftwerkExecutionContext;
 	}
 
+	//TODO Remove JSON temp file writing (not cloud native)
 	/**
 	 * Write the given survey data in a temporary JSON file '[datasetName].json'.
 	 *
 	 * @return The path to get the temporary dataset file created.
 	 */
-	@SuppressWarnings("unchecked")
 	public String writeVtlJsonDataset() {
-
-		JSONObject jsonVtlDataset = new JSONObject();
-
-		// dataStructure
-		jsonVtlDataset.put("dataStructure", jsonDataStructure());
-
-		// dataPoints
-		jsonVtlDataset.put("dataPoints", jsonDataPoints());
-
 		// Write the temporary dataset file
 		try {
 			File datasetFile = File.createTempFile(datasetName, ".json");
 			datasetFile.deleteOnExit();
 			String tempPath = datasetFile.getAbsolutePath();
-			Files.writeString(Paths.get(tempPath), jsonVtlDataset.toJSONString(), StandardOpenOption.TRUNCATE_EXISTING);
+
+			Map<String,Object> mapVtlDataset = new HashMap<>();
+
+			// dataStructure
+			mapVtlDataset.put("dataStructure", getDataStructureJSONArray());
+
+			// dataPoints
+			mapVtlDataset.put("dataPoints", getDataPointsJSONArray());
+			JSONObject jsonVtlDataset = new JSONObject(mapVtlDataset);
+
+			try (Writer writer = Files.newBufferedWriter(
+					Paths.get(tempPath),
+					StandardCharsets.UTF_8,
+					StandardOpenOption.TRUNCATE_EXISTING)) {
+
+				jsonVtlDataset.writeJSONString(writer);
+			}
 			return tempPath;
 		} catch (IOException e) {
-			log.error(String.format("Unable to write the temporary file '%s.json'.", datasetName), e);
+			log.error("Unable to write the temporary file '{}.json' : {}", datasetName, e);
 			return null;
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private JSONArray jsonDataStructure() {
-
+	protected JSONArray getDataStructureJSONArray() {
 		JSONArray dataStructure = new JSONArray();
 
 		Integer variableNumber = 0;
 
 		// Root level identifiers
-		JSONObject jsonVtlIdentifier = new JSONObject();
-		jsonVtlIdentifier.put(NAME, Constants.ROOT_IDENTIFIER_NAME);
-		jsonVtlIdentifier.put(TYPE, STRING);
-		jsonVtlIdentifier.put(ROLE, IDENTIFIER);
-		dataStructure.add(jsonVtlIdentifier);
-		columnsMapping.put(Constants.ROOT_IDENTIFIER_NAME, variableNumber);
-		variableNumber++;
-		jsonVtlIdentifier = new JSONObject();
-		jsonVtlIdentifier.put(NAME, Constants.SURVEY_UNIT_IDENTIFIER_NAME);
-		jsonVtlIdentifier.put(TYPE, STRING);
-		jsonVtlIdentifier.put(ROLE, MEASURE);
-		dataStructure.add(jsonVtlIdentifier);
-		columnsMapping.put(Constants.SURVEY_UNIT_IDENTIFIER_NAME, variableNumber);
-		variableNumber++;
+		variableNumber = addRootLevelIdentifiers(dataStructure, variableNumber);
+
 		// Group identifiers
-		for (String groupName : metadataModel.getSubGroupNames()) {
-			// The group name is the identifier variable for the group
-			JSONObject jsonVtlGroupIdentifier = new JSONObject();
-			jsonVtlGroupIdentifier.put(NAME, groupName);
-			jsonVtlGroupIdentifier.put(TYPE, STRING);
-			jsonVtlGroupIdentifier.put(ROLE, IDENTIFIER);
-			dataStructure.add(jsonVtlGroupIdentifier);
-			columnsMapping.put(groupName, variableNumber);
-			variableNumber++;
-		}
+		variableNumber = addGroupIdentifiers(dataStructure, variableNumber);
 
 		// Variables
-		for (String variableName : metadataModel.getVariables().getVariableNames()) {
-			Variable variable = metadataModel.getVariables().getVariable(variableName);
-			JSONObject jsonVtlVariable = new JSONObject();
-			jsonVtlVariable.put(NAME, variableName); // recent change (see GroupProcessing class)
-			jsonVtlVariable.put(TYPE, convertToVtlType(variable.getType()));
-			jsonVtlVariable.put(ROLE, "MEASURE");
-			dataStructure.add(jsonVtlVariable);
-			columnsMapping.put(variableName, variableNumber);
-			variableNumber++;
-		}
+		addVariablesToDataStructure(dataStructure, variableNumber);
 
 		return dataStructure;
 	}
 
+	/**
+	 * Adds the root/interrogaiton level identifiers to the dataStructure
+	 * @param variableNumber the beginning index
+	 * @return the incremented variableNumber
+	 */
+	private Integer addRootLevelIdentifiers(JSONArray dataStructure, Integer variableNumber) {
+		variableNumber = addToDataStructure(Constants.ROOT_IDENTIFIER_NAME, STRING, IDENTIFIER,
+				dataStructure, variableNumber);
+		variableNumber = addToDataStructure(Constants.SURVEY_UNIT_IDENTIFIER_NAME, STRING, MEASURE,
+				dataStructure, variableNumber);
+		variableNumber = addToDataStructure(Constants.VALIDATION_DATE_NAME, STRING, MEASURE,
+				dataStructure, variableNumber);
+		variableNumber = addToDataStructure(Constants.QUESTIONNAIRE_STATE_NAME, STRING, MEASURE,
+				dataStructure, variableNumber);
+		return variableNumber;
+	}
+
+	/**
+	 * Adds the group identifiers to the dataStructure
+	 * @param variableNumber the beginning index
+	 * @return the incremented variableNumber
+	 */
+	private Integer addGroupIdentifiers(JSONArray dataStructure, Integer variableNumber) {
+		for (String groupName : metadataModel.getSubGroupNames()) {
+			variableNumber = addToDataStructure(groupName, STRING, IDENTIFIER, dataStructure, variableNumber);
+		}
+		return variableNumber;
+	}
+
+	/**
+	 * Adds the variables to the dataStructure
+	 * @param variableNumber the beginning index
+	 */
+	private void addVariablesToDataStructure(JSONArray dataStructure, Integer variableNumber) {
+		List<String> variableNames = new ArrayList<>(metadataModel.getVariables().getVariableNames());
+		for (String variableName : variableNames) {
+			if(variableName.endsWith(Constants.VARIABLE_STATE_SUFFIX_NAME)
+				&& !variableName.equals(Constants.LAST_STATE_NAME)
+			){
+				continue;
+			}
+			Variable variable = metadataModel.getVariables().getVariable(variableName);
+			variableNumber = addToDataStructure(
+					variableName,
+					convertToVtlType(variable.getType()),
+					MEASURE,
+					dataStructure,
+					variableNumber
+			);
+			boolean isFilterResultOrMissing = variableName.startsWith(Constants.FILTER_RESULT_PREFIX)
+					|| variableName.endsWith(Constants.MISSING_SUFFIX);
+			if(kraftwerkExecutionContext.isAddStates() && !isFilterResultOrMissing){
+				addVariableStateFieldToStructure(variable, dataStructure, variableNumber);
+				variableNumber++;
+			}
+		}
+	}
+
+	/**
+	 * Adds a new object in the VTL dataStructure and columnsMapping
+	 * @param name name of the object
+	 * @param type VTL type (cf. VariableType VTL names)
+	 * @param role role of the object (IDENTIFIER or MEASURE)
+	 * @param dataStructure dataStructure to insert into
+	 * @param variableNumber index of the object in the mapping
+	 * @return variableNumber + 1
+	 */
 	@SuppressWarnings("unchecked")
-	private JSONArray jsonDataPoints() {
+	private Integer addToDataStructure(
+			String name,
+			String type,
+			String role,
+			JSONArray dataStructure,
+			Integer variableNumber
+	) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put(NAME, name);
+		jsonObject.put(TYPE, type);
+		jsonObject.put(ROLE, role);
+		dataStructure.add(jsonObject);
+		columnsMapping.put(name, variableNumber);
+		variableNumber++;
+		return variableNumber;
+	}
+
+	/**
+	 * Adds the variable state (COLLECTED, EDITED...) to the VTL dataset structure
+	 */
+	@SuppressWarnings("unchecked")
+	private void addVariableStateFieldToStructure(Variable variable, JSONArray dataStructure, int variableNumber) {
+		JSONObject jsonVtlVariable = new JSONObject();
+		String variableStateFieldName = variable.getName() + Constants.VARIABLE_STATE_SUFFIX_NAME;
+		jsonVtlVariable.put(NAME, variableStateFieldName);
+		jsonVtlVariable.put(TYPE, convertToVtlType(VariableType.STRING));
+		jsonVtlVariable.put(ROLE, MEASURE);
+
+		dataStructure.add(jsonVtlVariable);
+
+		columnsMapping.putIfAbsent(variableStateFieldName, variableNumber);
+
+		if (metadataModel.getVariables().getVariable(variableStateFieldName) == null) {
+			metadataModel.getVariables().putVariable(new Variable(
+					variableStateFieldName,
+					variable.getGroup(),
+					VariableType.STRING
+			));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected JSONArray getDataPointsJSONArray() {
 
 		JSONArray dataPoints = new JSONArray();
 
 		for (QuestionnaireData questionnaireData : surveyData.getQuestionnaires()) {
 			GroupInstance rootInstance = questionnaireData.getAnswers();
 
-			String[] rowValues = new String[columnsMapping.size()];
+			String[] rowValues = new String[datasetWidth()];
 			Arrays.fill(rowValues, null); // NOTE: recent change here to differentiate empty string and non-response
 			// (previous implementation was: fill with empty strings ("")
 
 			// Root level identifiers
 			rowValues[0] = questionnaireData.getIdentifier();
 			rowValues[1] = questionnaireData.getAnswers().getValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
+			rowValues[2] = questionnaireData.getAnswers().getValue(Constants.VALIDATION_DATE_NAME);
+			rowValues[3] = questionnaireData.getAnswers().getValue(Constants.QUESTIONNAIRE_STATE_NAME);
 			
 			// Root variables values
 			addValuesToRow(rootInstance, rowValues);
@@ -197,17 +294,23 @@ public class VtlJsonDatasetWriter {
 
 	private void addValuesToRow(GroupInstance groupInstance, String[] rowValues) {
 		for (String variableName : groupInstance.getVariableNames()) {
-			if (columnsMapping.get(variableName) != null) {
-				String value = groupInstance.getValue(variableName);
-				if ( !variableName.equals(Constants.SURVEY_UNIT_IDENTIFIER_NAME)
-						&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
-				) {
-					value = convertBooleanValue(value);
-				}
-				rowValues[columnsMapping.get(variableName)] = value;
-			} else {
-				log.debug(String.format("Variable named \"%s\" found in data object is unknown.", variableName));
+			if (columnsMapping.get(variableName) == null) {
+				log.debug("Variable named \"{}\" found in data object is unknown.", variableName);
+				continue;
 			}
+			String value = groupInstance.getValue(variableName);
+			Set<String> rootLevelVariables = Set.of(
+					Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+					Constants.VALIDATION_DATE_NAME,
+					Constants.QUESTIONNAIRE_STATE_NAME
+			);
+			if (
+					!rootLevelVariables.contains(variableName)
+					&& metadataModel.getVariables().getVariable(variableName).getType() == VariableType.BOOLEAN
+			) {
+				value = convertBooleanValue(value);
+			}
+			rowValues[columnsMapping.get(variableName)] = value;
 		}
 	}
 
@@ -219,7 +322,7 @@ public class VtlJsonDatasetWriter {
 		return variableType.getVtlType();
 	}
 
-	/** Compatible boolean values for "true */
+	/** Compatible boolean values for "true" */
 	private static final Set<String> trueValues = Set.of("true", "1");
 	/** Compatible boolean values for "false" */
 	private static final Set<String> falseValues = Set.of("false", "0");
@@ -234,5 +337,12 @@ public class VtlJsonDatasetWriter {
 			return null;
 		}
 	}
+
+    private int datasetWidth() {
+        return columnsMapping.values().stream()
+				.mapToInt(Integer::intValue)
+                .max()
+                .orElse(-1) + 1;
+    }
 
 }

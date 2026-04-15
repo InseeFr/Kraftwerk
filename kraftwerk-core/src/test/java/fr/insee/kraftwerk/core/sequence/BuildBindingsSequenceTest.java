@@ -1,12 +1,12 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.UcqVariable;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -33,7 +33,10 @@ class BuildBindingsSequenceTest {
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
 		boolean withDdi = true;	
-		BuildBindingsSequence bbs = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		BuildBindingsSequence bbs = new BuildBindingsSequence(
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				TestConstants.getKraftwerkExecutionContext()
+		);
 		//WHEN 
 		MetadataModel metadata = null;
 		
@@ -51,7 +54,10 @@ class BuildBindingsSequenceTest {
 				inputSamplesDirectory, fileUtilsInterface);
 		String dataMode = "CAPI";
 		VtlBindings vtlBindings = new VtlBindings();
-		BuildBindingsSequence bbs = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		BuildBindingsSequence bbs = new BuildBindingsSequence(
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				TestConstants.getKraftwerkExecutionContext()
+		);
         MetadataModel capiMetadata = new MetadataModel();
 		capiMetadata.getVariables().putVariable(new Variable("VAR1", capiMetadata.getRootGroup(), VariableType.STRING));
 		capiMetadata.getVariables().putVariable(new UcqVariable("PAYSNAIS", capiMetadata.getRootGroup(), VariableType.STRING));

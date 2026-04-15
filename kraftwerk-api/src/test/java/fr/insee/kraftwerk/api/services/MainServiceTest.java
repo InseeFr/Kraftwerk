@@ -8,6 +8,10 @@ import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
+import fr.insee.kraftwerk.api.services.async.InMemoryJobStore;
+import fr.insee.kraftwerk.api.services.async.JobExecution;
+import fr.insee.kraftwerk.api.services.async.JobStatus;
+import fr.insee.kraftwerk.api.services.async.MainAsyncService;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +32,17 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -80,12 +87,19 @@ class MainServiceTest {
     private MainProcessingGenesisNew mainProcessingGenesisNew;
     @MockitoBean
     private MainProcessing mainProcessing;
-    @MockitoBean
+    @MockitoSpyBean
     private MainService mainService;
+    @MockitoSpyBean
+    private MainAsyncService mainAsyncService;
+
+    @MockitoBean
+    private OutputZipService outputZipService;
 
     @Autowired
     private TestUtils testUtils;
 
+    @Autowired
+    InMemoryJobStore jobStore;
 
     ConfigProperties configProperties = new ConfigProperties();
     MinioConfig minioConfig;
@@ -140,7 +154,7 @@ class MainServiceTest {
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("/src/test/resources/data/in/SAMPLETEST-SIMPLE-RESPONSE"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -156,7 +170,7 @@ class MainServiceTest {
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -171,7 +185,7 @@ class MainServiceTest {
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .param("questionnaireModelId","Test"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -187,7 +201,7 @@ class MainServiceTest {
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -203,7 +217,7 @@ class MainServiceTest {
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Test"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -218,7 +232,7 @@ class MainServiceTest {
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         mockMvc.perform(put(endpointURI).header("Authorization", "bearer token_blabla")
                         .param("questionnaireModelId","Test"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     /**
@@ -277,17 +291,27 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(inDirectory, response.getBody());
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -298,17 +322,28 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig,env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainService(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainService(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("Kraftwerk"));
     }
 
 
@@ -321,17 +356,27 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig,env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(inDirectory, response.getBody());
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -342,17 +387,28 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainFileByFile(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainFileByFile(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("Kraftwerk"));
     }
 
 
@@ -365,17 +421,27 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(inDirectory, response.getBody());
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -386,17 +452,28 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessing mockMainProcessing = mock(MainProcessing.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessing(anyString(),anyBoolean(),anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessing(
+                anyString(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain();
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainLunaticOnly(inDirectory, false, false);
+        ResponseEntity<String> response = mainService.mainLunaticOnly(
+                inDirectory,
+                false,
+                false,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("Kraftwerk"));
     }
 
 
@@ -409,17 +486,24 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(), anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(idCampaign, response.getBody());
+        assertAsyncStatus(response, JobStatus.DONE);
     }
 
     @Test
@@ -431,17 +515,25 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("Kraftwerk"));
     }
 
     @Test
@@ -452,17 +544,25 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesis(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesis(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("IO error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("IO"));
     }
 
     /*** Main Genesis Lunatic Only***/
@@ -474,17 +574,40 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doNothing().when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(idCampaign, response.getBody());
+        assertAsyncStatus(response, JobStatus.DONE);
+    }
+
+    private JobExecution assertAsyncStatus(ResponseEntity<String> response, JobStatus success) {
+        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+        String jobId = response.getBody();
+        awaitAsyncStatus(jobId, success);
+        return jobStore.get(jobId).orElseThrow();
+    }
+
+    private void awaitAsyncStatus(String jobId, JobStatus success) {
+        await()
+                .atMost(Duration.ofSeconds(2))
+                .untilAsserted(() -> {
+                    JobExecution job = jobStore.get(jobId).orElseThrow();
+                    assertEquals(success, job.status());
+                });
     }
 
     @Test
@@ -496,17 +619,25 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Kraftwerk error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("Kraftwerk"));
     }
 
     @Test
@@ -517,16 +648,25 @@ class MainServiceTest {
         // Mock the dependencies
         FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
         MainProcessingGenesisLegacy mockMainProcessing = mock(MainProcessingGenesisLegacy.class);
-        mainService  = Mockito.spy(new MainService(configProperties,minioConfig,vaultConfig, env));
         doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
-        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(anyBoolean(),anyBoolean(),any(FileUtilsInterface.class));
+        doReturn(mockMainProcessing).when(mainService).getMainProcessingGenesis(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
         doThrow(exception).when(mockMainProcessing).runMain(idCampaign,100);
 
         // WHEN
-        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(idCampaign,100, false);
+        // TODO use by questionnaire
+        ResponseEntity<String> response = mainService.mainGenesisLunaticOnly(
+                idCampaign,
+                100,
+                false
+        );
 
         // THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("IO error", response.getBody());
+        JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
+        assertTrue(job.errorMessage().contains("IO"));
     }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>fr.insee.kraftwerk</groupId>
         <artifactId>kraftwerk</artifactId>
-        <version>3.10.2</version>
+        <version>3.14.2</version>
     </parent>
 
     <artifactId>kraftwerk-encryption-tests</artifactId>
@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <lib_java_chiffrement.version>1.4.0</lib_java_chiffrement.version>
+        <lib_java_chiffrement.version>1.4.6</lib_java_chiffrement.version>
     </properties>
     <dependencies>
 

@@ -30,7 +30,7 @@ class VtlBindingsTest {
 	private VtlBindings vtlBindings;
 	private KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 
 	Dataset ds1 = new InMemoryDataset(
 			List.of(
@@ -83,7 +83,7 @@ class VtlBindingsTest {
 
 		Dataset capi = vtlBindings.getDataset("Capi avec espace");
 		assertEquals(4, capi.getDataPoints().size());
-		assertEquals(16, capi.getDataStructure().keySet().size());
+		assertEquals(18, capi.getDataStructure().keySet().size());
 	}
 
 	@Test

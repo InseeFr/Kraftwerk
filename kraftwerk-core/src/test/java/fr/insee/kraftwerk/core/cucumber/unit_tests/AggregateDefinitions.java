@@ -22,8 +22,10 @@ import static org.junit.Assert.assertTrue;
 // Used in do_we_aggregate
 public class AggregateDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
 	KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+	VtlExecute vtlExecute = new VtlExecute(
+			new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), kraftwerkExecutionContext
+	);
 
 	@Given("We have some VTLBindings named {string} and {string}")
 	public void initialize(String firstDataset, String secondDataset) throws KraftwerkException {
@@ -33,9 +35,19 @@ public class AggregateDefinitions {
 		vtlExecute.convertToVtlDataset(fakeCawiData, firstDataset, vtlBindings);
 		vtlExecute.convertToVtlDataset(fakePapiData, secondDataset, vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, fakeCawiData.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		GroupProcessing groupProcessing = new GroupProcessing(
+				vtlBindings,
+				fakeCawiData.getMetadataModel(),
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				kraftwerkExecutionContext
+		);
 		groupProcessing.applyVtlTransformations(firstDataset, null, kraftwerkExecutionContext);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, fakePapiData.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		GroupProcessing groupProcessing2 = new GroupProcessing(
+				vtlBindings,
+				fakePapiData.getMetadataModel(),
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				kraftwerkExecutionContext
+		);
 		groupProcessing2.applyVtlTransformations(secondDataset, null,kraftwerkExecutionContext);
 
 		//
@@ -45,14 +57,18 @@ public class AggregateDefinitions {
 
 	@When("I try to aggregate the bindings")
 	public void collect_variables() throws KraftwerkException {
-		DataProcessing reconciliationProcessing = new ReconciliationProcessing(vtlBindings, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		DataProcessing reconciliationProcessing = new ReconciliationProcessing(
+				vtlBindings,
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				kraftwerkExecutionContext
+		);
 		reconciliationProcessing.applyVtlTransformations(
 				"MULTIMODE", null,kraftwerkExecutionContext);
 	}
 
 	@Then("The datasets I try to aggregate should return an aggregated dataset")
 	public void the_aggregated_dataset_shoud_exist() {
-		assertEquals(18, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
+		assertEquals(20, vtlBindings.getDataset("MULTIMODE").getDataStructure().size());
 		// On check que l'aggregation a conservé les identifiants
 		assertTrue(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));
 		// On check que l'aggregation a conserve les variables qui sont en commun.

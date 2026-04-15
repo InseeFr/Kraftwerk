@@ -8,7 +8,7 @@ Feature: Do we save correctly all data from Genesis?
     Then We check if the CSV format is correct
     And In root csv output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     And In root parquet output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
-    And Step 2 : We check root output file has 2 lines and 150 variables
+    And Step 2 : We check root output file has 2 lines and 152 variables
     Examples:
       | CampaignId     |  InterrogationId | VariableName | Value |
       | TEST-TABLEAUX  |  AUTO11000       | TABLEAU2A11  | 4     |
@@ -21,7 +21,7 @@ Feature: Do we save correctly all data from Genesis?
     Then We check if the CSV format is correct
     And In root csv output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
     And In root parquet output file we should have "<Value>" for survey unit "<InterrogationId>", column "<VariableName>"
-    And Step 2 : We check root output file has 2 lines and 150 variables
+    And Step 2 : We check root output file has 2 lines and 152 variables
     Examples:
       | QuestionnaireModelId     |  InterrogationId | VariableName | Value |
       | TEST-TABLEAUX            |  AUTO11000       | TABLEAU2A11  | 4     |

@@ -24,7 +24,9 @@ public class ExportDatasetDefinitions {
 	public String tempDatasetPath = "";
 	public SurveyRawData survey = null;
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+	VtlExecute vtlExecute = new VtlExecute(
+			new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY), TestConstants.getKraftwerkExecutionContext()
+	);
 
 	@Given("We have some SurveyRawData named {string}")
 	public void initialize(String nameDataset) {
@@ -38,7 +40,7 @@ public class ExportDatasetDefinitions {
 
 	@When("I try to export the dataset named {string}")
 	public void exportDataset(String nameDataset) {
-		VtlJsonDatasetWriter vtlJsonDatasetWriter = new VtlJsonDatasetWriter(survey, nameDataset);
+		VtlJsonDatasetWriter vtlJsonDatasetWriter = new VtlJsonDatasetWriter(survey, nameDataset, TestConstants.getKraftwerkExecutionContext());
 		tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
 	}
 
@@ -48,13 +50,18 @@ public class ExportDatasetDefinitions {
 
 		vtlExecute.putVtlDataset(tempDatasetPath, "OUTPUT_TEST_EXPORT", vtlBindings);
 		// add group prefixes
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, survey.getMetadataModel(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+		GroupProcessing groupProcessing = new GroupProcessing(
+				vtlBindings,
+				survey.getMetadataModel(),
+				new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+				kraftwerkExecutionContext
+		);
 		groupProcessing.applyVtlTransformations("OUTPUT_TEST_EXPORT", null, kraftwerkExecutionContext);
 	}
 
 	@Then("I should get some dataset values from {string}")
 	public void checkDataset(String nameDataset) {
-		assertEquals(16, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
+		assertEquals(18, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().size());
 		assertEquals(4, vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().size());
 		assertEquals("Purple", vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataPoints().getFirst().get("CARS_LOOP.CAR_COLOR"));
 		assertTrue(vtlBindings.getDataset("OUTPUT_TEST_EXPORT").getDataStructure().containsKey(Constants.ROOT_IDENTIFIER_NAME));

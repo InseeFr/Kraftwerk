@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvMalformedLineException;
 import com.opencsv.exceptions.CsvValidationException;
 import cucumber.TestConstants;
 import fr.insee.bpm.metadata.model.MetadataModel;
@@ -42,6 +41,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,6 +100,7 @@ public class MainDefinitions {
 	@Before
 	public void init(){
 		this.isUsingEncryption = false;
+		kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
 	}
 
 	@Given("Step 0 : We have some survey in directory {string}")
@@ -230,7 +231,10 @@ public class MainDefinitions {
 	public void unimodal_treatments() throws KraftwerkException, SQLException {
 		try (Statement statement = database.createStatement()) {
 			metadataModelMap = MetadataUtils.getMetadata(userInputs.getModeInputsMap(), new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
-			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+			BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+					new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+					kraftwerkExecutionContext
+			);
 			for (String dataMode : userInputs.getModeInputsMap().keySet()) {
 				boolean withDDI = true;
 				buildBindingsSequence.buildVtlBindings(userInputs, dataMode, vtlBindings,
@@ -291,7 +295,9 @@ public class MainDefinitions {
 		reportingDataProcessing.runProcessMain(fileUtilsInterface,
 				FUNCTIONAL_TESTS_DIRECTORY,
 				campaignName,
-				reportingDataPathParam);
+				reportingDataPathParam,
+				kraftwerkExecutionContext
+		);
 	}
 
 	@When("We launch reporting data service with genesis input path with mode {string}")
@@ -301,7 +307,9 @@ public class MainDefinitions {
 		reportingDataProcessing.runProcessGenesis(fileUtilsInterface, Mode.valueOf(modeParam),
 				FUNCTIONAL_TESTS_DIRECTORY,
 				campaignName,
-				reportingDataPathParam);
+				reportingDataPathParam,
+				kraftwerkExecutionContext
+		);
 	}
 
 	@Then("Step 5 : We check if we have {int} lines")
@@ -329,6 +337,7 @@ public class MainDefinitions {
 
 	@Then("Step 2 : We check root output file has {int} lines and {int} variables")
 	public void check_csv_output_root_table(int expectedLineCount, int expectedVariablesCount) throws IOException, CsvValidationException {
+		System.out.println("Charset utilisé :" + Charset.defaultCharset());
 		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
 		CSVReader csvReader = getCSVReader(
 				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv"));
@@ -617,7 +626,7 @@ public class MainDefinitions {
 				executionOutDirectory.resolve(inDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
 				: executionOutDirectory.resolve(outputFiles.outputFileName(Constants.ROOT_GROUP_NAME, kraftwerkExecutionContext));
 
-		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath)){
+		try(BufferedReader bufferedReader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)){
 			String line = bufferedReader.readLine();
 			//Check header
 			String[] header = line.split(String.valueOf(Constants.CSV_OUTPUTS_SEPARATOR));
@@ -720,43 +729,6 @@ public class MainDefinitions {
 			);
 			Assertions.assertThat(resultSet.next()).isTrue();
 			Assertions.assertThat(resultSet.getString(fieldName)).isNotNull().isEqualTo(expectedValue);
-		}
-	}
-
-	@Then("We should not be able to read the csv output file")
-	public void check_csv_encrypted() throws IOException, CsvValidationException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-
-		Assertions.assertThat(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv")
-		).doesNotExist();
-
-		CSVReader csvReader = getCSVReader(
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME + ".csv.enc")
-		);
-		try{
-			String[] header = csvReader.readNext();
-			Assertions.assertThat(header).doesNotContain(Constants.ROOT_IDENTIFIER_NAME);
-		}catch (CsvMalformedLineException e){
-			//Accepted exception
-			Assertions.assertThat(e).isInstanceOf(CsvMalformedLineException.class);
-		}
-	}
-
-	@Then("We should not be able to read the parquet output file")
-	public void check_parquet_encrypted() throws SQLException {
-		Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
-		Path filePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet");
-		Assertions.assertThat(filePath).doesNotExist();
-
-		Path encryptedFilePath =
-				executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-						".parquet.enc");
-		Assertions.assertThat(encryptedFilePath.toFile()).exists().content().isNotEmpty();
-		try (Statement statement = database.createStatement()) {
-			Assertions.assertThatThrownBy(() -> SqlUtils.readParquetFile(statement, encryptedFilePath)).isInstanceOf(SQLException.class);
 		}
 	}
 

@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.sequence;
 
-
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;

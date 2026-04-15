@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -52,16 +51,16 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         super(config,genesisClient,fileUtilsInterface,kraftwerkExecutionContext);
     }
 
-    public void runMain(String questionnaireModelId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
+    public void runMain(String collectionInstrumentId, int batchSize, Mode dataMode) throws KraftwerkException, IOException {
         log.info("Batch size of interrogations retrieved from Genesis: {}", batchSize);
         String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                questionnaireModelId));
+                collectionInstrumentId));
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
-        log.info("Kraftwerk main service started for questionnaire: {} {}", questionnaireModelId, kraftwerkExecutionContext.isWithDDI()
+        log.info("Kraftwerk main service started for questionnaire: {} {}", collectionInstrumentId, kraftwerkExecutionContext.isWithDDI()
                 ? "with DDI": "without DDI");
-        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
-        init(questionnaireModelId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(collectionInstrumentId);
+        init(collectionInstrumentId, modes);
         //Try with resources to close database when done
         try (Connection tryDatabase = config.isDuckDbInMemory() ?
                 SqlUtils.openConnection()
@@ -70,7 +69,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 throw new KraftwerkException(500,"Error during internal database creation");
             }
             this.database = tryDatabase.createStatement();
-            processDataByBatch(questionnaireModelId, batchSize, dataMode);
+            processDataByBatch(collectionInstrumentId, batchSize, dataMode);
             outputFileWriter();
             writeErrors();
             if (!database.isClosed()){database.close();}
@@ -85,43 +84,70 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     In this method we write at the end of every batch, not at the end of all batch
     This method can do differential extraction (all data since last extraction) otherwise all data since january 1st 2025
      */
-    public void runMainJson(String questionnaireModelId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
-        log.info("Export json for questionnaireModelId {}", questionnaireModelId);
+    public void runMainJson(String collectionInstrumentId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
+        log.info("Export json for collectionInstrumentId {}", collectionInstrumentId);
 
-        LocalDateTime beginDate = resolveBeginDate(questionnaireModelId, dataMode, since);
+        LocalDateTime beginDate = resolveBeginDate(collectionInstrumentId, dataMode, since);
 
-        String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb".formatted(System.getProperty(JAVA_TMPDIR_PROPERTY),
-                questionnaireModelId));
+        List<InterrogationId> ids =
+                fetchInterrogationIds(collectionInstrumentId, beginDate);
+
+        runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, true);
+    }
+
+    public void runMainJsonReplay(String collectionInstrumentId,
+                                  int batchSize,
+                                  Mode dataMode,
+                                  LocalDateTime start,
+                                  @Nullable LocalDateTime end)
+            throws KraftwerkException, IOException {
+
+        List<InterrogationId> ids =
+                fetchInterrogationIdsWithRecordDateBetween(collectionInstrumentId, start, end);
+
+        runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, false);
+    }
+
+    private void runMainJsonInternal(
+            String id,
+            int batchSize,
+            Mode dataMode,
+            List<InterrogationId> ids,
+            boolean updateLastExtraction
+    ) throws KraftwerkException, IOException {
+
+        String databasePath = ("%s/kraftwerk_temp/%s/db.duckdb"
+                .formatted(System.getProperty(JAVA_TMPDIR_PROPERTY), id));
+
         //We delete database at start (in case there is already one)
         SqlUtils.deleteDatabaseFile(databasePath);
 
-        List<Mode> modes = client.getModesByQuestionnaire(questionnaireModelId);
-        init(questionnaireModelId, modes);
+        List<Mode> modes = client.getModesByQuestionnaire(id);
+        init(id, modes);
 
-        Path tmpOutputFile = createTempOutputFile(questionnaireModelId);
+        Path tmpOutputFile = createTempOutputFile(id);
 
         //Try with resources to close database when done
         try (Connection connection = openDatabaseConnection(databasePath);
-             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile))
-        {
+             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile)) {
+
             this.database = connection.createStatement();
 
-            List<InterrogationId> ids = fetchInterrogationIds(questionnaireModelId, beginDate);
-            List<List<InterrogationId>> partitions  = ListUtils.partition(ids, batchSize);
-            int nbPartitions = partitions .size();
+            List<List<InterrogationId>> partitions = ListUtils.partition(ids, batchSize);
+            int nbPartitions = partitions.size();
             int indexPartition = 1;
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
-            jsonGenerator.writeStartArray(); // Beginning of Json Array
+            jsonGenerator.writeStartArray();
 
-            for (List<InterrogationId> listId : partitions ) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getUEsLatestState(questionnaireModelId, listId);
+            for (List<InterrogationId> listId : partitions) {
+                List<SurveyUnitUpdateLatest> suLatest = client.getResponses(id, listId);
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
                 // if one mode is specified we filter to keep data of that mode only
-                if (dataMode != null){
-                    suLatest = suLatest.stream().filter(su-> su.getMode()==dataMode).toList();
+                if (dataMode != null) {
+                    suLatest = suLatest.stream().filter(su -> su.getMode() == dataMode).toList();
                     log.info("Number of documents kept for mode {}", dataMode);
                 }
                 unimodalProcess(suLatest);
@@ -130,17 +156,24 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                 tmpJsonFileWriter(listId, suLatest, objectMapper, jsonGenerator, database);
                 indexPartition++;
             }
+
             jsonGenerator.writeEndArray(); // End of Json Array
-            if (!database.isClosed()){database.close();}
-        }catch (SQLException e){
+            if (!database.isClosed()) database.close();
+        } catch (SQLException e) {
             log.error(e.toString());
-            throw new KraftwerkException(500,"SQL error");
+            throw new KraftwerkException(500, "SQL error");
         }
-        moveTempFile(outputFileName(questionnaireModelId), tmpOutputFile);
+
+        moveTempFile(outputFileName(id), tmpOutputFile);
         writeErrors();
-        client.saveDateExtraction(questionnaireModelId, dataMode);
+
+        if (updateLastExtraction) {
+            client.saveDateExtraction(id, dataMode);
+        }
+
         SqlUtils.deleteDatabaseFile(databasePath);
     }
+
 
     private Path createTempOutputFile(String questionnaireModelId) throws IOException {
         Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
@@ -188,6 +221,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         try {
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
             LocalDateTime beginDate = LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
+            // Overlap of 10s to avoid data loss between differential exports
+            beginDate = beginDate.minusSeconds(10);
 
             log.info("Extracting data between {} and now for questionnaire {}", beginDate, questionnaireModelId);
             return beginDate;
@@ -207,23 +242,27 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         return client.getInterrogationIds(questionnaireModelId);
     }
 
+    private List<InterrogationId> fetchInterrogationIdsWithRecordDateBetween(
+            String collectionInstrumentId,
+            LocalDateTime start,
+            @Nullable LocalDateTime end
+    ) throws KraftwerkException {
+
+         end = (end != null)
+                ? end
+                : LocalDateTime.now();
+
+        if (end.isBefore(start)) {
+            throw new KraftwerkException(400, "endDate must be after startDate");
+        }
+
+        return client.getInterrogationIdsBetweenDates(collectionInstrumentId, start, end);
+    }
+
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {
         Path outDirectory = FileUtilsInterface.transformToOut(specsDirectory,kraftwerkExecutionContext.getExecutionDateTime());
-        try {
-            if (Files.notExists(outDirectory)) {
-                Files.createDirectories(outDirectory);
-                log.info("Created folder: {}", outDirectory);
-            }
-        } catch (IOException e) {
-            log.error("Permission refused to create folder: {} : {}", outDirectory.getParent(), e);
-        }
         Path outputPath = outDirectory.resolve(filename);
-        //Encrypt file if requested
-        if(kraftwerkExecutionContext.isWithEncryption()) {
-            InputStream encryptedStream = encryptionUtils.encryptOutputFile(tmpOutputFile, kraftwerkExecutionContext);
-            fileUtilsInterface.writeFile(filename, encryptedStream, true);
-            log.info("File: {} successfully written and encrypted", filename);
-        }
+        kraftwerkExecutionContext.setOutDirectory(outDirectory);
         fileUtilsInterface.moveFile(tmpOutputFile,outputPath.toString());
         log.info("File: {} successfully written", outputPath);
     }
@@ -241,9 +280,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String timestamp = LocalDateTime.now().format(formatter);
         String fileName = String.format("export_%s_%s", questionnaireModelId, timestamp);
-        return kraftwerkExecutionContext.isWithEncryption() ?
-                fileName + JSON_EXTENSION + ".enc"
-                : fileName + JSON_EXTENSION;
+        return fileName + JSON_EXTENSION;
     }
 
     protected void tmpJsonFileWriter(List<InterrogationId> listIds,

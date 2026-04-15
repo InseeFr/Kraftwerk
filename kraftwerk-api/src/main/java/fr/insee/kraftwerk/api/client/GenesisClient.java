@@ -75,7 +75,7 @@ public class GenesisClient {
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
 		// We use another restTemplate because we don't need a token to ping Genesis
 		RestTemplate restTemplateWithoutAuth = new RestTemplate();
-		//Null requestEntity because health check is whitelisted
+		// Null requestEntity because health check is whitelisted
 		ResponseEntity<String> response = restTemplateWithoutAuth.exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody() != null ? response.getBody() : null;
 	}
@@ -94,6 +94,13 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
+    public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, LocalDateTime start, LocalDateTime end) throws KraftwerkException {
+		String url = String.format("%s/interrogations/by-collection-instrument-and-between-datetime?collectionInstrumentId=%s&start=%s&end=%s",
+				configProperties.getGenesisUrl(), collectionInstrumentId,start,end);
+		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
+		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+	}
+
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {
 		String url = String.format("%s/modes/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
@@ -102,16 +109,16 @@ public class GenesisClient {
 		return modes;
 	}
 
-	public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
-		String url = String.format("%s/modes/by-questionnaire?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireModelId);
+	public List<Mode> getModesByQuestionnaire(String collectionInstrumentId) throws KraftwerkException {
+		String url = String.format("%s/modes/by-questionnaire?collectionInstrumentId=%s", configProperties.getGenesisUrl(), collectionInstrumentId);
 		ResponseEntity<String[]> response = makeApiCall(url, HttpMethod.GET, null, String[].class);
 		List<Mode> modes = new ArrayList<>();
 		if (response.getBody() != null) Arrays.asList(response.getBody()).forEach(modeLabel -> modes.add(Mode.getEnumFromModeName(modeLabel)));
 		return modes;
 	}
 	
-	public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) throws KraftwerkException {
-		String url = String.format("%s/responses/simplified/by-list-interrogation-and-questionnaire/latest?questionnaireId=%s", configProperties.getGenesisUrl(), questionnaireId);
+	public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds) throws KraftwerkException {
+		String url = String.format("%s/responses/%s", configProperties.getGenesisUrl(), collectionInstrumentId);
 		ResponseEntity<SurveyUnitUpdateLatest[]> response = makeApiCall(url,HttpMethod.POST,interrogationIds,SurveyUnitUpdateLatest[].class);
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
@@ -142,9 +149,9 @@ public class GenesisClient {
 		makeApiCall(url,HttpMethod.POST,metadataModel,null);
 	}
 
-	public void saveDateExtraction(String questionnaireModelId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?questionnaireId=%s",
-				configProperties.getGenesisUrl(), questionnaireModelId);
+	public void saveDateExtraction(String collectionInstrumentId, Mode mode) throws KraftwerkException {
+		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
+				configProperties.getGenesisUrl(), collectionInstrumentId);
 		if (mode != null) {
 			url += "&mode=" + mode;
 		}
@@ -152,7 +159,7 @@ public class GenesisClient {
 	}
 
 	public LastJsonExtractionDate getLastExtractionDate(String questionnaireModelId, Mode mode) throws KraftwerkException {
-		String url = String.format("%s/extractions/json?questionnaireId=%s",
+		String url = String.format("%s/extractions/json?collectionInstrumentId=%s",
 				configProperties.getGenesisUrl(), questionnaireModelId);
 		if (mode != null) {
 			url += "&mode=" + mode;

@@ -4,13 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.rawdata.SurveyRawData;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -35,17 +34,20 @@ public class VtlExecute {
     /** Engine that will execute VTL instructions */
     private final ScriptEngine engine;
     private final FileUtilsInterface fileUtilsInterface;
+    private final KraftwerkExecutionContext kraftwerkExecutionContext;
 
 
-    public VtlExecute(FileUtilsInterface fileUtilsInterface){
+    public VtlExecute(FileUtilsInterface fileUtilsInterface, KraftwerkExecutionContext kraftwerkExecutionContext){
         mapper = new ObjectMapper();
         mapper.registerModule(new TrevasModule());
         // Engine
         engine = new ScriptEngineManager()
                 .getEngineByName("vtl");
         this.fileUtilsInterface = fileUtilsInterface;
+        this.kraftwerkExecutionContext = kraftwerkExecutionContext;
     }
-    
+
+    //TODO Remove JSON temp file writing (not cloud native)
     /**
      * Transform the given data object into a Trevas VTL dataset, and put it in the bindings.
      * The variables map of the given data object is also stored and can later be get using the method
@@ -59,7 +61,7 @@ public class VtlExecute {
      */
     public void convertToVtlDataset(SurveyRawData surveyRawData, String bindingName, VtlBindings bindings){
         // Write data in a json file
-        var vtlJsonDatasetWriter = new VtlJsonDatasetWriter(surveyRawData, bindingName);
+        var vtlJsonDatasetWriter = new VtlJsonDatasetWriter(surveyRawData, bindingName, kraftwerkExecutionContext);
         String tempDatasetPath = vtlJsonDatasetWriter.writeVtlJsonDataset();
         // Give this json file to the mapper to put a Dataset in the bindings
         putVtlDataset(tempDatasetPath, bindingName, bindings);
@@ -90,7 +92,7 @@ public class VtlExecute {
             bindings.put(bindingName, vtlDataset);
         }
         catch(IOException e){
-            log.error("Unable to connect dataset from url {}: {}", url, e);
+            log.error("Unable to connect dataset from url {}: {} caused by {}", url, e, e.getCause().toString());
         }
     }
 

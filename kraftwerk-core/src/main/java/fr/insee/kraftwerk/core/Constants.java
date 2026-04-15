@@ -29,7 +29,9 @@ public final class Constants {
 
 	public static final String USER_INPUT_FILE = "kraftwerk.json";
 
-	// Normalized name for VTL user scripts when using Genesis data
+    public static final String ENCRYPTED_FILE_EXTENSION = ".enc";
+
+    // Normalized name for VTL user scripts when using Genesis data
 	public static final String USER_VTL_UNIMODAL_SCRIPT_NAME = "script_unimodal.vtl";
 	public static final String USER_VTL_FINAL_SCRIPT_NAME = "script_final.vtl";
 
@@ -56,7 +58,10 @@ public final class Constants {
 	// ----- Fixed parameters
 	public static final String ROOT_GROUP_NAME = "RACINE";
 	public static final String ROOT_IDENTIFIER_NAME = "interrogationId";
-	public static final String SURVEY_UNIT_IDENTIFIER_NAME = "IdUE";
+	public static final String SURVEY_UNIT_IDENTIFIER_NAME = "usualSurveyUnitId";
+	public static final String VALIDATION_DATE_NAME = "validationDate";
+	public static final String VALIDATION_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
+	public static final String QUESTIONNAIRE_STATE_NAME = "questionnaireState";
 	public static final String LOOP_NAME_PREFIX = "BOUCLE";
 	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
 	public static final String REPORTING_DATA_GROUP_NAME = "REPORTINGDATA";
@@ -81,6 +86,7 @@ public final class Constants {
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 	public static final String MISSING_SUFFIX = "_MISSING";
 	public static final String COLLECTED = "COLLECTED";
+	public static final String VARIABLE_STATE_SUFFIX_NAME = "_STATE";
 	private static final String[] ENO_VARIABLES = {"COMMENT_QE","COMMENT_UE","HEURE_REMPL","MIN_REMPL"};
 
 
@@ -103,9 +109,9 @@ public final class Constants {
 	// ----- Reporting Variables Names in output file
 	public static final String REPORTING_DATA_PREFIX_NAME = "REPORT_";
 	public static final String IDENTIFICATION_CONFIGURATION = "TYPE_SPOTTING";
-	public static final String STATE_SUFFIX_NAME = "STATE";
+	public static final String REPORTING_DATA_STATE_SUFFIX_NAME = "STATE";
 	public static final String COMMENT_PREFIX_NAME = "COMMENT";
-	public static final String LAST_STATE_NAME = "LAST_" + Constants.STATE_SUFFIX_NAME;
+	public static final String LAST_STATE_NAME = "LAST_" + Constants.REPORTING_DATA_STATE_SUFFIX_NAME;
 	  
 	public static final String INTERVIEWER_ID_NAME = "IDENQ";
 	public static final String ORGANIZATION_UNIT_ID_NAME = "ORGANIZATION_UNIT_ID";
