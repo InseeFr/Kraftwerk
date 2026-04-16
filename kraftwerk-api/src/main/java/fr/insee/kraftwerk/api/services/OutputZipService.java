@@ -69,16 +69,16 @@ public class OutputZipService {
 
             String targetEncPath = resolveTargetEncPath(outDirectory, baseName, ENCRYPTED_FILE_EXTENSION);
 
-            fileUtils.moveFile(tempEncFile, targetEncPath);
-            tempEncFile = null;
-
             deleteWithRetry(tempZipFile);
             tempZipFile = null;
 
             fileUtils.deleteDirectoryContent(outDirectory);
 
+            fileUtils.moveFile(tempEncFile, targetEncPath);
+            tempEncFile = null;
+
             log.info("Encrypted archive created at {}", targetEncPath);
-            log.info("Deleted outDirectory {}", outDirectory);
+            log.info("Deleted non-encrypted content from {}", outDirectory);
 
         } catch (IOException e) {
             cleanupTemps(tempZipFile, tempEncFile);
@@ -97,12 +97,8 @@ public class OutputZipService {
         }
     }
 
-    private String resolveTargetEncPath(Path outDirectory, String baseName, String encExt) throws KraftwerkException {
-        Path parent = outDirectory.getParent();
-        if (parent == null) {
-            throw new KraftwerkException(500, "Cannot resolve parent of outDirectory: " + outDirectory);
-        }
-        return parent.resolve(baseName + ZIP_EXTENSION + encExt).toString();
+    private String resolveTargetEncPath(Path outDirectory, String baseName, String encExt) {
+        return outDirectory.resolve(baseName + ZIP_EXTENSION + encExt).toString();
     }
 
     /**
