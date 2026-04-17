@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.services.BatchExportService;
 import fr.insee.kraftwerk.api.services.MainService;
 import fr.insee.kraftwerk.api.services.ReportingDataService;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -42,6 +43,8 @@ class KraftwerkBatchTest {
 
     Environment environment;
 
+    BatchExportService batchExportService;
+
     @BeforeEach
     void setup() {
         configProperties = mock(ConfigProperties.class);
@@ -50,6 +53,7 @@ class KraftwerkBatchTest {
         reportingDataService = mock(ReportingDataService.class);
         mainService = mock(MainService.class);
         environment = mock(Environment.class);
+        batchExportService = mock(BatchExportService.class);
 
         when(minioConfig.isEnable()).thenReturn(false);
         when(configProperties.getDefaultDirectory()).thenReturn("/tmp");
@@ -61,7 +65,7 @@ class KraftwerkBatchTest {
                 vaultConfig,
                 reportingDataService,
                 mainService,
-                environment
+                environment, batchExportService
         );
     }
 
@@ -123,7 +127,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainService(
+        verify(batchExportService, times(1)).mainServiceBatch(
                 any(),
                 anyBoolean(),
                 eq(false),
@@ -143,7 +147,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -165,7 +169,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(100),
@@ -187,7 +191,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 eq(Mode.WEB),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -209,7 +213,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 eq(null),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -230,7 +234,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainService(
+        verify(batchExportService, times(1)).mainServiceBatch(
                 any(),
                 anyBoolean(),
                 eq(true),
@@ -251,7 +255,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -272,7 +276,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -294,7 +298,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(100),
@@ -316,7 +320,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 eq(Mode.WEB),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -337,7 +341,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -372,7 +376,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainFileByFile(
+        verify(batchExportService, times(1)).mainFileByFileBatch(
                 any(),
                 anyBoolean(),
                 eq(false),
@@ -393,7 +397,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainFileByFile(
+        verify(batchExportService, times(1)).mainFileByFileBatch(
                 any(),
                 anyBoolean(),
                 eq(true),
@@ -418,7 +422,8 @@ class KraftwerkBatchTest {
                 vaultConfig,
                 reportingDataService,
                 mainService,
-                environment
+                environment,
+                batchExportService
         );
 
         // THEN

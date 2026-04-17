@@ -1,6 +1,5 @@
 package fr.insee.kraftwerk.core.data.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 
