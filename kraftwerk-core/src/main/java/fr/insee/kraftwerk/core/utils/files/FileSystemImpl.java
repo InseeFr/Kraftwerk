@@ -172,23 +172,8 @@ public class FileSystemImpl implements FileUtilsInterface{
 
     @Override
     public void deleteDirectoryContent(Path directoryPath) throws KraftwerkException {
-        try {
-            if (!Files.exists(directoryPath)) {
-                return;
-            }
 
-            if (!Files.isDirectory(directoryPath)) {
-                throw new KraftwerkException(400, "Path is not a directory: " + directoryPath);
-            }
-
-            try (Stream<Path> paths = Files.list(directoryPath)) {
-                for (Path child : (Iterable<Path>) paths::iterator) {
-                    org.springframework.util.FileSystemUtils.deleteRecursively(child);
-                }
-            }
-        } catch (IOException e) {
-            throw new KraftwerkException(500, "IOException when deleting directory content : " + e.getMessage());
-        }
+        deleteDirectory(directoryPath);
     }
 
     @Override
