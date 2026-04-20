@@ -75,7 +75,7 @@ public class OutputZipService {
             deleteWithRetry(tempZipFile);
             tempZipFile = null;
 
-            fileUtils.deleteDirectory(outDirectory);
+            fileUtils.deleteDirectoryContent(outDirectory);
 
             log.info("Encrypted archive created at {}", targetEncPath);
             log.info("Deleted outDirectory {}", outDirectory);
