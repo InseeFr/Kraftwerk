@@ -226,7 +226,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                     List<SurveyUnitUpdateLatest> suLatest = null;
 
                     try {
-                        log.info("DEBUG processing interrogationId={}", interrogationId);
+                        log.info("DEBUG processing interrogationId={}", interrogationId.getId());
 
                         suLatest = client.getResponses(id, List.of(interrogationId));
 
