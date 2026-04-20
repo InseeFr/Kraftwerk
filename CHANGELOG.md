@@ -1,5 +1,5 @@
 # Changelog
-## 3.15.0 [TODO]
+## 3.15.0 [2026-04-20]
 ### Added
 - Export JSON debug endpoint
 
