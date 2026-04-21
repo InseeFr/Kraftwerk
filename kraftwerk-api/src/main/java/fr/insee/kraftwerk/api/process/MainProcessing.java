@@ -147,7 +147,7 @@ public class MainProcessing {
 	/* Step 4 : Insert into SQL database */
 	private void insertDatabase(Statement database) {
 		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
-		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
+		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database, kraftwerkExecutionContext);
 	}
 
 	/* Step 5 : Write output files */
