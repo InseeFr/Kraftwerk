@@ -2,6 +2,9 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.errors.DuckDBError;
+import fr.insee.kraftwerk.core.exceptions.ColumnNotFoundException;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -39,7 +42,8 @@ public class SqlUtils {
      * @param vtlBindings vtl bindings to send into database
      * @param statement statement associated to database
      */
-    public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement) {
+    public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement,
+                                                         KraftwerkExecutionContext kraftwerkExecutionContext) {
         try {
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 //Variables types map
@@ -49,6 +53,7 @@ public class SqlUtils {
             }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
+            kraftwerkExecutionContext.getErrors().add(new DuckDBError(e.toString()));
         }
     }
 
@@ -201,21 +206,30 @@ public class SqlUtils {
                         continue;
                     }
 
+
                     String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
                     try{
+                        String duckDBColumnType = getColumnType(database, datasetName, columnName);
+                        if(!variableType.getSqlType().equals(duckDBColumnType)){
+                            log.warn("""
+                                    Difference between VTL and SQL types on column/variable {} !
+                                    VTL: {}
+                                    SQL: {}""", columnName, variableType, duckDBColumnType);
+                        }
                         appendValueWithType(appender, data, variableType);
-                    }catch (SQLException | NumberFormatException | DateTimeParseException e) {
+                    }catch (SQLException
+                            | NumberFormatException
+                            | DateTimeParseException
+                            | ColumnNotFoundException e) {
                         log.error(e.toString());
-                        throw new SQLException(
-                                "Error Appender DuckDB"
-                                        + " [col=" + columnName
-                                        + ", type=" + sqlSchema.get(columnName)
-                                        + ", value=" + data
-                                        //Cannot be replaced by getOrDefault, ignore the warning
-                                        + ", raw=" + (dataRow.containsKey("interrogationId") ? dataRow.get("interrogationId") : "unknown")
-                                        + "]",
-                                e
-                        );
+                        String errorMessage = "Error Appender DuckDB"
+                                + " [columnName=" + columnName
+                                + ", vtlType=" + sqlSchema.get(columnName)
+                                + ", value=" + data
+                                //Cannot be replaced by getOrDefault, ignore the warning
+                                + ", interrogationId=" + (dataRow.containsKey("interrogationId") ? dataRow.get("interrogationId") : "unknown")
+                                + "]";
+                        throw new SQLException(errorMessage, e);
                     }
                 }
                 appender.endRow();
@@ -309,6 +323,33 @@ public class SqlUtils {
             }
         }
         return columnNames;
+    }
+
+    /**
+     * Connect to DuckDB and retrieve type of a column in a table
+     *
+     * @param tableName name of table to retrieve column
+     * @param columnName name of the column
+     * @return the type of the column (VARCHAR,INTEGER...)
+     * @throws SQLException if SQL error
+     * @throws ColumnNotFoundException if column not present in table
+     */
+    public static String getColumnType(Statement statement,
+                                       String tableName,
+                                       String columnName
+    ) throws SQLException, ColumnNotFoundException {
+        String columnType = null;
+        try (ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName))) {
+            while (resultSet.next()) {
+                if(resultSet.getString("column_name").equals(columnName)){
+                    columnType = resultSet.getString("column_type");
+                }
+            }
+        }
+        if(columnType == null){
+            throw new ColumnNotFoundException("Column %s not found in table %s".formatted(columnName, tableName));
+        }
+        return columnType;
     }
 
     /**
