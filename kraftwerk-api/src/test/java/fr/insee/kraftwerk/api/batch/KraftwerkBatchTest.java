@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.BatchResponseDto;
 import fr.insee.kraftwerk.api.services.BatchExportService;
 import fr.insee.kraftwerk.api.services.MainService;
 import fr.insee.kraftwerk.api.services.ReportingDataService;
@@ -14,15 +15,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -474,5 +479,38 @@ class KraftwerkBatchTest {
 
         verifyNoInteractions(mainService);
         verifyNoInteractions(reportingDataService);
+    }
+
+    @Test
+    void main_service_genesis_batch_shouldReturnJobIdAndOutputPath() {
+        ApplicationArguments args = mock(ApplicationArguments.class);
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
+        when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
+        when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
+        when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
+
+        BatchResponseDto dto = new BatchResponseDto("job-123", "out/TESTCAMPAIGN2/2026_04_22_10_00_00");
+        when(batchExportService.mainGenesisByQuestionnaireIdBatch(
+                any(),
+                any(),
+                anyInt(),
+                anyBoolean(),
+                anyBoolean()
+        )).thenReturn(dto);
+
+        ResponseEntity<Object> response = ReflectionTestUtils.invokeMethod(kraftwerkBatch, "runBatchMode", args);
+
+        assertNotNull(response);
+        assertEquals(202, response.getStatusCode().value());
+        assertEquals(dto, response.getBody());
+
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
+                eq("TESTCAMPAIGN2"),
+                eq(null),
+                eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
+                eq(false),
+                eq(true)
+        );
     }
 }
