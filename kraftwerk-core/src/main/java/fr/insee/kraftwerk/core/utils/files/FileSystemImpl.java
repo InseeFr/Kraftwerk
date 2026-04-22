@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -173,7 +174,23 @@ public class FileSystemImpl implements FileUtilsInterface{
     @Override
     public void deleteDirectoryContent(Path directoryPath) throws KraftwerkException {
 
-        deleteDirectory(directoryPath);
+        try {
+            if (!Files.exists(directoryPath)) {
+                return;
+            }
+
+            if (!Files.isDirectory(directoryPath)) {
+                throw new KraftwerkException(400, "Path is not a directory: " + directoryPath);
+            }
+
+            try (Stream<Path> paths = Files.list(directoryPath)) {
+                for (Path child : (Iterable<Path>) paths::iterator) {
+                    FileSystemUtils.deleteRecursively(child);
+                }
+            }
+        } catch (IOException e) {
+            throw new KraftwerkException(500, "IOException when deleting directory content : " + e.getMessage());
+        }
     }
 
     @Override
