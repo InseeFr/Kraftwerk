@@ -1,4 +1,8 @@
 # Changelog
+## 3.15.0 [2026-04-20]
+### Added
+- Export JSON debug endpoint
+
 ## 3.14.1 [2026-03-30]
 ### Added
 - Some logs

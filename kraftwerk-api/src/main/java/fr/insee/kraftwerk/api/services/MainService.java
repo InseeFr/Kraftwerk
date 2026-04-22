@@ -5,7 +5,9 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -32,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -332,6 +335,40 @@ public class MainService extends KraftwerkService {
         return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
     }
 
+    @PostMapping(value = "/debug/json")
+    public ResponseEntity<Object> jsonDebugExtraction(
+            @RequestParam String collectionInstrumentId,
+            @RequestParam(required = false) Mode dataMode,
+            @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
+            @RequestBody DebugJsonExportDto debugJsonExportDto
+    ) {
+        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        boolean withDDI = true;
+        boolean withEncryption = false;
+
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface, addStates);
+
+        try {
+            if (debugJsonExportDto == null || debugJsonExportDto.getInterrogationIds() == null || debugJsonExportDto.getInterrogationIds().isEmpty()) {
+                return ResponseEntity.badRequest().body("interrogationIds must not be empty");
+            }
+
+            DebugJsonExportResultDto result = mpGenesis.runMainJsonDebug(
+                    collectionInstrumentId,
+                    batchSize,
+                    dataMode,
+                    debugJsonExportDto.getInterrogationIds()
+            );
+
+            return ResponseEntity.ok(result);
+
+        } catch (KraftwerkException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @NotNull
     MainProcessingGenesisLegacy getMainProcessingGenesis(
