@@ -5,7 +5,9 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -307,14 +309,14 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract since",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00Z")
             )
-            @RequestParam(value = "sinceDate",required = true) LocalDateTime start,
+            @RequestParam(value = "sinceDate",required = true) Instant start,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract until",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00Z")
             )
-            @RequestParam(value = "untilDate",required = false) LocalDateTime end,
+            @RequestParam(value = "untilDate",required = false) Instant end,
             @Parameter(description = "${param.addStates}")
             @RequestParam(value = "addStates", defaultValue = "false")
             boolean addStates
@@ -340,6 +342,40 @@ public class MainService extends KraftwerkService {
         return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
     }
 
+    @PostMapping(value = "/debug/json")
+    public ResponseEntity<Object> jsonDebugExtraction(
+            @RequestParam String collectionInstrumentId,
+            @RequestParam(required = false) Mode dataMode,
+            @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
+            @RequestBody DebugJsonExportDto debugJsonExportDto
+    ) {
+        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        boolean withDDI = true;
+        boolean withEncryption = false;
+
+        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface, addStates);
+
+        try {
+            if (debugJsonExportDto == null || debugJsonExportDto.getInterrogationIds() == null || debugJsonExportDto.getInterrogationIds().isEmpty()) {
+                return ResponseEntity.badRequest().body("interrogationIds must not be empty");
+            }
+
+            DebugJsonExportResultDto result = mpGenesis.runMainJsonDebug(
+                    collectionInstrumentId,
+                    batchSize,
+                    dataMode,
+                    debugJsonExportDto.getInterrogationIds()
+            );
+
+            return ResponseEntity.ok(result);
+
+        } catch (KraftwerkException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @NotNull
     MainProcessingGenesisLegacy getMainProcessingGenesis(

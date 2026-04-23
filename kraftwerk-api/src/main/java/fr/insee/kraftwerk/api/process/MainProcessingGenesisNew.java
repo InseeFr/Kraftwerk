@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.dto.InterrogationBatchResponse;
+import fr.insee.kraftwerk.api.dto.DebugErrorDto;
+import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
 import fr.insee.kraftwerk.core.data.model.InterrogationId;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -32,6 +34,7 @@ import java.sql.Statement;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -115,8 +118,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     public void runMainJsonReplay(String collectionInstrumentId,
                                   int batchSize,
                                   Mode dataMode,
-                                  LocalDateTime start,
-                                  @Nullable LocalDateTime end)
+                                  Instant start,
+                                  @Nullable Instant end)
             throws KraftwerkException, IOException {
 
         List<InterrogationId> ids =
@@ -193,6 +196,121 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         SqlUtils.deleteDatabaseFile(databasePath);
     }
 
+    /**
+     * DEBUG ONLY.
+     *
+     * Helper method to debug problematic InterrogationIds.
+     * Processes each InterrogationId individually (with isolated try/catch)
+     * to identify failures without stopping the whole execution.
+     *
+     * This method intentionally duplicates part of the main logic for debugging purposes
+     */
+    public DebugJsonExportResultDto runMainJsonDebug(
+            String id,
+            int batchSize,
+            Mode dataMode,
+            List<InterrogationId> interrogationIds
+    ) throws KraftwerkException, IOException {
+
+        String databasePath = ("%s/kraftwerk_temp/%s/db_debug.duckdb"
+                .formatted(System.getProperty(JAVA_TMPDIR_PROPERTY), id));
+
+        SqlUtils.deleteDatabaseFile(databasePath);
+
+        List<Mode> modes = client.getModesByQuestionnaire(id);
+        init(id, modes);
+
+        Path tmpOutputFile = createTempOutputFile(id);
+        List<InterrogationId> successIds = new ArrayList<>();
+        List<DebugErrorDto> errors = new ArrayList<>();
+
+        try (Connection connection = openDatabaseConnection(databasePath);
+             JsonGenerator jsonGenerator = createJsonGenerator(tmpOutputFile)) {
+
+            this.database = connection.createStatement();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+
+            jsonGenerator.writeStartArray();
+
+            List<List<InterrogationId>> partitions = ListUtils.partition(interrogationIds, batchSize);
+            int nbPartitions = partitions.size();
+            int indexPartition = 1;
+
+            for (List<InterrogationId> part : partitions) {
+                log.info("DEBUG partition {}/{} (size={})", indexPartition, nbPartitions, part.size());
+
+                for (InterrogationId interrogationId : part) {
+                    List<SurveyUnitUpdateLatest> suLatest = null;
+
+                    try {
+                        log.info("DEBUG processing interrogationId={}", interrogationId.getId());
+
+                        suLatest = client.getResponses(id, List.of(interrogationId));
+
+                        if (suLatest == null || suLatest.isEmpty()) {
+                            log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);
+                            errors.add(new DebugErrorDto(interrogationId, null, "No SurveyUnit found"));
+                            continue;
+                        }
+
+                        vtlBindings = new VtlBindings();
+
+                        if (dataMode != null) {
+                            suLatest = suLatest.stream()
+                                    .filter(su -> su.getMode() == dataMode)
+                                    .toList();
+                        }
+
+                        if (suLatest.isEmpty()) {
+                            errors.add(new DebugErrorDto(interrogationId, null, "No SurveyUnit found after dataMode filtering"));
+                            continue;
+                        }
+
+                        unimodalProcess(suLatest);
+                        multimodalProcess();
+                        insertDatabase();
+
+                        tmpJsonFileWriter(List.of(interrogationId), suLatest, objectMapper, jsonGenerator, database);
+
+                        successIds.add(interrogationId);
+
+                    } catch (Exception e) {
+                        String usuId = (suLatest != null && !suLatest.isEmpty())
+                                ? suLatest.getFirst().getUsualSurveyUnitId()
+                                : null;
+
+                        log.error("DEBUG FAILED interrogationId={}, usualSurveyUnitId={}", interrogationId, usuId, e);
+
+                        errors.add(new DebugErrorDto(
+                                interrogationId,
+                                usuId,
+                                e.getMessage()
+                        ));
+                    }
+                }
+
+                indexPartition++;
+            }
+
+            jsonGenerator.writeEndArray();
+
+            if (!database.isClosed()) {
+                database.close();
+            }
+
+        } catch (SQLException e) {
+            log.error(e.toString());
+            throw new KraftwerkException(500, "SQL error");
+        } finally {
+            SqlUtils.deleteDatabaseFile(databasePath);
+        }
+        moveTempFile(outputFileName(id), tmpOutputFile);
+        writeErrors();
+
+        return new DebugJsonExportResultDto(id, successIds, errors);
+    }
 
     private Path createTempOutputFile(String questionnaireModelId) throws IOException {
         Files.createDirectories(Path.of(System.getProperty(JAVA_TMPDIR_PROPERTY)));
@@ -261,13 +379,13 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
     private List<InterrogationId> fetchInterrogationIdsWithRecordDateBetween(
             String collectionInstrumentId,
-            LocalDateTime start,
-            @Nullable LocalDateTime end
+            Instant start,
+            @Nullable Instant end
     ) throws KraftwerkException {
 
          end = (end != null)
                 ? end
-                : LocalDateTime.now();
+                : Instant.now();
 
         if (end.isBefore(start)) {
             throw new KraftwerkException(400, "endDate must be after startDate");

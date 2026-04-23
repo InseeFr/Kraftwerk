@@ -88,6 +88,23 @@ public class MinioImpl implements FileUtilsInterface {
     }
 
     @Override
+    public void deleteDirectoryContent(Path directoryPath) throws KraftwerkException {
+        String prefix = directoryPath.toString().replace("\\", "/");
+        if (!prefix.endsWith("/")) {
+            prefix += "/";
+        }
+
+        try {
+            for (String filePath : listFileNames(prefix)) {
+                deleteFile(filePath);
+            }
+        } catch (Exception e) {
+            log.error("Error deleting directory content {}", directoryPath, e);
+            throw new KraftwerkException(500, "Can't delete directory content " + directoryPath);
+        }
+    }
+
+    @Override
     public List<String> listFileNames(String dir) {
         try {
             ArrayList<String> filePaths = new ArrayList<>();
