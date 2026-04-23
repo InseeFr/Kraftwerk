@@ -8,6 +8,7 @@ import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
 import fr.insee.kraftwerk.api.services.async.MainAsyncService;
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
@@ -122,13 +124,11 @@ public class BatchExportService extends KraftwerkService {
     }
 
     private Path buildBatchOutDirectoryForGenesis(String collectionInstrumentId, LocalDateTime executionDateTime) {
-        return FileUtilsInterface.transformToOut(Paths.get(collectionInstrumentId), executionDateTime);
-    }
-
-    private Path buildBatchEncryptedOutputPath(Path outDirectory) {
-        Path parent = outDirectory.getParent();
-        String baseName = outDirectory.getFileName().toString();
-        return parent.resolve(baseName + ".zip.enc");
+        return Paths.get(
+                "out",
+                collectionInstrumentId,
+                executionDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN))
+        );
     }
 
     public BatchResponseDto mainServiceBatch(
@@ -153,8 +153,7 @@ public class BatchExportService extends KraftwerkService {
         String jobId = UUID.randomUUID().toString();
         LocalDateTime executionDateTime = mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
-        Path outDirectory = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        Path outputPath = withEncryption ? buildBatchEncryptedOutputPath(outDirectory) : outDirectory;
+        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
 
         mainAsyncService.runWithoutGenesis(
                 jobId,
@@ -167,7 +166,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainFileByFileBatch(
@@ -192,8 +193,7 @@ public class BatchExportService extends KraftwerkService {
         String jobId = UUID.randomUUID().toString();
         LocalDateTime executionDateTime = mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
-        Path outDirectory = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        Path outputPath = withEncryption ? buildBatchEncryptedOutputPath(outDirectory) : outDirectory;
+        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
 
         mainAsyncService.runWithoutGenesis(
                 jobId,
@@ -206,7 +206,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainLunaticOnlyBatch(
@@ -231,8 +233,7 @@ public class BatchExportService extends KraftwerkService {
         String jobId = UUID.randomUUID().toString();
         LocalDateTime executionDateTime = mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
-        Path outDirectory = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        Path outputPath = withEncryption ? buildBatchEncryptedOutputPath(outDirectory) : outDirectory;
+        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
 
         mainAsyncService.runWithoutGenesis(
                 jobId,
@@ -245,8 +246,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
-    }
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;    }
 
     public BatchResponseDto mainGenesisByQuestionnaireIdBatch(
             String questionnaireModelId,
@@ -268,8 +270,7 @@ public class BatchExportService extends KraftwerkService {
 
         LocalDateTime executionDateTime = mpGenesis.getKraftwerkExecutionContext().getExecutionDateTime();
 
-        Path outDirectory = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
-        Path outputPath = withEncryption ? buildBatchEncryptedOutputPath(outDirectory) : outDirectory;
+        Path outputPath = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
 
         exportJobStore.start(jobId);
         mainAsyncService.runWithGenesisByQuestionnaire(
@@ -283,7 +284,9 @@ public class BatchExportService extends KraftwerkService {
                 dataMode
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainGenesisLunaticOnlyByQuestionnaireBatch(
@@ -306,8 +309,7 @@ public class BatchExportService extends KraftwerkService {
 
         LocalDateTime executionDateTime = mpGenesis.getKraftwerkExecutionContext().getExecutionDateTime();
 
-        Path outDirectory = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
-        Path outputPath = withEncryption ? buildBatchEncryptedOutputPath(outDirectory) : outDirectory;
+        Path outputPath = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
 
         exportJobStore.start(jobId);
         mainAsyncService.runWithGenesisByQuestionnaire(
@@ -321,7 +323,9 @@ public class BatchExportService extends KraftwerkService {
                 dataMode
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public ResponseEntity<Object> jsonExtractionBatch(
@@ -347,7 +351,9 @@ public class BatchExportService extends KraftwerkService {
 
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            return ResponseEntity.ok(normalizePath(outputPath));
+            String response = normalizePath(outputPath);
+            log.info("Batch response: {}", response);
+            return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         } catch (IOException e) {

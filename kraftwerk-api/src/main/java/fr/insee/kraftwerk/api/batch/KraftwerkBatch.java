@@ -92,6 +92,11 @@ public class KraftwerkBatch implements ApplicationRunner {
                     ));
                     System.exit(1);
                 }
+                if (kraftwerkResponse != null
+                        && kraftwerkResponse.getStatusCode().is2xxSuccessful()
+                        && kraftwerkResponse.getBody() != null) {
+                    log.info("Batch response: {}", kraftwerkResponse.getBody());
+                }
                 return;
             } catch (Exception e){
                 if (!isTestEnvironment()) {
