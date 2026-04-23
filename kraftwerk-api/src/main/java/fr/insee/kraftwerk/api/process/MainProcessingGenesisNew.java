@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -101,8 +102,8 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     public void runMainJsonReplay(String collectionInstrumentId,
                                   int batchSize,
                                   Mode dataMode,
-                                  LocalDateTime start,
-                                  @Nullable LocalDateTime end)
+                                  Instant start,
+                                  @Nullable Instant end)
             throws KraftwerkException, IOException {
 
         List<InterrogationId> ids =
@@ -362,13 +363,13 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
     private List<InterrogationId> fetchInterrogationIdsWithRecordDateBetween(
             String collectionInstrumentId,
-            LocalDateTime start,
-            @Nullable LocalDateTime end
+            Instant start,
+            @Nullable Instant end
     ) throws KraftwerkException {
 
          end = (end != null)
                 ? end
-                : LocalDateTime.now();
+                : Instant.now();
 
         if (end.isBefore(start)) {
             throw new KraftwerkException(400, "endDate must be after startDate");
