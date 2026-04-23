@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +95,7 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-    public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, LocalDateTime start, LocalDateTime end) throws KraftwerkException {
+    public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, Instant start, Instant end) throws KraftwerkException {
 		String url = String.format("%s/interrogations/by-collection-instrument-and-between-datetime?collectionInstrumentId=%s&start=%s&end=%s",
 				configProperties.getGenesisUrl(), collectionInstrumentId,start,end);
 		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);

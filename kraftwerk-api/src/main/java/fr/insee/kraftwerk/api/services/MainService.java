@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -302,14 +303,14 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract since",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00Z")
             )
-            @RequestParam(value = "sinceDate",required = true) LocalDateTime start,
+            @RequestParam(value = "sinceDate",required = true) Instant start,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract until",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00Z")
             )
-            @RequestParam(value = "untilDate",required = false) LocalDateTime end,
+            @RequestParam(value = "untilDate",required = false) Instant end,
             @Parameter(description = "${param.addStates}")
             @RequestParam(value = "addStates", defaultValue = "false")
             boolean addStates
