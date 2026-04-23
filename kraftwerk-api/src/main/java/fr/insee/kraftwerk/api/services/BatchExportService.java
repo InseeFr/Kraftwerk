@@ -166,7 +166,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainFileByFileBatch(
@@ -204,7 +206,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainLunaticOnlyBatch(
@@ -242,8 +246,9 @@ public class BatchExportService extends KraftwerkService {
                 withEncryption
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
-    }
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;    }
 
     public BatchResponseDto mainGenesisByQuestionnaireIdBatch(
             String questionnaireModelId,
@@ -279,7 +284,9 @@ public class BatchExportService extends KraftwerkService {
                 dataMode
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public BatchResponseDto mainGenesisLunaticOnlyByQuestionnaireBatch(
@@ -316,7 +323,9 @@ public class BatchExportService extends KraftwerkService {
                 dataMode
         );
 
-        return new BatchResponseDto(jobId, normalizePath(outputPath));
+        BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+        log.info("Batch response: {}", response);
+        return response;
     }
 
     public ResponseEntity<Object> jsonExtractionBatch(
@@ -342,7 +351,9 @@ public class BatchExportService extends KraftwerkService {
 
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            return ResponseEntity.ok(normalizePath(outputPath));
+            String response = normalizePath(outputPath);
+            log.info("Batch response: {}", response);
+            return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         } catch (IOException e) {
