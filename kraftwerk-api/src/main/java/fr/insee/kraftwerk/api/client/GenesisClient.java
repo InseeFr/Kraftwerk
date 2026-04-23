@@ -104,11 +104,11 @@ public class GenesisClient {
 		return Optional.ofNullable(response.getBody()).orElseThrow(() -> new KraftwerkException(502,"Empty response body from Genesis API"));
 	}
 
-    public List<InterrogationId> getInterrogationIdsBetweenDates(String collectionInstrumentId, Instant start, Instant end) throws KraftwerkException {
-		String url = String.format("%s/interrogations/by-collection-instrument-and-between-datetime?collectionInstrumentId=%s&start=%s&end=%s",
+    public InterrogationBatchResponse getInterrogationBatchBetween(String collectionInstrumentId, Instant start, Instant end) throws KraftwerkException {
+		String url = String.format("%s/collection-instruments/%s/interrogations?since=%s&until=%s",
 				configProperties.getGenesisUrl(), collectionInstrumentId,start,end);
-		ResponseEntity<InterrogationId[]> response = makeApiCall(url,HttpMethod.GET,null,InterrogationId[].class);
-		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
+		ResponseEntity<InterrogationBatchResponse> response = makeApiCall(url,HttpMethod.GET,null,InterrogationBatchResponse.class);
+		return Optional.ofNullable(response.getBody()).orElseThrow(() -> new KraftwerkException(502,"Empty response body from Genesis API"));
 	}
 
 	public List<Mode> getModes(String campaignId) throws KraftwerkException {

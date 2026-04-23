@@ -247,7 +247,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                     try {
                         log.info("DEBUG processing interrogationId={}", interrogationId.getId());
 
-                        suLatest = client.getResponses(id, List.of(interrogationId));
+                        suLatest = client.getResponses(id, List.of(interrogationId), Instant.now());
 
                         if (suLatest == null || suLatest.isEmpty()) {
                             log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);
@@ -391,7 +391,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             throw new KraftwerkException(400, "endDate must be after startDate");
         }
 
-        return client.getInterrogationIdsBetweenDates(collectionInstrumentId, start, end);
+        return client.getInterrogationBatchBetween(collectionInstrumentId, start, end).getInterrogationIds();
     }
 
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {
