@@ -32,7 +32,6 @@
 		<sonar.coverage.exclusions>
 			src/main/java/fr/insee/kraftwerk/api/client/*,
 			src/main/java/fr/insee/kraftwerk/api/configuration/*
-			src/main/java/fr/insee/kraftwerk/api/configuration/*
 			**/kraftwerk-encryption-tests/**
 			**/kraftwerk-functional-tests/**
 		</sonar.coverage.exclusions>
