@@ -3,6 +3,8 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.BatchResponseDto;
+import fr.insee.kraftwerk.api.services.BatchExportService;
 import fr.insee.kraftwerk.api.services.MainService;
 import fr.insee.kraftwerk.api.services.ReportingDataService;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -29,6 +31,7 @@ public class KraftwerkBatch implements ApplicationRunner {
     VaultConfig vaultConfig;
     ReportingDataService reportingDataService;
     MainService mainService;
+    BatchExportService batchExportService;
 
     @Value("${fr.insee.postcollecte.files}")
     protected String defaultDirectory;
@@ -57,7 +60,9 @@ public class KraftwerkBatch implements ApplicationRunner {
                           VaultConfig vaultConfig,
                           ReportingDataService reportingDataService,
                           MainService mainService,
-                          Environment environment
+                          Environment environment,
+                          BatchExportService batchExportService
+
     ){
         this.configProperties = configProperties;
         this.minioConfig = minioConfig;
@@ -71,6 +76,7 @@ public class KraftwerkBatch implements ApplicationRunner {
         this.reportingDataService = reportingDataService;
         this.mainService = mainService;
         this.environment = environment;
+        this.batchExportService = batchExportService;
     }
 
     @Override
@@ -166,17 +172,23 @@ public class KraftwerkBatch implements ApplicationRunner {
     }
 
     private ResponseEntity<Object> launchMainServiceWithDDI(ArgsChecker argsChecker) {
-        ResponseEntity<String> response = null;
+        ResponseEntity<Object> response = null;
+
         switch (argsChecker.getKraftwerkServiceType()) {
-            case GENESIS -> response = mainService.mainGenesisByQuestionnaireId(
-                argsChecker.getQuestionnaireId(),
-                argsChecker.getMode(),
-                argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
-                argsChecker.isWithEncryption(),
-                argsChecker.isAddStates()
-            );
+            case GENESIS -> {
+                        BatchResponseDto batchResponse =
+                        batchExportService.mainGenesisByQuestionnaireIdBatch(
+                                argsChecker.getQuestionnaireId(),
+                                argsChecker.getMode(),
+                                argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
+                                argsChecker.isWithEncryption(),
+                                argsChecker.isAddStates()
+                        );
+                response = ResponseEntity.accepted().body(batchResponse);
+            }
+
             case JSON -> {
-                return mainService.jsonExtraction(
+                return batchExportService.jsonExtractionBatch(
                         argsChecker.getQuestionnaireId(),
                         argsChecker.getMode(),
                         argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
@@ -184,43 +196,70 @@ public class KraftwerkBatch implements ApplicationRunner {
                         argsChecker.isAddStates()
                 );
             }
-            case MAIN -> response = mainService.mainService(
-                    argsChecker.getQuestionnaireId(),
-                    false,
-                    argsChecker.isWithEncryption(),
-                    argsChecker.isAddStates()
-            );
-            case FILE_BY_FILE -> response = mainService.mainFileByFile(
-                    argsChecker.getArgQuestionnaireId(),
-                    false,
-                    argsChecker.isWithEncryption(),
-                    argsChecker.isAddStates()
-            );
+
+            case MAIN -> {
+                        BatchResponseDto batchResponse =
+                        batchExportService.mainServiceBatch(
+                                argsChecker.getQuestionnaireId(),
+                                false,
+                                argsChecker.isWithEncryption(),
+                                argsChecker.isAddStates()
+                        );
+                response = ResponseEntity.accepted().body(batchResponse);
+            }
+
+            case FILE_BY_FILE -> {
+                        BatchResponseDto batchResponse =
+                        batchExportService.mainFileByFileBatch(
+                                argsChecker.getArgQuestionnaireId(),
+                                false,
+                                argsChecker.isWithEncryption(),
+                                argsChecker.isAddStates()
+                        );
+                response = ResponseEntity.accepted().body(batchResponse);
+            }
         }
-        return getObjectResponseEntity(response);
+
+        return response != null
+                ? response
+                : ResponseEntity.internalServerError().body("Batch mode : null response");
     }
 
     private ResponseEntity<Object> launchMainServiceWithoutDDI(ArgsChecker argsChecker) {
-        ResponseEntity<String> response = null;
+        ResponseEntity<Object> response = null;
+
         switch (argsChecker.getKraftwerkServiceType()) {
-            case GENESIS -> response = mainService.mainGenesisLunaticOnlyByQuestionnaire(
-                    argsChecker.getQuestionnaireId(),
-                    argsChecker.getMode(),
-                    argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
-                    argsChecker.isWithEncryption(),
-                    argsChecker.isAddStates()
-            );
-            case MAIN -> response = mainService.mainService(
-                    argsChecker.getQuestionnaireId(),
-                    false,
-                    argsChecker.isWithEncryption(),
-                    argsChecker.isAddStates()
-            );
+            case GENESIS -> {
+                        BatchResponseDto batchResponse =
+                        batchExportService.mainGenesisLunaticOnlyByQuestionnaireBatch(
+                                argsChecker.getQuestionnaireId(),
+                                argsChecker.getMode(),
+                                argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
+                                argsChecker.isWithEncryption(),
+                                argsChecker.isAddStates()
+                        );
+                response = ResponseEntity.accepted().body(batchResponse);
+            }
+
+            case MAIN -> {
+                        BatchResponseDto batchResponse =
+                        batchExportService.mainLunaticOnlyBatch(
+                                argsChecker.getQuestionnaireId(),
+                                false,
+                                argsChecker.isWithEncryption(),
+                                argsChecker.isAddStates()
+                        );
+                response = ResponseEntity.accepted().body(batchResponse);
+            }
+
             case JSON, FILE_BY_FILE -> {
                 return launchMainServiceWithDDI(argsChecker);
             }
         }
-        return getObjectResponseEntity(response);
+
+        return response != null
+                ? response
+                : ResponseEntity.internalServerError().body("Batch mode : null response");
     }
 
     private ResponseEntity<Object> launchReportingDataService(ArgsChecker argsChecker) {
