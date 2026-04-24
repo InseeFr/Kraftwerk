@@ -98,7 +98,7 @@ public class ReportingDataProcessing {
         try (Connection writeDatabaseConnection = SqlUtils.openConnection()) {
             try(Statement writeDatabase = writeDatabaseConnection.createStatement()){
                 InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
-                insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase);
+                insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, writeDatabase, kraftwerkExecutionContext);
                 WriterSequence writerSequence = new WriterSequence();
                 writerSequence.writeOutputFiles(inOrSpecDirectory,
                         "_REPORTING_DATA_ONLY",

@@ -1,4 +1,8 @@
 # Changelog
+## 3.15.1 [TODO]
+### Fixed
+- Batch not processed if a calculated variable was an integer in a former batch and empty/string in current batch
+
 ## 3.15.0 [2026-04-20]
 ### Added
 - Export JSON debug endpoint
