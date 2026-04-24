@@ -102,6 +102,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
         if (ids.isEmpty()) {
             log.info("No interrogation to process collectionInstrumentId={} since={}", collectionInstrumentId, beginDate);
+            runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, false);
             return false;
         }
 
