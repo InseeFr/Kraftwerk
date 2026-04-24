@@ -351,7 +351,7 @@ public class BatchExportService extends KraftwerkService {
 
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            String response = normalizePath(outputPath);
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
