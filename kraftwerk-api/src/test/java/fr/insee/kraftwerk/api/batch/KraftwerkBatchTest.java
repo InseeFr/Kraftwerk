@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -342,7 +343,7 @@ class KraftwerkBatchTest {
         when(args.getOptionValues("service")).thenReturn(List.of("JSON"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
-        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00"));
+        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00Z"));
 
         kraftwerkBatch.run(args);
 
@@ -350,7 +351,7 @@ class KraftwerkBatchTest {
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
-                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0)),
+                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0).toInstant(ZoneOffset.UTC)),
                 eq(false)
         );
         verifyNoInteractions(reportingDataService);

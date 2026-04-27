@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.dto.InterrogationBatchResponse;
 import fr.insee.kraftwerk.api.dto.DebugErrorDto;
 import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.LastJsonExtractionDate;
@@ -88,15 +89,31 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     In this method we write at the end of every batch, not at the end of all batch
     This method can do differential extraction (all data since last extraction) otherwise all data since january 1st 2025
      */
-    public void runMainJson(String collectionInstrumentId, int batchSize, Mode dataMode, LocalDateTime since) throws KraftwerkException, IOException {
-        log.info("Export json for collectionInstrumentId {}", collectionInstrumentId);
+    public boolean runMainJson(String collectionInstrumentId, int batchSize, Mode dataMode, Instant since) throws KraftwerkException, IOException {
 
-        LocalDateTime beginDate = resolveBeginDate(collectionInstrumentId, dataMode, since);
+        long start = System.currentTimeMillis();
 
-        List<InterrogationId> ids =
-                fetchInterrogationIds(collectionInstrumentId, beginDate);
+        Instant beginDate = resolveBeginDate(collectionInstrumentId, dataMode, since);
+
+        InterrogationBatchResponse batchResponse =
+                fetchInterrogationBatch(collectionInstrumentId, beginDate);
+
+        List<InterrogationId> ids = batchResponse.getInterrogationIds();
+
+        if (ids.isEmpty()) {
+            log.info("No interrogation to process collectionInstrumentId={} since={}", collectionInstrumentId, beginDate);
+            runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, false);
+            return false;
+        }
+
+        log.info("Processing {} interrogationIds for collectionInstrumentId={}", ids.size(), collectionInstrumentId);
+        if (batchResponse.getNextSince()!=null) kraftwerkExecutionContext.setRecordedBefore(batchResponse.getNextSince());
 
         runMainJsonInternal(collectionInstrumentId, batchSize, dataMode, ids, true);
+
+        long duration = System.currentTimeMillis() - start;
+        log.info("Processed {} interrogationId for collectionInstrumentId={} in {} ms", ids.size(), collectionInstrumentId, duration);
+        return true;
     }
 
     public void runMainJsonReplay(String collectionInstrumentId,
@@ -146,7 +163,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             jsonGenerator.writeStartArray();
 
             for (List<InterrogationId> listId : partitions) {
-                List<SurveyUnitUpdateLatest> suLatest = client.getResponses(id, listId);
+                List<SurveyUnitUpdateLatest> suLatest = client.getResponses(id, listId, kraftwerkExecutionContext.getRecordedBefore());
                 log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
                 vtlBindings = new VtlBindings();
                 // if one mode is specified we filter to keep data of that mode only
@@ -172,7 +189,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         writeErrors();
 
         if (updateLastExtraction) {
-            client.saveDateExtraction(id, dataMode);
+            LastJsonExtractionDate lastJsonExtractionDate = new LastJsonExtractionDate();
+            lastJsonExtractionDate.setLastExtractionDate(kraftwerkExecutionContext.getRecordedBefore());
+            client.saveDateExtraction(id, dataMode, lastJsonExtractionDate);
         }
 
         SqlUtils.deleteDatabaseFile(databasePath);
@@ -229,7 +248,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
                     try {
                         log.info("DEBUG processing interrogationId={}", interrogationId.getId());
 
-                        suLatest = client.getResponses(id, List.of(interrogationId));
+                        suLatest = client.getResponses(id, List.of(interrogationId), Instant.now());
 
                         if (suLatest == null || suLatest.isEmpty()) {
                             log.warn("DEBUG EMPTY interrogationId={} -> no SurveyUnit found", interrogationId);
@@ -324,9 +343,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
      * 2. The last extraction date from Genesis,
      * 3. Or null if nothing is found (meaning: extract all data).
      */
-    private LocalDateTime resolveBeginDate(String questionnaireModelId,
+    private Instant resolveBeginDate(String questionnaireModelId,
                                            Mode dataMode,
-                                           @Nullable LocalDateTime since) {
+                                           @Nullable Instant since) {
         // 1. Explicit date provided
         if (since != null) {
             log.info("Using provided extraction start date {} for questionnaire {}", since, questionnaireModelId);
@@ -339,9 +358,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
         try {
             LastJsonExtractionDate lastExtractDate = client.getLastExtractionDate(questionnaireModelId, dataMode);
-            LocalDateTime beginDate = LocalDateTime.parse(lastExtractDate.getLastExtractionDate());
-            // Overlap of 10s to avoid data loss between differential exports
-            beginDate = beginDate.minusSeconds(10);
+            Instant beginDate = lastExtractDate.getLastExtractionDate();
 
             log.info("Extracting data between {} and now for questionnaire {}", beginDate, questionnaireModelId);
             return beginDate;
@@ -352,13 +369,13 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
         }
     }
 
-    private List<InterrogationId> fetchInterrogationIds(String questionnaireModelId,
-                                                        @Nullable LocalDateTime beginDate)
+    private InterrogationBatchResponse fetchInterrogationBatch(String questionnaireModelId,
+                                                             @Nullable Instant beginDate)
             throws KraftwerkException {
         if (beginDate != null) {
-            return client.getInterrogationIdsFromDate(questionnaireModelId, beginDate);
+            return client.getInterrogationBatchSince(questionnaireModelId, beginDate);
         }
-        return client.getInterrogationIds(questionnaireModelId);
+        return client.getInterrogationBatchAll(questionnaireModelId);
     }
 
     private List<InterrogationId> fetchInterrogationIdsWithRecordDateBetween(
@@ -375,7 +392,7 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             throw new KraftwerkException(400, "endDate must be after startDate");
         }
 
-        return client.getInterrogationIdsBetweenDates(collectionInstrumentId, start, end);
+        return client.getInterrogationBatchBetween(collectionInstrumentId, start, end).getInterrogationIds();
     }
 
     private void moveTempFile(String filename, Path tmpOutputFile) throws KraftwerkException {

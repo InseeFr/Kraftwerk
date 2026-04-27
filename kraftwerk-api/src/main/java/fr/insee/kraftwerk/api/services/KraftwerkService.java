@@ -23,6 +23,7 @@ import java.nio.file.Path;
 @RestController
 @ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Success"),
+		@ApiResponse(responseCode = "204", description = "No content"),
 		@ApiResponse(responseCode = "400", description = "Bad Request"),
 		@ApiResponse(responseCode = "413", description = "Request Entity Too Large"),
 		@ApiResponse(responseCode = "404", description = "Not Found"),
