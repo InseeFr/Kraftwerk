@@ -1,4 +1,14 @@
 # Changelog
+
+## 3.15.2 [TODO]
+### Added
+- Display export file path in batch responses
+- Store encrypted archive in a timestamped directory
+
+## 3.15.1 [2026-04-23]
+### Fixed
+- Fix issue where no encrypted files were generated on Kube
+
 ## 3.15.0 [2026-04-20]
 ### Added
 - Export JSON debug endpoint
