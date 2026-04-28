@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
@@ -190,11 +191,11 @@ class ArgsCheckerTest {
         ArgsChecker checker = ArgsChecker.builder()
                 .argServiceName("JSON")
                 .argQuestionnaireId("questionnaire-123")
-                .argSince("2024-01-15T10:30:00")
+                .argSince("2024-01-15T10:30:00Z")
                 .build();
 
         assertThatNoException().isThrownBy(checker::checkArgs);
-        assertThat(checker.getSince()).isEqualTo(LocalDateTime.of(2024, 1, 15, 10, 30, 0));
+        assertThat(checker.getSince()).isEqualTo(Instant.parse("2024-01-15T10:30:00Z"));
     }
 
     @Test

@@ -129,7 +129,7 @@ public abstract class AbstractMainProcessingGenesis {
         int nbPartitions = listIds.size();
         int indexPartition = 1;
         for (List<InterrogationId> listId : listIds) {
-            List<SurveyUnitUpdateLatest> suLatest = client.getResponses(questionnaireModelId, listId);
+            List<SurveyUnitUpdateLatest> suLatest = client.getResponses(questionnaireModelId, listId,null);
             log.info("Number of documents retrieved from database : {}, partition {}/{}", suLatest.size(), indexPartition, nbPartitions);
             vtlBindings = new VtlBindings();
             if (dataMode != null){

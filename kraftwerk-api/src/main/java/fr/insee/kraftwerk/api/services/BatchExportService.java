@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -332,7 +333,7 @@ public class BatchExportService extends KraftwerkService {
             String collectionInstrumentId,
             Mode dataMode,
             int batchSize,
-            LocalDateTime since,
+            Instant since,
             boolean addStates
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();

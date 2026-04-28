@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -56,13 +57,15 @@ public class MainService extends KraftwerkService {
     VaultConfig vaultConfig;
     boolean useMinio;
     InMemoryExportJobStore exportJobStore;
+    private final Clock clock;
 
 
     @Autowired
-    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore) {
+    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock) {
         super(configProperties, minioConfig);
         this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
+        this.clock = clock;
         this.minioConfig = minioConfig;
         this.vaultConfig = vaultConfig;
         this.exportJobStore = exportJobStore;
@@ -269,9 +272,10 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since,
+            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) Instant since,
             @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
     ){
+        log.info("START jsonExtraction collectionInstrumentId={} batchSize={} since={}", collectionInstrumentId, batchSize, since);
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
         boolean withEncryption = false;
@@ -283,8 +287,11 @@ public class MainService extends KraftwerkService {
                 addStates
         );
         try {
-            mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            log.info("Data extracted");
+            boolean hasProcessed = mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
+            log.info("END jsonExtraction collectionInstrumentId={} status={}", collectionInstrumentId, hasProcessed ? "PROCESSED" : "NO_DATA");
+            if (!hasProcessed) {
+                return ResponseEntity.noContent().build();
+            }
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
