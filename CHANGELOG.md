@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.15.2 [2026-04-29]
+## 3.15.3 [2026-04-29]
 ### Added
 - Display export file path in batch responses
 - Store encrypted archive in a timestamped directory
