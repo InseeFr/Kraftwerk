@@ -5,6 +5,12 @@
 - Display export file path in batch responses
 - Store encrypted archive in a timestamped directory
 
+### Changed
+
+We previously stored the timestamp at the end of the extraction process, several minutes after retrieving the IDs to be processed. As a result, any records created after the interrogationIds were listed but before the process completed were not included in the differential JSON output.
+
+To address this issue, we now capture the most recent timestamp (recordDate) at the moment the interrogationIds are retrieved. This timestamp is then used as the reference point for the next differential extraction.
+
 ## 3.15.1 [2026-04-23]
 ### Fixed
 - Fix issue where no encrypted files were generated on Kube
