@@ -71,6 +71,7 @@ public abstract class DataProcessing {
         return automatedInstructions.toString();
     }
 
+    //TODO cache vtlScript to avoid to call readFile on each batch
     protected void applyUserVtlInstructions(Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
         String vtlScript;
         try (InputStream inputStream = fileUtilsInterface.readFile(userVtlInstructionsPath.toString())){
