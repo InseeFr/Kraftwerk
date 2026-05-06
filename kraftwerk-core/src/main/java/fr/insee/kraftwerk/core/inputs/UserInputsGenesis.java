@@ -1,16 +1,11 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
-import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.JsonReader;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +41,7 @@ public class UserInputsGenesis extends UserInputs{
      * @return a ModeInputs object
      */
     private ModeInputs getModeInputs(Mode mode, boolean withDDI) throws KraftwerkException {
-        ModeInputs modeInputs = new ModeInputs();
+        ModeInputs modeInputs = new ModeInputs(fileUtilsInterface);
         if (withDDI) {
             modeInputs.setDdiUrl(findDDIFile(inputDirectory.resolve(mode.name())).toString());
         }
