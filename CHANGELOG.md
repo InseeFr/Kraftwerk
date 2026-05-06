@@ -1,10 +1,5 @@
 # Changelog
 
-## 3.16.0 [TODO]
-### Changed
-- Add `withEncryption` support for JSON export endpoints (`/json` and `/json/replay`)
-
-
 ## 3.15.3 [2026-04-29]
 ### Added
 - Display export file path in batch responses
