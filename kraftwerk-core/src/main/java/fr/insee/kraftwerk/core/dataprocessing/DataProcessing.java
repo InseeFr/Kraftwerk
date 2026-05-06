@@ -71,18 +71,34 @@ public abstract class DataProcessing {
         return automatedInstructions.toString();
     }
 
-    //TODO cache vtlScript to avoid to call readFile on each batch
-    protected void applyUserVtlInstructions(Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) throws KraftwerkException {
-        String vtlScript;
-        try (InputStream inputStream = fileUtilsInterface.readFile(userVtlInstructionsPath.toString())){
-            vtlScript = new String(inputStream.readAllBytes());
-        } catch ( IOException e){
-            throw new KraftwerkException(500, "Reading error on vtl script");
-        }
+    protected void applyUserVtlInstructions(
+            Path userVtlInstructionsPath,
+            KraftwerkExecutionContext kraftwerkExecutionContext
+    ) throws KraftwerkException {
+        String vtlScript = getUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
         log.info("User VTL instructions read for step {}:\n{}", getStepName(), vtlScript);
-        if (! (vtlScript == null || vtlScript.isEmpty() || vtlScript.contentEquals("")) ) {
-        	vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
+        if (vtlScript != null
+                && !vtlScript.isEmpty()
+                && !vtlScript.contentEquals("")
+        ) {
+            vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
         }
     }
 
+    private String getUserVtlInstructions(
+            Path userVtlInstructionsPath,
+            KraftwerkExecutionContext kraftwerkExecutionContext
+    ) throws KraftwerkException {
+        if(kraftwerkExecutionContext.getUserVtlInstructionsCache().containsKey(userVtlInstructionsPath)){
+            return kraftwerkExecutionContext.getUserVtlInstructionsCache().get(userVtlInstructionsPath);
+        }
+        log.info("Reading vtl user instructions file {}", userVtlInstructionsPath.toString());
+        try (InputStream inputStream = fileUtilsInterface.readFile(userVtlInstructionsPath.toString())){
+            String vtlScript = new String(inputStream.readAllBytes());
+            kraftwerkExecutionContext.getUserVtlInstructionsCache().put(userVtlInstructionsPath, vtlScript);
+            return vtlScript;
+        } catch (IOException _){
+            throw new KraftwerkException(500, "Reading error on vtl script");
+        }
+    }
 }
