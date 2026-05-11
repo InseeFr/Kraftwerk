@@ -360,13 +360,12 @@ public class MainService extends KraftwerkService {
             @RequestParam String collectionInstrumentId,
             @RequestParam(required = false) Mode dataMode,
             @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
             @RequestBody DebugJsonExportDto debugJsonExportDto
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
-        boolean withEncryption = false;
-
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface, addStates);
 
         try {
@@ -379,6 +378,10 @@ public class MainService extends KraftwerkService {
                     batchSize,
                     dataMode,
                     debugJsonExportDto.getInterrogationIds()
+            );
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
             );
 
             return ResponseEntity.ok(result);
