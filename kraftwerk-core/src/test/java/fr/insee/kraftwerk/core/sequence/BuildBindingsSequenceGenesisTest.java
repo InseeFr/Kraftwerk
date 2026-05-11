@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,8 +149,10 @@ class BuildBindingsSequenceGenesisTest {
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsKey(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.SURVEY_UNIT_IDENTIFIER_NAME, "TESTIDUE");
         Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.QUESTIONNAIRE_STATE_NAME, "FINISHED");
-        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst()).containsEntry(Constants.VALIDATION_DATE_NAME, validationDate
-                .format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT)));
+        Assertions.assertThat(vtlBindings.getDataset("WEB").getDataAsMap().getFirst())
+                .containsEntry(Constants.VALIDATION_DATE_NAME, validationDate
+                        .atZone(ZoneId.of("Europe/Paris"))
+                        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     }
 
     @Test
