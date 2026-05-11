@@ -193,6 +193,7 @@ public class KraftwerkBatch implements ApplicationRunner {
                         argsChecker.getMode(),
                         argsChecker.getBatchSize() == null ? DEFAULT_BATCH_SIZE : argsChecker.getBatchSize(),
                         argsChecker.getSince(),
+                        argsChecker.isWithEncryption(),
                         argsChecker.isAddStates()
                 );
             }

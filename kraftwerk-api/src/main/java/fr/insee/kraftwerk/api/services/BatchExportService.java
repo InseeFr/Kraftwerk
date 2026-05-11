@@ -334,11 +334,11 @@ public class BatchExportService extends KraftwerkService {
             Mode dataMode,
             int batchSize,
             Instant since,
+            boolean withEncryption,
             boolean addStates
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
-        boolean withEncryption = false;
 
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
