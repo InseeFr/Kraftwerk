@@ -4,26 +4,35 @@ import fr.insee.bpm.metadata.model.CalculatedVariables;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
+import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
-import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CalculatedProcessingTest {
 
@@ -33,8 +42,8 @@ class CalculatedProcessingTest {
     private static KraftwerkExecutionContext kraftwerkExecutionContext;
     private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
-    @BeforeAll
-    static void setFooCalculated() {
+    @BeforeEach
+    void setFooCalculated() {
         //
         fooCalculated = new CalculatedVariables();
         fooCalculated.putVariable(
@@ -94,6 +103,58 @@ class CalculatedProcessingTest {
         assertEquals(2L, outDataset.getDataPoints().getFirst().get("FOO1"));
     }
 
+    @Nested
+    class applyUserVtlInstructions_tests{
+        @Test
+        @SneakyThrows
+        void applyUserVtlInstructions_parse_test(){
+            //GIVEN
+            Path userInstructionsPath = Path.of("test");
+            String testScript = "TEST";
+
+            FileSystemImpl fileSystemMock = mock(FileSystemImpl.class);
+            when(fileSystemMock.readFile(userInstructionsPath.toString()))
+                    .thenReturn(new ByteArrayInputStream(testScript.getBytes()));
+
+            VtlBindings vtlBindingsTest = getVtlBindings();
+            CalculatedProcessing processing = new CalculatedProcessing(
+                    vtlBindingsTest, fooCalculated, fileSystemMock, kraftwerkExecutionContext
+            );
+
+            //WHEN
+            processing.applyUserVtlInstructions(userInstructionsPath, kraftwerkExecutionContext);
+
+            //THEN
+            verify(fileSystemMock, times(1)).readFile(userInstructionsPath.toString());
+            assertTrue(kraftwerkExecutionContext.getUserVtlInstructionsCache().containsKey(userInstructionsPath));
+            assertEquals(testScript, kraftwerkExecutionContext.getUserVtlInstructionsCache().get(userInstructionsPath));
+        }
+
+        @Test
+        @SneakyThrows
+        void applyUserVtlInstructions_get_from_cache_test(){
+            //GIVEN
+            Path userInstructionsPath = Path.of("test");
+            String testScript = "TEST";
+            kraftwerkExecutionContext.getUserVtlInstructionsCache().put(userInstructionsPath, testScript);
+
+            FileSystemImpl fileSystemMock = mock(FileSystemImpl.class);
+
+
+            VtlBindings vtlBindingsTest = getVtlBindings();
+            CalculatedProcessing processing = new CalculatedProcessing(
+                    vtlBindingsTest, fooCalculated, fileSystemMock, kraftwerkExecutionContext
+            );
+
+            //WHEN
+            processing.applyUserVtlInstructions(userInstructionsPath, kraftwerkExecutionContext);
+
+            //THEN
+            verify(fileSystemMock, never()).readFile(userInstructionsPath.toString());
+        }
+    }
+
+    //UTILS
     @NotNull
     private static VtlBindings getVtlBindings() {
         Dataset fooDataset = new InMemoryDataset(

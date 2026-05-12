@@ -64,7 +64,7 @@ public class ReportingDataProcessing {
         Path reportingDataFilePath = inDirectory.resolve(reportingDataFilePathParam);
         SurveyRawData surveyRawData = new SurveyRawData();
         surveyRawData.setMetadataModel(new MetadataModel());
-        ModeInputs modeInputs = new ModeInputs();
+        ModeInputs modeInputs = new ModeInputs(fileUtilsInterface);
         modeInputs.setReportingDataFile(reportingDataFilePath);
 
         parseReportingData(modeInputs, surveyRawData, fileUtilsInterface);
