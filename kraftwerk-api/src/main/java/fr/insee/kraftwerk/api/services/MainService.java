@@ -41,7 +41,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.UUID;
 
 @RestController
@@ -55,13 +56,18 @@ public class MainService extends KraftwerkService {
     VaultConfig vaultConfig;
     boolean useMinio;
     InMemoryExportJobStore exportJobStore;
+    private final Clock clock;
+    private final OutputZipService outputZipService;
+
 
 
     @Autowired
-    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore) {
+    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock, OutputZipService outputZipService) {
         super(configProperties, minioConfig);
         this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
+        this.clock = clock;
+        this.outputZipService = outputZipService;
         this.minioConfig = minioConfig;
         this.vaultConfig = vaultConfig;
         this.exportJobStore = exportJobStore;
@@ -268,12 +274,14 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.collectionInstrumentId}", required = true, example = INDIRECTORY_EXAMPLE) @RequestParam String collectionInstrumentId,
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
-            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) LocalDateTime since,
+            @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) Instant since,
+            @Parameter(description = "${param.withEncryption}")
+            @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
     ){
+        log.info("START jsonExtraction collectionInstrumentId={} batchSize={} since={}", collectionInstrumentId, batchSize, since);
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
-        boolean withEncryption = false;
 
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
@@ -282,8 +290,15 @@ public class MainService extends KraftwerkService {
                 addStates
         );
         try {
-            mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            log.info("Data extracted");
+            boolean hasProcessed = mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
+            log.info("END jsonExtraction collectionInstrumentId={} status={}", collectionInstrumentId, hasProcessed ? "PROCESSED" : "NO_DATA");
+            if (!hasProcessed) {
+                return ResponseEntity.noContent().build();
+            }
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
+            );
 		} catch (KraftwerkException e) {
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		} catch (IOException e) {
@@ -302,21 +317,22 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract since",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00Z")
             )
-            @RequestParam(value = "sinceDate",required = true) LocalDateTime start,
+            @RequestParam(value = "sinceDate",required = true) Instant start,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             @Parameter(description = "Extract until",
-                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00")
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00Z")
             )
-            @RequestParam(value = "untilDate",required = false) LocalDateTime end,
+            @RequestParam(value = "untilDate",required = false) Instant end,
+            @Parameter(description = "${param.withEncryption}")
+            @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @Parameter(description = "${param.addStates}")
             @RequestParam(value = "addStates", defaultValue = "false")
             boolean addStates
     ){
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
-        boolean withEncryption = false;
 
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
@@ -326,6 +342,10 @@ public class MainService extends KraftwerkService {
         );
         try {
             mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, start, end);
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
+            );
             log.info("Data extracted");
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
@@ -340,13 +360,12 @@ public class MainService extends KraftwerkService {
             @RequestParam String collectionInstrumentId,
             @RequestParam(required = false) Mode dataMode,
             @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
+            @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @RequestParam(value = "addStates", defaultValue = "false") boolean addStates,
             @RequestBody DebugJsonExportDto debugJsonExportDto
     ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
-        boolean withEncryption = false;
-
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(withDDI, withEncryption, fileUtilsInterface, addStates);
 
         try {
@@ -359,6 +378,10 @@ public class MainService extends KraftwerkService {
                     batchSize,
                     dataMode,
                     debugJsonExportDto.getInterrogationIds()
+            );
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
             );
 
             return ResponseEntity.ok(result);

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -33,7 +34,7 @@ public class ArgsChecker {
     private boolean withEncryption;
     private boolean isFileByFile;
     private boolean withDDI;
-    private LocalDateTime since;
+    private Instant since;
     private boolean addStates;
     private Integer batchSize;
     private Mode mode;
@@ -123,7 +124,7 @@ public class ArgsChecker {
     private void checkArgSince() {
         if(this.argSince != null){
             try {
-                this.since = LocalDateTime.parse(argSince);
+                this.since = Instant.parse(argSince);
             }catch (DateTimeParseException e){
                 log.error(e.toString());
                 throw new IllegalArgumentException("Invalid since argument ! : %s, should be YYYY-MM-DDThh:mm:ss");

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +39,8 @@ public class KraftwerkExecutionContext {
     private boolean addStates;
 
     private Path outDirectory;
+
+    private Instant recordedBefore;
 
     public KraftwerkExecutionContext(
             String inDirectoryParam,

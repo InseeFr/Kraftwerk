@@ -1,12 +1,12 @@
 package fr.insee.kraftwerk.api.dto;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+import java.time.Instant;
+
+@Data
 @NoArgsConstructor
 public class LastJsonExtractionDate {
-    private String lastExtractionDate;
+    private Instant lastExtractionDate;
 }

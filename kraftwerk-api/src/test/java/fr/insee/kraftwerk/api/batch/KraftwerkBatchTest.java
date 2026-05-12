@@ -3,6 +3,8 @@ package fr.insee.kraftwerk.api.batch;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
+import fr.insee.kraftwerk.api.dto.BatchResponseDto;
+import fr.insee.kraftwerk.api.services.BatchExportService;
 import fr.insee.kraftwerk.api.services.MainService;
 import fr.insee.kraftwerk.api.services.ReportingDataService;
 import fr.insee.kraftwerk.core.data.model.Mode;
@@ -13,15 +15,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -42,6 +49,8 @@ class KraftwerkBatchTest {
 
     Environment environment;
 
+    BatchExportService batchExportService;
+
     @BeforeEach
     void setup() {
         configProperties = mock(ConfigProperties.class);
@@ -50,6 +59,7 @@ class KraftwerkBatchTest {
         reportingDataService = mock(ReportingDataService.class);
         mainService = mock(MainService.class);
         environment = mock(Environment.class);
+        batchExportService = mock(BatchExportService.class);
 
         when(minioConfig.isEnable()).thenReturn(false);
         when(configProperties.getDefaultDirectory()).thenReturn("/tmp");
@@ -61,7 +71,7 @@ class KraftwerkBatchTest {
                 vaultConfig,
                 reportingDataService,
                 mainService,
-                environment
+                environment, batchExportService
         );
     }
 
@@ -123,7 +133,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainService(
+        verify(batchExportService, times(1)).mainServiceBatch(
                 any(),
                 anyBoolean(),
                 eq(false),
@@ -143,7 +153,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -165,7 +175,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(100),
@@ -187,7 +197,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 eq(Mode.WEB),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -209,7 +219,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 eq(null),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -230,7 +240,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainService(
+        verify(batchExportService, times(1)).mainServiceBatch(
                 any(),
                 anyBoolean(),
                 eq(true),
@@ -251,7 +261,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainGenesisByQuestionnaireId(
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
@@ -272,11 +282,12 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -294,11 +305,12 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(100),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -316,11 +328,12 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 eq(Mode.WEB),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -333,15 +346,16 @@ class KraftwerkBatchTest {
         when(args.getOptionValues("service")).thenReturn(List.of("JSON"));
         when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
-        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00"));
+        when(args.getOptionValues("extract-json-since")).thenReturn(List.of("2022-12-01T12:00:00Z"));
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).jsonExtraction(
+        verify(batchExportService, times(1)).jsonExtractionBatch(
                 any(),
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
-                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0)),
+                eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0).toInstant(ZoneOffset.UTC)),
+                eq(false),
                 eq(false)
         );
         verifyNoInteractions(reportingDataService);
@@ -372,7 +386,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainFileByFile(
+        verify(batchExportService, times(1)).mainFileByFileBatch(
                 any(),
                 anyBoolean(),
                 eq(false),
@@ -393,7 +407,7 @@ class KraftwerkBatchTest {
 
         kraftwerkBatch.run(args);
 
-        verify(mainService, times(1)).mainFileByFile(
+        verify(batchExportService, times(1)).mainFileByFileBatch(
                 any(),
                 anyBoolean(),
                 eq(true),
@@ -418,7 +432,8 @@ class KraftwerkBatchTest {
                 vaultConfig,
                 reportingDataService,
                 mainService,
-                environment
+                environment,
+                batchExportService
         );
 
         // THEN
@@ -469,5 +484,38 @@ class KraftwerkBatchTest {
 
         verifyNoInteractions(mainService);
         verifyNoInteractions(reportingDataService);
+    }
+
+    @Test
+    void main_service_genesis_batch_shouldReturnJobIdAndOutputPath() {
+        ApplicationArguments args = mock(ApplicationArguments.class);
+        when(args.getOptionNames()).thenReturn(Set.of("service", "questionnaireId", "with-ddi", "add-states"));
+        when(args.getOptionValues("service")).thenReturn(List.of("GENESIS"));
+        when(args.getOptionValues("questionnaireId")).thenReturn(List.of("TESTCAMPAIGN2"));
+        when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
+        when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
+
+        BatchResponseDto dto = new BatchResponseDto("job-123", "out/TESTCAMPAIGN2/2026_04_22_10_00_00");
+        when(batchExportService.mainGenesisByQuestionnaireIdBatch(
+                any(),
+                any(),
+                anyInt(),
+                anyBoolean(),
+                anyBoolean()
+        )).thenReturn(dto);
+
+        ResponseEntity<Object> response = ReflectionTestUtils.invokeMethod(kraftwerkBatch, "runBatchMode", args);
+
+        assertNotNull(response);
+        assertEquals(202, response.getStatusCode().value());
+        assertEquals(dto, response.getBody());
+
+        verify(batchExportService, times(1)).mainGenesisByQuestionnaireIdBatch(
+                eq("TESTCAMPAIGN2"),
+                eq(null),
+                eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
+                eq(false),
+                eq(true)
+        );
     }
 }

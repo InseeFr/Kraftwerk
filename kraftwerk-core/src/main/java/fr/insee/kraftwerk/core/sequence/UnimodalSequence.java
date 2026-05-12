@@ -44,6 +44,7 @@ public class UnimodalSequence {
 
 		/* Step 2.4b : Apply VTL expression for calculated variables (if any) */
 		if (modeInputs.getLunaticFile() != null) {
+			//TODO cache results to avoid fileUtilsInterface call each batch (getCalculatedFromLunatic into cacheable method ?
 			CalculatedVariables calculatedVariables = LunaticReader
 					.getCalculatedFromLunatic(fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString()));
 			CalculatedProcessing calculatedProcessing = new CalculatedProcessing(
