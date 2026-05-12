@@ -212,7 +212,7 @@ public class SqlUtils {
                             : dataRow.get(sqlColumnName).toString().replace("\n","");
 
                     try{
-                        String duckDBColumnType = sqlTableColumnTypes.get(sqlColumnName);
+                        String duckDBColumnType = sqlColumn.getValue();
                         if(!vtlVariableType.getSqlType().equals(duckDBColumnType)){
                             log.warn("""
                                     Difference between VTL and SQL types on column/variable {} !
