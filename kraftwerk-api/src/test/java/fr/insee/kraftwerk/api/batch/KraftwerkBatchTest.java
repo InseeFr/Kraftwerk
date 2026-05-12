@@ -287,6 +287,7 @@ class KraftwerkBatchTest {
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -309,6 +310,7 @@ class KraftwerkBatchTest {
                 any(),
                 eq(100),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -331,6 +333,7 @@ class KraftwerkBatchTest {
                 eq(Mode.WEB),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
                 eq(null),
+                eq(false),
                 eq(true)
         );
         verifyNoInteractions(reportingDataService);
@@ -352,6 +355,7 @@ class KraftwerkBatchTest {
                 any(),
                 eq(KraftwerkBatch.DEFAULT_BATCH_SIZE),
                 eq(LocalDateTime.of(2022, 12, 1, 12, 0 ,0).toInstant(ZoneOffset.UTC)),
+                eq(false),
                 eq(false)
         );
         verifyNoInteractions(reportingDataService);
