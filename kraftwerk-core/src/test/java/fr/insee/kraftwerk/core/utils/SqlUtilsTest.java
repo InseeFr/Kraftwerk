@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
-import fr.insee.kraftwerk.core.exceptions.ColumnNotFoundException;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
@@ -348,44 +347,30 @@ class SqlUtilsTest {
 
     @Test
     @SneakyThrows
-    void getColumnType_test() {
+    void getColumnTypes_test() {
         try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
             //Given
             testDatabaseStatement.execute("CREATE TABLE testtable1(testint1 INT, teststring1 NVARCHAR)");
 
             //When
-            List<String> columnTypes = List.of(
-                    SqlUtils.getColumnType(testDatabaseStatement, "testtable1", "testint1"),
-                    SqlUtils.getColumnType(testDatabaseStatement, "testtable1", "teststring1"));
+            Map<String, String> columnTypes = SqlUtils.getColumnTypes(testDatabaseStatement, "testtable1");
 
             //Then
-            Assertions.assertThat(columnTypes).contains("INTEGER","VARCHAR");
+            Assertions.assertThat(columnTypes)
+                    .containsEntry("testint1", "INTEGER")
+                    .containsEntry("teststring1","VARCHAR");
         }
     }
 
     @Test
     @SneakyThrows
-    void getColumnType_test_absentTable_throws_SQLException() {
+    void getColumnTypes_test_absentTable_throws_SQLException() {
         try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
             //GIVEN no table
             //WHEN + THEN
             Assertions.assertThatThrownBy(() ->
-                    SqlUtils.getColumnType(testDatabaseStatement, "testtable1", "testint1")
+                    SqlUtils.getColumnTypes(testDatabaseStatement, "testtable1")
             ).isInstanceOf(SQLException.class);
-        }
-    }
-
-    @Test
-    @SneakyThrows
-    void getColumnType_test_absentColumn_throws_ColumnNotFoundException() {
-        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
-            //GIVEN
-            testDatabaseStatement.execute("CREATE TABLE testtable1(testint1 INT, teststring1 NVARCHAR)");
-
-            //WHEN + THEN
-            Assertions.assertThatThrownBy(() ->
-                    SqlUtils.getColumnType(testDatabaseStatement, "testtable1", "IDONTEXIST")
-            ).isInstanceOf(ColumnNotFoundException.class);
         }
     }
 
