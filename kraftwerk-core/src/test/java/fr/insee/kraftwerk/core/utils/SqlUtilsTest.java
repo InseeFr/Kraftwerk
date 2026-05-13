@@ -10,6 +10,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,8 +24,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class SqlUtilsTest {
     private static Connection testDatabase;
@@ -60,7 +63,7 @@ class SqlUtilsTest {
             vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
 
             //When
-            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement);
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement, TestConstants.getKraftwerkExecutionContext());
 
             //Then
             //1 table / dataset
@@ -72,6 +75,137 @@ class SqlUtilsTest {
             //Table has data
             ResultSet resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
             Assertions.assertThat(resultSet.next()).isTrue();
+        }
+    }
+
+    @Test
+    void convertVTLBindingTest_empty_variable_on_int() throws SQLException, KraftwerkException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //GIVEN
+            String variableName = "TestVar";
+            UserInputsFile testUserInputsFile = new UserInputsFile(
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"),
+                    new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY)
+            );
+
+            //First batch
+            VtlBindings vtlBindings = new VtlBindings();
+            Dataset testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, Integer.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            Map<String, Object> dataRow = new HashMap<>();
+            dataRow.put(variableName, 1);
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //First conversion
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement,
+                    TestConstants.getKraftwerkExecutionContext());
+
+            //Second batch, variable is string this time
+            vtlBindings = new VtlBindings();
+            testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, String.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            dataRow = new HashMap<>();
+            dataRow.put(variableName, "");
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //WHEN
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement, TestConstants.getKraftwerkExecutionContext());
+
+            //THEN
+            //Table has 2 data rows : null and 1
+            ResultSet resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
+            int rowCount = 0;
+            Set<String> values = new HashSet<>();
+            while (resultSet.next()){
+                values.add(resultSet.getString(variableName));
+                rowCount++;
+            }
+            Assertions.assertThat(rowCount).isEqualTo(2);
+            Assertions.assertThat(values).containsExactlyInAnyOrder(null, "1");
+        }
+    }
+
+    @Test
+    void convertVTLBindingTest_int_variable_on_string() throws SQLException, KraftwerkException {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //GIVEN
+            String variableName = "TestVar";
+            UserInputsFile testUserInputsFile = new UserInputsFile(
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs/inputs_valid_several_modes.json"),
+                    Path.of(TestConstants.UNIT_TESTS_DIRECTORY, "user_inputs"),
+                    new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY)
+            );
+
+            //First batch
+            VtlBindings vtlBindings = new VtlBindings();
+            Dataset testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, String.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            Map<String, Object> dataRow = new HashMap<>();
+            dataRow.put(variableName, "Test");
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //First conversion
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement, TestConstants.getKraftwerkExecutionContext());
+
+            //Second batch, variable is string this time
+            vtlBindings = new VtlBindings();
+            testDataset = new InMemoryDataset(List.of(),
+                    List.of(new Structured.Component(variableName, Integer.class, Dataset.Role.MEASURE)));
+            for (String mode : testUserInputsFile.getModes()) {
+                vtlBindings.put(mode, testDataset);
+            }
+            vtlBindings.put(testUserInputsFile.getMultimodeDatasetName(), testDataset);
+            vtlBindings.put(Constants.ROOT_GROUP_NAME, testDataset);
+            vtlBindings.put("LOOP", testDataset);
+            vtlBindings.put("FROM_USER", testDataset);
+
+            //Add data to root dataset
+            dataRow = new HashMap<>();
+            dataRow.put(variableName, 1);
+            vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataPoints().add(new Structured.DataPoint(vtlBindings.getDataset(Constants.ROOT_GROUP_NAME).getDataStructure(), dataRow));
+
+            //WHEN
+            SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabaseStatement, TestConstants.getKraftwerkExecutionContext());
+
+            //THEN
+            //Table has 1 data row since the error batch is ignored
+            ResultSet resultSet = testDatabaseStatement.executeQuery("SELECT * FROM " + Constants.ROOT_GROUP_NAME);
+            int rowCount = 0;
+            Set<String> values = new HashSet<>();
+            while (resultSet.next()){
+                values.add(resultSet.getString(variableName));
+                rowCount++;
+            }
+            Assertions.assertThat(rowCount).isEqualTo(1);
+            Assertions.assertThat(values).contains("Test");
         }
     }
 
@@ -211,6 +345,34 @@ class SqlUtilsTest {
     }
 
 
+    @Test
+    @SneakyThrows
+    void getColumnTypes_test() {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //Given
+            testDatabaseStatement.execute("CREATE TABLE testtable1(testint1 INT, teststring1 NVARCHAR)");
+
+            //When
+            Map<String, String> columnTypes = SqlUtils.getColumnTypes(testDatabaseStatement, "testtable1");
+
+            //Then
+            Assertions.assertThat(columnTypes)
+                    .containsEntry("testint1", "INTEGER")
+                    .containsEntry("teststring1","VARCHAR");
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getColumnTypes_test_absentTable_throws_SQLException() {
+        try(Statement testDatabaseStatement = SqlUtils.openConnection().createStatement()) {
+            //GIVEN no table
+            //WHEN + THEN
+            Assertions.assertThatThrownBy(() ->
+                    SqlUtils.getColumnTypes(testDatabaseStatement, "testtable1")
+            ).isInstanceOf(SQLException.class);
+        }
+    }
 
     @AfterAll
     static void closeConnection() throws SQLException {

@@ -79,7 +79,7 @@ class ParquetOutputFilesTest {
 			vtlBindings.put("LOOP", testDataset);
 			vtlBindings.put("FROM_USER", testDataset);
 			//
-			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase);
+			SqlUtils.convertVtlBindingsIntoSqlDatabase(vtlBindings, testDatabase, TestConstants.getKraftwerkExecutionContext());
 			outputFiles = new ParquetOutputFiles(
 					Paths.get(TestConstants.UNIT_TESTS_DUMP),
 					vtlBindings,
