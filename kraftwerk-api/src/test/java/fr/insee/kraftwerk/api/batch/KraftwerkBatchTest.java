@@ -495,7 +495,7 @@ class KraftwerkBatchTest {
         when(args.getOptionValues("with-ddi")).thenReturn(List.of("true"));
         when(args.getOptionValues("add-states")).thenReturn(List.of("true"));
 
-        BatchResponseDto dto = new BatchResponseDto("job-123", "out/TESTCAMPAIGN2/2026_04_22_10_00_00");
+        BatchResponseDto dto = new BatchResponseDto( "out/TESTCAMPAIGN2/2026_04_22_10_00_00");
         when(batchExportService.mainGenesisByQuestionnaireIdBatch(
                 any(),
                 any(),
