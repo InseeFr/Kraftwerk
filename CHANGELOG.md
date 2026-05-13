@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.16.0 [TODO]
+## 3.16.0 [2026-05-13]
 ### Changed
 - Add `withEncryption` support for JSON export endpoints (`/json` and `/json/replay`)
 
