@@ -168,7 +168,7 @@ public class BatchExportService extends KraftwerkService {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
 
-            BatchResponseDto response = new BatchResponseDto(normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -214,7 +214,7 @@ public class BatchExportService extends KraftwerkService {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
 
-            BatchResponseDto response = new BatchResponseDto(normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -260,7 +260,7 @@ public class BatchExportService extends KraftwerkService {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
 
-            BatchResponseDto response = new BatchResponseDto(normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -300,7 +300,7 @@ public class BatchExportService extends KraftwerkService {
                     fileUtilsInterface
             );
 
-            return new BatchResponseDto(normalizePath(outputPath));
+            return new BatchResponseDto("",normalizePath(outputPath));
 
         } catch (KraftwerkException | IOException e) {
             log.error("Batch export failed for {}", questionnaireModelId, e);
@@ -338,7 +338,7 @@ public class BatchExportService extends KraftwerkService {
                     fileUtilsInterface
             );
 
-            BatchResponseDto response = new BatchResponseDto(normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -371,7 +371,7 @@ public class BatchExportService extends KraftwerkService {
 
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
-            BatchResponseDto response = new BatchResponseDto(normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
