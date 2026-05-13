@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.JsonReader;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class UserInputsFile extends UserInputs {
 				Path paradataPath = (paradataFolder != null && fileUtilsInterface.isFileExists(paradataFolder)) ? convertToUserPath(paradataFolder) : fileUtilsInterface.convertToPath(paradataFolder,inputDirectory);
 				Path reportingDataFile = (reportingFolder != null && fileUtilsInterface.isFileExists(reportingFolder)) ? convertToUserPath(reportingFolder) : fileUtilsInterface.convertToPath(reportingFolder,inputDirectory);
 				Path vtlFile = fileUtilsInterface.convertToPath(readField(fileNode, "mode_specifications"),inputDirectory);
-				ModeInputs modeInputs = new ModeInputs();
+				ModeInputs modeInputs = new ModeInputs(fileUtilsInterface);
 				modeInputs.setDataFile(dataPath);
 				modeInputs.setDdiUrl(ddiFile);
 				modeInputs.setLunaticFile(lunaticFile);

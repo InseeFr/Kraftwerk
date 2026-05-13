@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
 import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.FileSystemUtils;
@@ -28,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Log4j2
+@NoArgsConstructor
 public class FileSystemImpl implements FileUtilsInterface{
 
 	private static final String ARCHIVE = "Archive";
