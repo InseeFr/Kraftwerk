@@ -42,6 +42,9 @@ public class KraftwerkExecutionContext {
 
     private Instant recordedBefore;
 
+    //Caches
+    private Map<Path, String> userVtlInstructionsCache;
+
     public KraftwerkExecutionContext(
             String inDirectoryParam,
             boolean fileByFile,
@@ -62,6 +65,8 @@ public class KraftwerkExecutionContext {
         this.withEncryption = withEncryption;
         this.limitSize = limitSize;
         this.addStates = addStates;
+
+        this.userVtlInstructionsCache = new HashMap<>();
     }
 
     public String getFormattedString() {

@@ -177,7 +177,7 @@ public class MainProcessing {
 					currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
 					currentFileInputs.setMultimodeDatasetName(source.getMultimodeDatasetName());
 					ModeInputs sourceModeInputs = source.getModeInputs(dataMode);
-					ModeInputs currentFileModeInputs = new ModeInputs();
+					ModeInputs currentFileModeInputs = new ModeInputs(source.getFileUtilsInterface());
 					currentFileModeInputs.setDataFile(dataFile);
 					currentFileModeInputs.setDdiUrl(sourceModeInputs.getDdiUrl());
 					currentFileModeInputs.setLunaticFile(sourceModeInputs.getLunaticFile());
