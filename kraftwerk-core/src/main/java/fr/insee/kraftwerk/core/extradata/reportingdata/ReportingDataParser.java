@@ -81,10 +81,10 @@ public abstract class ReportingDataParser {
 
 
 		for (int k = 1; k <= this.maxStates; k++) {
-			Variable variableListStates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataGroup,
+			Variable variableListStates = new Variable(Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_" + k, reportingDataGroup,
 					VariableType.STRING, "50");
 			surveyRawData.putVariable(variableListStates);
-			Variable variableListStatesDates = new Variable(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
+			Variable variableListStatesDates = new Variable(Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
 					reportingDataGroup, VariableType.DATE, "50");
 			surveyRawData.putVariable(variableListStatesDates);
 		}
@@ -329,10 +329,10 @@ public abstract class ReportingDataParser {
 		for (int k = 1; k <= reportingDataUE.size(); k++) {
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k, reportingDataUE.getStates().get(k - 1).getStateType());
+					.putValue(Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_" + k, reportingDataUE.getStates().get(k - 1).getStateType());
 			questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)
 					.getInstance(Constants.REPORTING_DATA_PREFIX_NAME + reportingDataUE.getIdentifier())
-					.putValue(Constants.STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
+					.putValue(Constants.REPORTING_DATA_STATE_SUFFIX_NAME + "_" + k + DATE_SUFFIX,
 							reportingDataOutputDateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(reportingDataUE.getStates().get(k - 1).getTimestamp()),ZoneId.of("CET"))));
 		}
 		questionnaire.getAnswers().getSubGroup(Constants.REPORTING_DATA_GROUP_NAME)

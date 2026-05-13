@@ -17,7 +17,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -45,23 +44,25 @@ public class OIDCAuthConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        for (var pattern : whitelistMatchers) {
-            http.authorizeHttpRequests(authorize ->
-                    authorize
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(pattern)).permitAll()
-            );
-        }
-        http
-                .authorizeHttpRequests(configurer -> configurer
-                        .requestMatchers("/main/**").hasAnyRole(String.valueOf(ApplicationRole.USER),String.valueOf(ApplicationRole.SCHEDULER))
-                        .requestMatchers("/steps/**").hasRole(String.valueOf(ApplicationRole.ADMIN))
-                        .requestMatchers("/split/**").hasRole(String.valueOf(ApplicationRole.ADMIN))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(whitelistMatchers).permitAll()
+
+                        .requestMatchers("/main/**")
+                        .hasAnyRole(ApplicationRole.USER.name(), ApplicationRole.SCHEDULER.name())
+
+                        .requestMatchers("/steps/**", "/split/**")
+                        .hasRole(ApplicationRole.ADMIN.name())
+
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                );
+
         return http.build();
     }
+
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {

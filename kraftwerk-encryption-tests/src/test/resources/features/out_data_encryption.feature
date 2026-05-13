@@ -4,9 +4,9 @@ Feature: Output Data Encryption
     Given Step 0 : We have some survey in directory "<Directory>"
     And We want to encrypt output data at the end of process
     When Step 1 : We launch main service
-    Then We should not be able to read the csv output file
-    And We should not be able to read the parquet output file
-    And We should be able to decrypt the file
+    And We archive and encrypt the outputs
+    Then We should not be able to read the output zip without decryption
+    And We should be able to decrypt the zip and read the csv inside
 
     Examples:
     # Parameters :
@@ -20,9 +20,9 @@ Feature: Output Data Encryption
     Given Step 0 : We have some survey in directory "<Directory>"
     And We want to encrypt output data at the end of process
     When Step 1 : We launch main service file by file
-    Then We should not be able to read the csv output file
-    And We should not be able to read the parquet output file
-    And We should be able to decrypt the file
+    And We archive and encrypt the outputs
+    Then We should not be able to read the output zip without decryption
+    And We should be able to decrypt the zip and read the csv inside
 
     Examples:
     # Parameters :
@@ -38,8 +38,8 @@ Feature: Output Data Encryption
     And We have a external variable "<VariableName>" in a document with CampaignId "<CampaignId>", InterrogationId "<InterrogationId>" with value "<Value>"
     And We want to encrypt output data at the end of genesis process
     When We use the Genesis service with campaignId "<CampaignId>"
-    Then We should not be able to read the csv output file
-    And We should not be able to read the parquet output file
+    And We archive and encrypt the outputs
+    Then We should not be able to read the output zip without decryption
     And We should be able to decrypt the file (Genesis)
 
     Examples:
@@ -52,8 +52,8 @@ Feature: Output Data Encryption
     And We have a external variable "<VariableName>" in a document with QuestionnaireModelId "<QuestionnaireModelId>", InterrogationId "<InterrogationId>" with value "<Value>"
     And We want to encrypt output data at the end of genesis process
     When We use the Genesis service with questionnaireModelId "<QuestionnaireModelId>"
-    Then We should not be able to read the csv output file
-    And We should not be able to read the parquet output file
+    And We archive and encrypt the outputs
+    Then We should not be able to read the output zip without decryption
     And We should be able to decrypt the file (Genesis)
 
     Examples:

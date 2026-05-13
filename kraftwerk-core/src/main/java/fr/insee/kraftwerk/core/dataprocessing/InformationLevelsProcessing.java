@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlMacros;
@@ -16,8 +17,11 @@ import java.util.Set;
  */
 public class InformationLevelsProcessing extends DataProcessing {
 
-    public InformationLevelsProcessing(VtlBindings vtlBindings, FileUtilsInterface fileUtilsInterface) {
-        super(vtlBindings, fileUtilsInterface);
+    public InformationLevelsProcessing(VtlBindings vtlBindings,
+									   FileUtilsInterface fileUtilsInterface,
+									   KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
+        super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
     }
 
     @Override
@@ -42,8 +46,14 @@ public class InformationLevelsProcessing extends DataProcessing {
 		Set<String> rootVariableNames = metadataModel.getVariables().getGroupVariableNames(Constants.ROOT_GROUP_NAME);
 
 		String rootMeasures = VtlMacros.toVtlSyntax(rootVariableNames);
-		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s];",
-				Constants.ROOT_GROUP_NAME, bindingName, Constants.ROOT_IDENTIFIER_NAME, rootMeasures, Constants.MODE_VARIABLE_NAME));
+		rootInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s, %s, %s];",
+				Constants.ROOT_GROUP_NAME,
+				bindingName,
+				Constants.ROOT_IDENTIFIER_NAME,
+				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+				Constants.QUESTIONNAIRE_STATE_NAME,
+				Constants.VALIDATION_DATE_NAME,
+				rootMeasures, Constants.MODE_VARIABLE_NAME));
 
 		vtlScript.add(rootInstructions.toString());
 
@@ -61,8 +71,14 @@ public class InformationLevelsProcessing extends DataProcessing {
 					.map(metadataModel::getFullyQualifiedName).toList();
 
 			String groupMeasures = VtlMacros.toVtlSyntax(groupMeasureNames);
-			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s];",
-					groupName, bindingName, Constants.ROOT_IDENTIFIER_NAME, groupName, groupMeasures, Constants.MODE_VARIABLE_NAME));
+			groupInstructions.append(String.format("%s := %s [keep %s, %s, %s, %s, %s];",
+					groupName,
+					bindingName,
+					Constants.ROOT_IDENTIFIER_NAME,
+					Constants.SURVEY_UNIT_IDENTIFIER_NAME,
+					groupName,
+					groupMeasures,
+					Constants.MODE_VARIABLE_NAME));
 			// Empty lines are created to produce group level tables and need to be removed
 			groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
 					groupName, groupName, groupName));

@@ -105,7 +105,12 @@ class CleanUpProcessingTest {
         vtlBindings.put("MULTIMODE", multimodeDataset);
 
         // Apply clean up
-        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(vtlBindings, metadatas, fileUtilsInterface);
+        CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(
+                vtlBindings,
+                metadatas,
+                fileUtilsInterface,
+                kraftwerkExecutionContext
+        );
         cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,kraftwerkExecutionContext);
 
         // Are paper indicator variables removed in VTL multimode dataset ?

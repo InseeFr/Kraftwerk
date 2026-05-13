@@ -2,8 +2,8 @@ package cucumber.functional_tests;
 
 import cucumber.TestConstants;
 import fr.insee.bpm.exceptions.MetadataParserException;
-import fr.insee.bpm.metadata.reader.ddi.DDIReader;
 import fr.insee.bpm.metadata.model.MetadataModel;
+import fr.insee.bpm.metadata.reader.ddi.DDIReader;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;

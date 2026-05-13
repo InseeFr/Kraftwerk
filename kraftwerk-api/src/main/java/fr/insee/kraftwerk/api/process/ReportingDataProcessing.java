@@ -35,28 +35,31 @@ public class ReportingDataProcessing {
     public void runProcessMain(FileUtilsInterface fileUtilsInterface,
                                String defaultDirectory,
                                String inDirectoryParam,
-                               String reportingDataFilePathParam
+                               String reportingDataFilePathParam,
+                               KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", inDirectoryParam);
-        runProcess(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam);
+        runProcess(fileUtilsInterface, inDirectory, inDirectory, reportingDataFilePathParam, kraftwerkExecutionContext);
     }
 
     public void runProcessGenesis(FileUtilsInterface fileUtilsInterface,
                                   Mode mode,
                                   String defaultDirectory,
                                   String inDirectoryParam,
-                                  String reportingDataFilePathParam
+                                  String reportingDataFilePathParam,
+                                  KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
         Path inDirectory = Path.of(defaultDirectory, "in", mode.getFolder(), inDirectoryParam);
         Path specDirectory = Path.of(defaultDirectory, "specs", inDirectoryParam);
-        runProcess(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam);
+        runProcess(fileUtilsInterface, inDirectory, specDirectory, reportingDataFilePathParam, kraftwerkExecutionContext);
     }
 
 
     private void runProcess(FileUtilsInterface fileUtilsInterface,
-                           Path inDirectory,
-                           Path inOrSpecDirectory,
-                           String reportingDataFilePathParam
+                            Path inDirectory,
+                            Path inOrSpecDirectory,
+                            String reportingDataFilePathParam,
+                            KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
         Path reportingDataFilePath = inDirectory.resolve(reportingDataFilePathParam);
         SurveyRawData surveyRawData = new SurveyRawData();
@@ -66,17 +69,26 @@ public class ReportingDataProcessing {
 
         parseReportingData(modeInputs, surveyRawData, fileUtilsInterface);
 
-        VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
+        VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
         VtlBindings vtlBindings = new VtlBindings();
         vtlExecute.convertToVtlDataset(surveyRawData, Constants.REPORTING_DATA_GROUP_NAME, vtlBindings);
 
         /* Apply reporting data VTL transformations */
+        KraftwerkExecutionContext context = new KraftwerkExecutionContext(
+                "",
+                false,
+                true,
+                false,
+                0L,
+                false
+        );
         DataProcessing dataProcessing = DataProcessingManager.getProcessingClass(
                 DataFormat.LUNATIC_XML,
                 vtlBindings,
                 new MetadataModel(),
-                fileUtilsInterface);
-        KraftwerkExecutionContext context = new KraftwerkExecutionContext("",false,true,false,0L);
+                fileUtilsInterface,
+                kraftwerkExecutionContext
+        );
         dataProcessing.applyVtlTransformations(
                 Constants.REPORTING_DATA_GROUP_NAME,
                 Path.of(Constants.VTL_FOLDER_PATH)

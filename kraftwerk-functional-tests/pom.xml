@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.7.0</version>
+		<version>3.15.4</version>
 	</parent>
 
 	<artifactId>kraftwerk-functional-tests</artifactId>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>fr.insee.kraftwerk</groupId>
 			<artifactId>kraftwerk-api</artifactId>
-			<version>${parent.version}</version>
+			<version>${project.parent.version}</version>
 			<classifier>app-to-import</classifier>
 		</dependency>
 	</dependencies>
@@ -31,6 +31,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<argLine>${argLine} -Dfile.encoding=UTF-8</argLine>
 					<printSummary>true</printSummary>
 					<!-- <testFailureIgnore>true</testFailureIgnore> -->
 					<includes>

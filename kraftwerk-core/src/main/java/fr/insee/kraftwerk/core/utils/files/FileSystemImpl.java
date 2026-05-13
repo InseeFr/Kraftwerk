@@ -7,6 +7,7 @@ import fr.insee.kraftwerk.core.inputs.UserInputsFile;
 import fr.insee.kraftwerk.core.utils.DateUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +22,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -96,6 +98,7 @@ public class FileSystemImpl implements FileUtilsInterface{
 	public List<String> listFilePaths(String dir) {
 		return Stream.of(new File(dir).listFiles())
 				.filter(file -> !file.isDirectory())
+                .sorted(Comparator.comparing(File::getName).reversed())
 				.map(File::getAbsolutePath)
 				.toList();
 	}
@@ -168,7 +171,29 @@ public class FileSystemImpl implements FileUtilsInterface{
 		}
 	}
 
-	@Override
+    @Override
+    public void deleteDirectoryContent(Path directoryPath) throws KraftwerkException {
+
+        try {
+            if (!Files.exists(directoryPath)) {
+                return;
+            }
+
+            if (!Files.isDirectory(directoryPath)) {
+                throw new KraftwerkException(400, "Path is not a directory: " + directoryPath);
+            }
+
+            try (Stream<Path> paths = Files.list(directoryPath)) {
+                for (Path child : (Iterable<Path>) paths::iterator) {
+                    FileSystemUtils.deleteRecursively(child);
+                }
+            }
+        } catch (IOException e) {
+            throw new KraftwerkException(500, "IOException when deleting directory content : " + e.getMessage());
+        }
+    }
+
+    @Override
 	public InputStream readFile(String path) {
 		try{
 			return Files.newInputStream(Path.of(path));

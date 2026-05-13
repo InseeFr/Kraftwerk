@@ -27,6 +27,9 @@ public class KraftwerkApi extends SpringBootServletInitializer {
 		boolean hasProfileArg = Arrays.stream(args)
 				.anyMatch(arg -> arg.startsWith("--spring.profiles.active="));
 
+		boolean batchMode = Arrays.stream(args)
+				.anyMatch(arg -> arg.startsWith("--service="));
+
 		SpringApplication app = new SpringApplication(KraftwerkApi.class);
 
 		if (!hasProfileArg) {
@@ -36,6 +39,12 @@ public class KraftwerkApi extends SpringBootServletInitializer {
 			log.info("🔧 Profile explicitly set via args, no override.");
 		}
 
-		app.run(args);
+		if(batchMode) {
+			log.info("SpringApplication will run in BATCH MODE");
+			app.run(args).close();
+		} else {
+			log.info("SpringApplication will run in API MODE");
+			app.run(args);
+		}
 	}
 }

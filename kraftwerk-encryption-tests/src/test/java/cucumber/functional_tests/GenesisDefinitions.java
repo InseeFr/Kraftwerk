@@ -26,27 +26,34 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import stubs.ConfigStub;
 import stubs.GenesisClientStub;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static cucumber.functional_tests.MainDefinitions.database;
 import static cucumber.functional_tests.MainDefinitions.outDirectory;
 
+@SpringBootTest
 public class GenesisDefinitions {
 
     ConfigStub configStub = new ConfigStub();
@@ -243,7 +250,7 @@ public class GenesisDefinitions {
             surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
 
             surveyUnitUpdateLatest.setCampaignId(campaignId);
-            surveyUnitUpdateLatest.setQuestionnaireId(campaignId);
+            surveyUnitUpdateLatest.setCollectionInstrumentId(campaignId);
             surveyUnitUpdateLatest.setInterrogationId(interrogationId);
             surveyUnitUpdateLatest.setMode(Mode.WEB);
 
@@ -258,7 +265,7 @@ public class GenesisDefinitions {
 
     private SurveyUnitUpdateLatest getSurveyUnitUpdateLatestByQuestionnaire(String questionnaireModelId, String interrogationId) {
         List<SurveyUnitUpdateLatest> mongoFiltered = genesisClientStub.getMongoStub().stream().filter(
-                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getQuestionnaireId().equals(questionnaireModelId)
+                surveyUnitUpdateLatest -> surveyUnitUpdateLatest.getCollectionInstrumentId().equals(questionnaireModelId)
                         && surveyUnitUpdateLatest.getInterrogationId().equals(interrogationId)
         ).toList();
 
@@ -267,7 +274,7 @@ public class GenesisDefinitions {
             surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
 
             surveyUnitUpdateLatest.setCampaignId(questionnaireModelId);
-            surveyUnitUpdateLatest.setQuestionnaireId(questionnaireModelId);
+            surveyUnitUpdateLatest.setCollectionInstrumentId(questionnaireModelId);
             surveyUnitUpdateLatest.setInterrogationId(interrogationId);
             surveyUnitUpdateLatest.setMode(Mode.WEB);
 
@@ -392,51 +399,96 @@ public class GenesisDefinitions {
             Assertions.assertThat(resultSet.getString(variableName)).isNotNull().isEqualTo(value);
         }
     }
-
     @Then("We should be able to decrypt the file \\(Genesis)")
     public void check_genesis_file_decryption() throws IOException, SymmetricEncryptionException, SQLException {
-        Path executionOutDirectory = outDirectory.resolve(Objects.requireNonNull(new File(outDirectory.toString()).listFiles(File::isDirectory))[0].getName());
+
         SymmetricEncryptionEndpoint symmetricEncryptionEndpoint =
                 TestConstants.getSymmetricEncryptionEndpointForTest(context.getBean(VaultCaller.class));
 
-
-        //Check CSV
-        Path encryptedFilePath =
-                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-                        ".csv.enc");
-        Assertions.assertThat(encryptedFilePath).exists();
-
-        Assertions.assertThat(
-                new String(
-                        symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath)),
-                        StandardCharsets.UTF_8)
-        ).contains(Constants.ROOT_IDENTIFIER_NAME);
-
-
-        //Check parquet
-        encryptedFilePath =
-                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-                        ".parquet.enc");
-        Assertions.assertThat(encryptedFilePath).exists();
-        Path decryptedFilePath =
-                executionOutDirectory.resolve(outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME +
-                        ".parquet");
-
-        Files.write(
-                decryptedFilePath,
-                symmetricEncryptionEndpoint.decrypt(Files.readAllBytes(encryptedFilePath))
-        );
+        Path tmpParquet = decryptZipAssertCsvAndExtractParquet(symmetricEncryptionEndpoint);
 
         try (Statement statement = database.createStatement()) {
-            SqlUtils.readParquetFile(statement, decryptedFilePath);
+            String parquetPath = tmpParquet.toAbsolutePath().toString().replace("\\", "/");
+
             ResultSet resultSet = statement.executeQuery(
-                    ("SELECT %s " +
-                            "FROM '%s' ").formatted(
-                            Constants.ROOT_IDENTIFIER_NAME,
-                            outDirectory.getFileName() + "_" + Constants.ROOT_GROUP_NAME
-                    )
+                    ("SELECT %s FROM read_parquet('%s') LIMIT 1")
+                            .formatted(Constants.ROOT_IDENTIFIER_NAME, parquetPath)
             );
+
             Assertions.assertThat(resultSet.next()).isTrue();
+        }
+    }
+
+    private Path decryptZipAssertCsvAndExtractParquet(SymmetricEncryptionEndpoint endpoint)
+            throws IOException, SymmetricEncryptionException {
+
+        Path zipFolder = outDirectory;
+        Assertions.assertThat(zipFolder).isNotNull();
+        Assertions.assertThat(zipFolder.toFile()).exists().isDirectory();
+
+        Path encryptedZipPath;
+        try (var s = Files.list(zipFolder)) {
+            encryptedZipPath = s.filter(p -> p.getFileName().toString().endsWith(".zip.enc"))
+                    .max(Comparator.comparingLong(p -> p.toFile().lastModified()))
+                    .orElseThrow(() -> new AssertionError(
+                            "No .zip.enc found in " + zipFolder +
+                                    ". Files are: " + listFilesForDebug(zipFolder)
+                    ));
+        }
+
+        Assertions.assertThat(encryptedZipPath).exists();
+        Assertions.assertThat(encryptedZipPath.toFile()).content().isNotEmpty();
+
+        byte[] decryptedZipBytes = endpoint.decrypt(Files.readAllBytes(encryptedZipPath));
+        Assertions.assertThat(decryptedZipBytes).isNotNull().isNotEmpty();
+
+        boolean foundCsv = false;
+        boolean foundParquet = false;
+
+        String expectedCsvSuffix = Constants.ROOT_GROUP_NAME + ".csv";
+        String expectedParquetSuffix = Constants.ROOT_GROUP_NAME + ".parquet";
+
+        Path tmpParquet = Files.createTempFile("genesis-decrypted-", ".parquet");
+        tmpParquet.toFile().deleteOnExit();
+
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decryptedZipBytes))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                String entryName = entry.getName();
+
+                if (entryName.endsWith(expectedCsvSuffix)) {
+                    foundCsv = true;
+                    String csvText = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+                    Assertions.assertThat(csvText).contains(Constants.ROOT_IDENTIFIER_NAME);
+                } else if (entryName.endsWith(expectedParquetSuffix)) {
+                    foundParquet = true;
+                    Files.write(tmpParquet, zis.readAllBytes(),
+                            StandardOpenOption.CREATE,
+                            StandardOpenOption.TRUNCATE_EXISTING);
+                }
+            }
+        }
+
+        Assertions.assertThat(foundCsv)
+                .as("CSV entry should exist inside decrypted zip")
+                .isTrue();
+
+        Assertions.assertThat(foundParquet)
+                .as("Parquet entry should exist inside decrypted zip")
+                .isTrue();
+
+        return tmpParquet;
+    }
+
+    private String listFilesForDebug(Path dir) {
+        try (var s = Files.list(dir)) {
+            return s
+                    .map(p -> p.getFileName().toString())
+                    .sorted()
+                    .toList()
+                    .toString();
+        } catch (IOException e) {
+            return "<error listing files: " + e.getMessage() + ">";
         }
     }
 

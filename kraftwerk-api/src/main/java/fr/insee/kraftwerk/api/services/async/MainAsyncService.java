@@ -1,0 +1,139 @@
+package fr.insee.kraftwerk.api.services.async;
+
+
+import fr.insee.kraftwerk.api.client.GenesisClient;
+import fr.insee.kraftwerk.api.configuration.ConfigProperties;
+import fr.insee.kraftwerk.api.configuration.MinioConfig;
+import fr.insee.kraftwerk.api.dto.ExportCheckResultDto;
+import fr.insee.kraftwerk.api.process.MainProcessing;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
+import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
+import fr.insee.kraftwerk.api.services.KraftwerkService;
+import fr.insee.kraftwerk.api.services.OutputZipService;
+import fr.insee.kraftwerk.core.data.model.Mode;
+import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Slf4j
+public class MainAsyncService extends KraftwerkService {
+
+	private final InMemoryJobStore jobStore;
+	private final OutputZipService outputZipService;
+    private final InMemoryExportJobStore exportJobStore;
+    protected final GenesisClient client;
+
+    public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService, InMemoryExportJobStore exportJobStore, GenesisClient client) {
+		super(configProperties, minioConfig);
+		this.jobStore = jobStore;
+        this.outputZipService = outputZipService;
+        this.exportJobStore = exportJobStore;
+        this.client = client;
+    }
+
+	@GetMapping("/status/{jobId}")
+	public ResponseEntity<JobExecution> getStatus(@PathVariable String jobId) {
+		return jobStore.get(jobId)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+
+	@Async("kraftwerkExecutor")
+	public void runWithoutGenesis(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessing mp, String inDirectoryParam, boolean archiveAtEnd, boolean fileByFile, boolean withDDI, boolean withEncryption) {
+		jobStore.start(jobId);
+		try {
+            mp.runMain();
+            outputZipService.encryptAndArchiveOutputs(mp.getKraftwerkExecutionContext(),fileUtilsInterface);
+            jobStore.success(jobId);
+
+		} catch (KraftwerkException e) {
+			log.error(e.getMessage());
+			jobStore.fail(jobId, e);
+		}
+		/* Step 4.3- 4.4 : Archive */
+		if (archiveAtEnd) archive(inDirectoryParam, fileUtilsInterface);
+
+	}
+
+	/**
+	 * @deprecated since 3.4.1 (use by campaignId which does no longer exist)*/
+	@Async("kraftwerkExecutor")
+	@Deprecated(since = "3.4.1", forRemoval = true)
+	public void runWithGenesis(String jobId, FileUtilsInterface fileUtilsInterface, MainProcessingGenesisLegacy mpGenesis,String campaignId, boolean withDDI, boolean withEncryption, int batchSize) {
+		jobStore.start(jobId);
+		try {
+			mpGenesis.runMain(campaignId, batchSize);
+            outputZipService.encryptAndArchiveOutputs(mpGenesis.getKraftwerkExecutionContext(),fileUtilsInterface);
+            jobStore.success(jobId);
+
+		} catch (KraftwerkException e) {
+			log.error("KRAFTWERK EXCEPTION for campaign {}: {}", campaignId, e.getMessage());
+			jobStore.fail(jobId, e);
+
+		} catch (IOException e) {
+			log.error("INTERNAL ERROR for campaign {}: {}",campaignId, e.getMessage());
+			jobStore.fail(jobId, e);
+
+		}
+	}
+
+    @Async("kraftwerkExecutor")
+    public void runWithGenesisByQuestionnaire(
+            String jobId,
+            FileUtilsInterface fileUtilsInterface,
+            MainProcessingGenesisNew mpGenesis,
+            String questionnaireModelId,
+            boolean withDDI,
+            boolean withEncryption,
+            int batchSize,
+            Mode dataMode
+    ) {
+
+        try {
+
+            long interrogationsCount = client.getInterrogationIds(questionnaireModelId).size();
+
+            mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
+
+            outputZipService.encryptAndArchiveOutputs(
+                    mpGenesis.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
+            );
+
+            List<String> errors = new ArrayList<>();
+
+            if (mpGenesis.getKraftwerkExecutionContext().getErrors() != null) {
+                mpGenesis.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    questionnaireModelId,
+                    interrogationsCount
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
+        } catch (KraftwerkException e) {
+            log.error("KRAFTWERK EXCEPTION for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
+            exportJobStore.fail(jobId, e);
+
+        } catch (IOException e) {
+            log.error("INTERNAL ERROR for questionnaireModelId {}: {}", questionnaireModelId, e.getMessage());
+            exportJobStore.fail(jobId, e);
+        }
+    }
+
+}

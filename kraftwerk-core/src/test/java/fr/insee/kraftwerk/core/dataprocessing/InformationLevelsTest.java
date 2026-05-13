@@ -54,7 +54,11 @@ class InformationLevelsTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDataset);
 		//
-		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
+		InformationLevelsProcessing processing = new InformationLevelsProcessing(
+				vtlBindings,
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
@@ -94,7 +98,11 @@ class InformationLevelsTest {
 		VtlBindings vtlBindings = new VtlBindings();
 		vtlBindings.put("MULTIMODE", testDatasetWithPartialIdNull);
 		//
-		InformationLevelsProcessing processing = new InformationLevelsProcessing(vtlBindings, fileUtilsInterface);
+		InformationLevelsProcessing processing = new InformationLevelsProcessing(
+				vtlBindings,
+				fileUtilsInterface,
+				kraftwerkExecutionContext
+		);
 		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);

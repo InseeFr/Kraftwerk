@@ -84,7 +84,9 @@ class ReconciliationTest {
 		//
 		vtlBindings.put("SINGLE_MODE", testDatasets.get(dsName));
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
@@ -96,7 +98,9 @@ class ReconciliationTest {
 		vtlBindings.put(mode1, testDatasets.get(mode1));
 		vtlBindings.put(mode2, testDatasets.get(mode2));
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		return vtlBindings.getDataset("MULTIMODE");
@@ -140,7 +144,9 @@ class ReconciliationTest {
 		vtlBindings.put("CAWI", capiDataset);
 		vtlBindings.put("PAPI", papiDataset);
 		//
-		ReconciliationProcessing reconciliation = new ReconciliationProcessing(vtlBindings, fileUtilsInterface);
+		ReconciliationProcessing reconciliation = new ReconciliationProcessing(
+				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
+		);
 		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");

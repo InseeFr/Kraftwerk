@@ -44,8 +44,7 @@ public class ImportScriptTest {
 
 	Map<String, MetadataModel> metadata;
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
-	
-	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface);
+	VtlExecute vtlExecute = new VtlExecute(fileUtilsInterface, TestConstants.getKraftwerkExecutionContext());
 
 	@BeforeEach
 	void initMetadata() {
@@ -65,9 +64,13 @@ public class ImportScriptTest {
 
 		// add group prefixes
 		KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
-		GroupProcessing groupProcessing = new GroupProcessing(vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface);
+		GroupProcessing groupProcessing = new GroupProcessing(
+				vtlBindings, srdWeb.getMetadataModel(), fileUtilsInterface, kraftwerkExecutionContext
+		);
 		groupProcessing.applyVtlTransformations("CAWI", null, kraftwerkExecutionContext);
-		GroupProcessing groupProcessing2 = new GroupProcessing(vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface);
+		GroupProcessing groupProcessing2 = new GroupProcessing(
+				vtlBindings, srdPaper.getMetadataModel(), fileUtilsInterface, kraftwerkExecutionContext
+		);
 		groupProcessing2.applyVtlTransformations("PAPI", null, kraftwerkExecutionContext);
 
 		dataStructure = vtlBindings.getDataset("CAWI").getDataStructure();

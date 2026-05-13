@@ -50,8 +50,12 @@ public class CalculatedProcessingDefinition {
     private Dataset outDataset;
     private List<String> variableNamesList;
 	
-	VtlExecute vtlExecute = new VtlExecute(new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
     KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
+    VtlExecute vtlExecute = new VtlExecute(
+            new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+            kraftwerkExecutionContext
+    );
+
 
     @ParameterType("(?:[^,]*)(?:,\\s?[^,]*)*")
     public List<String> listOfStrings(String arg){
@@ -86,7 +90,11 @@ public class CalculatedProcessingDefinition {
         //
         CalculatedVariables calculatedVariables = LunaticReader.getCalculatedFromLunatic(
                 new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY).readFile(Path.of(campaignPacks.get(campaignName).get(dataMode).get("lunatic")).toString()));
-        DataProcessing calculatedProcessing = new CalculatedProcessing(vtlBindings,calculatedVariables, new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY));
+        DataProcessing calculatedProcessing = new CalculatedProcessing(
+                vtlBindings,calculatedVariables,
+                new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY),
+                kraftwerkExecutionContext
+        );
         calculatedProcessing.applyVtlTransformations("TEST", null, kraftwerkExecutionContext);
         //
         outDataset = vtlBindings.getDataset("TEST");

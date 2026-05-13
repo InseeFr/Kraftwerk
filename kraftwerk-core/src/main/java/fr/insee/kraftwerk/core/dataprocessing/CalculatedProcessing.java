@@ -2,8 +2,8 @@ package fr.insee.kraftwerk.core.dataprocessing;
 
 import fr.insee.bpm.metadata.model.CalculatedVariables;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
-import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
+import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlScript;
 import lombok.extern.log4j.Log4j2;
@@ -20,8 +20,12 @@ public class CalculatedProcessing extends DataProcessing {
     public static final int MAXIMAL_RESOLVING_ITERATIONS = 100;
     private final CalculatedVariables calculatedVariables;
 
-    public CalculatedProcessing(VtlBindings vtlBindings,  CalculatedVariables calculatedVariables, FileUtilsInterface fileUtilsInterface) {
-        super(vtlBindings, fileUtilsInterface);
+    public CalculatedProcessing(VtlBindings vtlBindings,
+                                CalculatedVariables calculatedVariables,
+                                FileUtilsInterface fileUtilsInterface,
+                                KraftwerkExecutionContext kraftwerkExecutionContext
+    ) {
+        super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
         this.calculatedVariables = calculatedVariables;
     }
 
@@ -39,8 +43,7 @@ public class CalculatedProcessing extends DataProcessing {
             applyUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
             applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         } else {
-            log.info(String.format("No user VTL instructions given for dataset named %s (step %s).",
-                    bindingName, getStepName()));
+            log.info("No user VTL instructions given for dataset named {} (step {}).", bindingName, getStepName());
         }
         return automatedVtlInstructions;
     }

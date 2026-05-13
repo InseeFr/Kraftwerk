@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import fr.insee.kraftwerk.core.dataprocessing.StepEnum;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.kraftwerk.core.vtl.VtlExecute;
@@ -17,8 +18,9 @@ public class VtlReaderWriterSequence {
 	FileUtilsInterface fileUtilsInterface;
 
 
-	public VtlReaderWriterSequence(FileUtilsInterface fileUtilsInterface) {
-		vtlExecute = new VtlExecute(fileUtilsInterface);
+	public VtlReaderWriterSequence(FileUtilsInterface fileUtilsInterface,
+								   KraftwerkExecutionContext kraftwerkExecutionContext) {
+		vtlExecute = new VtlExecute(fileUtilsInterface, kraftwerkExecutionContext);
 		this.fileUtilsInterface = fileUtilsInterface;
 	}
 

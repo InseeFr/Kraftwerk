@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.dataprocessing;
 import fr.insee.bpm.metadata.model.MetadataModel;
 
 import fr.insee.kraftwerk.core.parsers.DataFormat;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.extern.log4j.Log4j2;
@@ -24,17 +25,28 @@ public class DataProcessingManager {
 	 *
 	 * @return One of the concrete parsers.
 	 */
-	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat, VtlBindings vtlBindings, MetadataModel metadataModel, FileUtilsInterface fileUtilsInterface) {
+	public static UnimodalDataProcessing getProcessingClass(DataFormat dataFormat,
+															VtlBindings vtlBindings,
+															MetadataModel metadataModel,
+															FileUtilsInterface fileUtilsInterface,
+															KraftwerkExecutionContext kraftwerkExecutionContext
+	) {
 		UnimodalDataProcessing dataProcessing = null;
 		switch (dataFormat) {
 		case XFORMS:
-			dataProcessing = new XformsDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
+			dataProcessing = new XformsDataProcessing(
+					vtlBindings, metadataModel, fileUtilsInterface, kraftwerkExecutionContext
+			);
 			break;
 		case PAPER:
-			dataProcessing = new PaperDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
+			dataProcessing = new PaperDataProcessing(
+					vtlBindings, metadataModel, fileUtilsInterface, kraftwerkExecutionContext
+			);
 			break;
 		case LUNATIC_XML , LUNATIC_JSON:
-			dataProcessing = new LunaticDataProcessing(vtlBindings, metadataModel, fileUtilsInterface);
+			dataProcessing = new LunaticDataProcessing(
+					vtlBindings, metadataModel, fileUtilsInterface, kraftwerkExecutionContext
+			);
 			break;
 		default:
 			log.warn("Unknown data collection tool, null returned.");

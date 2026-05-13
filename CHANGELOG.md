@@ -1,4 +1,104 @@
 # Changelog
+
+## 3.15.3 [2026-04-29]
+### Added
+- Display export file path in batch responses
+- Store encrypted archive in a timestamped directory
+
+### Changed
+
+We previously stored the timestamp at the end of the extraction process, several minutes after retrieving the IDs to be processed. As a result, any records created after the interrogationIds were listed but before the process completed were not included in the differential JSON output.
+
+To address this issue, we now capture the most recent timestamp (recordDate) at the moment the interrogationIds are retrieved. This timestamp is then used as the reference point for the next differential extraction.
+
+## 3.15.1 [2026-04-23]
+### Fixed
+- Fix issue where no encrypted files were generated on Kube
+
+## 3.15.0 [2026-04-20]
+### Added
+- Export JSON debug endpoint
+
+## 3.14.1 [2026-03-30]
+### Added
+- Some logs
+### Updated
+- Springboot 3.5.13
+
+## 3.14.0 [2026-03-26]
+### Added
+- Get status of export endpoint
+
+## 3.13.0 [2026-03-20]
+### Added
+- Batch mode : BatchSize and Mode parameters
+
+## 3.12.2 [2026-03-13]
+### Changed
+- Max allocated JVM memory to 2GB
+### Fixed
+- Crash when too much data in one batch to write into VTL JSON dataset
+- Exponential variables "_STATE" created per partition
+
+## 3.12.1 [2026-03-05]
+### Fixed
+- addState crash fix 
+
+## 3.12.0 [2026-03-05]
+### Added
+- Variable states from Genesis in exports if addStates is true
+### Changed
+- Java 21 -> 25
+
+### Updated
+- BPM 1.1.0
+## 3.11.1 [2026-01-13]
+### Fixed
+- Link variables
+
+## 3.11.0 [2026-01-07]
+- Filiere model in genesis : usualSurveyUnitId, validationDate and questionnaireState
+
+### Updated
+- BPM 1.0.23
+## 3.10.6 [2025-12-18]
+### Fixed
+- New BPM version
+
+## 3.10.5 [2025-12-18]
+### Changed
+- Adaptations to new BPM version regarding missing and filter_results
+
+## 3.10.1 [2025-11-18]
+### Fixed
+- Batch mode error management
+
+## 3.10.0 [2025-11-13]
+### Changed
+- Batch mode: named and optional parameters
+
+## 3.9.5 [2025-11-06]
+### Fixed
+- Scientific notation for Doubles during JSON extraction
+
+## 3.9.2 [2025-10-24]
+### Fixed
+- Inverse the order of files
+
+### Updated
+- BPM 1.0.18
+## 3.9.1 [2025-10-24]
+### Fixed
+- Read files by their names (which are containing the date of extraction)
+
+## 3.9.0 [2025-10-20]
+### Added
+- Extraction in json
+
+## 3.8.0 [2025-10-16]
+### Added
+- Survey unit id export
+
 ## 3.7.0 [2025-09-25]
 ### Changed
 - Reporting data outcome spotting calculation for IASCO and HOUSEF2F

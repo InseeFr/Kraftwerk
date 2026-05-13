@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,7 +74,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<SurveyUnitUpdateLatest> getUEsLatestState(String questionnaireId, List<InterrogationId> interrogationIds) {
+            public List<SurveyUnitUpdateLatest> getResponses(String collectionInstrumentId, List<InterrogationId> interrogationIds, Instant recordedBefore) {
                 SurveyUnitUpdateLatest surveyUnitUpdateLatest = new SurveyUnitUpdateLatest();
                 surveyUnitUpdateLatest.setCollectedVariables(new ArrayList<>());
                 surveyUnitUpdateLatest.setExternalVariables(new ArrayList<>());
@@ -86,7 +87,7 @@ class MainProcessingGenesisLegacyTest {
             }
 
             @Override
-            public List<Mode> getModesByQuestionnaire(String questionnaireModelId) throws KraftwerkException {
+            public List<Mode> getModesByQuestionnaire(String collectionInstrumentId) throws KraftwerkException {
                 return Collections.singletonList(Mode.WEB);
             }
 
@@ -104,7 +105,8 @@ class MainProcessingGenesisLegacyTest {
                 false,
                 true,
                 false,
-                419430400L
+                419430400L,
+                false
         );
 
         mainProcessing = new MainProcessingGenesisLegacy(configProperties, genesisClient, fileUtils, kraftwerkExecutionContext);

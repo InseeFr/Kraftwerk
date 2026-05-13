@@ -42,6 +42,7 @@ public class MainProcessing {
 	List<UserInputsFile> userInputsFileList; // for file by file process
 	@Getter
 	private VtlBindings vtlBindings = new VtlBindings();
+    @Getter
 	private final KraftwerkExecutionContext kraftwerkExecutionContext;
 	private final FileUtilsInterface fileUtilsInterface;
 
@@ -123,7 +124,9 @@ public class MainProcessing {
 
 	/* Step 2 : unimodal data */
 	private void unimodalProcess() throws KraftwerkException {
-		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(fileUtilsInterface);
+		BuildBindingsSequence buildBindingsSequence = new BuildBindingsSequence(
+				fileUtilsInterface, kraftwerkExecutionContext
+		);
 		for (String dataMode : userInputsFile.getModeInputsMap().keySet()) {
 			MetadataModel metadataForMode = metadataModels.get(dataMode);
 			buildBindingsSequence.buildVtlBindings(userInputsFile, dataMode, vtlBindings, metadataForMode, kraftwerkExecutionContext.isWithDDI(),
@@ -164,7 +167,7 @@ public class MainProcessing {
 
 	private static List<UserInputsFile> getUserInputsFile(UserInputsFile source, boolean fileByFile) throws KraftwerkException {
 		List<UserInputsFile> userInputsFileList = new ArrayList<>();
-		if(Boolean.TRUE.equals(fileByFile)){
+		if(fileByFile){
 			for (String dataMode : source.getModeInputsMap().keySet()) {
 				List<Path> dataFiles = getFilesToProcess(source, dataMode);
 				for (Path dataFile : dataFiles) {

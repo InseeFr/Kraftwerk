@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.rawdata;
 
 import fr.insee.kraftwerk.core.Constants;
+import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ public class GroupInstance {
 	/**
 	 * Group name (the "typeGroupe" field of group instances in Coleman data)
 	 */
+	@Getter
 	String groupName;
 
 	/**

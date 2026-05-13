@@ -25,8 +25,12 @@ public class CleanUpProcessing extends DataProcessing {
 
     private Map<String, MetadataModel> metadataModels;
 
-    public CleanUpProcessing(VtlBindings vtlBindings, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) {
-        super(vtlBindings, fileUtilsInterface);
+    public CleanUpProcessing(VtlBindings vtlBindings,
+                             Map<String, MetadataModel> metadataModels,
+                             FileUtilsInterface fileUtilsInterface,
+                             KraftwerkExecutionContext kraftwerkExecutionContext
+    ) {
+        super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
         this.metadataModels=metadataModels;
     }
 

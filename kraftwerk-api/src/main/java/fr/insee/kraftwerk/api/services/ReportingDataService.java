@@ -6,6 +6,7 @@ import fr.insee.kraftwerk.api.process.FolderSystem;
 import fr.insee.kraftwerk.api.process.ReportingDataProcessing;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.files.MinioImpl;
@@ -69,15 +70,27 @@ public class ReportingDataService extends KraftwerkService{
         return launchReportingDataProcessing("reporting/"+reportingDataFileName, campaignId, folderSystem, mode);
     }
 
-    private ResponseEntity<String> launchReportingDataProcessing(String reportingDataFilePath, String campaignId,
-                                                                 FolderSystem folderSystem, @Nullable Mode mode) {
+    private ResponseEntity<String> launchReportingDataProcessing(String reportingDataFilePath,
+                                                                 String campaignId,
+                                                                 FolderSystem folderSystem,
+                                                                 @Nullable Mode mode) {
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                defaultDirectory,
+                false,
+                true,
+                false,
+                limitSize,
+                false //We have to instanciate this KraftwerkExecutionContext just to send this to vtlExecute
+        );
         ReportingDataProcessing reportingDataProcessing = new ReportingDataProcessing();
         try {
             if(folderSystem.equals(FolderSystem.MAIN)){
-                reportingDataProcessing.runProcessMain(fileUtilsInterface,
+                reportingDataProcessing.runProcessMain(
+                        fileUtilsInterface,
                         defaultDirectory,
                         campaignId,
-                        reportingDataFilePath
+                        reportingDataFilePath,
+                        kraftwerkExecutionContext
                 );
                 return ResponseEntity.ok("Reporting data processed");
             }
@@ -89,7 +102,8 @@ public class ReportingDataService extends KraftwerkService{
                     mode,
                     defaultDirectory,
                     campaignId,
-                    reportingDataFilePath
+                    reportingDataFilePath,
+                    kraftwerkExecutionContext
             );
             return ResponseEntity.ok("Reporting data processed");
         }catch (KraftwerkException e){
