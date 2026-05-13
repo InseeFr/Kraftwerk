@@ -1,6 +1,9 @@
 # Changelog
+## 3.16.1 [TODO]
+### Fixed
+- Batch not processed if a calculated variable was an integer in a former batch and empty/string in current batch
 
-## 3.16.0 [TODO]
+## 3.16.0 [2026-05-13]
 ### Changed
 - Add `withEncryption` support for JSON export endpoints (`/json` and `/json/replay`)
 

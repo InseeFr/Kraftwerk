@@ -164,7 +164,7 @@ public abstract class AbstractMainProcessingGenesis {
     /* Step 4 : Insert into SQL database */
     protected void insertDatabase(){
         InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
-        insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
+        insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database, kraftwerkExecutionContext);
     }
 
     /* Step 5 : Write output files */

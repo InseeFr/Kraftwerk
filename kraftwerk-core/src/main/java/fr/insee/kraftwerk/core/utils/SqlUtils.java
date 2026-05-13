@@ -2,6 +2,7 @@ package fr.insee.kraftwerk.core.utils;
 
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
+import fr.insee.kraftwerk.core.errors.DuckDBError;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -39,16 +40,18 @@ public class SqlUtils {
      * @param vtlBindings vtl bindings to send into database
      * @param statement statement associated to database
      */
-    public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement) {
+    public static void convertVtlBindingsIntoSqlDatabase(VtlBindings vtlBindings, Statement statement,
+                                                         KraftwerkExecutionContext kraftwerkExecutionContext) {
         try {
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 //Variables types map
-                LinkedHashMap<String, VariableType> sqlSchema = extractSqlSchema(vtlBindings.getDataset(datasetName).getDataStructure());
-                createDataSQLTables(statement, datasetName, sqlSchema);
-                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema);
+                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(vtlBindings.getDataset(datasetName).getDataStructure());
+                createDataSQLTables(statement, datasetName, vtlSchema);
+                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), vtlSchema);
             }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
+            kraftwerkExecutionContext.getErrors().add(new DuckDBError(e.toString()));
         }
     }
 
@@ -58,17 +61,17 @@ public class SqlUtils {
      *
      * @param statement   DuckDB connection
      * @param datasetName dataset to convert
-     * @param sqlSchema schema of dataset
+     * @param vtlSchema schema of dataset
      * @throws SQLException if sql error
      */
     private static void createDataSQLTables(
             Statement statement,
             String datasetName,
-            LinkedHashMap<String, VariableType> sqlSchema
+            LinkedHashMap<String, VariableType> vtlSchema
     ) throws SQLException {
 
         //Skip if no variable
-        if (sqlSchema.isEmpty()) {
+        if (vtlSchema.isEmpty()) {
             log.warn("Empty schema for dataset {}", datasetName);
             return;
         }
@@ -76,7 +79,7 @@ public class SqlUtils {
         //Don't CREATE if table already exists (ex: file-by-file)
         List<String> tableNames = getTableNames(statement);
         if (!tableNames.contains(datasetName)) {
-            String createTableQuery = getCreateTableQuery(datasetName, sqlSchema);
+            String createTableQuery = getCreateTableQuery(datasetName, vtlSchema);
 
             //Execute query
             log.debug("SQL Query : {}", createTableQuery);
@@ -84,7 +87,7 @@ public class SqlUtils {
             return;
         }
         //add missing columns if necessary
-        LinkedHashMap<String, VariableType> variablesToAdd = getVariablesToAdd(statement, datasetName, sqlSchema);
+        LinkedHashMap<String, VariableType> variablesToAdd = getVariablesToAdd(statement, datasetName, vtlSchema);
         if(variablesToAdd.isEmpty()){
             return;
         }
@@ -110,14 +113,14 @@ public class SqlUtils {
     private static LinkedHashMap<String, VariableType> getVariablesToAdd(
             Statement statement,
             String datasetName,
-            LinkedHashMap<String, VariableType> sqlSchema
+            LinkedHashMap<String, VariableType> vtlSchema
     ) throws SQLException {
         LinkedHashMap<String,VariableType> variablesToAdd = new LinkedHashMap<>();
         Set<String> columnsAlreadyInDatabase = new HashSet<>(getColumnNames(statement, datasetName));
         //Filter out variable names already in database table
-        sqlSchema.keySet().stream()
+        vtlSchema.keySet().stream()
                 .filter(variableName -> !columnsAlreadyInDatabase.contains(variableName))
-                .forEach(variableNameToAdd -> variablesToAdd.put(variableNameToAdd,sqlSchema.get(variableNameToAdd)));
+                .forEach(variableNameToAdd -> variablesToAdd.put(variableNameToAdd,vtlSchema.get(variableNameToAdd)));
         return variablesToAdd;
     }
 
@@ -141,7 +144,7 @@ public class SqlUtils {
      * @param structure the structure of the dataset
      * @return a (variable name,type) map
      */
-    private static LinkedHashMap<String, VariableType> extractSqlSchema(Structured.DataStructure structure) {
+    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(Structured.DataStructure structure) {
         LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
         for (Structured.Component component : structure.values()) {
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
@@ -179,41 +182,57 @@ public class SqlUtils {
      *
      * @param database DuckDB connection
      * @param dataset   dataset to convert
-     * @param sqlSchema schema
+     * @param vtlSchema Schema extracted from VTL dataset
      */
-    private static void insertDataIntoTable(Statement database, String datasetName, Dataset dataset, LinkedHashMap<String, VariableType> sqlSchema) throws SQLException {
+    private static void insertDataIntoTable(Statement database, String datasetName, Dataset dataset, LinkedHashMap<String, VariableType> vtlSchema) throws SQLException {
         if (dataset.getDataAsMap().isEmpty()) {
             return;
         }
 
         DuckDBConnection duckDBConnection = (DuckDBConnection) database.getConnection();
-        List<String> tableColumns = getColumnNames(database, datasetName);
-
+        Map<String, String> sqlTableColumnTypes = getColumnTypes(database, datasetName);
 
         log.debug("URL de connexion : {}", duckDBConnection.getMetaData().getURL());
         try(var appender = duckDBConnection.createAppender(DuckDBConnection.DEFAULT_SCHEMA,datasetName)){
+            //For each VTL data row
             for (Map<String, Object> dataRow : dataset.getDataAsMap()) {
                 appender.beginRow();
-                for (String columnName : tableColumns) {
-                    VariableType variableType = sqlSchema.get(columnName);
-                    if (variableType == null) { //variable not presents in the sqlScheme extracted from VTL bindings
+                //For each SQL column
+                for (Map.Entry<String,String> sqlColumn : sqlTableColumnTypes.entrySet()) {
+                    String sqlColumnName = sqlColumn.getKey();
+                    VariableType vtlVariableType = vtlSchema.get(sqlColumnName);
+                    if (vtlVariableType == null) { //variable not present in the schema extracted from VTL bindings
                         appender.appendNull();
                         continue;
                     }
 
-                    String data = dataRow.get(columnName) == null ? null : dataRow.get(columnName).toString().replace("\n","");
+                    //To avoid SQL script errors, we remove \n
+                    String data = dataRow.get(sqlColumnName) == null ?
+                            null
+                            : dataRow.get(sqlColumnName).toString().replace("\n","");
+
                     try{
-                        appendValueWithType(appender, data, variableType);
-                    }catch (SQLException | NumberFormatException | DateTimeParseException e) {
-                        throw new SQLException(
-                                "Error Appender DuckDB"
-                                        + " [col=" + columnName
-                                        + ", type=" + sqlSchema.get(columnName)
-                                        + ", value=" + data
-                                        + ", raw=" + dataRow.get("interrogationId")
-                                        + "]",
-                                e
-                        );
+                        String duckDBColumnType = sqlColumn.getValue();
+                        if(!vtlVariableType.getSqlType().equals(duckDBColumnType)){
+                            log.warn("""
+                                    Difference between VTL and SQL types on column/variable {} !
+                                    VTL: {}
+                                    SQL: {}""", sqlColumnName, vtlVariableType, duckDBColumnType);
+                        }
+
+                        appendValueWithType(appender, data, vtlVariableType);
+                    }catch (SQLException
+                            | NumberFormatException
+                            | DateTimeParseException e) {
+                        log.error(e.toString());
+                        String errorMessage = "Error Appender DuckDB"
+                                + " [columnName=" + sqlColumnName
+                                + ", vtlType=" + vtlSchema.get(sqlColumnName)
+                                + ", value=" + data
+                                //Cannot be replaced by getOrDefault, ignore the warning
+                                + ", interrogationId=" + (dataRow.containsKey("interrogationId") ? dataRow.get("interrogationId") : "unknown")
+                                + "]";
+                        throw new SQLException(errorMessage, e);
                     }
                 }
                 appender.endRow();
@@ -225,7 +244,7 @@ public class SqlUtils {
     private static void appendValueWithType(DuckDBAppender appender,
                                             String data,
                                             VariableType variableType) throws SQLException {
-        if (data == null){
+        if (data == null || data.isEmpty()){
             appender.appendNull();
             return;
         }
@@ -307,6 +326,28 @@ public class SqlUtils {
             }
         }
         return columnNames;
+    }
+
+    /**
+     * Connect to DuckDB and retrieve types of all columns in a table
+     *
+     * @param tableName name of table to retrieve column
+     * @return A map with the name of the column as key and the type of the column (VARCHAR,INTEGER...) as value
+     * @throws SQLException if SQL error
+     */
+    public static Map<String,String> getColumnTypes(Statement statement,
+                                       String tableName
+    ) throws SQLException {
+        Map<String,String> columnTypes = new LinkedHashMap<>();
+        try (ResultSet resultSet = statement.executeQuery(String.format("DESCRIBE \"%s\"", tableName))) {
+            while (resultSet.next()) {
+                columnTypes.put(
+                        resultSet.getString("column_name"),
+                        resultSet.getString("column_type")
+                );
+            }
+        }
+        return columnTypes;
     }
 
     /**
