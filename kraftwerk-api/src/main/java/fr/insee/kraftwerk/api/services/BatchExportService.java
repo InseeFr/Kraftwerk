@@ -189,7 +189,7 @@ public class BatchExportService extends KraftwerkService {
             exportJobStore.complete(jobId, result, errors);
 
 
-            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -252,7 +252,7 @@ public class BatchExportService extends KraftwerkService {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
 
-            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -315,7 +315,7 @@ public class BatchExportService extends KraftwerkService {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
 
-            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
@@ -429,7 +429,7 @@ public class BatchExportService extends KraftwerkService {
             exportJobStore.complete(jobId, result, errors);
 
 
-            BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
+            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
             log.info("Batch response: {}", response);
             return response;
 
