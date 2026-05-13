@@ -4,6 +4,7 @@ import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.dto.BatchResponseDto;
+import fr.insee.kraftwerk.api.dto.ExportCheckResultDto;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
@@ -27,6 +28,8 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -140,6 +143,7 @@ public class BatchExportService extends KraftwerkService {
     ) {
         boolean fileByFile = false;
         boolean withDDI = true;
+        String jobId = UUID.randomUUID().toString();
 
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         MainProcessing mp = getMainProcessing(
@@ -155,6 +159,7 @@ public class BatchExportService extends KraftwerkService {
                 mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
         Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
+        exportJobStore.start(jobId);
 
         try {
             mp.runMain();
@@ -167,6 +172,22 @@ public class BatchExportService extends KraftwerkService {
             if (archiveAtEnd) {
                 archive(inDirectoryParam, fileUtilsInterface);
             }
+
+            List<String> errors = new ArrayList<>();
+
+            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
+                mp.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    inDirectoryParam,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
 
             BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
@@ -186,6 +207,7 @@ public class BatchExportService extends KraftwerkService {
     ) {
         boolean fileByFile = true;
         boolean withDDI = true;
+        String jobId = UUID.randomUUID().toString();
 
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         MainProcessing mp = getMainProcessing(
@@ -201,6 +223,7 @@ public class BatchExportService extends KraftwerkService {
                 mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
         Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
+        exportJobStore.start(jobId);
 
         try {
             mp.runMain();
@@ -209,6 +232,21 @@ public class BatchExportService extends KraftwerkService {
                     mp.getKraftwerkExecutionContext(),
                     fileUtilsInterface
             );
+
+            List<String> errors = new ArrayList<>();
+
+            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
+                mp.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    inDirectoryParam,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
 
             if (archiveAtEnd) {
                 archive(inDirectoryParam, fileUtilsInterface);
@@ -232,6 +270,7 @@ public class BatchExportService extends KraftwerkService {
     ) {
         boolean fileByFile = false;
         boolean withDDI = false;
+        String jobId = UUID.randomUUID().toString();
 
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         MainProcessing mp = getMainProcessing(
@@ -247,6 +286,7 @@ public class BatchExportService extends KraftwerkService {
                 mp.getKraftwerkExecutionContext().getExecutionDateTime();
 
         Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
+        exportJobStore.start(jobId);
 
         try {
             mp.runMain();
@@ -255,6 +295,21 @@ public class BatchExportService extends KraftwerkService {
                     mp.getKraftwerkExecutionContext(),
                     fileUtilsInterface
             );
+
+            List<String> errors = new ArrayList<>();
+
+            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
+                mp.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    inDirectoryParam,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
 
             if (archiveAtEnd) {
                 archive(inDirectoryParam, fileUtilsInterface);
@@ -279,6 +334,7 @@ public class BatchExportService extends KraftwerkService {
     ) {
         boolean withDDI = true;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        String jobId = UUID.randomUUID().toString();
 
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
@@ -292,6 +348,8 @@ public class BatchExportService extends KraftwerkService {
 
         Path outputPath = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
 
+        exportJobStore.start(jobId);
+
         try {
             mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
 
@@ -300,10 +358,27 @@ public class BatchExportService extends KraftwerkService {
                     fileUtilsInterface
             );
 
-            return new BatchResponseDto("",normalizePath(outputPath));
+            List<String> errors = new ArrayList<>();
+
+            if (mpGenesis.getKraftwerkExecutionContext().getErrors() != null) {
+                mpGenesis.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    questionnaireModelId,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
+            BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
+            log.info("Batch response: {}", response);
+            return response;
 
         } catch (KraftwerkException | IOException e) {
-            log.error("Batch export failed for {}", questionnaireModelId, e);
+            exportJobStore.fail(jobId, e);
             throw new RuntimeException(e);
         }
     }
@@ -317,6 +392,7 @@ public class BatchExportService extends KraftwerkService {
     ) {
         boolean withDDI = false;
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        String jobId = UUID.randomUUID().toString();
 
         MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
                 withDDI,
@@ -329,6 +405,7 @@ public class BatchExportService extends KraftwerkService {
                 mpGenesis.getKraftwerkExecutionContext().getExecutionDateTime();
 
         Path outputPath = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
+        exportJobStore.start(jobId);
 
         try {
             mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
@@ -337,6 +414,20 @@ public class BatchExportService extends KraftwerkService {
                     mpGenesis.getKraftwerkExecutionContext(),
                     fileUtilsInterface
             );
+            List<String> errors = new ArrayList<>();
+            if (mpGenesis.getKraftwerkExecutionContext().getErrors() != null) {
+                mpGenesis.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    questionnaireModelId,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
 
             BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
             log.info("Batch response: {}", response);
