@@ -195,6 +195,7 @@ public class BatchExportService extends KraftwerkService {
 
         } catch (KraftwerkException e) {
             log.error("Batch main export failed for input directory {}", inDirectoryParam, e);
+            exportJobStore.fail(jobId, e);
             throw new RuntimeException(e);
         }
     }
@@ -258,6 +259,7 @@ public class BatchExportService extends KraftwerkService {
 
         } catch (KraftwerkException e) {
             log.error("Batch file-by-file export failed for input directory {}", inDirectoryParam, e);
+            exportJobStore.fail(jobId, e);
             throw new RuntimeException(e);
         }
     }
@@ -321,6 +323,7 @@ public class BatchExportService extends KraftwerkService {
 
         } catch (KraftwerkException e) {
             log.error("Batch export failed for input directory {}", inDirectoryParam, e);
+            exportJobStore.fail(jobId, e);
             throw new RuntimeException(e);
         }
     }
@@ -435,6 +438,7 @@ public class BatchExportService extends KraftwerkService {
 
         } catch (KraftwerkException | IOException e) {
             log.error("Batch export failed for questionnaireModelId {}", questionnaireModelId, e);
+            exportJobStore.fail(jobId, e);
             throw new RuntimeException(e);
         }
     }
