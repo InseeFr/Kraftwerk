@@ -45,9 +45,9 @@ public class SqlUtils {
         try {
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 //Variables types map
-                LinkedHashMap<String, VariableType> sqlSchema = extractSqlSchemaFromDataset(vtlBindings.getDataset(datasetName).getDataStructure());
-                createDataSQLTables(statement, datasetName, sqlSchema);
-                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), sqlSchema);
+                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(vtlBindings.getDataset(datasetName).getDataStructure());
+                createDataSQLTables(statement, datasetName, vtlSchema);
+                insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), vtlSchema);
             }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
@@ -61,17 +61,17 @@ public class SqlUtils {
      *
      * @param statement   DuckDB connection
      * @param datasetName dataset to convert
-     * @param sqlSchema schema of dataset
+     * @param vtlSchema schema of dataset
      * @throws SQLException if sql error
      */
     private static void createDataSQLTables(
             Statement statement,
             String datasetName,
-            LinkedHashMap<String, VariableType> sqlSchema
+            LinkedHashMap<String, VariableType> vtlSchema
     ) throws SQLException {
 
         //Skip if no variable
-        if (sqlSchema.isEmpty()) {
+        if (vtlSchema.isEmpty()) {
             log.warn("Empty schema for dataset {}", datasetName);
             return;
         }
@@ -79,7 +79,7 @@ public class SqlUtils {
         //Don't CREATE if table already exists (ex: file-by-file)
         List<String> tableNames = getTableNames(statement);
         if (!tableNames.contains(datasetName)) {
-            String createTableQuery = getCreateTableQuery(datasetName, sqlSchema);
+            String createTableQuery = getCreateTableQuery(datasetName, vtlSchema);
 
             //Execute query
             log.debug("SQL Query : {}", createTableQuery);
@@ -87,7 +87,7 @@ public class SqlUtils {
             return;
         }
         //add missing columns if necessary
-        LinkedHashMap<String, VariableType> variablesToAdd = getVariablesToAdd(statement, datasetName, sqlSchema);
+        LinkedHashMap<String, VariableType> variablesToAdd = getVariablesToAdd(statement, datasetName, vtlSchema);
         if(variablesToAdd.isEmpty()){
             return;
         }
@@ -113,14 +113,14 @@ public class SqlUtils {
     private static LinkedHashMap<String, VariableType> getVariablesToAdd(
             Statement statement,
             String datasetName,
-            LinkedHashMap<String, VariableType> sqlSchema
+            LinkedHashMap<String, VariableType> vtlSchema
     ) throws SQLException {
         LinkedHashMap<String,VariableType> variablesToAdd = new LinkedHashMap<>();
         Set<String> columnsAlreadyInDatabase = new HashSet<>(getColumnNames(statement, datasetName));
         //Filter out variable names already in database table
-        sqlSchema.keySet().stream()
+        vtlSchema.keySet().stream()
                 .filter(variableName -> !columnsAlreadyInDatabase.contains(variableName))
-                .forEach(variableNameToAdd -> variablesToAdd.put(variableNameToAdd,sqlSchema.get(variableNameToAdd)));
+                .forEach(variableNameToAdd -> variablesToAdd.put(variableNameToAdd,vtlSchema.get(variableNameToAdd)));
         return variablesToAdd;
     }
 
@@ -144,7 +144,7 @@ public class SqlUtils {
      * @param structure the structure of the dataset
      * @return a (variable name,type) map
      */
-    private static LinkedHashMap<String, VariableType> extractSqlSchemaFromDataset(Structured.DataStructure structure) {
+    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(Structured.DataStructure structure) {
         LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
         for (Structured.Component component : structure.values()) {
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
@@ -182,9 +182,9 @@ public class SqlUtils {
      *
      * @param database DuckDB connection
      * @param dataset   dataset to convert
-     * @param sqlSchema SQL schema extracted from VTL dataset
+     * @param vtlSchema Schema extracted from VTL dataset
      */
-    private static void insertDataIntoTable(Statement database, String datasetName, Dataset dataset, LinkedHashMap<String, VariableType> sqlSchema) throws SQLException {
+    private static void insertDataIntoTable(Statement database, String datasetName, Dataset dataset, LinkedHashMap<String, VariableType> vtlSchema) throws SQLException {
         if (dataset.getDataAsMap().isEmpty()) {
             return;
         }
@@ -200,8 +200,8 @@ public class SqlUtils {
                 //For each SQL column
                 for (Map.Entry<String,String> sqlColumn : sqlTableColumnTypes.entrySet()) {
                     String sqlColumnName = sqlColumn.getKey();
-                    VariableType vtlVariableType = sqlSchema.get(sqlColumnName);
-                    if (vtlVariableType == null) { //variable not present in the sqlSchema extracted from VTL bindings
+                    VariableType vtlVariableType = vtlSchema.get(sqlColumnName);
+                    if (vtlVariableType == null) { //variable not present in the schema extracted from VTL bindings
                         appender.appendNull();
                         continue;
                     }
@@ -227,7 +227,7 @@ public class SqlUtils {
                         log.error(e.toString());
                         String errorMessage = "Error Appender DuckDB"
                                 + " [columnName=" + sqlColumnName
-                                + ", vtlType=" + sqlSchema.get(sqlColumnName)
+                                + ", vtlType=" + vtlSchema.get(sqlColumnName)
                                 + ", value=" + data
                                 //Cannot be replaced by getOrDefault, ignore the warning
                                 + ", interrogationId=" + (dataRow.containsKey("interrogationId") ? dataRow.get("interrogationId") : "unknown")
