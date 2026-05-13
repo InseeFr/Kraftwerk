@@ -1,7 +1,7 @@
 # Changelog
 ## 3.17.0 [TODO]
 ### Updated
--️ Trevas 2 ⚠ can break old VTL scripts
+-️ Trevas 2 ⚠ can break old VTL scripts (can't override tables, can't keep/drop identifiers anymore)
 
 ## 3.16.1 [TODO]
 ### Fixed

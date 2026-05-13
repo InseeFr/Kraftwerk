@@ -50,15 +50,12 @@ public class CleanUpProcessing extends DataProcessing {
      */
     @Override
     public String applyVtlTransformations(String bindingName, Path userVtlInstructionsPath, KraftwerkExecutionContext kraftwerkExecutionContext) {
-        // Remove paper UCQ variables in vtl multimode dataset
-        VtlScript cleanUpScript = generateVtlInstructions(bindingName);
-        log.debug("Automated clean up instructions after step {} : {}", getStepName(), cleanUpScript);
-        vtlExecute.evalVtlScript(cleanUpScript, vtlBindings, kraftwerkExecutionContext);
+        String cleanUpScript = applyAutomatedVtlInstructions(bindingName, kraftwerkExecutionContext);
         // Remove corresponding variables in VariablesMap
         removePaperUcqVariables();
         // Remove unimodal datasets
         removeUnimodalDatasets();
-        return cleanUpScript.toString();
+        return cleanUpScript;
     }
 
     /** Generate VTL script to remove the paper indicator variables. */
@@ -76,7 +73,7 @@ public class CleanUpProcessing extends DataProcessing {
         }
         if (!paperUcqVtlNames.isEmpty()) {
             StringBuilder dropInstruction = new StringBuilder(
-                    String.format("%s := %s [ drop ", bindingName, bindingName)
+                    String.format("%s := %s [ drop ", bindingName + TEMP_DATASET_SUFFIX, bindingName)
             );
             StringJoiner vtlDropVariables = new StringJoiner(", ");
             paperUcqVtlNames.forEach(vtlDropVariables::add);

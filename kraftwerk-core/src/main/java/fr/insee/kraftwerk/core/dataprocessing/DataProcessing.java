@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -84,16 +84,20 @@ public abstract class DataProcessing {
 
     private String getLastTempDatasetName(String bindingName){
         String tempDatasetName = bindingName + TEMP_DATASET_SUFFIX;
-        return vtlBindings.getDatasetNames().stream()
+        Optional<String> lastTempDataSetNameOptional = vtlBindings.getDatasetNames().stream()
                 .filter(datasetName -> datasetName.startsWith(tempDatasetName))
                 .filter(datasetName -> datasetName.substring(tempDatasetName.length()).matches("\\d+")) // Must end with a number
                 //Get max based on number at the end
-                .max(Comparator.comparingInt(s -> Integer.parseInt(s.substring(tempDatasetName.length()))))
-                .orElse(null);
+                .max(Comparator.comparingInt(s -> Integer.parseInt(s.substring(tempDatasetName.length()))));
+        if(lastTempDataSetNameOptional.isPresent()){
+            return lastTempDataSetNameOptional.get();
+        }
+        return vtlBindings.getDatasetNames().contains(tempDatasetName) ? tempDatasetName : null;
     }
 
     private void cleanTempDatasets(String bindingName){
         String tempDatasetNamePrefix = bindingName + TEMP_DATASET_SUFFIX;
+        vtlBindings.remove(tempDatasetNamePrefix); // Removes numberless temp dataset if exists
         vtlBindings.getDatasetNames().stream()
                 .filter(datasetName -> datasetName.startsWith(tempDatasetNamePrefix))
                 .filter(datasetName -> datasetName.substring(tempDatasetNamePrefix.length()).matches("\\d+"))

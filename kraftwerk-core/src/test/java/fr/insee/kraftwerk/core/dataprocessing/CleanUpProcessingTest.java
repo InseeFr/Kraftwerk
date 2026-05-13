@@ -64,10 +64,10 @@ class CleanUpProcessingTest {
             ),
             List.of(
                     new Structured.Component("ID", String.class, Role.IDENTIFIER),
-                    new Structured.Component("FOO", String.class, Role.IDENTIFIER),
-                    new Structured.Component("GENDER", String.class, Role.IDENTIFIER),
-                    new Structured.Component("GENDER_1", String.class, Role.IDENTIFIER),
-                    new Structured.Component("GENDER_2", String.class, Role.IDENTIFIER),
+                    new Structured.Component("FOO", String.class, Role.MEASURE),
+                    new Structured.Component("GENDER", String.class, Role.MEASURE),
+                    new Structured.Component("GENDER_1", String.class, Role.MEASURE),
+                    new Structured.Component("GENDER_2", String.class, Role.MEASURE),
                     new Structured.Component(Constants.MODE_VARIABLE_NAME, String.class, Role.IDENTIFIER)
             )
     );
