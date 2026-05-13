@@ -147,7 +147,7 @@ public class MainProcessing {
 	/* Step 4 : Insert into SQL database */
 	private void insertDatabase(Statement database) {
 		InsertDatabaseSequence insertDatabaseSequence = new InsertDatabaseSequence();
-		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database);
+		insertDatabaseSequence.insertDatabaseProcessing(vtlBindings, database, kraftwerkExecutionContext);
 	}
 
 	/* Step 5 : Write output files */
@@ -177,7 +177,7 @@ public class MainProcessing {
 					currentFileInputs.setVtlTransformationsFile(source.getVtlTransformationsFile());
 					currentFileInputs.setMultimodeDatasetName(source.getMultimodeDatasetName());
 					ModeInputs sourceModeInputs = source.getModeInputs(dataMode);
-					ModeInputs currentFileModeInputs = new ModeInputs();
+					ModeInputs currentFileModeInputs = new ModeInputs(source.getFileUtilsInterface());
 					currentFileModeInputs.setDataFile(dataFile);
 					currentFileModeInputs.setDdiUrl(sourceModeInputs.getDdiUrl());
 					currentFileModeInputs.setLunaticFile(sourceModeInputs.getLunaticFile());

@@ -5,7 +5,7 @@ COPY --chown=$JAVA_USER:$JAVA_USER Kraftwerk/kraftwerk-api/target/kraftwerk-api-
 
 ENV JAVA_TOOL_OPTIONS \
     -XX:+UseZGC \
-    -Xmx2g
+    -Xmx4g
 
 EXPOSE 8080
 
