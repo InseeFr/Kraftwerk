@@ -11,6 +11,8 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
 
 
 /**
@@ -23,6 +25,8 @@ import java.nio.file.Path;
  */
 @Log4j2
 public abstract class DataProcessing {
+
+    protected static final String TEMP_DATASET_SUFFIX = "_tmp";
 
     protected final VtlBindings vtlBindings;
 	VtlExecute vtlExecute;
@@ -68,7 +72,33 @@ public abstract class DataProcessing {
         if (!(automatedInstructions.isEmpty() || automatedInstructions.toString().contentEquals(""))) {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, kraftwerkExecutionContext);
         }
+
+        String lastTempDatasetName = getLastTempDatasetName(bindingName);
+        if(lastTempDatasetName != null){
+            vtlBindings.replace(bindingName, vtlBindings.getDataset(lastTempDatasetName));
+            cleanTempDatasets(bindingName);
+        }
+
         return automatedInstructions.toString();
+    }
+
+    private String getLastTempDatasetName(String bindingName){
+        String tempDatasetName = bindingName + TEMP_DATASET_SUFFIX;
+        return vtlBindings.getDatasetNames().stream()
+                .filter(datasetName -> datasetName.startsWith(tempDatasetName))
+                .filter(datasetName -> datasetName.substring(tempDatasetName.length()).matches("\\d+")) // Must end with a number
+                //Get max based on number at the end
+                .max(Comparator.comparingInt(s -> Integer.parseInt(s.substring(tempDatasetName.length()))))
+                .orElse(null);
+    }
+
+    private void cleanTempDatasets(String bindingName){
+        String tempDatasetNamePrefix = bindingName + TEMP_DATASET_SUFFIX;
+        vtlBindings.getDatasetNames().stream()
+                .filter(datasetName -> datasetName.startsWith(tempDatasetNamePrefix))
+                .filter(datasetName -> datasetName.substring(tempDatasetNamePrefix.length()).matches("\\d+"))
+                .toList()
+                .forEach(vtlBindings::remove);
     }
 
     protected void applyUserVtlInstructions(

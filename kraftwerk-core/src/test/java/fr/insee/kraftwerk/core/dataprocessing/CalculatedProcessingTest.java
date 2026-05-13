@@ -97,6 +97,14 @@ class CalculatedProcessingTest {
         assertTrue(outDataset.getDataStructure().containsKey("FOO1"));
         assertTrue(outDataset.getDataStructure().containsKey("FOO2"));
         assertTrue(outDataset.getDataStructure().containsKey("FOO3"));
+
+        // Temp datasets must be deleted
+        assertTrue(
+                vtlBindings.getDatasetNames()
+                .stream().filter(datasetName -> datasetName.startsWith("TEST_tmp"))
+                .toList().isEmpty()
+        );
+
         //
         assertEquals(1L, outDataset.getDataPoints().getFirst().get("FOO3"));
         assertEquals(1L, outDataset.getDataPoints().getFirst().get("FOO2"));

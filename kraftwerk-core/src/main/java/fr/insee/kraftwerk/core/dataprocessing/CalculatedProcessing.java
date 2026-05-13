@@ -60,15 +60,18 @@ public class CalculatedProcessing extends DataProcessing {
         List<String> orderedCalculatedNames = resolveCalculated(calculatedVariables);
 
         VtlScript vtlScript = new VtlScript();
-
+        int scriptIndex = 0;
+        String tempBindingName = null;
         for (String calculatedName : orderedCalculatedNames) {
-
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
             if (vtlExpression != null && !vtlExpression.isEmpty()) {
+                String sourceBindingName = scriptIndex == 0 ? bindingName : tempBindingName;
+                //Increment temp bindingName
+                tempBindingName = bindingName + TEMP_DATASET_SUFFIX + scriptIndex;
                 vtlScript.add(String.format("%s := %s [calc %s := %s];",
-                        bindingName, bindingName, calculatedName, vtlExpression));
+                        tempBindingName, sourceBindingName, calculatedName, vtlExpression));
             }
-
+            scriptIndex++;
         }
 
         return vtlScript;
