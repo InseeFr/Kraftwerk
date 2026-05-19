@@ -1,5 +1,5 @@
 # Changelog
-## 3.16.1 [TODO]
+## 3.16.1 [2026-05-14]
 ### Fixed
 - Batch not processed if a calculated variable was an integer in a former batch and empty/string in current batch
 
