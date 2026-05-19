@@ -66,6 +66,7 @@ public class CalculatedProcessing extends DataProcessing {
                 //Increment temp bindingName
                 vtlScript.add(String.format("%s := %s [calc %s := %s];",
                         getIncrementedTempDatasetName(bindingName), getTempDatasetName(bindingName), calculatedName, vtlExpression));
+                incrementTempDataset(bindingName);
             }
         }
 
