@@ -18,6 +18,9 @@ public class ReconciliationProcessing extends DataProcessing {
 
 	private final String modeVariableIdentifier;
 
+	//To keep track of last temp dataset names
+	private final Map<String, String> tempDatasetNames = new HashMap<>();
+
 	/** Return processing instance with default mode variable name. */
 	public ReconciliationProcessing(
 			VtlBindings vtlBindings,
@@ -87,12 +90,10 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		VtlScript vtlScript = new VtlScript();
 
-		// Identifiers
-		Set<String> identifiers = getIdentifiers();
-
 		// Add mode identifier (as measure for now)
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlScript.add(createModeIdentifier(datasetName));
+			tempDatasetNames.put(datasetName, getIncrementedTempDatasetName(datasetName));
 		}
 
 		// Get the common measures
@@ -103,27 +104,42 @@ public class ReconciliationProcessing extends DataProcessing {
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			for (String measure : commonMeasures){
 				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
-					vtlScript.add(String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",datasetName, measure));
+					String incrementedDatasetName = getIncrementedTempDatasetName(datasetName);
+					vtlScript.add(
+							String.format("%s := %s [calc %s := cast(%s,number)];",
+									incrementedDatasetName,
+                                    tempDatasetNames.getOrDefault(datasetName, datasetName),
+									measure,
+									measure)
+					);
+					tempDatasetNames.put(datasetName, incrementedDatasetName);
 				}
 			}
 		}
 
 		commonMeasures.add(modeVariableIdentifier);
 
-		// List of all common variables (identifiers + measures) in the vtl syntax
-		String vtlCommonVariables = VtlMacros.toVtlSyntax(mergeSets(identifiers, commonMeasures));
+		// List of all common variables (measures) in the vtl syntax
+		// EDIT Since VTL 2.1.0 we cannot use identifiers in keep/drop
+		String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasures);
 
 		// Instantiate the multimodal dataset with the first dataset that comes
 		List<String> unimodalDatasetNames = vtlBindings.getDatasetNames();
 		String firstDatasetName = unimodalDatasetNames.getFirst();
 		vtlScript.add(String.format("%s := %s [keep %s];",
-				bindingName, firstDatasetName, vtlCommonVariables));
+				bindingName, tempDatasetNames.getOrDefault(firstDatasetName, firstDatasetName), vtlCommonVariables));
 
 		// Concatenate the remaining datasets
 		for (int k = 1; k < unimodalDatasetNames.size(); k++) {
-			String datasetName = unimodalDatasetNames.get(k);
+			String unimodalDatasetName = unimodalDatasetNames.get(k);
+			String tempUnimodalDatasetName = tempDatasetNames.getOrDefault(unimodalDatasetName, unimodalDatasetName);
+			String incrementedTempDatasetName = getIncrementedTempDatasetName(bindingName);
 			vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
-					bindingName, bindingName, datasetName, vtlCommonVariables));
+					incrementedTempDatasetName,
+					tempDatasetNames.getOrDefault(bindingName, bindingName),
+					tempUnimodalDatasetName,
+					vtlCommonVariables));
+			tempDatasetNames.put(bindingName, incrementedTempDatasetName);
 		}
 
 		// Get back variables that are not common with left joins
@@ -137,24 +153,70 @@ public class ReconciliationProcessing extends DataProcessing {
 
 				// Keep on the dataset to be joined
 				vtlScript.add(String.format("%s_keep := %s [keep %s];",
-						datasetName, datasetName, vtlOtherVariables));
+						getIncrementedTempDatasetName(datasetName),
+						tempDatasetNames.getOrDefault(datasetName, datasetName),
+						vtlOtherVariables));
+				tempDatasetNames.put(datasetName, getIncrementedTempDatasetName(datasetName));
 
 				// Join
 				vtlScript.add(String.format("%s := left_join(%s, %s_keep);",
-						bindingName, bindingName, datasetName));
+						getIncrementedTempDatasetName(bindingName),
+						tempDatasetNames.getOrDefault(bindingName, bindingName),
+						tempDatasetNames.getOrDefault(datasetName, datasetName)));
+				tempDatasetNames.put(bindingName, getIncrementedTempDatasetName(bindingName));
 			}
 		}
 
 		// Set mode identifier role
 		vtlScript.add(String.format("%s := %s [calc identifier %s := %s];",
-				bindingName, bindingName, modeVariableIdentifier, modeVariableIdentifier));
+				getIncrementedTempDatasetName(bindingName), tempDatasetNames.getOrDefault(bindingName, bindingName),
+				modeVariableIdentifier,
+				modeVariableIdentifier));
+		tempDatasetNames.put(bindingName, getIncrementedTempDatasetName(bindingName));
 
 		return vtlScript;
 	}
 
 	private String createModeIdentifier(String modeName) {
 		return String.format("%s := %s [calc %s := \"%s\"];",
-				modeName, modeName, modeVariableIdentifier, modeName);
+				getIncrementedTempDatasetName(modeName),
+				tempDatasetNames.getOrDefault(modeName, modeName),
+				modeVariableIdentifier,
+				modeName);
+	}
+
+	private String getIncrementedTempDatasetName(String datasetName) {
+		if(!tempDatasetNames.containsKey(datasetName)){
+			return datasetName + TEMP_DATASET_SUFFIX + 0;
+		}
+
+		OptionalInt tempDatasetNumberOptional = extractTempDatasetNumber(tempDatasetNames.get(datasetName));
+		if(tempDatasetNumberOptional.isPresent()){
+			return datasetName + TEMP_DATASET_SUFFIX + (tempDatasetNumberOptional.getAsInt() + 1);
+		}
+
+		//If number not found at end
+		return datasetName + TEMP_DATASET_SUFFIX + 0;
+	}
+
+	/**
+	 * Extracts number from a temporary dataset name
+	 * @param tempDatasetName name of dataset
+	 * @return the number at the end
+	 */
+	private OptionalInt extractTempDatasetNumber(String tempDatasetName) {
+		int i = tempDatasetName.length() - 1;
+
+		//Decrement character index until it finds a non digit character
+		while (i >= 0 && Character.isDigit(tempDatasetName.charAt(i))) {
+			i--;
+		}
+		// No number found
+		if (i == tempDatasetName.length() - 1) {
+			return OptionalInt.empty();
+		}
+		// Number found, parse it and put it into optional
+		return OptionalInt.of(Integer.parseInt(tempDatasetName.substring(i + 1)));
 	}
 
 
@@ -191,6 +253,7 @@ public class ReconciliationProcessing extends DataProcessing {
 	/**
 	 * Return a variables map containing variables of a dataset that aren't in some
 	 * (unimodal) datasets that are in the bindings.
+	 * We exclude identifiers as for VTL 2.1 we have to exclude them from keep
 	 *
 	 * @param datasetName The name of the dataset.
 	 *
@@ -198,8 +261,8 @@ public class ReconciliationProcessing extends DataProcessing {
 	 */
 	private Set<String> getOtherVariables(String datasetName, Set<String> variablesSet) {
 		Set<String> otherVariables = new TreeSet<>();
-		for (String variableName : vtlBindings.getDataset(datasetName).getDataStructure().keySet()) {
-			if(! variablesSet.contains(variableName)) {
+		for (String variableName : vtlBindings.getDataset(datasetName).getMeasureNames()) {
+			if(!variablesSet.contains(variableName)) {
 				otherVariables.add(variableName);
 			}
 		}

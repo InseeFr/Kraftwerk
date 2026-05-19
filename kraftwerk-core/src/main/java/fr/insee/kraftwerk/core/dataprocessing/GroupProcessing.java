@@ -41,10 +41,12 @@ public class GroupProcessing extends DataProcessing{
         VtlScript vtlScript = new VtlScript();
         VariablesMap variablesMap = metadataModel.getVariables();
 
+        int i = 0;
         for (String variableName : variablesMap.getVariableNames()) {
             if (variablesMap.getVariable(variableName).getGroup() != metadataModel.getRootGroup()) {
                 vtlScript.add(String.format("%s := %s [rename %s to %s];",
-                        bindingName, bindingName, variableName, metadataModel.getFullyQualifiedName(variableName)));
+                        bindingName + TEMP_DATASET_SUFFIX + i, bindingName, variableName, metadataModel.getFullyQualifiedName(variableName)));
+                i++;
             }
         }
 
