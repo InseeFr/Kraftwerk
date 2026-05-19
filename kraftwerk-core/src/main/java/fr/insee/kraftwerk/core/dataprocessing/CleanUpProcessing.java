@@ -73,7 +73,7 @@ public class CleanUpProcessing extends DataProcessing {
         }
         if (!paperUcqVtlNames.isEmpty()) {
             StringBuilder dropInstruction = new StringBuilder(
-                    String.format("%s := %s [ drop ", bindingName + TEMP_DATASET_SUFFIX, bindingName)
+                    String.format("%s := %s [ drop ", getIncrementedTempDatasetName(bindingName), bindingName)
             );
             StringJoiner vtlDropVariables = new StringJoiner(", ");
             paperUcqVtlNames.forEach(vtlDropVariables::add);

@@ -1,11 +1,10 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static fr.insee.kraftwerk.core.dataprocessing.DataProcessing.MODE_VARIABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -112,9 +112,9 @@ class ReconciliationTest {
 		//
 		assertNotNull(multimodeDataset);
 		//
-		assertEquals(Role.IDENTIFIER, multimodeDataset.getDataStructure().get(Constants.MODE_VARIABLE_NAME).getRole());
+		assertEquals(Role.IDENTIFIER, multimodeDataset.getDataStructure().get(MODE_VARIABLE_NAME).getRole());
 		//
-		assertEquals(Set.of("ID", "LOOP", "FOO", "CAPI_SPECIFIC", "CAWI_SPECIFIC", "LOOP.FOO1", Constants.MODE_VARIABLE_NAME),
+		assertEquals(Set.of("ID", "LOOP", "FOO", "CAPI_SPECIFIC", "CAWI_SPECIFIC", "LOOP.FOO1", MODE_VARIABLE_NAME),
 				multimodeDataset.getDataStructure().keySet());
 	}
 
@@ -124,7 +124,7 @@ class ReconciliationTest {
 		//
 		assertNotNull(multimodeDataset);
 		//
-		assertEquals(Set.of("ID", "LOOP", "FOO", "CAPI_SPECIFIC", "LOOP.FOO1", "LOOP.PAPER_SPECIFIC", Constants.MODE_VARIABLE_NAME),
+		assertEquals(Set.of("ID", "LOOP", "FOO", "CAPI_SPECIFIC", "LOOP.FOO1", "LOOP.PAPER_SPECIFIC", MODE_VARIABLE_NAME),
 				multimodeDataset.getDataStructure().keySet());
 	}
 
@@ -134,7 +134,7 @@ class ReconciliationTest {
 		//
 		assertNotNull(multimodeDataset);
 		//
-		assertEquals(Set.of("ID", "LOOP", "FOO", "CAWI_SPECIFIC", "LOOP.FOO1", "LOOP.PAPER_SPECIFIC", Constants.MODE_VARIABLE_NAME),
+		assertEquals(Set.of("ID", "LOOP", "FOO", "CAWI_SPECIFIC", "LOOP.FOO1", "LOOP.PAPER_SPECIFIC", MODE_VARIABLE_NAME),
 				multimodeDataset.getDataStructure().keySet());
 	}
 

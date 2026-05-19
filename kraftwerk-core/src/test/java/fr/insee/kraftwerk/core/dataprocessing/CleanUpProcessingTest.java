@@ -5,11 +5,10 @@ import fr.insee.bpm.metadata.model.PaperUcq;
 import fr.insee.bpm.metadata.model.UcqVariable;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
-import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
@@ -17,9 +16,12 @@ import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-
+import static fr.insee.kraftwerk.core.dataprocessing.DataProcessing.MODE_VARIABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -68,7 +70,7 @@ class CleanUpProcessingTest {
                     new Structured.Component("GENDER", String.class, Role.MEASURE),
                     new Structured.Component("GENDER_1", String.class, Role.MEASURE),
                     new Structured.Component("GENDER_2", String.class, Role.MEASURE),
-                    new Structured.Component(Constants.MODE_VARIABLE_NAME, String.class, Role.IDENTIFIER)
+                    new Structured.Component(MODE_VARIABLE_NAME, String.class, Role.IDENTIFIER)
             )
     );
 

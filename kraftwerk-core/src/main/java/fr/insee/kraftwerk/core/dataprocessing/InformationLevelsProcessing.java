@@ -53,7 +53,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 				Constants.SURVEY_UNIT_IDENTIFIER_NAME,
 				Constants.QUESTIONNAIRE_STATE_NAME,
 				Constants.VALIDATION_DATE_NAME,
-				rootMeasures, Constants.MODE_VARIABLE_NAME));
+				rootMeasures, MODE_VARIABLE_NAME));
 
 		vtlScript.add(rootInstructions.toString());
 
@@ -78,7 +78,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 					Constants.SURVEY_UNIT_IDENTIFIER_NAME,
 					groupName,
 					groupMeasures,
-					Constants.MODE_VARIABLE_NAME));
+					MODE_VARIABLE_NAME));
 			// Empty lines are created to produce group level tables and need to be removed
 			groupInstructions.append(String.format("%s := %s [filter %s<>\"\"];",
 					groupName, groupName, groupName));
