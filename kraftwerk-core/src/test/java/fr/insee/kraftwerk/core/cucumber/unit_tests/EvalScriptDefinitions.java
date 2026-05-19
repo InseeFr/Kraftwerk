@@ -10,10 +10,12 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.junit.Assert.assertEquals;
 
 // Used in do_we_apply_vtl_instruction and do_we_apply_vtl_script
+@Slf4j
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	
@@ -36,6 +38,9 @@ public class EvalScriptDefinitions {
 	@When("I try to apply some VTL instruction : {string}")
 	public void exportDataset(String vtlScript) {
 		vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
+		if(!kraftwerkExecutionContext.getErrors().isEmpty()) {
+			log.warn(kraftwerkExecutionContext.getErrors().toString());
+		}
 	}
 
 	@Then("The binding {string} should have {int} variables")
