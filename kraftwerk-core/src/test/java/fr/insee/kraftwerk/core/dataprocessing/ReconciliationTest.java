@@ -9,6 +9,7 @@ import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,6 +23,7 @@ import static fr.insee.kraftwerk.core.dataprocessing.DataProcessing.MODE_VARIABL
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Slf4j
 class ReconciliationTest {
 
 	private VtlBindings vtlBindings;
@@ -151,6 +153,9 @@ class ReconciliationTest {
 		//
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
 		//
+		if(!kraftwerkExecutionContext.getErrors().isEmpty()){
+			log.warn(kraftwerkExecutionContext.getErrors().toString());
+		}
 		assertNotNull(multimodeDataset);
 	}
 }

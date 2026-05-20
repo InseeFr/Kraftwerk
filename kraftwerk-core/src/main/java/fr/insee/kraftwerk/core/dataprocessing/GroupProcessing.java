@@ -45,9 +45,10 @@ public class GroupProcessing extends DataProcessing{
             if (variablesMap.getVariable(variableName).getGroup() != metadataModel.getRootGroup()) {
                 vtlScript.add(String.format("%s := %s [rename %s to %s];",
                         getIncrementedTempDatasetName(bindingName),
-                        bindingName,
+                        getLastDatasetName(bindingName),
                         variableName,
                         metadataModel.getFullyQualifiedName(variableName)));
+                incrementTempDataset(bindingName);
             }
         }
 

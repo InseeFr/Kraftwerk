@@ -11,10 +11,8 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 
 
@@ -80,26 +78,13 @@ public abstract class DataProcessing {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, kraftwerkExecutionContext);
         }
 
-        String lastTempDatasetName = getLastTempDatasetName(bindingName);
+        String lastTempDatasetName = getLastDatasetName(bindingName);
         if(lastTempDatasetName != null){
             vtlBindings.replace(bindingName, vtlBindings.getDataset(lastTempDatasetName));
             cleanTempDatasets(bindingName);
         }
 
         return automatedInstructions.toString();
-    }
-
-    private String getLastTempDatasetName(String bindingName){
-        String tempDatasetName = bindingName + TEMP_DATASET_SUFFIX;
-        Optional<String> lastTempDataSetNameOptional = vtlBindings.getDatasetNames().stream()
-                .filter(datasetName -> datasetName.startsWith(tempDatasetName))
-                .filter(datasetName -> datasetName.substring(tempDatasetName.length()).matches("\\d+")) // Must end with a number
-                //Get max based on number at the end
-                .max(Comparator.comparingInt(s -> Integer.parseInt(s.substring(tempDatasetName.length()))));
-        if(lastTempDataSetNameOptional.isPresent()){
-            return lastTempDataSetNameOptional.get();
-        }
-        return vtlBindings.getDatasetNames().contains(tempDatasetName) ? tempDatasetName : null;
     }
 
     private void cleanTempDatasets(String bindingName){
@@ -110,6 +95,7 @@ public abstract class DataProcessing {
                 .filter(datasetName -> datasetName.substring(tempDatasetNamePrefix.length()).matches("\\d+"))
                 .toList()
                 .forEach(vtlBindings::remove);
+        tempDatasetNames.remove(bindingName);
     }
 
     protected void applyUserVtlInstructions(
@@ -147,7 +133,7 @@ public abstract class DataProcessing {
      * @param datasetName Name of the dataset to get a temporary dataset name from
      * @return the name of the last created temp dataset, returns the source dataset name if no temp dataset exists
      */
-    protected String getTempDatasetName(String datasetName){
+    protected String getLastDatasetName(String datasetName){
         return tempDatasetNames.getOrDefault(datasetName, datasetName);
     }
 

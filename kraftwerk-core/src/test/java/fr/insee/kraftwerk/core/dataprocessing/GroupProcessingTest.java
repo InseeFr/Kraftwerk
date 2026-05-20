@@ -5,27 +5,27 @@ import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.Variable;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.TestConstants;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
 import fr.insee.vtl.model.Structured;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+@Slf4j
 class GroupProcessingTest {
 
     private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 
     @Test
     void addPrefixes() {
-        //
+        //GIVEN
         Dataset initialDataset = new InMemoryDataset(
                 List.of(
                         List.of("T01", "foo", 1L, 2L)
@@ -40,22 +40,24 @@ class GroupProcessingTest {
         KraftwerkExecutionContext kraftwerkExecutionContext = TestConstants.getKraftwerkExecutionContext();
         VtlBindings vtlBindings = new VtlBindings();
         vtlBindings.put("TEST", initialDataset);
-        //
+
         MetadataModel metadata = new MetadataModel();
         metadata.putGroup(new Group("DEPTH1", metadata.getRootGroup().getName()));
         metadata.putGroup(new Group("DEPTH2", "DEPTH1"));
         metadata.getVariables().putVariable(new Variable("FOO", metadata.getRootGroup(), VariableType.STRING));
         metadata.getVariables().putVariable(new Variable("FOO1", metadata.getGroup("DEPTH1"), VariableType.NUMBER));
         metadata.getVariables().putVariable(new Variable("FOO2", metadata.getGroup("DEPTH2"), VariableType.NUMBER));
-        //
+
+        //WHEN
         new GroupProcessing(
                 vtlBindings, metadata, fileUtilsInterface, kraftwerkExecutionContext
         ).applyAutomatedVtlInstructions("TEST", kraftwerkExecutionContext);
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
-        //
-        assertEquals(
-                Set.of("ID", "FOO", "DEPTH1.FOO1", "DEPTH1.DEPTH2.FOO2"),
-                outDataset.getDataStructure().keySet());
+        //THEN
+        if(!kraftwerkExecutionContext.getErrors().isEmpty()){
+            log.warn(kraftwerkExecutionContext.getErrors().toString());
+        }
+        Assertions.assertThat(outDataset.getDataStructure().keySet()).containsExactlyInAnyOrder("ID", "FOO", "DEPTH1.FOO1", "DEPTH1.DEPTH2.FOO2");
     }
 }

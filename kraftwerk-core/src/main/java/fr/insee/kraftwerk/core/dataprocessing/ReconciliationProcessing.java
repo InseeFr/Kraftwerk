@@ -10,8 +10,10 @@ import fr.insee.vtl.model.Structured;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -75,7 +77,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 	}
 
-	private VtlScript severalModesInstructions(String bindingName)  {
+	private VtlScript severalModesInstructions(String multimodeBindingName)  {
 
 		/*
 		 * The idea of the generated vtl instructions is as follows :
@@ -96,18 +98,21 @@ public class ReconciliationProcessing extends DataProcessing {
 			incrementTempDataset(datasetName);
 		}
 
-		// Get the common measures
-		Set<String> commonMeasures = getCommonMeasures();
+		// Get the common measures between all datasets
+		Set<String> commonMeasuresAllDatasets = getCommonMeasures();
 
 
-		// Cast Integer into Number to ensure numerical measure have the same type
+		// Cast Integer into Number to ensure numerical measures have the same type
 		for (String datasetName : vtlBindings.getDatasetNames()) {
-			for (String measure : commonMeasures){
-				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
+			for (String measure : commonMeasuresAllDatasets){
+				if (
+					vtlBindings.getDataset(datasetName).getMeasureNames().contains(measure)
+					&& vtlBindings.getMeasureType(datasetName, measure).equals("integer")
+				) {
 					vtlScript.add(
 							String.format("%s := %s [calc %s := cast(%s,number)];",
 									getIncrementedTempDatasetName(datasetName),
-                                    getTempDatasetName(datasetName),
+                                    getLastDatasetName(datasetName),
 									measure,
 									measure)
 					);
@@ -116,62 +121,99 @@ public class ReconciliationProcessing extends DataProcessing {
 			}
 		}
 
-		commonMeasures.add(modeVariableIdentifier);
-
 		// List of all common variables (measures) in the vtl syntax
-		// EDIT Since VTL 2.1.0 we cannot use identifiers in keep/drop
-		String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasures);
+		// Since VTL 2.1.0 we cannot use identifiers in keep/drop
+		String vtlCommonVariablesAllDatasets = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
 
 		// Instantiate the multimodal dataset with the first dataset that comes
+		// and only the common variables between all unimode datasets
 		List<String> unimodalDatasetNames = vtlBindings.getDatasetNames();
 		String firstDatasetName = unimodalDatasetNames.getFirst();
 		vtlScript.add(String.format("%s := %s [keep %s];",
-				bindingName, tempDatasetNames.getOrDefault(firstDatasetName, firstDatasetName), vtlCommonVariables));
+				multimodeBindingName,
+				getLastDatasetName(firstDatasetName),
+				vtlCommonVariablesAllDatasets));
 
 		// Concatenate the remaining datasets
-		for (int k = 1; k < unimodalDatasetNames.size(); k++) {
-			String unimodalDatasetName = unimodalDatasetNames.get(k);
-			String tempUnimodalDatasetName = tempDatasetNames.getOrDefault(unimodalDatasetName, unimodalDatasetName);
-			String incrementedTempDatasetName = getIncrementedTempDatasetName(bindingName);
+		for (String modeDatasetName : unimodalDatasetNames) {
+			String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
 			vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
-					incrementedTempDatasetName,
-					tempDatasetNames.getOrDefault(bindingName, bindingName),
-					tempUnimodalDatasetName,
+					getIncrementedTempDatasetName(multimodeBindingName),
+					getLastDatasetName(multimodeBindingName),
+					getLastDatasetName(modeDatasetName),
 					vtlCommonVariables));
-			incrementTempDataset(bindingName);
+			incrementTempDataset(multimodeBindingName);
 		}
 
-		// Get back variables that are not common with left joins
-		for (String datasetName : unimodalDatasetNames) {
+		Map<String, String> addedVariablesNamesAndType = new HashMap<>();
+		// Get back variables that are not common between all datasets
+		for (String modeDatasetName : unimodalDatasetNames) {
+			Set<String> modeMeasures = new HashSet<>(vtlBindings.getDataset(modeDatasetName).getMeasureNames());
+
+			//Get variables already present both in mode and multimodal DS
+			Set<String> commonMeasures = getCommonElements(List.of(modeMeasures, addedVariablesNamesAndType.keySet()));
+			commonMeasures.addAll(commonMeasuresAllDatasets);
+
+			if(!commonMeasures.isEmpty()) {
+				//Calc variables present in multimode but not in mode
+				Set<String> multimodeMeasuresToCalc = getAbsentElements(
+					addedVariablesNamesAndType.keySet(),
+					modeMeasures
+				);
+				if(!multimodeMeasuresToCalc.isEmpty()) {
+					vtlScript.add(getCalcEmptyVariablesScript(
+									modeDatasetName,
+									multimodeMeasuresToCalc,
+									addedVariablesNamesAndType));
+					incrementTempDataset(modeDatasetName);
+				}
+				commonMeasures.addAll(multimodeMeasuresToCalc);
+
+				//Union on common variables
+				String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasures);
+				vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
+						getIncrementedTempDatasetName(multimodeBindingName),
+						getLastDatasetName(multimodeBindingName),
+						getLastDatasetName(modeDatasetName),
+						vtlCommonVariables));
+				incrementTempDataset(multimodeBindingName);
+			}
 
 			// Get the other variables
-			Set<String> otherVariables = getOtherVariables(datasetName, commonMeasures);
+			Set<String> allCommonVariables = new HashSet<>(commonMeasuresAllDatasets);
+			allCommonVariables.addAll(addedVariablesNamesAndType.keySet());
+			Set<String> variablesToAdd = getAbsentElements(modeMeasures, allCommonVariables);
 
-			if (!otherVariables.isEmpty()) {
-				String vtlOtherVariables = VtlMacros.toVtlSyntax(otherVariables);
+			if (!variablesToAdd.isEmpty()) {
+				String vtlOtherVariables = VtlMacros.toVtlSyntax(variablesToAdd);
 
 				// Keep on the dataset to be joined
 				vtlScript.add(String.format("%s_keep := %s [keep %s];",
-						getIncrementedTempDatasetName(datasetName),
-						getTempDatasetName(datasetName),
+						getIncrementedTempDatasetName(modeDatasetName),
+						getLastDatasetName(modeDatasetName),
 						vtlOtherVariables));
-				incrementTempDataset(datasetName);
+				incrementTempDataset(modeDatasetName);
 
 				// Join
 				vtlScript.add(String.format("%s := left_join(%s, %s_keep);",
-						getIncrementedTempDatasetName(bindingName),
-						getTempDatasetName(bindingName),
-						getTempDatasetName(datasetName)));
-				incrementTempDataset(bindingName);
+						getIncrementedTempDatasetName(multimodeBindingName),
+						getLastDatasetName(multimodeBindingName),
+						getLastDatasetName(modeDatasetName)));
+				incrementTempDataset(multimodeBindingName);
+
+				for(String variableToAdd : variablesToAdd){
+					addedVariablesNamesAndType.put(variableToAdd,
+							vtlBindings.getMeasureType(modeDatasetName, variableToAdd));
+				}
 			}
 		}
 
 		// Set mode identifier role
 		vtlScript.add(String.format("%s := %s [calc identifier %s := %s];",
-				getIncrementedTempDatasetName(bindingName), getTempDatasetName(bindingName),
+				getIncrementedTempDatasetName(multimodeBindingName), getLastDatasetName(multimodeBindingName),
 				modeVariableIdentifier,
 				modeVariableIdentifier));
-		incrementTempDataset(bindingName);
+		incrementTempDataset(multimodeBindingName);
 
 		return vtlScript;
 	}
@@ -183,7 +225,7 @@ public class ReconciliationProcessing extends DataProcessing {
 	private String createModeIdentifier(String modeName) {
 		return String.format("%s := %s [calc %s := \"%s\"];",
 				getIncrementedTempDatasetName(modeName),
-				getTempDatasetName(modeName),
+				getLastDatasetName(modeName),
 				modeVariableIdentifier,
 				modeName);
 	}
@@ -195,31 +237,35 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
-			variableNamesList.add( dataStructure.keySet()
-					.stream().filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)
-					.collect(Collectors.toSet()) );
+			Set<String> variableNames = dataStructure.keySet()
+					.stream()
+					.filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)
+					.collect(Collectors.toCollection(HashSet::new));
+			variableNames.add(modeVariableIdentifier);
+			variableNamesList.add(variableNames);
 		}
-
 		return getCommonElements(variableNamesList);
 	}
 
 	/**
-	 * Return a variables map containing variables of a dataset that aren't in some
-	 * (unimodal) datasets that are in the bindings.
-	 * We exclude identifiers as for VTL 2.1 we have to exclude them from keep
+	 * Return a set containing Strings that are NOT in the second one
 	 *
-	 * @param datasetName The name of the dataset.
+	 * @param sourceSet The name of the source set.
+	 * @param comparedSet Second set to compare from
 	 *
-	 * @return A VariablesMap object
+	 * @return A set of string that are in the first one but not in the second set
 	 */
-	private Set<String> getOtherVariables(String datasetName, Set<String> variablesSet) {
-		Set<String> otherVariables = new TreeSet<>();
-		for (String variableName : vtlBindings.getDataset(datasetName).getMeasureNames()) {
-			if(!variablesSet.contains(variableName)) {
-				otherVariables.add(variableName);
+	private Set<String> getAbsentElements(
+			Set<String> sourceSet,
+			Set<String> comparedSet
+	) {
+		Set<String> absentStrings = new TreeSet<>();
+		for(String element : sourceSet){
+			if(!comparedSet.contains(element)){
+				absentStrings.add(element);
 			}
 		}
-		return otherVariables;
+		return absentStrings;
 	}
 
 	/**
@@ -244,5 +290,35 @@ public class ReconciliationProcessing extends DataProcessing {
 			intersection = newIntersection;
 		}
 		return intersection;
+	}
+
+	/**
+	 * @param modeDatasetName Dataset to add to
+	 * @param multimodeMeasuresToCalc Measures to add empty value
+	 * @param variablesNamesAndType A map containing the types of the multimode measures to calc (used in cast)
+	 * @return a VTL script that adds empty measures to a map
+	 */
+	private String getCalcEmptyVariablesScript(String modeDatasetName,
+	                                           Set<String> multimodeMeasuresToCalc,
+	                                           Map<String, String> variablesNamesAndType) {
+		if(multimodeMeasuresToCalc.isEmpty()){
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder("%s := %s [calc ".formatted(
+				getIncrementedTempDatasetName(modeDatasetName),
+				getLastDatasetName(modeDatasetName)
+		));
+		for(String multimodeMeasure : multimodeMeasuresToCalc
+		){
+			stringBuilder.append("%s := cast(null, ".formatted(multimodeMeasure));
+			String multimodeMeasureType = variablesNamesAndType.get(multimodeMeasure);
+			stringBuilder.append("%s), ".formatted(multimodeMeasureType));
+		}
+		//Delete last ", " and replace with "];"
+		stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
+		stringBuilder.append("];");
+
+		return stringBuilder.toString();
 	}
 }
