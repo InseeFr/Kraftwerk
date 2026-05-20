@@ -114,8 +114,8 @@ public class ImportScriptTest {
 				List.of(new Structured.Component("ID", Long.class, Dataset.Role.IDENTIFIER))
 		);
 		vtlBindings.put("test", ds);
-		vtlExecute.evalVtlScript("test := test [calc foo := 4.1];", vtlBindings, kraftwerkExecutionContext);
-		Dataset outDs = vtlBindings.getDataset("test");
+		vtlExecute.evalVtlScript("test2 := test [calc foo := 4.1];", vtlBindings, kraftwerkExecutionContext);
+		Dataset outDs = vtlBindings.getDataset("test2");
 		assertEquals(Double.class, outDs.getDataPoints().get(0).get("foo").getClass());
 		// => "NUMBER" type in Trevas datasets is java "Double" type
 	}
