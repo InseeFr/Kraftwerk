@@ -92,7 +92,8 @@ public class VtlExecute {
             bindings.put(bindingName, vtlDataset);
         }
         catch(IOException e){
-            log.error("Unable to connect dataset from url {}: {} caused by {}", url, e, e.getCause().toString());
+            log.error("Unable to connect dataset from url {}: {} caused by {}", url, e, e.getCause() == null ?
+                    "null" : e.getCause().toString());
         }
     }
 
