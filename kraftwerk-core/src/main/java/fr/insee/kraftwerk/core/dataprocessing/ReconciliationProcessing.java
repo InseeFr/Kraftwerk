@@ -100,26 +100,9 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		// Get the common measures between all datasets
 		Set<String> commonMeasuresAllDatasets = getCommonMeasures();
-
-
+		
 		// Cast Integer into Number to ensure numerical measures have the same type
-		for (String datasetName : vtlBindings.getDatasetNames()) {
-			for (String measure : commonMeasuresAllDatasets){
-				if (
-					vtlBindings.getDataset(datasetName).getMeasureNames().contains(measure)
-					&& vtlBindings.getMeasureType(datasetName, measure).equals("integer")
-				) {
-					vtlScript.add(
-							String.format("%s := %s [calc %s := cast(%s,number)];",
-									getIncrementedTempDatasetName(datasetName),
-                                    getLastDatasetName(datasetName),
-									measure,
-									measure)
-					);
-					incrementTempDataset(datasetName);
-				}
-			}
-		}
+		addCastToNumberScripts(commonMeasuresAllDatasets, vtlScript);
 
 		// List of all common variables (measures) in the vtl syntax
 		// Since VTL 2.1.0 we cannot use identifiers in keep/drop
@@ -134,7 +117,7 @@ public class ReconciliationProcessing extends DataProcessing {
 				getLastDatasetName(firstDatasetName),
 				vtlCommonVariablesAllDatasets));
 
-		// Concatenate the remaining datasets
+		// Concatenate the remaining datasets using union
 		for (String modeDatasetName : unimodalDatasetNames) {
 			String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
 			vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
@@ -245,6 +228,31 @@ public class ReconciliationProcessing extends DataProcessing {
 			variableNamesList.add(variableNames);
 		}
 		return getCommonElements(variableNamesList);
+	}
+
+	/**
+	 * Adds scripts to cast integers to numbers for given measures on ALL datasets
+	 * @param measureNames measures to affect
+	 * @param vtlScript list of VTL scripts to add to
+	 */
+	private void addCastToNumberScripts(Set<String> measureNames, VtlScript vtlScript) {
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			for (String measure : measureNames){
+				if (
+						vtlBindings.getDataset(datasetName).getMeasureNames().contains(measure)
+								&& vtlBindings.getMeasureType(datasetName, measure).equals("integer")
+				) {
+					vtlScript.add(
+							String.format("%s := %s [calc %s := cast(%s,number)];",
+									getIncrementedTempDatasetName(datasetName),
+									getLastDatasetName(datasetName),
+									measure,
+									measure)
+					);
+					incrementTempDataset(datasetName);
+				}
+			}
+		}
 	}
 
 	/**
