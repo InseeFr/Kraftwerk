@@ -51,8 +51,9 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		// Root dataset
 		Set<String> rootVariableNames = metadataModel.getVariables().getGroupVariableNames(Constants.ROOT_GROUP_NAME);
-		Set<String> fixedIdentifiers = extractFixedIdentifiersFromDataset(bindingName);
-		addRootDatasetVtlScript(bindingName, rootVariableNames, fixedIdentifiers, vtlScript);
+		Set<String> fixedIdentifiersInDataset = extractFixedIdentifiersFromDataset(bindingName);
+		rootVariableNames.removeIf(fixedIdentifiersInDataset::contains);
+		addRootDatasetVtlScript(bindingName, rootVariableNames, fixedIdentifiersInDataset, vtlScript);
 
 		// To delete duplicates, to be eventually reviewed with a better VTL solution
 		addDeduplicateVTLScript(Constants.ROOT_GROUP_NAME, vtlScript);
@@ -108,7 +109,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 	private void addRootDatasetVtlScript(String multimodeDatasetName,
 										 Set<String> rootVariableNames,
-										 Set<String> fixedIdentifiers,
+										 Set<String> fixedIdentifiersInDataset,
 										 VtlScript vtlScript) {
 		StringBuilder rootInstructions = new StringBuilder();
 
@@ -120,8 +121,8 @@ public class InformationLevelsProcessing extends DataProcessing {
 		boolean isModeIdentifierPresent = vtlBindings.getDatasetNames().contains(multimodeDatasetName)
 				&& vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
 
-		if(!fixedIdentifiers.isEmpty()){
-			String fixedIdentifiersVtl = VtlMacros.toVtlSyntax(fixedIdentifiers);
+		if(!fixedIdentifiersInDataset.isEmpty()){
+			String fixedIdentifiersVtl = VtlMacros.toVtlSyntax(fixedIdentifiersInDataset);
 			rootInstructions.append(fixedIdentifiersVtl);
 			if(!rootVariableNames.isEmpty() || isModeIdentifierPresent){
 				rootInstructions.append(", ");

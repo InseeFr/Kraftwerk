@@ -232,7 +232,7 @@ public class VtlExecute {
      */
     public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, KraftwerkExecutionContext kraftwerkExecutionContext){
         if(vtlScript != null && !vtlScript.isEmpty()) {
-            for(String vtlInstruction : vtlScript) {
+            for(String vtlInstruction : vtlScript.stream().filter(script -> !script.contentEquals("")).toList()) {
                 evalVtlScript(vtlInstruction, bindings, kraftwerkExecutionContext);
             }
         } else {

@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 
 
 /**
@@ -77,27 +78,32 @@ public abstract class DataProcessing {
             Path userVtlInstructionsPath,
             KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
-        String vtlScript = getUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
+        VtlScript vtlScript = getUserVtlInstructions(userVtlInstructionsPath, kraftwerkExecutionContext);
         log.info("User VTL instructions read for step {}:\n{}", getStepName(), vtlScript);
-        if (vtlScript != null
-                && !vtlScript.isEmpty()
-                && !vtlScript.contentEquals("")
-        ) {
-            vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
-        }
+        vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
     }
 
-    private String getUserVtlInstructions(
+    private VtlScript getUserVtlInstructions(
             Path userVtlInstructionsPath,
             KraftwerkExecutionContext kraftwerkExecutionContext
     ) throws KraftwerkException {
+        VtlScript vtlScript = new VtlScript();
+
+        //Read from cache
         if(kraftwerkExecutionContext.getUserVtlInstructionsCache().containsKey(userVtlInstructionsPath)){
-            return kraftwerkExecutionContext.getUserVtlInstructionsCache().get(userVtlInstructionsPath);
+            vtlScript.addAll(
+                    List.of(kraftwerkExecutionContext.getUserVtlInstructionsCache().get(userVtlInstructionsPath)
+                            .split(System.lineSeparator()))
+            );
+            return vtlScript;
         }
+
+        //Read from file
         log.info("Reading vtl user instructions file {}", userVtlInstructionsPath.toString());
         try (InputStream inputStream = fileUtilsInterface.readFile(userVtlInstructionsPath.toString())){
-            String vtlScript = new String(inputStream.readAllBytes());
-            kraftwerkExecutionContext.getUserVtlInstructionsCache().put(userVtlInstructionsPath, vtlScript);
+            String vtlScriptString = new String(inputStream.readAllBytes());
+            kraftwerkExecutionContext.getUserVtlInstructionsCache().put(userVtlInstructionsPath, vtlScriptString);
+            vtlScript.addAll(List.of(vtlScriptString.split(System.lineSeparator())));
             return vtlScript;
         } catch (IOException _){
             throw new KraftwerkException(500, "Reading error on vtl script");
