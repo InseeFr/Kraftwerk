@@ -55,9 +55,6 @@ class GroupProcessingTest {
         Dataset outDataset = vtlBindings.getDataset("TEST");
 
         //THEN
-        if(!kraftwerkExecutionContext.getErrors().isEmpty()){
-            log.warn(kraftwerkExecutionContext.getErrors().toString());
-        }
         Assertions.assertThat(outDataset.getDataStructure().keySet()).containsExactlyInAnyOrder("ID", "FOO", "DEPTH1.FOO1", "DEPTH1.DEPTH2.FOO2");
     }
 }

@@ -142,20 +142,19 @@ class ReconciliationTest {
 
 	@Test
 	void applyReconciliation_threeModes() throws KraftwerkException {
+		//GIVEN
 		vtlBindings.put("CAPI", cawiDataset);
 		vtlBindings.put("CAWI", capiDataset);
 		vtlBindings.put("PAPI", papiDataset);
-		//
 		ReconciliationProcessing reconciliation = new ReconciliationProcessing(
 				vtlBindings, fileUtilsInterface, kraftwerkExecutionContext
 		);
+
+		//WHEN
 		reconciliation.applyVtlTransformations("MULTIMODE", null, kraftwerkExecutionContext);
-		//
+
+		//THEN
 		Dataset multimodeDataset = vtlBindings.getDataset("MULTIMODE");
-		//
-		if(!kraftwerkExecutionContext.getErrors().isEmpty()){
-			log.warn(kraftwerkExecutionContext.getErrors().toString());
-		}
 		assertNotNull(multimodeDataset);
 	}
 }

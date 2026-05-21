@@ -66,10 +66,10 @@ class CleanUpProcessingTest {
             ),
             List.of(
                     new Structured.Component("ID", String.class, Role.IDENTIFIER),
-                    new Structured.Component("FOO", String.class, Role.MEASURE),
-                    new Structured.Component("GENDER", String.class, Role.MEASURE),
-                    new Structured.Component("GENDER_1", String.class, Role.MEASURE),
-                    new Structured.Component("GENDER_2", String.class, Role.MEASURE),
+                    new Structured.Component("FOO", String.class, Role.IDENTIFIER),
+                    new Structured.Component("GENDER", String.class, Role.IDENTIFIER),
+                    new Structured.Component("GENDER_1", String.class, Role.IDENTIFIER),
+                    new Structured.Component("GENDER_2", String.class, Role.IDENTIFIER),
                     new Structured.Component(MODE_VARIABLE_NAME, String.class, Role.IDENTIFIER)
             )
     );
@@ -116,6 +116,7 @@ class CleanUpProcessingTest {
         cleanUpProcessing.applyVtlTransformations("MULTIMODE", null,kraftwerkExecutionContext);
 
         // Are paper indicator variables removed in VTL multimode dataset ?
+        // FIXME Rework cleanup
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_1"));
         assertFalse(vtlBindings.getDataset("MULTIMODE").getDataStructure().containsKey("GENDER_2"));
         // Are these also removed in VariablesMap object ?

@@ -63,9 +63,6 @@ class InformationLevelsTest {
 		);
 		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
-		if(!kraftwerkExecutionContext.getErrors().isEmpty()){
-			log.error(kraftwerkExecutionContext.getErrors().toString());
-		}
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");
 
@@ -110,9 +107,6 @@ class InformationLevelsTest {
 		);
 		processing.applyAutomatedVtlInstructions("MULTIMODE", kraftwerkExecutionContext);
 		//
-		if(!kraftwerkExecutionContext.getErrors().isEmpty()){
-			log.error(kraftwerkExecutionContext.getErrors().toString());
-		}
 		Dataset rootDataset = vtlBindings.getDataset(Constants.ROOT_GROUP_NAME);
 		Dataset loopDataset = vtlBindings.getDataset("LOOP");
 

@@ -145,7 +145,7 @@ public class VtlJsonDatasetWriter {
 	 */
 	private Integer addGroupIdentifiers(JSONArray dataStructure, Integer variableNumber) {
 		for (String groupName : metadataModel.getSubGroupNames()) {
-			//TODO Think about putting this as a measure to not to have it included in root dataset
+			//FIXME Think about putting this as a measure to not to have it included in root dataset
 			variableNumber = addToDataStructure(groupName, STRING, IDENTIFIER, dataStructure, variableNumber);
 		}
 		return variableNumber;

@@ -38,9 +38,6 @@ public class EvalScriptDefinitions {
 	@When("I try to apply some VTL instruction : {string}")
 	public void exportDataset(String vtlScript) {
 		vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
-		if(!kraftwerkExecutionContext.getErrors().isEmpty()) {
-			log.warn(kraftwerkExecutionContext.getErrors().toString());
-		}
 	}
 
 	@Then("The binding {string} should have {int} variables")
