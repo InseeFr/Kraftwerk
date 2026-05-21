@@ -103,6 +103,9 @@ public class InformationLevelsProcessing extends DataProcessing {
     }
 
 	private Set<String> extractFixedIdentifiersFromDataset(String datasetName) {
+		if(!vtlBindings.getDatasetNames().contains(datasetName)){
+			return new HashSet<>();
+		}
 		return new HashSet<>(
 				fixedIdentifiers.stream().filter(
 						identifier -> vtlBindings.getDataset(datasetName).getMeasureNames().contains(identifier)
@@ -121,8 +124,8 @@ public class InformationLevelsProcessing extends DataProcessing {
 				getLastDatasetName(multimodeDatasetName)
 		));
 
-		boolean isModeIdentifierPresent =
-				vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
+		boolean isModeIdentifierPresent = vtlBindings.getDatasetNames().contains(multimodeDatasetName)
+				&& vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
 
 		if(!fixedIdentifiers.isEmpty()){
 			String fixedIdentifiersVtl = VtlMacros.toVtlSyntax(fixedIdentifiers);
