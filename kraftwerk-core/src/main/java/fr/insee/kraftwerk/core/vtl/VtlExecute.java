@@ -164,6 +164,9 @@ public class VtlExecute {
                 context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
                 // Replace destination dataset name to TEMP
+                if(bindings.getDatasetNames().contains(TEMP_DATASET_NAME)){
+                    bindings.remove(TEMP_DATASET_NAME);
+                }
                 String destinationDatasetName = getDestinationDatasetName(vtlScript);
                 String vtlScriptToUse = vtlScript;
                 if(destinationDatasetName != null) {
