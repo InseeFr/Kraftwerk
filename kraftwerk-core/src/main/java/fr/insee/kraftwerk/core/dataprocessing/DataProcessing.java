@@ -78,6 +78,7 @@ public abstract class DataProcessing {
         	vtlExecute.evalVtlScript(automatedInstructions, vtlBindings, kraftwerkExecutionContext);
         }
 
+        //Replace dataset by last temp dataset and clean all temp datasets
         String lastTempDatasetName = getLastDatasetName(bindingName);
         if(lastTempDatasetName != null){
             vtlBindings.replace(bindingName, vtlBindings.getDataset(lastTempDatasetName));
@@ -87,7 +88,7 @@ public abstract class DataProcessing {
         return automatedInstructions.toString();
     }
 
-    private void cleanTempDatasets(String bindingName){
+    protected void cleanTempDatasets(String bindingName){
         String tempDatasetNamePrefix = bindingName + TEMP_DATASET_SUFFIX;
         vtlBindings.remove(tempDatasetNamePrefix); // Removes numberless temp dataset if exists
         vtlBindings.getDatasetNames().stream()
