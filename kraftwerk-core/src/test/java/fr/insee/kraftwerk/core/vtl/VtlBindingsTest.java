@@ -91,7 +91,7 @@ class VtlBindingsTest {
 		vtlBindings.put("TEST", ds1);
 		//
 		StringBuilder vtlScript = new StringBuilder("\n");
-		vtlScript.append("TEST := TEST [calc CODE_POSTAL := \n");
+		vtlScript.append("TEST2 := TEST [calc CODE_POSTAL := \n");
 		vtlScript.append("    if LIB_COMMUNE = \"Lille\" then \"59000\" else ( \n");
 		vtlScript.append("    if LIB_COMMUNE = \"Amiens\" then \"80000\" else ( \n");
 		vtlScript.append("    \"\" ))];");
@@ -99,7 +99,7 @@ class VtlBindingsTest {
 		log.info(vtlScript.toString());
 		vtlExecute.evalVtlScript(vtlScript.toString(), vtlBindings, kraftwerkExecutionContext);
 		//
-		Dataset ds = vtlBindings.getDataset("TEST");
+		Dataset ds = vtlBindings.getDataset("TEST2");
 
 		//
 		assertTrue(ds.getDataStructure().containsKey("CODE_POSTAL"));
@@ -134,12 +134,12 @@ class VtlBindingsTest {
 		vtlBindings.put("TEST", ds1);
 		//
 		VtlScript vtlScript = new VtlScript();
-		vtlScript.add("TEST := TEST [calc new1 := \"new\"];");
+		vtlScript.add("TEST2 := TEST [calc new1 := \"new\"];");
 		vtlScript.add("nOt VtL cOdE "); // should write a warning in the log but not throw an exception
-		vtlScript.add("TEST := TEST [calc new2 := 2];");
+		vtlScript.add("TEST3 := TEST2 [calc new2 := 2];");
 		vtlExecute.evalVtlScript(vtlScript, vtlBindings, kraftwerkExecutionContext);
 		//
-		Dataset ds = vtlBindings.getDataset("TEST");
+		Dataset ds = vtlBindings.getDataset("TEST3");
 
 		//
 		assertTrue(ds.getDataStructure().containsKey("new1"));
