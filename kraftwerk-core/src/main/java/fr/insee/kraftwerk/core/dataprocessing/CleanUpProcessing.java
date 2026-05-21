@@ -73,14 +73,13 @@ public class CleanUpProcessing extends DataProcessing {
         }
         if (!paperUcqVtlNames.isEmpty()) {
             StringBuilder dropInstruction = new StringBuilder(
-                    String.format("%s := %s [ drop ", getIncrementedTempDatasetName(bindingName), bindingName)
+                    String.format("%1$s := %1$s [ drop ", bindingName)
             );
             StringJoiner vtlDropVariables = new StringJoiner(", ");
             paperUcqVtlNames.forEach(vtlDropVariables::add);
             dropInstruction.append(vtlDropVariables);
             dropInstruction.append(" ];");
             vtlScript.add(dropInstruction.toString());
-            incrementTempDataset(bindingName);
         }
         return vtlScript;
     }

@@ -58,10 +58,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 		addDeduplicateVTLScript(Constants.ROOT_GROUP_NAME, vtlScript);
 
 		//Use the last temp root dataset as definitive
-		vtlScript.add("%s := %s;".formatted(
-				Constants.ROOT_GROUP_NAME,
-				getLastDatasetName(Constants.ROOT_GROUP_NAME)
-		));
+		vtlScript.add("%1$s := %1$s;".formatted(Constants.ROOT_GROUP_NAME));
 
 		// Group datasets
 		for (String groupName : metadataModel.getSubGroupNames()) {
@@ -73,9 +70,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			addGroupDatasetVtlScript(bindingName, groupName, groupMeasureNames, vtlScript);
 
 			// Empty lines are created to produce group level tables and need to be removed
-			vtlScript.add(String.format("%s := %s [filter %s<>\"\"];",
-					getIncrementedTempDatasetName(groupName), getLastDatasetName(groupName), groupName));
-			incrementTempDataset(groupName);
+			vtlScript.add(String.format("%1$s := %1$s [filter %1$s<>\"\"];", groupName));
 
 			// To delete duplicates
 			addDeduplicateVTLScript(groupName, vtlScript);
@@ -84,18 +79,16 @@ public class InformationLevelsProcessing extends DataProcessing {
 			for (int j = 0; j < groupVariableNames.size(); j++) {
 				String variableName = groupVariableNames.get(j);
 				String fullyQualifiedName = groupMeasureNames.get(j);
-				vtlScript.add(String.format("%s := %s [rename %s to %s];",
-						getIncrementedTempDatasetName(groupName),
-						getLastDatasetName(groupName),
+				vtlScript.add(String.format("%1$s := %1$s [rename %2$s to %3$s];",
+						groupName,
 						fullyQualifiedName,
 						variableName));
-				incrementTempDataset(groupName);
 			}
 
 			//Use the last temp group dataset as definitive
-			vtlScript.add("%s := %s;".formatted(
+			vtlScript.add("%s <- %s;".formatted(
 					groupName,
-					getLastDatasetName(groupName)
+					groupName
 			));
 		}
 
@@ -120,8 +113,8 @@ public class InformationLevelsProcessing extends DataProcessing {
 		StringBuilder rootInstructions = new StringBuilder();
 
 		rootInstructions.append("%s := %s [keep ".formatted(
-				getIncrementedTempDatasetName(Constants.ROOT_GROUP_NAME),
-				getLastDatasetName(multimodeDatasetName)
+				Constants.ROOT_GROUP_NAME,
+				multimodeDatasetName
 		));
 
 		boolean isModeIdentifierPresent = vtlBindings.getDatasetNames().contains(multimodeDatasetName)
@@ -146,16 +139,10 @@ public class InformationLevelsProcessing extends DataProcessing {
 		}
 		rootInstructions.append(" ];");
 		vtlScript.add(rootInstructions.toString());
-		incrementTempDataset(Constants.ROOT_GROUP_NAME);
 	}
 
 	private void addDeduplicateVTLScript(String datasetName, VtlScript vtlScript){
-		vtlScript.add("%s := union(%s, %s);".formatted(
-				getIncrementedTempDatasetName(datasetName),
-				getLastDatasetName(datasetName),
-				getLastDatasetName(datasetName)
-		));
-		incrementTempDataset(datasetName);
+		vtlScript.add("%1$s := union(%1$s, %1$s);".formatted(datasetName));
 	}
 
 	private void addGroupDatasetVtlScript(String multimodeDatasetName,
@@ -164,10 +151,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 	                                      VtlScript vtlScript) {
 		StringBuilder groupInstructions = new StringBuilder();
 
-		groupInstructions.append("%s := %s [keep ".formatted(
-				getIncrementedTempDatasetName(groupName),
-				getLastDatasetName(multimodeDatasetName)
-		));
+		groupInstructions.append("%s := %s [keep ".formatted(groupName, multimodeDatasetName));
 
 		boolean isModeIdentifierPresent =
 				vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
@@ -184,6 +168,5 @@ public class InformationLevelsProcessing extends DataProcessing {
 		}
 		groupInstructions.append(" ];");
 		vtlScript.add(groupInstructions.toString());
-		incrementTempDataset(groupName);
 	}
 }

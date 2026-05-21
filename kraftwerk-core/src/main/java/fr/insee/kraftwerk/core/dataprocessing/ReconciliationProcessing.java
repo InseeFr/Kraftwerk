@@ -95,7 +95,6 @@ public class ReconciliationProcessing extends DataProcessing {
 		// Add mode identifier (as measure for now)
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlScript.add(createModeIdentifier(datasetName));
-			incrementTempDataset(datasetName);
 		}
 
 		// Get the common measures between all datasets
@@ -114,18 +113,16 @@ public class ReconciliationProcessing extends DataProcessing {
 		String firstDatasetName = unimodalDatasetNames.getFirst();
 		vtlScript.add(String.format("%s := %s [keep %s];",
 				multimodeBindingName,
-				getLastDatasetName(firstDatasetName),
+				firstDatasetName,
 				vtlCommonVariablesAllDatasets));
 
 		// Concatenate the remaining datasets using union
 		for (String modeDatasetName : unimodalDatasetNames) {
 			String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
-			vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
-					getIncrementedTempDatasetName(multimodeBindingName),
-					getLastDatasetName(multimodeBindingName),
-					getLastDatasetName(modeDatasetName),
+			vtlScript.add(String.format("%1$s := union(%1$s, %2$s [keep %3$s]);",
+					multimodeBindingName,
+					modeDatasetName,
 					vtlCommonVariables));
-			incrementTempDataset(multimodeBindingName);
 		}
 
 		Map<String, String> addedVariablesNamesAndType = new HashMap<>();
@@ -148,18 +145,15 @@ public class ReconciliationProcessing extends DataProcessing {
 									modeDatasetName,
 									multimodeMeasuresToCalc,
 									addedVariablesNamesAndType));
-					incrementTempDataset(modeDatasetName);
 				}
 				commonMeasures.addAll(multimodeMeasuresToCalc);
 
 				//Union on common variables
 				String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasures);
-				vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
-						getIncrementedTempDatasetName(multimodeBindingName),
-						getLastDatasetName(multimodeBindingName),
-						getLastDatasetName(modeDatasetName),
+				vtlScript.add(String.format("%1$s := union(%1$s, %2$s [keep %3$s]);",
+						multimodeBindingName,
+						modeDatasetName,
 						vtlCommonVariables));
-				incrementTempDataset(multimodeBindingName);
 			}
 
 			// Get the other variables
@@ -171,18 +165,13 @@ public class ReconciliationProcessing extends DataProcessing {
 				String vtlOtherVariables = VtlMacros.toVtlSyntax(variablesToAdd);
 
 				// Keep on the dataset to be joined
-				vtlScript.add(String.format("%s_keep := %s [keep %s];",
-						getIncrementedTempDatasetName(modeDatasetName),
-						getLastDatasetName(modeDatasetName),
+				vtlScript.add(String.format("%1$s_keep := %1$s [keep %2$s];",
+						modeDatasetName,
 						vtlOtherVariables));
-				incrementTempDataset(modeDatasetName);
 
 				// Join
-				vtlScript.add(String.format("%s := left_join(%s, %s_keep);",
-						getIncrementedTempDatasetName(multimodeBindingName),
-						getLastDatasetName(multimodeBindingName),
-						getLastDatasetName(modeDatasetName)));
-				incrementTempDataset(multimodeBindingName);
+				vtlScript.add(String.format("%1$s := left_join(%1$s, %2$s_keep);",
+						multimodeBindingName, modeDatasetName));
 
 				for(String variableToAdd : variablesToAdd){
 					addedVariablesNamesAndType.put(variableToAdd,
@@ -192,11 +181,8 @@ public class ReconciliationProcessing extends DataProcessing {
 		}
 
 		// Set mode identifier role
-		vtlScript.add(String.format("%s := %s [calc identifier %s := %s];",
-				getIncrementedTempDatasetName(multimodeBindingName), getLastDatasetName(multimodeBindingName),
-				modeVariableIdentifier,
-				modeVariableIdentifier));
-		incrementTempDataset(multimodeBindingName);
+		vtlScript.add(String.format("%1$s := %1$s [calc identifier %2$s := %2$s];",
+				multimodeBindingName, modeVariableIdentifier));
 
 		return vtlScript;
 	}
@@ -206,11 +192,9 @@ public class ReconciliationProcessing extends DataProcessing {
 	 * @return the VTL script that creates that identifier into a temp dataset
 	 */
 	private String createModeIdentifier(String modeName) {
-		return String.format("%s := %s [calc %s := \"%s\"];",
-				getIncrementedTempDatasetName(modeName),
-				getLastDatasetName(modeName),
-				modeVariableIdentifier,
-				modeName);
+		return String.format("%1$s := %1$s [calc %2$s := \"%1$s\"];",
+				modeName,
+				modeVariableIdentifier);
 	}
 
 	/** Return a set containing variable names that are common to each dataset in the bindings. */
@@ -243,13 +227,9 @@ public class ReconciliationProcessing extends DataProcessing {
 								&& vtlBindings.getMeasureType(datasetName, measure).equals("integer")
 				) {
 					vtlScript.add(
-							String.format("%s := %s [calc %s := cast(%s,number)];",
-									getIncrementedTempDatasetName(datasetName),
-									getLastDatasetName(datasetName),
-									measure,
-									measure)
+							String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",
+									datasetName, measure)
 					);
-					incrementTempDataset(datasetName);
 				}
 			}
 		}
@@ -313,9 +293,8 @@ public class ReconciliationProcessing extends DataProcessing {
 			return null;
 		}
 
-		StringBuilder stringBuilder = new StringBuilder("%s := %s [calc ".formatted(
-				getIncrementedTempDatasetName(modeDatasetName),
-				getLastDatasetName(modeDatasetName)
+		StringBuilder stringBuilder = new StringBuilder("%1$s := %1$s [calc ".formatted(
+				modeDatasetName
 		));
 		for(String multimodeMeasure : multimodeMeasuresToCalc
 		){
