@@ -80,6 +80,7 @@ public class CleanUpProcessing extends DataProcessing {
             dropInstruction.append(vtlDropVariables);
             dropInstruction.append(" ];");
             vtlScript.add(dropInstruction.toString());
+            incrementTempDataset(bindingName);
         }
         return vtlScript;
     }
