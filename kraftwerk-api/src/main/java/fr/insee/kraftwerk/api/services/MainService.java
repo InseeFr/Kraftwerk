@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.api.services;
 
 
-import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
@@ -27,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -412,7 +410,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisLegacy(
                 configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                mainAsyncService.client,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
@@ -436,7 +434,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisNew(
                 configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                mainAsyncService.client,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );

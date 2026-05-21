@@ -31,7 +31,7 @@ public class MainAsyncService extends KraftwerkService {
 	private final InMemoryJobStore jobStore;
 	private final OutputZipService outputZipService;
     private final InMemoryExportJobStore exportJobStore;
-    protected final GenesisClient client;
+    public final GenesisClient client;
 
     public MainAsyncService(ConfigProperties configProperties, MinioConfig minioConfig, InMemoryJobStore jobStore, OutputZipService outputZipService, InMemoryExportJobStore exportJobStore, GenesisClient client) {
 		super(configProperties, minioConfig);

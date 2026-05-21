@@ -7,7 +7,6 @@ import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,14 +30,14 @@ public class HealthcheckService extends KraftwerkService {
 
 	ConfigProperties configProperties;
 
-	@Autowired
-	public HealthcheckService(ConfigProperties configProperties, MinioConfig minioConfig) {
+    @Autowired
+    public HealthcheckService(ConfigProperties configProperties,
+                              MinioConfig minioConfig,
+                              GenesisClient genesisClient) {
         super(configProperties, minioConfig);
         this.configProperties = configProperties;
-		this.client = new GenesisClient(new RestTemplateBuilder(), configProperties);
-
-	}
-
+        this.client = genesisClient;
+    }
 
 	@GetMapping("health-check")
 	public ResponseEntity<String> healthcheck() {
