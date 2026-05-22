@@ -452,21 +452,47 @@ public class SqlUtils {
     private static void deduplicateTable(Statement statement, String tableName)
     throws SQLException{
         //Dedup by interrogationId if root, by interrogationId and group identifier for loops
-        String dedupColumn = tableName.equals(Constants.ROOT_GROUP_NAME) ?
-            Constants.ROOT_IDENTIFIER_NAME
-                : "%s\",\"%s".formatted(Constants.ROOT_IDENTIFIER_NAME,tableName.replace("\"", ""));
+        Set<String> dedupColumns = tableName.equals(Constants.ROOT_GROUP_NAME) ?
+            Set.of(Constants.ROOT_IDENTIFIER_NAME)
+            : Set.of(Constants.ROOT_IDENTIFIER_NAME, tableName.replace("\"", "")); //Remove " to avoid injection
 
+        //Don't dedup if columns are not present
+        if(!new HashSet<>(getColumnNames(statement, tableName)).containsAll(dedupColumns)){
+            return;
+        }
+
+        String dedupColumnsString = getDedupColumnsString(dedupColumns);
         String sqlScript = """
                 CREATE OR REPLACE TABLE '%1$s' AS
                 SELECT * EXCLUDE (rn)
                 FROM (
                     SELECT *,
-                    ROW_NUMBER() OVER (PARTITION BY "%2$s" ORDER BY rowid) AS rn
+                    ROW_NUMBER() OVER (PARTITION BY %2$s ORDER BY rowid) AS rn
                     FROM '%1$s'
                 )
                 WHERE rn = 1;
-                """.formatted(tableName.replace("\"", ""), dedupColumn);
+                """.formatted(tableName.replace("\"", ""), dedupColumnsString);
         statement.execute(sqlScript);
     }
 
+    private static String getDedupColumnsString(Set<String> dedupColumns) {
+        return dedupColumns.size() == 1 && dedupColumns.contains(Constants.ROOT_IDENTIFIER_NAME) ?
+                "\"%s\"".formatted(Constants.ROOT_IDENTIFIER_NAME)
+                : getDedupColumnsForLoop(dedupColumns);
+
+    }
+
+    private static String getDedupColumnsForLoop(Set<String> dedupColumns) {
+        StringBuilder dedupColumnsStringBuilder = new StringBuilder();
+        for(String dedupColumn : dedupColumns){
+            dedupColumnsStringBuilder.append("\"");
+            dedupColumnsStringBuilder.append(dedupColumn);
+            dedupColumnsStringBuilder.append("\",");
+        }
+        dedupColumnsStringBuilder.delete(
+                dedupColumnsStringBuilder.length() - 1
+                , dedupColumnsStringBuilder.length()
+        );
+        return dedupColumnsStringBuilder.toString();
+    }
 }
