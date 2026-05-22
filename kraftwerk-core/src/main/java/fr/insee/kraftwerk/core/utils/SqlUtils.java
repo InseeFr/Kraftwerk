@@ -3,6 +3,7 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.errors.DuckDBError;
+import fr.insee.kraftwerk.core.exceptions.DatasetNotFoundException;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -45,7 +46,10 @@ public class SqlUtils {
         try {
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 //Variables types map
-                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(vtlBindings.getDataset(datasetName).getDataStructure());
+                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(
+                        vtlBindings,
+                        datasetName
+                );
                 createDataSQLTables(statement, datasetName, vtlSchema);
                 insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), vtlSchema);
             }
@@ -141,12 +145,31 @@ public class SqlUtils {
 
     /**
      * Extract variable types from a dataset
-     * @param structure the structure of the dataset
+     * @param datasetName the name of the dataset to extract the schema from
+     * @param vtlBindings the bindings where the dataset is from
      * @return a (variable name,type) map
      */
-    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(Structured.DataStructure structure) {
+    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(
+            VtlBindings vtlBindings,
+            String datasetName
+    ) {
+        if(!vtlBindings.getDatasetNames().contains(datasetName)){
+            throw new DatasetNotFoundException();
+        }
+
+        //Get other datasets names
+        Set<String> otherDatasetsNames = new HashSet<>(vtlBindings.getDatasetNames().stream()
+                .filter(bindingDatasetName -> !bindingDatasetName.equals(datasetName))
+                .toList());
+
+        Structured.DataStructure structure = vtlBindings.getDataset(datasetName).getDataStructure();
         LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
-        for (Structured.Component component : structure.values()) {
+        //Exclude loop identifiers
+        for (Structured.Component component : structure.values().stream()
+                .filter(component -> !(otherDatasetsNames.contains(component.getName())
+                        && component.getRole().equals(Dataset.Role.IDENTIFIER)))
+                .toList()
+        ) {
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
             if (type != null){
                 //If column not added yet (ignore case)
