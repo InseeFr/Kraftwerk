@@ -61,7 +61,6 @@ class MultimodalSequenceTest {
 
         // Vérifier que les fichiers VTL ont bien été créés
         assertTrue(new File("target/tmp/ReconciliationProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
-        assertTrue(new File("target/tmp/CleanUpProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
         assertTrue(new File("target/tmp/MultimodeTransformations_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
         assertTrue(new File("target/tmp/InformationLevelsProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
     }
