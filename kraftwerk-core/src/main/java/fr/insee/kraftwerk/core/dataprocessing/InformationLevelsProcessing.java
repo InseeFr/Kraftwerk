@@ -96,6 +96,11 @@ public class InformationLevelsProcessing extends DataProcessing {
 		return vtlScript;
     }
 
+	/**
+	 * Get fixed identifiers (like usualSurveyUnitId, questionnaireState...) from dataset
+	 * @param datasetName Dataset to extract from
+	 * @return fixed identifiers of this.fixedIdentifiers that are in the dataset
+	 */
 	private Set<String> extractFixedIdentifiersFromDataset(String datasetName) {
 		if(!vtlBindings.getDatasetNames().contains(datasetName)){
 			return new HashSet<>();

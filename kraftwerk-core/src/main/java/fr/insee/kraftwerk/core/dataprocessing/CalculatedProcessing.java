@@ -63,7 +63,6 @@ public class CalculatedProcessing extends DataProcessing {
         for (String calculatedName : orderedCalculatedNames) {
             String vtlExpression = calculatedVariables.getVtlExpression(calculatedName);
             if (vtlExpression != null && !vtlExpression.isEmpty()) {
-                //Increment temp bindingName
                 vtlScript.add(String.format("%1$s := %1$s [calc %2$s := %3$s];",
                         bindingName, calculatedName, vtlExpression));
             }
