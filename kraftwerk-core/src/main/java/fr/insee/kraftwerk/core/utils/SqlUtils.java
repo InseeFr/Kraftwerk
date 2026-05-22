@@ -52,6 +52,7 @@ public class SqlUtils {
                 );
                 createDataSQLTables(statement, datasetName, vtlSchema);
                 insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), vtlSchema);
+                deduplicateTable(statement, datasetName);
             }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
@@ -440,4 +441,32 @@ public class SqlUtils {
             log.warn("❌ Can't delete DB File ! \n {}", e.toString());
         }
     }
+
+    /**
+     * Deduplicates the table by the root identifier if root
+     * and by the root identifier + the group identifier if loop
+     * @param statement DuckDB to apply to
+     * @param tableName Name of the dataset/table
+     * @throws SQLException if something went wrong
+     */
+    private static void deduplicateTable(Statement statement, String tableName)
+    throws SQLException{
+        //Dedup by interrogationId if root, by interrogationId and group identifier for loops
+        String dedupColumn = tableName.equals(Constants.ROOT_GROUP_NAME) ?
+            Constants.ROOT_IDENTIFIER_NAME
+                : "%s\",\"%s".formatted(Constants.ROOT_IDENTIFIER_NAME,tableName.replace("\"", ""));
+
+        String sqlScript = """
+                CREATE OR REPLACE TABLE '%1$s' AS
+                SELECT * EXCLUDE (rn)
+                FROM (
+                    SELECT *,
+                    ROW_NUMBER() OVER (PARTITION BY "%2$s" ORDER BY rowid) AS rn
+                    FROM '%1$s'
+                )
+                WHERE rn = 1;
+                """.formatted(tableName.replace("\"", ""), dedupColumn);
+        statement.execute(sqlScript);
+    }
+
 }
