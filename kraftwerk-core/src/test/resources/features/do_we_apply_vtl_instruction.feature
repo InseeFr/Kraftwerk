@@ -16,5 +16,5 @@ Feature: Do we apply a VTL instruction correctly?
     | OUTPUT := COLEMAN [keep LAST_NAME];              | OUTPUT       | 3               |
     | OUTPUT := COLEMAN [calc newinterrogationId := interrogationId];        | OUTPUT       | 19              |
     | OUTPUT := COLEMAN [rename LAST_NAME to Label_1B];| OUTPUT       | 18              |
-    | COLEMAN2 := COLEMAN [drop LAST_NAME];             | COLEMAN2      | 17              |
+    | COLEMAN := COLEMAN [drop LAST_NAME];             | COLEMAN      | 17              |
     
