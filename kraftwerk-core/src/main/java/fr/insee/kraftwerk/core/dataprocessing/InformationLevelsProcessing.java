@@ -68,7 +68,7 @@ public class InformationLevelsProcessing extends DataProcessing {
 			List<String> groupVariableNames = new ArrayList<>(metadataModel.getVariables().getGroupVariableNames(groupName));
 			List<String> groupMeasureNames = groupVariableNames.stream()
 					.map(metadataModel::getFullyQualifiedName).toList();
-			addGroupDatasetVtlScript(bindingName, groupName, groupMeasureNames, fixedIdentifiersInDataset, vtlScript);
+			addGroupDatasetVtlScript(bindingName, groupName, groupMeasureNames, vtlScript);
 
 			// Empty lines are created to produce group level tables and need to be removed
 			vtlScript.add(String.format("%1$s := %1$s [filter %1$s<>\"\"];", groupName));
@@ -149,7 +149,6 @@ public class InformationLevelsProcessing extends DataProcessing {
 	private void addGroupDatasetVtlScript(String multimodeDatasetName,
 	                                      String groupName,
 	                                      List<String> groupMeasureNames,
-										  Set<String> fixedIdentifiersInDataset,
 	                                      VtlScript vtlScript) {
 		StringBuilder groupInstructions = new StringBuilder();
 
@@ -157,10 +156,12 @@ public class InformationLevelsProcessing extends DataProcessing {
 
 		boolean isModeIdentifierPresent =
 				vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
+		boolean isSurveyUnitIdentifierNamePresent =
+				vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
 
-		if(!fixedIdentifiersInDataset.isEmpty()){
-			String fixedIdentifiersVtl = VtlMacros.toVtlSyntax(fixedIdentifiersInDataset);
-			groupInstructions.append(fixedIdentifiersVtl);
+
+		if(isSurveyUnitIdentifierNamePresent){
+			groupInstructions.append(Constants.SURVEY_UNIT_IDENTIFIER_NAME);
 			if(!groupMeasureNames.isEmpty() || isModeIdentifierPresent){
 				groupInstructions.append(", ");
 			}
