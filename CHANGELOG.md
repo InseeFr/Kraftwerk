@@ -1,5 +1,5 @@
 # Changelog
-## 3.16.3 [TODO]
+## 3.16.3 [2026-05-27]
 ### Fixed
 - Run batch as sync to avoid spring context closed
 
