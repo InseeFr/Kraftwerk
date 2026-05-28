@@ -1,7 +1,11 @@
-# Changelog
+ # Changelog
 ## 4.0.0 [TODO]
 ### Updated
 -️ Trevas 2 ⚠ can break old VTL scripts (can't override tables, can't keep/drop identifiers anymore)
+
+## 3.16.3 [2026-05-27]
+### Fixed
+- Run batch as sync to avoid spring context closed
 
 ## 3.16.1 [2026-05-14]
 ### Fixed

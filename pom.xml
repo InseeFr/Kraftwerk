@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.16.2</version>
+	<version>3.16.3</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
@@ -37,7 +37,7 @@
 			**/kraftwerk-functional-tests/**
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.23.1</pitest.version>
+		<pitest.version>1.25.1</pitest.version>
 		<pitest.junit.version>1.2.3</pitest.junit.version>
 	
 	</properties>
