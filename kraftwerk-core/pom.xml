@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>3.16.3</version>
+		<version>3.16.4</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -17,7 +17,7 @@
 	<properties>
 		<trevas.version>2.4.0</trevas.version>
 		<duckdb.version>1.5.3.0</duckdb.version>
-		<bpm.version>1.1.4</bpm.version>
+		<bpm.version>1.1.5</bpm.version>
 	</properties>
 
 
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>12.9</version>
+			<version>13.0</version>
 		</dependency>
 		<!-- XML oriented test dependency -->
 		<!-- https://www.xmlunit.org/ -->

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.16.3</version>
+	<version>3.16.4</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
@@ -37,7 +37,7 @@
 			**/kraftwerk-functional-tests/**
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.25.1</pitest.version>
+		<pitest.version>1.25.3</pitest.version>
 		<pitest.junit.version>1.2.3</pitest.junit.version>
 	
 	</properties>
@@ -158,7 +158,7 @@
 				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
-					<version>5.6.0.6792</version>
+					<version>5.7.0.6970</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
