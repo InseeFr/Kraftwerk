@@ -98,7 +98,7 @@ public class UserInputsFile extends UserInputs {
 			throw new MissingMandatoryFieldException(
 					String.format("Mandatory field \"%s\" missing in the input file given", field));
 		}
-		log.info(String.format("Optional field \"%s\" missing in the input file given", field));
+		log.info("Optional field \"{}\" missing in the input file given", field);
 		return null;
 	}
 

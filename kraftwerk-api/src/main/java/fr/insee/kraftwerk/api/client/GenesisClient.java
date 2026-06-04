@@ -37,19 +37,13 @@ public class GenesisClient {
 
 
     @Autowired
-    public GenesisClient(RestClient.Builder restClientBuilder, ConfigProperties configProperties) {
+    public GenesisClient(ConfigProperties configProperties) {
         this.configProperties = configProperties;
         OidcService oidcService = new OidcService(configProperties);
 
-        this.restClient = restClientBuilder
+        this.restClient = RestClient.builder()
                 .requestInterceptor(new GenesisAuthInterceptor(oidcService))
                 .build();
-    }
-
-	//Constructors used for tests
-    public GenesisClient(ConfigProperties configProperties) {
-        this.restClient = null;
-        this.configProperties = configProperties;
     }
 
     public GenesisClient(RestTemplate restTemplateForTest, ConfigProperties configProperties) {

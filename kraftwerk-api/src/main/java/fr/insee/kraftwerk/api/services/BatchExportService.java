@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -117,7 +116,7 @@ public class BatchExportService extends KraftwerkService {
 
         return new MainProcessingGenesisNew(
                 configProperties,
-                new GenesisClient(RestClient.builder(), configProperties),
+                new GenesisClient(configProperties),
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
