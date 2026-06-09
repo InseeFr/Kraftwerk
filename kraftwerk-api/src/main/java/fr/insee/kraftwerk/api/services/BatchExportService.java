@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.dto.BatchResponseDto;
 import fr.insee.kraftwerk.api.dto.ExportCheckResultDto;
+import fr.insee.kraftwerk.api.exceptions.BatchExecutionFailedException;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
@@ -41,6 +42,7 @@ public class BatchExportService extends KraftwerkService {
     private final InMemoryExportJobStore exportJobStore;
     private final OutputZipService outputZipService;
 
+    private static final String BATCH_RESPONSE_LOG = "Batch response: {}";
 
     private MinioClient minioClient;
     private boolean useMinio;
@@ -171,13 +173,13 @@ public class BatchExportService extends KraftwerkService {
             }
 
             BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
-            log.info("Batch response: {}", response);
+            log.info(BATCH_RESPONSE_LOG, response);
             return response;
 
         } catch (KraftwerkException e) {
             log.error("Batch legacy export failed for input directory {}", inDirectoryParam, e);
             exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
+            throw new BatchExecutionFailedException(e);
         }
     }
 
@@ -283,12 +285,12 @@ public class BatchExportService extends KraftwerkService {
             exportJobStore.complete(jobId, result, errors);
 
             BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
-            log.info("Batch response: {}", response);
+            log.info(BATCH_RESPONSE_LOG, response);
             return response;
 
         } catch (KraftwerkException | IOException e) {
             exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
+            throw new BatchExecutionFailedException(e);
         }
     }
 
@@ -316,7 +318,7 @@ public class BatchExportService extends KraftwerkService {
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
             BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
-            log.info("Batch response: {}", response);
+            log.info(BATCH_RESPONSE_LOG, response);
             return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
