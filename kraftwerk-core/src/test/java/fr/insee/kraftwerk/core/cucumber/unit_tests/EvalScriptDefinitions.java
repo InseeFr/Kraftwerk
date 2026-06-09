@@ -10,12 +10,10 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import lombok.extern.slf4j.Slf4j;
 
 import static org.junit.Assert.assertEquals;
 
 // Used in do_we_apply_vtl_instruction and do_we_apply_vtl_script
-@Slf4j
 public class EvalScriptDefinitions {
 	public VtlBindings vtlBindings = new VtlBindings();
 	

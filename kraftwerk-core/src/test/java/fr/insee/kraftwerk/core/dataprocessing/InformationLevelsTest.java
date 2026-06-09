@@ -11,7 +11,6 @@ import fr.insee.kraftwerk.core.TestConstants;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import fr.insee.kraftwerk.core.Constants;
@@ -20,7 +19,6 @@ import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.InMemoryDataset;
 
-@Slf4j
 class InformationLevelsTest {
 	private final FileUtilsInterface fileUtilsInterface = new FileSystemImpl(TestConstants.TEST_RESOURCES_DIRECTORY);
 	private final String rootId = Constants.ROOT_IDENTIFIER_NAME;
@@ -69,17 +67,17 @@ class InformationLevelsTest {
 		//
 		assertNotNull(rootDataset);
 		assertNotNull(loopDataset);
-		// We have to keep the LOOP identifier since VTL 2
-		assertEquals(Set.of(rootId, "LOOP", "FOO"),
+		//
+		assertEquals(Set.of(rootId, "FOO"),
 				rootDataset.getDataStructure().keySet());
 		assertEquals(Set.of(rootId, "LOOP", "FOO1"),
 				loopDataset.getDataStructure().keySet());
 		//
-		assertEquals(3, rootDataset.getDataPoints().size());
+		assertEquals(2, rootDataset.getDataPoints().size());
 		assertEquals("T01", rootDataset.getDataPoints().get(0).get(rootId));
 		assertEquals("foo1", rootDataset.getDataPoints().get(0).get("FOO"));
-		assertEquals("T02", rootDataset.getDataPoints().get(2).get(rootId));
-		assertEquals("foo2", rootDataset.getDataPoints().get(2).get("FOO"));
+		assertEquals("T02", rootDataset.getDataPoints().get(1).get(rootId));
+		assertEquals("foo2", rootDataset.getDataPoints().get(1).get("FOO"));
 		//
 		assertEquals(3, loopDataset.getDataPoints().size());
 		assertEquals("T01", loopDataset.getDataPoints().get(0).get(rootId));
@@ -113,18 +111,17 @@ class InformationLevelsTest {
 		//
 		assertNotNull(rootDataset);
 		assertNotNull(loopDataset);
-		// We have to keep the LOOP identifier since VTL 2
-		// TODO Think about adding loop identifier as measure (fr/insee/kraftwerk/core/vtl/VtlJsonDatasetWriter.java:148)
-		assertEquals(Set.of(rootId, "LOOP", "FOO"),
+		//
+		assertEquals(Set.of(rootId, "FOO"),
 				rootDataset.getDataStructure().keySet());
 		assertEquals(Set.of(rootId, "LOOP", "FOO1"),
 				loopDataset.getDataStructure().keySet());
 		//
-		assertEquals(3, rootDataset.getDataPoints().size());
+		assertEquals(2, rootDataset.getDataPoints().size());
 		assertEquals("T01", rootDataset.getDataPoints().get(0).get(rootId));
 		assertEquals("foo1", rootDataset.getDataPoints().get(0).get("FOO"));
-		assertEquals("T02", rootDataset.getDataPoints().get(2).get(rootId));
-		assertEquals("foo2", rootDataset.getDataPoints().get(2).get("FOO"));
+		assertEquals("T02", rootDataset.getDataPoints().get(1).get(rootId));
+		assertEquals("foo2", rootDataset.getDataPoints().get(1).get("FOO"));
 		//
 		assertEquals(2, loopDataset.getDataPoints().size());
 		assertEquals("T01", loopDataset.getDataPoints().get(0).get(rootId));
