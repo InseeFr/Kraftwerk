@@ -235,8 +235,13 @@ public class OutputZipService {
             try {
                 Files.deleteIfExists(path);
                 return;
-            } catch (IOException e) {
-                try { Thread.sleep(80L); } catch (InterruptedException ignored) {}
+            } catch (IOException _) {
+                try {
+                    Thread.sleep(80L);
+                }
+                catch (InterruptedException _) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
         path.toFile().deleteOnExit();
