@@ -51,20 +51,37 @@ public class GenesisClient {
         this.configProperties = configProperties;
     }
 
-    private <T, R> ResponseEntity<R> makeApiCall(String url, HttpMethod method, T requestBody, Class<R> responseType)
-            throws KraftwerkException {
+    private <T, R> ResponseEntity<R> makeApiCall(
+            String url,
+            HttpMethod method,
+            T requestBody,
+            Class<R> responseType
+    ) throws KraftwerkException {
         try {
-            return restClient
+            var request = restClient
                     .method(method)
-                    .uri(url)
-                    .body(requestBody)          // null-safe : ignoré si requestBody est null
+                    .uri(url);
+
+            if (requestBody != null) {
+                request.body(requestBody);
+            }
+
+            if (responseType == null || responseType == Void.class) {
+                return (ResponseEntity<R>) request
+                        .retrieve()
+                        .toBodilessEntity();
+            }
+
+            return request
                     .retrieve()
                     .toEntity(responseType);
 
         } catch (RestClientResponseException e) {
             HttpStatusCode statusCode = e.getStatusCode();
             throw new KraftwerkException(500, String.format(
-                    "Unable to reach Genesis API, http code received : %d", statusCode.value()));
+                    "Unable to reach Genesis API, http code received : %d",
+                    statusCode.value()
+            ));
         }
     }
 
@@ -153,7 +170,7 @@ public class GenesisClient {
 	public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel) throws KraftwerkException {
 		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
 				configProperties.getGenesisUrl(), questionnaireId, mode);
-		makeApiCall(url,HttpMethod.POST,metadataModel,null);
+		makeApiCall(url,HttpMethod.POST,metadataModel, Void.class);
 	}
 
 	public void saveDateExtraction(String collectionInstrumentId, Mode mode, LastJsonExtractionDate lastJsonExtractionDate) throws KraftwerkException {
@@ -162,7 +179,7 @@ public class GenesisClient {
 		if (mode != null) {
 			url += "?mode=" + mode;
 		}
-		makeApiCall(url,HttpMethod.PUT,lastJsonExtractionDate,null);
+		makeApiCall(url,HttpMethod.PUT,lastJsonExtractionDate, Void.class);
 	}
 
 	public LastJsonExtractionDate getLastExtractionDate(String collectionInstrumentId, Mode mode) throws KraftwerkException {

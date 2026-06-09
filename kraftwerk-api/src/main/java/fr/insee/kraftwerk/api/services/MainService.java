@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.api.services;
 
 
+import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.configuration.VaultConfig;
@@ -56,16 +57,18 @@ public class MainService extends KraftwerkService {
     InMemoryExportJobStore exportJobStore;
     private final Clock clock;
     private final OutputZipService outputZipService;
+    private final GenesisClient genesisClient;
 
 
 
     @Autowired
-    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock, OutputZipService outputZipService) {
+    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock, OutputZipService outputZipService, GenesisClient genesisClient) {
         super(configProperties, minioConfig);
         this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
         this.clock = clock;
         this.outputZipService = outputZipService;
+        this.genesisClient = genesisClient;
         this.minioConfig = minioConfig;
         this.vaultConfig = vaultConfig;
         this.exportJobStore = exportJobStore;
@@ -434,7 +437,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisNew(
                 configProperties,
-                mainAsyncService.client,
+                genesisClient,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
