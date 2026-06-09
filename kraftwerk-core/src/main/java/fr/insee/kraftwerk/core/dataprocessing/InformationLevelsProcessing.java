@@ -123,25 +123,16 @@ public class InformationLevelsProcessing extends DataProcessing {
 				multimodeDatasetName
 		));
 
-		boolean isModeIdentifierPresent = vtlBindings.getDatasetNames().contains(multimodeDatasetName)
-				&& vtlBindings.getDataset(multimodeDatasetName).getMeasureNames().contains(MODE_VARIABLE_NAME);
-
 		if(!fixedIdentifiersInDataset.isEmpty()){
 			String fixedIdentifiersVtl = VtlMacros.toVtlSyntax(fixedIdentifiersInDataset);
 			rootInstructions.append(fixedIdentifiersVtl);
-			if(!rootVariableNames.isEmpty() || isModeIdentifierPresent){
+			if(!rootVariableNames.isEmpty()){
 				rootInstructions.append(", ");
 			}
 		}
 		if(!rootVariableNames.isEmpty()){
 			String rootMeasuresVtl = VtlMacros.toVtlSyntax(rootVariableNames);
 			rootInstructions.append(rootMeasuresVtl);
-			if(isModeIdentifierPresent){
-				rootInstructions.append(", ");
-			}
-		}
-		if(isModeIdentifierPresent){
-			rootInstructions.append(MODE_VARIABLE_NAME);
 		}
 		rootInstructions.append(" ];");
 		vtlScript.add(rootInstructions.toString());
