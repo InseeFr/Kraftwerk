@@ -1,7 +1,6 @@
 package fr.insee.kraftwerk.core.vtl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.vtl.engine.exceptions.CastException;
 import fr.insee.vtl.jackson.TrevasModule;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.InMemoryDataset;
@@ -35,7 +34,7 @@ class TrevasTests {
         bindings.put("ds", dataset);
         //
         String expression = """
-                ds1 := ds [calc S2_MAA1AT := if (not(isnull(S2_MAA2AT))
+                ds := ds [calc S2_MAA1AT := if (not(isnull(S2_MAA2AT))
                 and isnull(S2_MAA2ATC) and isnull(S2_MAA3AT) )
                 then S2_MAA2AT else (if (not(isnull(S2_MAA2AT))
                 and not(isnull(S2_MAA2ATC)) and isnull(S2_MAA3AT) )
@@ -55,7 +54,7 @@ class TrevasTests {
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
         //
-        assertThrows(CastException.class, () -> engine.eval(expression));
+        assertThrows(NumberFormatException.class, () -> engine.eval(expression));
         //
         //assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("S2_MAA1AT"));
     }
@@ -79,13 +78,13 @@ class TrevasTests {
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
         //
-        engine.eval("ds1 := ds [calc FOO_NUM := cast(FOO, integer)];");
+        engine.eval("ds := ds [calc FOO_NUM := cast(FOO, integer)];");
 
         //
-        assertTrue(((Dataset) bindings.get("ds1")).getDataStructure().containsKey("FOO_NUM"));
-        assertEquals(9L, ((Dataset) bindings.get("ds1")).getDataPoints().get(0).get("FOO_NUM"));
-        assertEquals(8L, ((Dataset) bindings.get("ds1")).getDataPoints().get(1).get("FOO_NUM"));
-        assertEquals(101L, ((Dataset) bindings.get("ds1")).getDataPoints().get(2).get("FOO_NUM"));
+        assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("FOO_NUM"));
+        assertEquals(9L, ((Dataset) bindings.get("ds")).getDataPoints().get(0).get("FOO_NUM"));
+        assertEquals(8L, ((Dataset) bindings.get("ds")).getDataPoints().get(1).get("FOO_NUM"));
+        assertEquals(101L, ((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO_NUM"));
     }
 
     @Test
@@ -107,12 +106,12 @@ class TrevasTests {
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
         //
-        engine.eval("ds1 := ds [calc FOO := if FOO=\"9\" then \"5\" else FOO];");
+        engine.eval("ds := ds [calc FOO := if FOO=\"9\" then \"5\" else FOO];");
 
         //
-        assertTrue(((Dataset) bindings.get("ds1")).getDataStructure().containsKey("FOO"));
-        assertEquals("5", ((Dataset) bindings.get("ds1")).getDataPoints().get(0).get("FOO"));
-        assertEquals("8", ((Dataset) bindings.get("ds1")).getDataPoints().get(1).get("FOO"));
-        assertEquals("7", ((Dataset) bindings.get("ds1")).getDataPoints().get(2).get("FOO"));
+        assertTrue(((Dataset) bindings.get("ds")).getDataStructure().containsKey("FOO"));
+        assertEquals("5", ((Dataset) bindings.get("ds")).getDataPoints().get(0).get("FOO"));
+        assertEquals("8", ((Dataset) bindings.get("ds")).getDataPoints().get(1).get("FOO"));
+        assertEquals("7", ((Dataset) bindings.get("ds")).getDataPoints().get(2).get("FOO"));
     }
 }

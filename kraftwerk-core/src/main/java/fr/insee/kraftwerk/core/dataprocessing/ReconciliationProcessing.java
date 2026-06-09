@@ -1,5 +1,6 @@
 package fr.insee.kraftwerk.core.dataprocessing;
 
+import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
@@ -9,13 +10,7 @@ import fr.insee.vtl.model.Dataset.Role;
 import fr.insee.vtl.model.Structured;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -30,7 +25,7 @@ public class ReconciliationProcessing extends DataProcessing {
 			KraftwerkExecutionContext kraftwerkExecutionContext
 	) {
 		super(vtlBindings, fileUtilsInterface, kraftwerkExecutionContext);
-		this.modeVariableIdentifier = MODE_VARIABLE_NAME;
+		this.modeVariableIdentifier = Constants.MODE_VARIABLE_NAME;
 	}
 
 	/** Return processing instance with mode variable name given. */
@@ -77,7 +72,7 @@ public class ReconciliationProcessing extends DataProcessing {
 
 	}
 
-	private VtlScript severalModesInstructions(String multimodeBindingName)  {
+	private VtlScript severalModesInstructions(String bindingName)  {
 
 		/*
 		 * The idea of the generated vtl instructions is as follows :
@@ -92,109 +87,90 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		VtlScript vtlScript = new VtlScript();
 
+		// Identifiers
+		Set<String> identifiers = getIdentifiers();
+
 		// Add mode identifier (as measure for now)
 		for (String datasetName : vtlBindings.getDatasetNames()) {
 			vtlScript.add(createModeIdentifier(datasetName));
 		}
 
-		// Get the common measures between all datasets
-		Set<String> commonMeasuresAllDatasets = getCommonMeasures();
-		
-		// Cast Integer into Number to ensure numerical measures have the same type
-		addCastToNumberScripts(commonMeasuresAllDatasets, vtlScript);
+		// Get the common measures
+		Set<String> commonMeasures = getCommonMeasures();
 
-		// List of all common variables (measures) in the vtl syntax
-		// Since VTL 2.1.0 we cannot use identifiers in keep/drop
-		String vtlCommonVariablesAllDatasets = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
+
+		// Cast Integer into Number to ensure numerical measure have the same type
+		for (String datasetName : vtlBindings.getDatasetNames()) {
+			for (String measure : commonMeasures){
+				if (vtlBindings.getMeasureType(datasetName,measure).equals("integer")){
+					vtlScript.add(String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",datasetName, measure));
+				}
+			}
+		}
+
+		commonMeasures.add(modeVariableIdentifier);
+
+		// List of all common variables (identifiers + measures) in the vtl syntax
+		String vtlCommonVariables = VtlMacros.toVtlSyntax(mergeSets(identifiers, commonMeasures));
 
 		// Instantiate the multimodal dataset with the first dataset that comes
-		// and only the common variables between all unimode datasets
 		List<String> unimodalDatasetNames = vtlBindings.getDatasetNames();
 		String firstDatasetName = unimodalDatasetNames.getFirst();
 		vtlScript.add(String.format("%s := %s [keep %s];",
-				multimodeBindingName,
-				firstDatasetName,
-				vtlCommonVariablesAllDatasets));
+				bindingName, firstDatasetName, vtlCommonVariables));
 
-		// Concatenate the remaining datasets using union
-		for (String modeDatasetName : unimodalDatasetNames) {
-			String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasuresAllDatasets);
-			vtlScript.add(String.format("%1$s := union(%1$s, %2$s [keep %3$s]);",
-					multimodeBindingName,
-					modeDatasetName,
-					vtlCommonVariables));
+		// Concatenate the remaining datasets
+		for (int k = 1; k < unimodalDatasetNames.size(); k++) {
+			String datasetName = unimodalDatasetNames.get(k);
+			vtlScript.add(String.format("%s := union(%s, %s [keep %s]);",
+					bindingName, bindingName, datasetName, vtlCommonVariables));
 		}
 
-		Map<String, String> addedVariablesNamesAndType = new HashMap<>();
-		// Get back variables that are not common between all datasets
-		for (String modeDatasetName : unimodalDatasetNames) {
-			Set<String> modeMeasures = new HashSet<>(vtlBindings.getDataset(modeDatasetName).getMeasureNames());
-
-			//Get variables already present both in mode and multimodal DS
-			Set<String> commonMeasures = getCommonElements(List.of(modeMeasures, addedVariablesNamesAndType.keySet()));
-			commonMeasures.addAll(commonMeasuresAllDatasets);
-
-			if(!commonMeasures.isEmpty()) {
-				//Calc variables present in multimode but not in mode
-				Set<String> multimodeMeasuresToCalc = getAbsentElements(
-					addedVariablesNamesAndType.keySet(),
-					modeMeasures
-				);
-				if(!multimodeMeasuresToCalc.isEmpty()) {
-					vtlScript.add(getCalcEmptyVariablesScript(
-									modeDatasetName,
-									multimodeMeasuresToCalc,
-									addedVariablesNamesAndType));
-				}
-				commonMeasures.addAll(multimodeMeasuresToCalc);
-
-				//Union on common variables
-				String vtlCommonVariables = VtlMacros.toVtlSyntax(commonMeasures);
-				vtlScript.add(String.format("%1$s := union(%1$s, %2$s [keep %3$s]);",
-						multimodeBindingName,
-						modeDatasetName,
-						vtlCommonVariables));
-			}
+		// Get back variables that are not common with left joins
+		for (String datasetName : unimodalDatasetNames) {
 
 			// Get the other variables
-			Set<String> allCommonVariables = new HashSet<>(commonMeasuresAllDatasets);
-			allCommonVariables.addAll(addedVariablesNamesAndType.keySet());
-			Set<String> variablesToAdd = getAbsentElements(modeMeasures, allCommonVariables);
+			Set<String> otherVariables = getOtherVariables(datasetName, commonMeasures);
 
-			if (!variablesToAdd.isEmpty()) {
-				String vtlOtherVariables = VtlMacros.toVtlSyntax(variablesToAdd);
+			if (!otherVariables.isEmpty()) {
+				String vtlOtherVariables = VtlMacros.toVtlSyntax(otherVariables);
 
 				// Keep on the dataset to be joined
-				vtlScript.add(String.format("%1$s_keep := %1$s [keep %2$s];",
-						modeDatasetName,
-						vtlOtherVariables));
+				vtlScript.add(String.format("%s_keep := %s [keep %s];",
+						datasetName, datasetName, vtlOtherVariables));
 
 				// Join
-				vtlScript.add(String.format("%1$s := left_join(%1$s, %2$s_keep);",
-						multimodeBindingName, modeDatasetName));
-
-				for(String variableToAdd : variablesToAdd){
-					addedVariablesNamesAndType.put(variableToAdd,
-							vtlBindings.getMeasureType(modeDatasetName, variableToAdd));
-				}
+				vtlScript.add(String.format("%s := left_join(%s, %s_keep);",
+						bindingName, bindingName, datasetName));
 			}
 		}
 
 		// Set mode identifier role
-		vtlScript.add(String.format("%1$s := %1$s [calc identifier %2$s := %2$s];",
-				multimodeBindingName, modeVariableIdentifier));
+		vtlScript.add(String.format("%s := %s [calc identifier %s := %s];",
+				bindingName, bindingName, modeVariableIdentifier, modeVariableIdentifier));
 
 		return vtlScript;
 	}
 
-	/**
-	 * Creates the mode identifier into the mode dataset
-	 * @return the VTL script that creates that identifier into a temp dataset
-	 */
 	private String createModeIdentifier(String modeName) {
-		return String.format("%1$s := %1$s [calc %2$s := \"%1$s\"];",
-				modeName,
-				modeVariableIdentifier);
+		return String.format("%s := %s [calc %s := \"%s\"];",
+				modeName, modeName, modeVariableIdentifier, modeName);
+	}
+
+
+	/** Return a set containing identifiers variable names that are in the bindings datasets. */
+	public Set<String> getIdentifiers() {
+
+		Set<String> identifiers = new TreeSet<>();
+
+		for (String datasetName : vtlBindings.keySet()) {
+			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
+			identifiers.addAll( dataStructure.keySet()
+					.stream()
+					.filter(name -> dataStructure.get(name).getRole() == Role.IDENTIFIER)
+					.collect(Collectors.toSet()) );
+		}
+		return identifiers;
 	}
 
 	/** Return a set containing variable names that are common to each dataset in the bindings. */
@@ -204,56 +180,30 @@ public class ReconciliationProcessing extends DataProcessing {
 
 		for (String datasetName : vtlBindings.keySet()) {
 			Structured.DataStructure dataStructure = vtlBindings.getDataset(datasetName).getDataStructure();
-			Set<String> variableNames = dataStructure.keySet()
-					.stream()
-					.filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)
-					.collect(Collectors.toCollection(HashSet::new));
-			variableNames.add(modeVariableIdentifier);
-			variableNamesList.add(variableNames);
+			variableNamesList.add( dataStructure.keySet()
+					.stream().filter(name -> dataStructure.get(name).getRole() == Role.MEASURE)
+					.collect(Collectors.toSet()) );
 		}
+
 		return getCommonElements(variableNamesList);
 	}
 
 	/**
-	 * Adds scripts to cast integers to numbers for given measures on ALL datasets
-	 * @param measureNames measures to affect
-	 * @param vtlScript list of VTL scripts to add to
+	 * Return a variables map containing variables of a dataset that aren't in some
+	 * (unimodal) datasets that are in the bindings.
+	 *
+	 * @param datasetName The name of the dataset.
+	 *
+	 * @return A VariablesMap object
 	 */
-	private void addCastToNumberScripts(Set<String> measureNames, VtlScript vtlScript) {
-		for (String datasetName : vtlBindings.getDatasetNames()) {
-			for (String measure : measureNames){
-				if (
-						vtlBindings.getDataset(datasetName).getMeasureNames().contains(measure)
-								&& vtlBindings.getMeasureType(datasetName, measure).equals("integer")
-				) {
-					vtlScript.add(
-							String.format("%1$s := %1$s [calc %2$s := cast(%2$s,number)];",
-									datasetName, measure)
-					);
-				}
+	private Set<String> getOtherVariables(String datasetName, Set<String> variablesSet) {
+		Set<String> otherVariables = new TreeSet<>();
+		for (String variableName : vtlBindings.getDataset(datasetName).getDataStructure().keySet()) {
+			if(! variablesSet.contains(variableName)) {
+				otherVariables.add(variableName);
 			}
 		}
-	}
-
-	/**
-	 * Return a set containing Strings that are NOT in the second one
-	 *
-	 * @param sourceSet The name of the source set.
-	 * @param comparedSet Second set to compare from
-	 *
-	 * @return A set of string that are in the first one but not in the second set
-	 */
-	private Set<String> getAbsentElements(
-			Set<String> sourceSet,
-			Set<String> comparedSet
-	) {
-		Set<String> absentStrings = new TreeSet<>();
-		for(String element : sourceSet){
-			if(!comparedSet.contains(element)){
-				absentStrings.add(element);
-			}
-		}
-		return absentStrings;
+		return otherVariables;
 	}
 
 	/**
@@ -280,32 +230,14 @@ public class ReconciliationProcessing extends DataProcessing {
 		return intersection;
 	}
 
-	/**
-	 * @param modeDatasetName Dataset to add to
-	 * @param multimodeMeasuresToCalc Measures to add empty value
-	 * @param variablesNamesAndType A map containing the types of the multimode measures to calc (used in cast)
-	 * @return a VTL script that adds empty measures to a map
-	 */
-	private String getCalcEmptyVariablesScript(String modeDatasetName,
-	                                           Set<String> multimodeMeasuresToCalc,
-	                                           Map<String, String> variablesNamesAndType) {
-		if(multimodeMeasuresToCalc.isEmpty()){
-			return null;
+	/** Merge all sets given in the result set. Given sets are not modified. */
+	@SafeVarargs
+	private Set<String> mergeSets(Set<String> set1, Set<String>... sets) {
+		Set<String> res = new HashSet<>(Set.copyOf(set1));
+		for (Set<String> set : sets) {
+			res.addAll(set);
 		}
-
-		StringBuilder stringBuilder = new StringBuilder("%1$s := %1$s [calc ".formatted(
-				modeDatasetName
-		));
-		for(String multimodeMeasure : multimodeMeasuresToCalc
-		){
-			stringBuilder.append("%s := cast(null, ".formatted(multimodeMeasure));
-			String multimodeMeasureType = variablesNamesAndType.get(multimodeMeasure);
-			stringBuilder.append("%s), ".formatted(multimodeMeasureType));
-		}
-		//Delete last ", " and replace with "];"
-		stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
-		stringBuilder.append("];");
-
-		return stringBuilder.toString();
+		return res;
 	}
+
 }

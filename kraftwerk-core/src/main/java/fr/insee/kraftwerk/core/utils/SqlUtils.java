@@ -3,7 +3,6 @@ package fr.insee.kraftwerk.core.utils;
 import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.kraftwerk.core.Constants;
 import fr.insee.kraftwerk.core.errors.DuckDBError;
-import fr.insee.kraftwerk.core.exceptions.DatasetNotFoundException;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import fr.insee.vtl.model.Dataset;
 import fr.insee.vtl.model.Structured;
@@ -46,13 +45,9 @@ public class SqlUtils {
         try {
             for (String datasetName : vtlBindings.getDatasetNames()) {
                 //Variables types map
-                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(
-                        vtlBindings,
-                        datasetName
-                );
+                LinkedHashMap<String, VariableType> vtlSchema = extractSchemaFromDataset(vtlBindings.getDataset(datasetName).getDataStructure());
                 createDataSQLTables(statement, datasetName, vtlSchema);
                 insertDataIntoTable(statement, datasetName, vtlBindings.getDataset(datasetName), vtlSchema);
-                deduplicateTable(statement, datasetName);
             }
         } catch (SQLException e) {
             log.error("SQL Error during VTL bindings conversion :\n{}",e.toString());
@@ -146,31 +141,12 @@ public class SqlUtils {
 
     /**
      * Extract variable types from a dataset
-     * @param datasetName the name of the dataset to extract the schema from
-     * @param vtlBindings the bindings where the dataset is from
+     * @param structure the structure of the dataset
      * @return a (variable name,type) map
      */
-    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(
-            VtlBindings vtlBindings,
-            String datasetName
-    ) {
-        if(!vtlBindings.getDatasetNames().contains(datasetName)){
-            throw new DatasetNotFoundException();
-        }
-
-        //Get other datasets names
-        Set<String> otherDatasetsNames = new HashSet<>(vtlBindings.getDatasetNames().stream()
-                .filter(bindingDatasetName -> !bindingDatasetName.equals(datasetName))
-                .toList());
-
-        Structured.DataStructure structure = vtlBindings.getDataset(datasetName).getDataStructure();
+    private static LinkedHashMap<String, VariableType> extractSchemaFromDataset(Structured.DataStructure structure) {
         LinkedHashMap<String, VariableType> schema = new LinkedHashMap<>();
-        //Exclude loop identifiers
-        for (Structured.Component component : structure.values().stream()
-                .filter(component -> !(otherDatasetsNames.contains(component.getName())
-                        && component.getRole().equals(Dataset.Role.IDENTIFIER)))
-                .toList()
-        ) {
+        for (Structured.Component component : structure.values()) {
             VariableType type = VariableType.getTypeFromJavaClass(component.getType());
             if (type != null){
                 //If column not added yet (ignore case)
@@ -440,59 +416,5 @@ public class SqlUtils {
         } catch (IOException e){
             log.warn("❌ Can't delete DB File ! \n {}", e.toString());
         }
-    }
-
-    /**
-     * Deduplicates the table by the root identifier if root
-     * and by the root identifier + the group identifier if loop
-     * @param statement DuckDB to apply to
-     * @param tableName Name of the dataset/table
-     * @throws SQLException if something went wrong
-     */
-    private static void deduplicateTable(Statement statement, String tableName)
-    throws SQLException{
-        //Dedup by interrogationId if root, by interrogationId and group identifier for loops
-        Set<String> dedupColumns = tableName.equals(Constants.ROOT_GROUP_NAME) ?
-            Set.of(Constants.ROOT_IDENTIFIER_NAME)
-            : Set.of(Constants.ROOT_IDENTIFIER_NAME, tableName.replace("\"", "")); //Remove " to avoid injection
-
-        //Don't dedup if columns are not present
-        if(!new HashSet<>(getColumnNames(statement, tableName)).containsAll(dedupColumns)){
-            return;
-        }
-
-        String dedupColumnsString = getDedupColumnsString(dedupColumns);
-        String sqlScript = """
-                CREATE OR REPLACE TABLE '%1$s' AS
-                SELECT * EXCLUDE (rn)
-                FROM (
-                    SELECT *,
-                    ROW_NUMBER() OVER (PARTITION BY %2$s ORDER BY rowid) AS rn
-                    FROM '%1$s'
-                )
-                WHERE rn = 1;
-                """.formatted(tableName.replace("\"", ""), dedupColumnsString);
-        statement.execute(sqlScript);
-    }
-
-    private static String getDedupColumnsString(Set<String> dedupColumns) {
-        return dedupColumns.size() == 1 && dedupColumns.contains(Constants.ROOT_IDENTIFIER_NAME) ?
-                "\"%s\"".formatted(Constants.ROOT_IDENTIFIER_NAME)
-                : getDedupColumnsForLoop(dedupColumns);
-
-    }
-
-    private static String getDedupColumnsForLoop(Set<String> dedupColumns) {
-        StringBuilder dedupColumnsStringBuilder = new StringBuilder();
-        for(String dedupColumn : dedupColumns){
-            dedupColumnsStringBuilder.append("\"");
-            dedupColumnsStringBuilder.append(dedupColumn);
-            dedupColumnsStringBuilder.append("\",");
-        }
-        dedupColumnsStringBuilder.delete(
-                dedupColumnsStringBuilder.length() - 1
-                , dedupColumnsStringBuilder.length()
-        );
-        return dedupColumnsStringBuilder.toString();
     }
 }
