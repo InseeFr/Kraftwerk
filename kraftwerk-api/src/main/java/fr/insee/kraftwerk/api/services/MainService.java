@@ -413,7 +413,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisLegacy(
                 configProperties,
-                mainAsyncService.client,
+                genesisClient,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
