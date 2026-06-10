@@ -13,6 +13,7 @@ import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
 import fr.insee.kraftwerk.api.services.async.MainAsyncService;
+import fr.insee.kraftwerk.api.utils.DateTimeUtils;
 import fr.insee.kraftwerk.core.data.model.Mode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -275,11 +277,32 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @Parameter(description = "Extract since") @RequestParam(value = "sinceDate",required = false) Instant since,
-            @Parameter(description = "${param.withEncryption}")
+            @Parameter(
+                    description = "Extract since in France local time (Europe/Paris)",
+                    example = "2026-06-10T14:00:00"
+            )
+            @RequestParam(value = "localSinceDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime localSinceDate,
             @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @Parameter(description = "${param.addStates}") @RequestParam(value = "addStates", defaultValue = "false") boolean addStates
-    ){
-        log.info("START jsonExtraction collectionInstrumentId={} batchSize={} since={}", collectionInstrumentId, batchSize, since);
+    ) {
+        Instant resolvedSince;
+
+        try {
+            resolvedSince = DateTimeUtils.resolveInstant(since, localSinceDate);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        log.info(
+                "START jsonExtraction collectionInstrumentId={} batchSize={} sinceUtc={} localSinceDate={}",
+                collectionInstrumentId,
+                batchSize,
+                resolvedSince,
+                localSinceDate
+        );
+
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
 
@@ -290,7 +313,7 @@ public class MainService extends KraftwerkService {
                 addStates
         );
         try {
-            boolean hasProcessed = mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
+            boolean hasProcessed = mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, resolvedSince);
             log.info("END jsonExtraction collectionInstrumentId={} status={}", collectionInstrumentId, hasProcessed ? "PROCESSED" : "NO_DATA");
             if (!hasProcessed) {
                 return ResponseEntity.noContent().build();
@@ -299,13 +322,17 @@ public class MainService extends KraftwerkService {
                     mpGenesis.getKraftwerkExecutionContext(),
                     fileUtilsInterface
             );
-		} catch (KraftwerkException e) {
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
-	}
+        } catch (KraftwerkException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(String.format(
+                "Data extracted for collectionInstrumentId %s",
+                collectionInstrumentId
+        ));
+    }
 
     @GetMapping(value ="/json/replay")
     @Operation(operationId = "jsonExtractionReplay",
@@ -316,21 +343,49 @@ public class MainService extends KraftwerkService {
             @Parameter(description = "${param.dataMode}") @RequestParam(required = false) Mode dataMode,
             @Parameter(description = "${param.batchSize}") @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(description = "Extract since",
+            @Parameter(description = "Extract since in UTC",
                     schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T00:00:00Z")
             )
-            @RequestParam(value = "sinceDate",required = true) Instant start,
+            @RequestParam(value = "sinceDate",required = false) Instant start,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(description = "Extract until",
+            @Parameter(description = "Extract since in Europe/Paris timezone",
+                    schema = @Schema(type = "string", format = "date-time", example = "2026-01-01T01:00:00")
+            )
+            @RequestParam(value = "localSinceDate", required = false) LocalDateTime localStart,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(description = "Extract until in UTC",
                     schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T00:00:00Z")
             )
             @RequestParam(value = "untilDate",required = false) Instant end,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(description = "Extract until in Europe/Paris timezone", schema = @Schema(type = "string", format = "date-time", example = "2026-02-02T01:00:00")
+            )
+            @RequestParam(value = "localUntilDate", required = false)
+            LocalDateTime localEnd,
             @Parameter(description = "${param.withEncryption}")
             @RequestParam(value = "withEncryption", defaultValue = "false") boolean withEncryption,
             @Parameter(description = "${param.addStates}")
             @RequestParam(value = "addStates", defaultValue = "false")
             boolean addStates
-    ){
+    ) {
+        Instant resolvedStart,resolvedEnd;
+        try {
+            resolvedStart = DateTimeUtils.resolveRequiredInstant(
+                    start,
+                    localStart,
+                    "sinceDate",
+                    "localSinceDate"
+            );
+
+            resolvedEnd = DateTimeUtils.resolveInstant(
+                    end,
+                    localEnd
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         boolean withDDI = true;
 
@@ -341,12 +396,19 @@ public class MainService extends KraftwerkService {
                 addStates
         );
         try {
-            mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, start, end);
+            mpGenesis.runMainJsonReplay(collectionInstrumentId, batchSize, dataMode, resolvedStart, resolvedEnd);
             outputZipService.encryptAndArchiveOutputs(
                     mpGenesis.getKraftwerkExecutionContext(),
                     fileUtilsInterface
             );
-            log.info("Data extracted");
+
+            log.info(
+                    "Data extracted collectionInstrumentId={} start={} end={}",
+                    collectionInstrumentId,
+                    resolvedStart,
+                    resolvedEnd
+            );
+
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         } catch (IOException e) {
