@@ -330,9 +330,9 @@ public class MainService extends KraftwerkService {
         }
 
         return ResponseEntity.ok(Map.of(
-                "Data extracted for collectionInstrumentId %s",
-                collectionInstrumentId,
-                "localSinceDate", DateTimeUtils.toFranceDateTime(resolvedSince)
+                "message", String.format("Data extracted for collectionInstrumentId %s", collectionInstrumentId),
+                "sinceUtc", resolvedSince,
+                "sinceLocal", DateTimeUtils.toFranceDateTime(resolvedSince)
         ));
     }
 
