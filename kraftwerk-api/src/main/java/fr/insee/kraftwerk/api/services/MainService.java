@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -328,9 +329,10 @@ public class MainService extends KraftwerkService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
-        return ResponseEntity.ok(String.format(
+        return ResponseEntity.ok(Map.of(
                 "Data extracted for collectionInstrumentId %s",
-                collectionInstrumentId
+                collectionInstrumentId,
+                "localSinceDate", DateTimeUtils.toFranceDateTime(resolvedSince)
         ));
     }
 
@@ -416,7 +418,10 @@ public class MainService extends KraftwerkService {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        return ResponseEntity.ok(String.format("Data extracted for collectionInstrumentId %s",collectionInstrumentId));
+        return ResponseEntity.ok(Map.of("Data extracted for collectionInstrumentId %s",collectionInstrumentId,
+                "localSinceDate", DateTimeUtils.toFranceDateTime(resolvedStart),
+                "localEndDate", DateTimeUtils.toFranceDateTime(resolvedEnd)
+                ));
     }
 
     @PostMapping(value = "/debug/json")
