@@ -403,10 +403,12 @@ public class MainService extends KraftwerkService {
             );
 
             log.info(
-                    "Data extracted collectionInstrumentId={} start={} end={}",
+                    "Data extracted collectionInstrumentId={} startDateUtc={} localStartDate={} endDateUtc={} localEndDate={}",
                     collectionInstrumentId,
                     resolvedStart,
-                    resolvedEnd
+                    localStart,
+                    resolvedEnd,
+                    localEnd
             );
 
         } catch (KraftwerkException e) {
