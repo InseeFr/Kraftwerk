@@ -5,6 +5,7 @@ import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.configuration.MinioConfig;
 import fr.insee.kraftwerk.api.dto.BatchResponseDto;
 import fr.insee.kraftwerk.api.dto.ExportCheckResultDto;
+import fr.insee.kraftwerk.api.exceptions.BatchExecutionFailedException;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
 import fr.insee.kraftwerk.api.services.async.InMemoryExportJobStore;
@@ -41,6 +42,7 @@ public class BatchExportService extends KraftwerkService {
     private final InMemoryExportJobStore exportJobStore;
     private final OutputZipService outputZipService;
 
+    private static final String BATCH_RESPONSE_LOG = "Batch response: {}";
 
     private MinioClient minioClient;
     private boolean useMinio;
@@ -68,16 +70,117 @@ public class BatchExportService extends KraftwerkService {
         }
     }
 
-
-    private String normalizePath(Path path) {
-        return path.toString().replace("\\", "/");
+    //LEGACY
+    public BatchResponseDto mainServiceBatch(
+            String inDirectoryParam,
+            boolean archiveAtEnd,
+            boolean withEncryption,
+            boolean addStates
+    ) {
+        return runLegacyBatchExport(
+                inDirectoryParam,
+                archiveAtEnd,
+                withEncryption,
+                addStates,
+                false,
+                true);
     }
 
-    FileUtilsInterface getFileUtilsInterface() {
-        if (useMinio) {
-            return new MinioImpl(minioClient, minioConfig.getBucketName());
+    public BatchResponseDto mainFileByFileBatch(
+            String inDirectoryParam,
+            boolean archiveAtEnd,
+            boolean withEncryption,
+            boolean addStates
+    ) {
+        return runLegacyBatchExport(
+                inDirectoryParam,
+                archiveAtEnd,
+                withEncryption,
+                addStates,
+                true,
+                true
+        );
+    }
+
+    public BatchResponseDto mainLunaticOnlyBatch(
+            String inDirectoryParam,
+            boolean archiveAtEnd,
+            boolean withEncryption,
+            boolean addStates
+    ) {
+        return runLegacyBatchExport(
+                inDirectoryParam,
+                archiveAtEnd,
+                withEncryption,
+                addStates,
+                false,
+                false
+        );
+    }
+
+
+    private BatchResponseDto runLegacyBatchExport(
+            String inDirectoryParam,
+            boolean archiveAtEnd,
+            boolean withEncryption,
+            boolean addStates,
+            boolean fileByFile,
+            boolean withDDI
+    ) {
+        String jobId = UUID.randomUUID().toString();
+
+        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
+        MainProcessing mp = getMainProcessing(
+                inDirectoryParam,
+                fileByFile,
+                withDDI,
+                withEncryption,
+                fileUtilsInterface,
+                addStates
+        );
+
+        LocalDateTime executionDateTime =
+                mp.getKraftwerkExecutionContext().getExecutionDateTime();
+
+        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
+        exportJobStore.start(jobId);
+
+        try {
+            mp.runMain();
+
+            outputZipService.encryptAndArchiveOutputs(
+                    mp.getKraftwerkExecutionContext(),
+                    fileUtilsInterface
+            );
+
+            List<String> errors = new ArrayList<>();
+
+            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
+                mp.getKraftwerkExecutionContext()
+                        .getErrors()
+                        .forEach(error -> errors.add(error.toString()));
+            }
+
+            ExportCheckResultDto result = new ExportCheckResultDto(
+                    inDirectoryParam,
+                    0L
+            );
+
+            exportJobStore.complete(jobId, result, errors);
+
+            if (archiveAtEnd) {
+                archive(inDirectoryParam, fileUtilsInterface);
+            }
+
+            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
+            log.info(BATCH_RESPONSE_LOG, response);
+            return response;
+
+        } catch (KraftwerkException e) {
+            log.error("Batch legacy export failed for input directory {}", inDirectoryParam, e);
+            exportJobStore.fail(jobId, e);
+            throw new BatchExecutionFailedException(e);
         }
-        return new FileSystemImpl(configProperties.getDefaultDirectory());
     }
 
     private MainProcessing getMainProcessing(
@@ -100,233 +203,11 @@ public class BatchExportService extends KraftwerkService {
         return new MainProcessing(kraftwerkExecutionContext, defaultDirectory, fileUtilsInterface);
     }
 
-    MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(
-            boolean withDDI,
-            boolean withEncryption,
-            FileUtilsInterface fileUtilsInterface,
-            boolean addStates
-    ) {
-        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
-                null,
-                false,
-                withDDI,
-                withEncryption,
-                limitSize,
-                addStates
-        );
-
-        return new MainProcessingGenesisNew(
-                configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
-                fileUtilsInterface,
-                kraftwerkExecutionContext
-        );
-    }
-
     private Path buildBatchOutDirectoryForMain(String inDirectoryParam, LocalDateTime executionDateTime) {
         return FileUtilsInterface.transformToOut(Paths.get(inDirectoryParam), executionDateTime);
     }
 
-    private Path buildBatchOutDirectoryForGenesis(String collectionInstrumentId, LocalDateTime executionDateTime) {
-        return Paths.get(
-                "out",
-                collectionInstrumentId,
-                executionDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN))
-        );
-    }
-
-    public BatchResponseDto mainServiceBatch(
-            String inDirectoryParam,
-            boolean archiveAtEnd,
-            boolean withEncryption,
-            boolean addStates
-    ) {
-        boolean fileByFile = false;
-        boolean withDDI = true;
-        String jobId = UUID.randomUUID().toString();
-
-        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(
-                inDirectoryParam,
-                fileByFile,
-                withDDI,
-                withEncryption,
-                fileUtilsInterface,
-                addStates
-        );
-
-        LocalDateTime executionDateTime =
-                mp.getKraftwerkExecutionContext().getExecutionDateTime();
-
-        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        exportJobStore.start(jobId);
-
-        try {
-            mp.runMain();
-
-            outputZipService.encryptAndArchiveOutputs(
-                    mp.getKraftwerkExecutionContext(),
-                    fileUtilsInterface
-            );
-
-            if (archiveAtEnd) {
-                archive(inDirectoryParam, fileUtilsInterface);
-            }
-
-            List<String> errors = new ArrayList<>();
-
-            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
-                mp.getKraftwerkExecutionContext()
-                        .getErrors()
-                        .forEach(error -> errors.add(error.toString()));
-            }
-
-            ExportCheckResultDto result = new ExportCheckResultDto(
-                    inDirectoryParam,
-                    0L
-            );
-
-            exportJobStore.complete(jobId, result, errors);
-
-
-            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
-            log.info("Batch response: {}", response);
-            return response;
-
-        } catch (KraftwerkException e) {
-            log.error("Batch main export failed for input directory {}", inDirectoryParam, e);
-            exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public BatchResponseDto mainFileByFileBatch(
-            String inDirectoryParam,
-            boolean archiveAtEnd,
-            boolean withEncryption,
-            boolean addStates
-    ) {
-        boolean fileByFile = true;
-        boolean withDDI = true;
-        String jobId = UUID.randomUUID().toString();
-
-        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(
-                inDirectoryParam,
-                fileByFile,
-                withDDI,
-                withEncryption,
-                fileUtilsInterface,
-                addStates
-        );
-
-        LocalDateTime executionDateTime =
-                mp.getKraftwerkExecutionContext().getExecutionDateTime();
-
-        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        exportJobStore.start(jobId);
-
-        try {
-            mp.runMain();
-
-            outputZipService.encryptAndArchiveOutputs(
-                    mp.getKraftwerkExecutionContext(),
-                    fileUtilsInterface
-            );
-
-            List<String> errors = new ArrayList<>();
-
-            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
-                mp.getKraftwerkExecutionContext()
-                        .getErrors()
-                        .forEach(error -> errors.add(error.toString()));
-            }
-
-            ExportCheckResultDto result = new ExportCheckResultDto(
-                    inDirectoryParam,
-                    0L
-            );
-
-            exportJobStore.complete(jobId, result, errors);
-
-            if (archiveAtEnd) {
-                archive(inDirectoryParam, fileUtilsInterface);
-            }
-
-            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
-            log.info("Batch response: {}", response);
-            return response;
-
-        } catch (KraftwerkException e) {
-            log.error("Batch file-by-file export failed for input directory {}", inDirectoryParam, e);
-            exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public BatchResponseDto mainLunaticOnlyBatch(
-            String inDirectoryParam,
-            boolean archiveAtEnd,
-            boolean withEncryption,
-            boolean addStates
-    ) {
-        boolean fileByFile = false;
-        boolean withDDI = false;
-        String jobId = UUID.randomUUID().toString();
-
-        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        MainProcessing mp = getMainProcessing(
-                inDirectoryParam,
-                fileByFile,
-                withDDI,
-                withEncryption,
-                fileUtilsInterface,
-                addStates
-        );
-
-        LocalDateTime executionDateTime =
-                mp.getKraftwerkExecutionContext().getExecutionDateTime();
-
-        Path outputPath = buildBatchOutDirectoryForMain(inDirectoryParam, executionDateTime);
-        exportJobStore.start(jobId);
-
-        try {
-            mp.runMain();
-
-            outputZipService.encryptAndArchiveOutputs(
-                    mp.getKraftwerkExecutionContext(),
-                    fileUtilsInterface
-            );
-
-            List<String> errors = new ArrayList<>();
-
-            if (mp.getKraftwerkExecutionContext().getErrors() != null) {
-                mp.getKraftwerkExecutionContext()
-                        .getErrors()
-                        .forEach(error -> errors.add(error.toString()));
-            }
-
-            ExportCheckResultDto result = new ExportCheckResultDto(
-                    inDirectoryParam,
-                    0L
-            );
-
-            exportJobStore.complete(jobId, result, errors);
-
-            if (archiveAtEnd) {
-                archive(inDirectoryParam, fileUtilsInterface);
-            }
-
-            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
-            log.info("Batch response: {}", response);
-            return response;
-
-        } catch (KraftwerkException e) {
-            log.error("Batch export failed for input directory {}", inDirectoryParam, e);
-            exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
-        }
-    }
+    //GENESIS
 
     public BatchResponseDto mainGenesisByQuestionnaireIdBatch(
             String questionnaireModelId,
@@ -335,7 +216,34 @@ public class BatchExportService extends KraftwerkService {
             boolean withEncryption,
             boolean addStates
     ) {
-        boolean withDDI = true;
+        return runGenesisBatchExport(questionnaireModelId, dataMode, batchSize, withEncryption, addStates, true);
+    }
+
+    public BatchResponseDto mainGenesisLunaticOnlyByQuestionnaireBatch(
+            String questionnaireModelId,
+            Mode dataMode,
+            int batchSize,
+            boolean withEncryption,
+            boolean addStates
+    ) {
+        return runGenesisBatchExport(
+                questionnaireModelId,
+                dataMode,
+                batchSize,
+                withEncryption,
+                addStates,
+                false
+        );
+    }
+
+    private BatchResponseDto runGenesisBatchExport(
+            String questionnaireModelId,
+            Mode dataMode,
+            int batchSize,
+            boolean withEncryption,
+            boolean addStates,
+            boolean withDDI
+    ) {
         FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
         String jobId = UUID.randomUUID().toString();
 
@@ -377,69 +285,12 @@ public class BatchExportService extends KraftwerkService {
             exportJobStore.complete(jobId, result, errors);
 
             BatchResponseDto response = new BatchResponseDto(jobId, normalizePath(outputPath));
-            log.info("Batch response: {}", response);
+            log.info(BATCH_RESPONSE_LOG, response);
             return response;
 
         } catch (KraftwerkException | IOException e) {
             exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public BatchResponseDto mainGenesisLunaticOnlyByQuestionnaireBatch(
-            String questionnaireModelId,
-            Mode dataMode,
-            int batchSize,
-            boolean withEncryption,
-            boolean addStates
-    ) {
-        boolean withDDI = false;
-        FileUtilsInterface fileUtilsInterface = getFileUtilsInterface();
-        String jobId = UUID.randomUUID().toString();
-
-        MainProcessingGenesisNew mpGenesis = getMainProcessingGenesisByQuestionnaire(
-                withDDI,
-                withEncryption,
-                fileUtilsInterface,
-                addStates
-        );
-
-        LocalDateTime executionDateTime =
-                mpGenesis.getKraftwerkExecutionContext().getExecutionDateTime();
-
-        Path outputPath = buildBatchOutDirectoryForGenesis(questionnaireModelId, executionDateTime);
-        exportJobStore.start(jobId);
-
-        try {
-            mpGenesis.runMain(questionnaireModelId, batchSize, dataMode);
-
-            outputZipService.encryptAndArchiveOutputs(
-                    mpGenesis.getKraftwerkExecutionContext(),
-                    fileUtilsInterface
-            );
-            List<String> errors = new ArrayList<>();
-            if (mpGenesis.getKraftwerkExecutionContext().getErrors() != null) {
-                mpGenesis.getKraftwerkExecutionContext()
-                        .getErrors()
-                        .forEach(error -> errors.add(error.toString()));
-            }
-
-            ExportCheckResultDto result = new ExportCheckResultDto(
-                    questionnaireModelId,
-                    0L
-            );
-
-            exportJobStore.complete(jobId, result, errors);
-
-
-            BatchResponseDto response = new BatchResponseDto(jobId,normalizePath(outputPath));
-            log.info("Batch response: {}", response);
-            return response;
-
-        } catch (KraftwerkException | IOException e) {
-            log.error("Batch export failed for questionnaireModelId {}", questionnaireModelId, e);
-            exportJobStore.fail(jobId, e);
-            throw new RuntimeException(e);
+            throw new BatchExecutionFailedException(e);
         }
     }
 
@@ -467,12 +318,55 @@ public class BatchExportService extends KraftwerkService {
         try {
             mpGenesis.runMainJson(collectionInstrumentId, batchSize, dataMode, since);
             BatchResponseDto response = new BatchResponseDto("",normalizePath(outputPath));
-            log.info("Batch response: {}", response);
+            log.info(BATCH_RESPONSE_LOG, response);
             return ResponseEntity.ok(response);
         } catch (KraftwerkException e) {
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }
+
+    MainProcessingGenesisNew getMainProcessingGenesisByQuestionnaire(
+            boolean withDDI,
+            boolean withEncryption,
+            FileUtilsInterface fileUtilsInterface,
+            boolean addStates
+    ) {
+        KraftwerkExecutionContext kraftwerkExecutionContext = new KraftwerkExecutionContext(
+                null,
+                false,
+                withDDI,
+                withEncryption,
+                limitSize,
+                addStates
+        );
+
+        return new MainProcessingGenesisNew(
+                configProperties,
+                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                fileUtilsInterface,
+                kraftwerkExecutionContext
+        );
+    }
+
+    private Path buildBatchOutDirectoryForGenesis(String collectionInstrumentId, LocalDateTime executionDateTime) {
+        return Paths.get(
+                "out",
+                collectionInstrumentId,
+                executionDateTime.format(DateTimeFormatter.ofPattern(Constants.OUTPUT_FOLDER_DATETIME_PATTERN))
+        );
+    }
+
+    //UTILS
+    private String normalizePath(Path path) {
+        return path.toString().replace("\\", "/");
+    }
+
+    FileUtilsInterface getFileUtilsInterface() {
+        if (useMinio) {
+            return new MinioImpl(minioClient, minioConfig.getBucketName());
+        }
+        return new FileSystemImpl(configProperties.getDefaultDirectory());
     }
 }
