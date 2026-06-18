@@ -1,9 +1,11 @@
  # Changelog
 
-## 4.1.0 [TODO]
+## 4.1.0 [2026-06-18]
 ### Changed
 - spring-boot 3.5.14 -> 4.0.6
 
+### Updated
+- BPM 1.2.1
 ## 4.0.0 [2026-06-15]
 ### Updated
 -️ Trevas 2 ⚠ can break old VTL scripts (can't override tables, can't keep/drop identifiers anymore)
