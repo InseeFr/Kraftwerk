@@ -8,6 +8,8 @@ import fr.insee.kraftwerk.api.configuration.VaultConfig;
 import fr.insee.kraftwerk.api.dto.DebugJsonExportResultDto;
 import fr.insee.kraftwerk.api.dto.ExportJobResultDto;
 import fr.insee.kraftwerk.api.dto.DebugJsonExportDto;
+import fr.insee.kraftwerk.api.dto.JsonExtractionResponse;
+import fr.insee.kraftwerk.api.dto.JsonReplayResponse;
 import fr.insee.kraftwerk.api.process.MainProcessing;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisLegacy;
 import fr.insee.kraftwerk.api.process.MainProcessingGenesisNew;
@@ -329,11 +331,16 @@ public class MainService extends KraftwerkService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
-        return ResponseEntity.ok(Map.of(
-                "message", String.format("Data extracted for collectionInstrumentId %s", collectionInstrumentId),
-                "sinceUtc", resolvedSince,
-                "sinceLocal", DateTimeUtils.toFranceDateTime(resolvedSince)
-        ));
+        return ResponseEntity.ok(
+                new JsonExtractionResponse(
+                        String.format(
+                                "Data extracted for collectionInstrumentId %s",
+                                collectionInstrumentId
+                        ),
+                        resolvedSince,
+                        DateTimeUtils.toFranceDateTime(resolvedSince)
+                )
+        );
     }
 
     @GetMapping(value ="/json/replay")
@@ -418,10 +425,11 @@ public class MainService extends KraftwerkService {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        return ResponseEntity.ok(Map.of("Data extracted for collectionInstrumentId %s",collectionInstrumentId,
-                "localSinceDate", DateTimeUtils.toFranceDateTime(resolvedStart),
-                "localEndDate", DateTimeUtils.toFranceDateTime(resolvedEnd)
-                ));
+        return ResponseEntity.ok(new JsonReplayResponse(
+                String.format("Data extracted for collectionInstrumentId %s", collectionInstrumentId),
+                DateTimeUtils.toFranceDateTime(resolvedStart),
+                DateTimeUtils.toFranceDateTime(resolvedEnd)
+        ));
     }
 
     @PostMapping(value = "/debug/json")
