@@ -130,10 +130,10 @@ public class VtlExecute {
             try {
                 TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)), fileUtilsInterface);
             } catch (JsonProcessingException e) {
-                log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
+                log.debug("Unable to serialize dataset stored under name '{}'.", bindingName, e);
             }
         } else {
-            log.debug(String.format("No dataset under name '%s' in the bindings.", bindingName));
+            log.debug("No dataset under name '{}' in the bindings.", bindingName);
         }
 
     }

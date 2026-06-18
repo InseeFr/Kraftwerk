@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -58,16 +57,18 @@ public class MainService extends KraftwerkService {
     InMemoryExportJobStore exportJobStore;
     private final Clock clock;
     private final OutputZipService outputZipService;
+    private final GenesisClient genesisClient;
 
 
 
     @Autowired
-    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock, OutputZipService outputZipService) {
+    public MainService(MainAsyncService mainAsyncService, ConfigProperties configProperties, MinioConfig minioConfig, VaultConfig vaultConfig, Environment env, InMemoryExportJobStore exportJobStore, Clock clock, OutputZipService outputZipService, GenesisClient genesisClient) {
         super(configProperties, minioConfig);
         this.mainAsyncService = mainAsyncService;
         this.configProperties = configProperties;
         this.clock = clock;
         this.outputZipService = outputZipService;
+        this.genesisClient = genesisClient;
         this.minioConfig = minioConfig;
         this.vaultConfig = vaultConfig;
         this.exportJobStore = exportJobStore;
@@ -412,7 +413,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisLegacy(
                 configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                genesisClient,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
@@ -436,7 +437,7 @@ public class MainService extends KraftwerkService {
 
         return new MainProcessingGenesisNew(
                 configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                genesisClient,
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );

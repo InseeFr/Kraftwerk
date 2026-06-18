@@ -1,7 +1,7 @@
 package fr.insee.kraftwerk.core.sequence;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ObjectMapper;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
