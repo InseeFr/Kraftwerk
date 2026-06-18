@@ -9,14 +9,17 @@ import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.files.FileSystemImpl;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.script.SimpleBindings;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MultimodalSequenceTest {
@@ -58,8 +61,21 @@ class MultimodalSequenceTest {
 
         // Vérifier que les fichiers VTL ont bien été créés
         assertTrue(new File("target/tmp/ReconciliationProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
-        assertTrue(new File("target/tmp/CleanUpProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
         assertTrue(new File("target/tmp/MultimodeTransformations_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
         assertTrue(new File("target/tmp/InformationLevelsProcessing_" + Constants.MULTIMODE_DATASET_NAME + ".vtl").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void testCleanup() {
+        // GIVEN
+        metadataModels.put("testmode", new MetadataModel());
+        vtlBindings.put("testmode", new SimpleBindings());
+
+        // WHEN
+        multimodalSequence.multimodalProcessing(userInputs, vtlBindings, kraftwerkExecutionContext, metadataModels, fileUtilsInterface);
+
+        // THEN
+        assertFalse(vtlBindings.getDatasetNames().contains("testmode"));
     }
 }

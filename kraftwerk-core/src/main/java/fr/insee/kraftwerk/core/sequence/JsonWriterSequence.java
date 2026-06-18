@@ -17,6 +17,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -59,9 +60,10 @@ public class JsonWriterSequence {
         resultById.put("mode",currentSu.getMode().getJsonName());
         resultById.put("isCapturedIndirectly",currentSu.getIsCapturedIndirectly());
         resultById.put("questionnaireState", currentSu.getQuestionnaireState());
-        if(currentSu.getValidationDate() != null){
-            resultById.put("validationDate",currentSu.getValidationDate()
-                    .format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT)));
+        if (currentSu.getValidationDate() != null) {
+            resultById.put("validationDate", currentSu.getValidationDate()
+                    .atZone(ZoneId.of("Europe/Paris"))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         }
         resultById.put("data",transformDataToJson(interrogationId, metadataModelsByMode, database));
         return resultById;

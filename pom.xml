@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.16.4</version>
+	<version>4.0.1</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
@@ -23,7 +23,7 @@
 		<tomcat.version>10.1.55</tomcat.version>
 
 		<!-- Proprietes sonar -->
-		<jacoco.version>0.8.14</jacoco.version>
+		<jacoco.version>0.8.15</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
@@ -35,7 +35,7 @@
 			**/kraftwerk-functional-tests/**
 		</sonar.coverage.exclusions>
 		<!-- Pi Test-->
-		<pitest.version>1.25.3</pitest.version>
+		<pitest.version>1.25.4</pitest.version>
 		<pitest.junit.version>1.2.3</pitest.junit.version>
 	
 	</properties>
