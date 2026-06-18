@@ -2,22 +2,24 @@ package fr.insee.kraftwerk.core.sequence;
 
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.core.Constants;
-import fr.insee.kraftwerk.core.dataprocessing.CleanUpProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.DataProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.InformationLevelsProcessing;
 import fr.insee.kraftwerk.core.dataprocessing.MultimodeTransformations;
 import fr.insee.kraftwerk.core.dataprocessing.ReconciliationProcessing;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.inputs.UserInputs;
+import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.utils.TextFileWriter;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
-import fr.insee.kraftwerk.core.utils.KraftwerkExecutionContext;
 import fr.insee.kraftwerk.core.vtl.VtlBindings;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
+@Slf4j
 public class MultimodalSequence {
 	
 	public void multimodalProcessing(UserInputs userInputs, VtlBindings vtlBindings, KraftwerkExecutionContext kraftwerkExecutionContext, Map<String, MetadataModel> metadataModels, FileUtilsInterface fileUtilsInterface) throws KraftwerkException {
@@ -31,12 +33,8 @@ public class MultimodalSequence {
 				userInputs.getVtlReconciliationFile(), kraftwerkExecutionContext);
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "ReconciliationProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 
-		/* Step 3.1.b : clean up processing */
-		CleanUpProcessing cleanUpProcessing = new CleanUpProcessing(
-				vtlBindings, metadataModels, fileUtilsInterface, kraftwerkExecutionContext
-		);
-		vtlGenerate = cleanUpProcessing.applyVtlTransformations(multimodeDatasetName, null, kraftwerkExecutionContext);
-		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "CleanUpProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
+		/* Step 3.1.b : clean up unimodal datasets */
+		removeUnimodalDatasets(metadataModels.keySet(), vtlBindings);
 
 		/* Step 3.2 : treatments on the multimodal dataset */
 		DataProcessing multimodeTransformations = new MultimodeTransformations(
@@ -55,4 +53,18 @@ public class MultimodalSequence {
 		TextFileWriter.writeFile(fileUtilsInterface.getTempVtlFilePath(userInputs, "InformationLevelsProcessing",multimodeDatasetName), vtlGenerate, fileUtilsInterface);
 	}
 
+	/**
+	 * Removes unimodal datasets
+	 * @param unimodalDatasetsNames set of names of unimodal datasets
+	 * @param vtlBindings bindings to affect
+	 */
+	private void removeUnimodalDatasets(Set<String> unimodalDatasetsNames, VtlBindings vtlBindings) {
+		for (String unimodalDatasetName : unimodalDatasetsNames) {
+			vtlBindings.remove(unimodalDatasetName);
+			log.debug("{} unimodal dataset removed from vtl bindings.", unimodalDatasetName);
+			// datasets created during the reconciliation step
+			vtlBindings.remove(unimodalDatasetName + "_keep");
+			log.debug("{} generated dataset removed from vtl bindings.", unimodalDatasetName + "_keep");
+		}
+	}
 }

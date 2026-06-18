@@ -20,6 +20,7 @@ import fr.insee.kraftwerk.core.vtl.VtlExecute;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -58,10 +59,12 @@ public class BuildBindingsSequenceGenesis {
 
 			// Add surveyUnit/response variables to answers
 			answers.putValue(Constants.SURVEY_UNIT_IDENTIFIER_NAME, surveyUnit.getUsualSurveyUnitId());
-			answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null ?
-					surveyUnit.getValidationDate().format(DateTimeFormatter.ofPattern(Constants.VALIDATION_DATE_FORMAT))
-					: null
-			);
+            answers.putValue(Constants.VALIDATION_DATE_NAME, surveyUnit.getValidationDate() != null
+                    ? surveyUnit.getValidationDate()
+                    .atZone(ZoneId.of("Europe/Paris"))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                    : null
+            );
 			answers.putValue(Constants.QUESTIONNAIRE_STATE_NAME, surveyUnit.getQuestionnaireState());
 
 			// Add collected/external variables of the surveyUnit/response
