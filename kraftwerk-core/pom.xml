@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.insee.kraftwerk</groupId>
 		<artifactId>kraftwerk</artifactId>
-		<version>4.0.1</version>
+		<version>4.1.1</version>
 	</parent>
 
 	<artifactId>kraftwerk-core</artifactId>
@@ -16,8 +16,8 @@
 
 	<properties>
 		<trevas.version>2.4.0</trevas.version>
-		<duckdb.version>1.5.3.0</duckdb.version>
-		<bpm.version>1.2.0</bpm.version>
+		<duckdb.version>1.5.4.0</duckdb.version>
+		<bpm.version>1.2.1</bpm.version>
 	</properties>
 
 
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>xom</groupId>
 			<artifactId>xom</artifactId>
-			<version>1.4.5</version>
+			<version>1.4.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xml-apis</groupId>
