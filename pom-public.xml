@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.kraftwerk</groupId>
 	<artifactId>kraftwerk</artifactId>
-	<version>3.16.5</version>
+	<version>4.1.1</version>
 	<packaging>pom</packaging>
 	<name>kraftwerk</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.13</version>
+		<version>4.0.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
@@ -19,9 +19,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>7.34.3</cucumber.version>
-		<junit-jupiter.version>5.13.4</junit-jupiter.version>
-		<jackson-bom.version>2.21.1</jackson-bom.version>
-		<!-- (!!!) Dependency versions temporary overwritten for security reasons -->
 		<tomcat.version>10.1.55</tomcat.version>
 
 		<!-- Proprietes sonar -->
@@ -74,6 +71,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
@@ -86,6 +88,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
 
 		<!-- Tests -->
 		<!-- Unit testing with JUnit -->

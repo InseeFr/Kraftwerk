@@ -20,8 +20,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
@@ -37,6 +37,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -47,10 +50,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -668,5 +674,69 @@ class MainServiceTest {
         // THEN
         JobExecution job = assertAsyncStatus(response, JobStatus.FAILED);
         assertTrue(job.errorMessage().contains("IO"));
+    }
+
+    @Test
+    void jsonExtraction_withLocalSinceDate_convertsToUtc() throws Exception {
+        String collectionInstrumentId = "test-campaign-id";
+        LocalDateTime localSinceDate = LocalDateTime.of(2026, 6, 10, 14, 0);
+        Instant expectedSinceUtc = localSinceDate
+                .atZone(ZoneId.of("Europe/Paris"))
+                .toInstant();
+
+        FileUtilsInterface mockFileUtilsInterface = mock(FileUtilsInterface.class);
+        MainProcessingGenesisNew mockMpGenesis = mock(MainProcessingGenesisNew.class);
+
+        doReturn(mockFileUtilsInterface).when(mainService).getFileUtilsInterface();
+        doReturn(mockMpGenesis).when(mainService).getMainProcessingGenesisByQuestionnaire(
+                anyBoolean(),
+                anyBoolean(),
+                any(FileUtilsInterface.class),
+                anyBoolean()
+        );
+
+        doReturn(true).when(mockMpGenesis).runMainJson(
+                eq(collectionInstrumentId),
+                eq(1000),
+                isNull(),
+                eq(expectedSinceUtc)
+        );
+
+        ResponseEntity<Object> response = mainService.jsonExtraction(
+                collectionInstrumentId,
+                null,
+                1000,
+                null,
+                localSinceDate,
+                false,
+                false
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        verify(mockMpGenesis).runMainJson(
+                eq(collectionInstrumentId),
+                eq(1000),
+                isNull(),
+                eq(expectedSinceUtc)
+        );
+    }
+
+    @Test
+    void jsonExtraction_withSinceDateAndLocalSinceDate_returnsBadRequest() {
+        Instant since = Instant.parse("2026-06-10T12:00:00Z");
+        LocalDateTime localSinceDate = LocalDateTime.of(2026, 6, 10, 14, 0);
+
+        ResponseEntity<Object> response = mainService.jsonExtraction(
+                "test-campaign-id",
+                null,
+                1000,
+                since,
+                localSinceDate,
+                false,
+                false
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

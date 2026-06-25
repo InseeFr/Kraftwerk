@@ -41,7 +41,7 @@ public class LogRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
     	//Cache request to avoid calling twice the same inputStream
-        ContentCachingRequestWrapper req = new ContentCachingRequestWrapper(request);
+        ContentCachingRequestWrapper req = new ContentCachingRequestWrapper(request, 100 * 1024);
         ContentCachingResponseWrapper resp = new ContentCachingResponseWrapper(response);
 
 		if(req.getRequestURI().contains("/actuator/health")){

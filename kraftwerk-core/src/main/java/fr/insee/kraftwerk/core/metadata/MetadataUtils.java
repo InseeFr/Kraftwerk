@@ -4,8 +4,6 @@ import fr.insee.bpm.exceptions.MetadataParserException;
 import fr.insee.bpm.metadata.model.Group;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.bpm.metadata.model.SpecType;
-import fr.insee.bpm.metadata.model.Variable;
-import fr.insee.bpm.metadata.model.VariableType;
 import fr.insee.bpm.metadata.reader.ReaderUtils;
 import fr.insee.bpm.metadata.reader.lunatic.LunaticReader;
 import fr.insee.kraftwerk.core.Constants;
@@ -13,6 +11,7 @@ import fr.insee.kraftwerk.core.inputs.ModeInputs;
 import fr.insee.kraftwerk.core.utils.files.FileUtilsInterface;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,8 +47,16 @@ public class MetadataUtils {
                     lunaticStream
             );
             if (hasLunatic) {
-                // We read and store lunaticModelVersion
-                metadataModel.putSpecVersions(SpecType.LUNATIC,LunaticReader.getLunaticModelVersion(lunaticStream));
+                try (InputStream lunaticVersionStream =
+                             fileUtilsInterface.readFile(modeInputs.getLunaticFile().toString())) {
+
+                    metadataModel.putSpecVersions(
+                            SpecType.LUNATIC,
+                            LunaticReader.getLunaticModelVersion(lunaticVersionStream)
+                    );
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
             // Step 3 : we add reporting data group if there is any reporting data
             if(modeInputs.getReportingDataFile() != null){

@@ -1,9 +1,10 @@
 package fr.insee.kraftwerk.api.process;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JsonEncoding;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.StreamWriteFeature;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.ObjectMapper;
 import fr.insee.kraftwerk.api.client.GenesisClient;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.dto.InterrogationBatchResponse;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -158,8 +160,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
             int nbPartitions = partitions.size();
             int indexPartition = 1;
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+            JsonMapper objectMapper = JsonMapper.builder()
+                    .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
+                    .build();
             jsonGenerator.writeStartArray();
 
             for (List<InterrogationId> listId : partitions) {
@@ -230,8 +233,9 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
 
             this.database = connection.createStatement();
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+            JsonMapper objectMapper = JsonMapper.builder()
+                    .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
+                    .build();
 
             jsonGenerator.writeStartArray();
 
@@ -320,9 +324,11 @@ public class MainProcessingGenesisNew extends AbstractMainProcessingGenesis{
     }
 
     private JsonGenerator createJsonGenerator(Path tmpOutputFile) throws IOException {
-        JsonFactory jsonFactory = new JsonFactory();
-        return jsonFactory.createGenerator(tmpOutputFile.toFile(), JsonEncoding.UTF8);
-    }
+        JsonFactory jsonFactory = JsonFactory.builder().build();
+        return jsonFactory.createGenerator(
+                Files.newOutputStream(tmpOutputFile),
+                JsonEncoding.UTF8
+        );    }
 
     @SuppressWarnings("ConstantConditions")
     private Connection openDatabaseConnection(String databasePath) throws SQLException, KraftwerkException {

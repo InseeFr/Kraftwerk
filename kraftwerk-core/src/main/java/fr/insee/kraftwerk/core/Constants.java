@@ -60,7 +60,6 @@ public final class Constants {
 	public static final String ROOT_IDENTIFIER_NAME = "interrogationId";
 	public static final String SURVEY_UNIT_IDENTIFIER_NAME = "usualSurveyUnitId";
 	public static final String VALIDATION_DATE_NAME = "validationDate";
-	public static final String VALIDATION_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 	public static final String QUESTIONNAIRE_STATE_NAME = "questionnaireState";
 	public static final String LOOP_NAME_PREFIX = "BOUCLE";
 	public static final String MULTIMODE_DATASET_NAME = "MULTIMODE";
@@ -82,7 +81,6 @@ public final class Constants {
 
 
 	// ----- Explicit Variables Names
-	public static final String MODE_VARIABLE_NAME = "MODE_KRAFTWERK";
 	public static final String FILTER_RESULT_PREFIX = "FILTER_RESULT_";
 	public static final String MISSING_SUFFIX = "_MISSING";
 	public static final String COLLECTED = "COLLECTED";

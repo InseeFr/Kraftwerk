@@ -1,4 +1,13 @@
-# Changelog
+ # Changelog
+
+## 4.1.0 [2026-06-18]
+### Changed
+- spring-boot 3.5.14 -> 4.0.6
+
+## 4.0.0 [2026-06-15]
+### Updated
+-️ Trevas 2 ⚠ can break old VTL scripts (can't override tables, can't keep/drop identifiers anymore)
+
 ## 3.16.3 [2026-05-27]
 ### Fixed
 - Run batch as sync to avoid spring context closed
@@ -15,11 +24,8 @@
 ### Added
 - Display export file path in batch responses
 - Store encrypted archive in a timestamped directory
-
 ### Changed
-
 We previously stored the timestamp at the end of the extraction process, several minutes after retrieving the IDs to be processed. As a result, any records created after the interrogationIds were listed but before the process completed were not included in the differential JSON output.
-
 To address this issue, we now capture the most recent timestamp (recordDate) at the moment the interrogationIds are retrieved. This timestamp is then used as the reference point for the next differential extraction.
 
 ## 3.15.1 [2026-04-23]
