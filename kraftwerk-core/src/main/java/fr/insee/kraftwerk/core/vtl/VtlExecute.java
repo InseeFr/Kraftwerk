@@ -29,6 +29,8 @@ import java.nio.file.Paths;
 @Log4j2
 public class VtlExecute {
 
+    private static final String TEMP_DATASET_NAME = "TEMP";
+
     /** Mapper to convert json files into VTL Datasets. */
     private final ObjectMapper mapper;
     /** Engine that will execute VTL instructions */
@@ -128,10 +130,10 @@ public class VtlExecute {
             try {
                 TextFileWriter.writeFile(jsonOutFile, mapper.writeValueAsString(bindings.getDataset(bindingName)), fileUtilsInterface);
             } catch (JsonProcessingException e) {
-                log.debug(String.format("Unable to serialize dataset stored under name '%s'.", bindingName), e);
+                log.debug("Unable to serialize dataset stored under name '{}'.", bindingName, e);
             }
         } else {
-            log.debug(String.format("No dataset under name '%s' in the bindings.", bindingName));
+            log.debug("No dataset under name '{}' in the bindings.", bindingName);
         }
 
     }
@@ -161,13 +163,24 @@ public class VtlExecute {
                 // set script context
                 ScriptContext context = engine.getContext();
                 context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-                // eval
-                engine.eval(vtlScript);
-                // overwrite bindings
-                engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE);
 
+                // Replace destination dataset name to TEMP
+                if(bindings.getDatasetNames().contains(TEMP_DATASET_NAME)){
+                    bindings.remove(TEMP_DATASET_NAME);
+                }
+                String destinationDatasetName = getDestinationDatasetName(vtlScript);
+                String vtlScriptToUse = vtlScript;
+                if(destinationDatasetName != null) {
+                    vtlScriptToUse = vtlScript.replaceFirst(destinationDatasetName, TEMP_DATASET_NAME);
+                }
+
+                // eval and create temp table
+                engine.eval(vtlScriptToUse);
+
+                // overwrite bindings with the resulted temp one
+                createOrOverwriteBindingFromTemp(destinationDatasetName, bindings);
             } catch (ScriptException e) {
-                log.warn("ScriptException - VTL instruction given is invalid and has been skipped : {}",vtlScript);
+                log.warn("ScriptException - VTL instruction {} is invalid and has been skipped : {}",vtlScript, e.getMessage());
                 kraftwerkExecutionContext.addUniqueError(new ErrorVtlTransformation(vtlScript, e.getMessage()));
             } catch (NumberFormatException e) { 
                 log.debug("NumberFormatException - Corresponding variable could not be calculated.");
@@ -191,6 +204,27 @@ public class VtlExecute {
     }
 
     /**
+     * @param vtlScript a VTL script
+     * @return the name of the dataset produced by the script
+     */
+    private String getDestinationDatasetName(String vtlScript) {
+        if(vtlScript.contains(":=") && !vtlScript.contains("<-")){
+            return vtlScript.substring(0, vtlScript.indexOf(":=")).trim();
+        }
+        if(vtlScript.contains("<-")){
+            return vtlScript.substring(0, vtlScript.indexOf("<-")).trim();
+        }
+        return null;
+    }
+
+    private void createOrOverwriteBindingFromTemp(String destinationDatasetName, VtlBindings bindings) {
+        if(bindings.getDatasetNames().contains(TEMP_DATASET_NAME)){
+            bindings.put(destinationDatasetName, bindings.getDataset(TEMP_DATASET_NAME));
+            bindings.remove(TEMP_DATASET_NAME);
+        }
+    }
+
+    /**
      * Evaluate the given VTL instructions and update the bindings.
      * The name of the input datasets in the script must refer to the names given in the bindings.
      *
@@ -199,13 +233,11 @@ public class VtlExecute {
      */
     public void evalVtlScript(VtlScript vtlScript, VtlBindings bindings, KraftwerkExecutionContext kraftwerkExecutionContext){
         if(vtlScript != null && !vtlScript.isEmpty()) {
-            for(String vtlInstruction : vtlScript) {
+            for(String vtlInstruction : vtlScript.stream().filter(script -> !script.contentEquals("")).toList()) {
                 evalVtlScript(vtlInstruction, bindings, kraftwerkExecutionContext);
             }
         } else {
             log.info("null or empty VTL instructions list given. VTL bindings has not been changed.");
         }
     }
-
-
 }

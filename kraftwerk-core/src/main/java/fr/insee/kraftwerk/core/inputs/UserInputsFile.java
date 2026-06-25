@@ -1,6 +1,7 @@
 package fr.insee.kraftwerk.core.inputs;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.JsonNode;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import fr.insee.kraftwerk.core.exceptions.MissingMandatoryFieldException;
 import fr.insee.kraftwerk.core.exceptions.UnknownDataFormatException;
@@ -67,6 +68,9 @@ public class UserInputsFile extends UserInputs {
 			vtlTransformationsFile = fileUtilsInterface.convertToPath(readField(userInputs, "transformation_specifications"),inputDirectory);
 			vtlInformationLevelsFile = fileUtilsInterface.convertToPath(readField(userInputs, "information_levels_specifications"),inputDirectory);
 
+        } catch (StreamReadException e) {
+            log.error("Malformed user input file: {} , {}", userInputFile, e.getMessage());
+            throw new UnknownDataFormatException(e.getMessage());
 		} catch (IOException e) {
 			log.error("Unable to read user input file: {} , {}", userInputFile, e);
 			throw new UnknownDataFormatException(e.getMessage());
@@ -94,7 +98,7 @@ public class UserInputsFile extends UserInputs {
 			throw new MissingMandatoryFieldException(
 					String.format("Mandatory field \"%s\" missing in the input file given", field));
 		}
-		log.info(String.format("Optional field \"%s\" missing in the input file given", field));
+		log.info("Optional field \"{}\" missing in the input file given", field);
 		return null;
 	}
 

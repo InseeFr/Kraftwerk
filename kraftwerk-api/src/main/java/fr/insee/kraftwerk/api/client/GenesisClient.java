@@ -1,8 +1,9 @@
 package fr.insee.kraftwerk.api.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestClient;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import fr.insee.bpm.metadata.model.MetadataModel;
 import fr.insee.kraftwerk.api.configuration.ConfigProperties;
 import fr.insee.kraftwerk.api.dto.InterrogationBatchResponse;
@@ -13,9 +14,6 @@ import fr.insee.kraftwerk.core.data.model.SurveyUnitUpdateLatest;
 import fr.insee.kraftwerk.core.exceptions.KraftwerkException;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -32,46 +30,60 @@ import java.util.Optional;
 @Service
 public class GenesisClient {
 
-	private final RestTemplate restTemplate;
+    private final RestClient restClient;
 
 	@Getter
 	private final ConfigProperties configProperties;
 
 
-	@Autowired
-	public GenesisClient(RestTemplateBuilder restTemplateBuilder, ConfigProperties configProperties) {
-		this.restTemplate = restTemplateBuilder.build();
-		this.configProperties = configProperties;
-		OidcService oidcService = new OidcService(configProperties);
-		this.restTemplate.getInterceptors().add(new GenesisAuthInterceptor(oidcService));
-	}
+    @Autowired
+    public GenesisClient(ConfigProperties configProperties) {
+        this.configProperties = configProperties;
+        OidcService oidcService = new OidcService(configProperties);
 
-	//Constructors used for tests
-	public GenesisClient(ConfigProperties configProperties) {
-		restTemplate = null;
-		this.configProperties = configProperties;
-	}
-	public GenesisClient(RestTemplate restTemplateForTest, ConfigProperties configProperties) {
-		restTemplate = restTemplateForTest;
-		this.configProperties = configProperties;
-	}
+        this.restClient = RestClient.builder()
+                .requestInterceptor(new GenesisAuthInterceptor(oidcService))
+                .build();
+    }
 
-	private <T, R> ResponseEntity<R> makeApiCall(String url, HttpMethod method, T requestBody, Class<R> responseType) throws KraftwerkException {
-		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, headers);
+    public GenesisClient(RestTemplate restTemplateForTest, ConfigProperties configProperties) {
+        this.restClient = RestClient.create(restTemplateForTest);
+        this.configProperties = configProperties;
+    }
 
-		try {
-			ResponseEntity<R> response = restTemplate.exchange(url, method, requestEntity, responseType);
-			if (response.getStatusCode().is2xxSuccessful()) {
-				return response;
-			} else {
-				throw new KraftwerkException(500,"Unexpected error : " + response.getStatusCode());
-			}
-		} catch (RestClientResponseException e) {
-			HttpStatusCode statusCode = e.getStatusCode();
-            throw new KraftwerkException(500,String.format("Unable to reach Genesis API, http code received : %d",statusCode.value()));
-		}
-	}
+    private <T, R> ResponseEntity<R> makeApiCall(
+            String url,
+            HttpMethod method,
+            T requestBody,
+            Class<R> responseType
+    ) throws KraftwerkException {
+        try {
+            var request = restClient
+                    .method(method)
+                    .uri(url);
+
+            if (requestBody != null) {
+                request.body(requestBody);
+            }
+
+            if (responseType == null || responseType == Void.class) {
+                return (ResponseEntity<R>) request
+                        .retrieve()
+                        .toBodilessEntity();
+            }
+
+            return request
+                    .retrieve()
+                    .toEntity(responseType);
+
+        } catch (RestClientResponseException e) {
+            HttpStatusCode statusCode = e.getStatusCode();
+            throw new KraftwerkException(500, String.format(
+                    "Unable to reach Genesis API, http code received : %d",
+                    statusCode.value()
+            ));
+        }
+    }
 
 	public String pingGenesis(){
 		String url = String.format("%s/health-check", configProperties.getGenesisUrl());
@@ -135,7 +147,7 @@ public class GenesisClient {
 		return response.getBody() != null ? Arrays.asList(response.getBody()) : null;
 	}
 
-    public List<String> getQuestionnaireModelIds(String campaignId) throws JsonProcessingException, KraftwerkException {
+    public List<String> getQuestionnaireModelIds(String campaignId) throws JacksonException, KraftwerkException {
 		String url = String.format("%s/questionnaires/by-campaign?campaignId=%s", configProperties.getGenesisUrl(), campaignId);
 		ResponseEntity<String> response = makeApiCall(url,HttpMethod.GET,null,String.class);
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -158,7 +170,7 @@ public class GenesisClient {
 	public void saveMetadata(String questionnaireId, Mode mode, MetadataModel metadataModel) throws KraftwerkException {
 		String url = String.format("%s/questionnaire-metadata?questionnaireId=%s&mode=%s",
 				configProperties.getGenesisUrl(), questionnaireId, mode);
-		makeApiCall(url,HttpMethod.POST,metadataModel,null);
+		makeApiCall(url,HttpMethod.POST,metadataModel, Void.class);
 	}
 
 	public void saveDateExtraction(String collectionInstrumentId, Mode mode, LastJsonExtractionDate lastJsonExtractionDate) throws KraftwerkException {
@@ -167,7 +179,7 @@ public class GenesisClient {
 		if (mode != null) {
 			url += "?mode=" + mode;
 		}
-		makeApiCall(url,HttpMethod.PUT,lastJsonExtractionDate,null);
+		makeApiCall(url,HttpMethod.PUT,lastJsonExtractionDate, Void.class);
 	}
 
 	public LastJsonExtractionDate getLastExtractionDate(String collectionInstrumentId, Mode mode) throws KraftwerkException {

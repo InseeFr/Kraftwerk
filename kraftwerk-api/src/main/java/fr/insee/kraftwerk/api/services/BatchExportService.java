@@ -18,7 +18,6 @@ import fr.insee.kraftwerk.core.utils.files.MinioImpl;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -117,7 +116,7 @@ public class BatchExportService extends KraftwerkService {
 
         return new MainProcessingGenesisNew(
                 configProperties,
-                new GenesisClient(new RestTemplateBuilder(), configProperties),
+                new GenesisClient(configProperties),
                 fileUtilsInterface,
                 kraftwerkExecutionContext
         );
