@@ -18,7 +18,7 @@
 		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>7.34.3</cucumber.version>
+		<cucumber.version>7.34.4</cucumber.version>
 		<!-- (!!!) Dependency versions temporary overwritten for security reasons -->
 		<tomcat.version>10.1.55</tomcat.version>
 
