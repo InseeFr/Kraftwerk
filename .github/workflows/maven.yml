@@ -51,7 +51,7 @@ jobs:
         maven-args: --file pom-public.xml
 
     - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.3.6
+      uses: coverallsapp/github-action@v2.3.8
       with:
         fail-on-error: false
             
