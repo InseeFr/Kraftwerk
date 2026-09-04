@@ -19,8 +19,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>7.34.7</cucumber.version>
-		<!-- (!!!) Dependency versions temporary overwritten for security reasons -->
-		<tomcat.version>10.1.55</tomcat.version>
+		<<!-- CVE-2026-65182 (CRITICAL) : version imposee par spring-boot-dependencies non corrigee -->
+        <tomcat.version>11.0.25</tomcat.version>
 
 		<!-- Proprietes sonar -->
 		<jacoco.version>0.8.15</jacoco.version>
